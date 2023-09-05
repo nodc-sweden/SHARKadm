@@ -1,0 +1,39 @@
+@startuml SHARKadm
+
+class archived_data_delivery.Folder {
+    name 
+    relative_path
+    -__init__(parent_path)
+    +create()
+}
+
+class archived_data_delivery.ArchivedDataDelivery {
+    year
+}
+
+' 
+class archived_data_delivery.Correspondence {} 
+class archived_data_delivery.ProcessedData {} 
+class archived_data_delivery.ReceivedData {} 
+
+class archived_data_delivery.SharkMetadata {} 
+
+' In processed data
+class archived_data_delivery.change_log {}
+class archived_data_delivery.data {}
+class archived_data_delivery.delivery_note {}
+
+
+archived_data_delivery.ArchivedDataDelivery --|> archived_data_delivery.Folder
+
+archived_data_delivery.Correspondence --|> archived_data_delivery.Folder
+archived_data_delivery.ProcessedData --|> archived_data_delivery.Folder
+archived_data_delivery.ReceivedData --|> archived_data_delivery.Folder
+
+archived_data_delivery.Correspondence --* archived_data_delivery.ArchivedDataDelivery
+archived_data_delivery.ProcessedData --* archived_data_delivery.ArchivedDataDelivery
+archived_data_delivery.ReceivedData --* archived_data_delivery.ArchivedDataDelivery
+archived_data_delivery.SharkMetadata --* archived_data_delivery.ArchivedDataDelivery
+
+@enduml
+

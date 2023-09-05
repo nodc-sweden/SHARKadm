@@ -1,0 +1,47 @@
+Spat:
+  'ADRENO_CORT-HYPERPLASIA ': adreno_cort_hyperplasia_class
+  ADRENO_CORTHYPERPLASIA_CL: adreno_cort_hyperplasia_class
+  AGE: age_years
+  ALABO: analytical_laboratory_code
+  'ARTERIOSCLEROSIS ': arteriosclerosis_class
+  ARTERIOSCLEROSIS_CL: arteriosclerosis_class
+  'AUTOLYSIS ': autolysis_class
+  AUTOLYSIS_CL: autolysis_class
+  'BLUBBER_THICKNESS ': blubber_thickness_cm
+  BLUBB_THICK: blubber_thickness_cm
+  'BODY_LENGTH ': body_length_cm
+  BODY_LGTH: body_length_cm
+  'BODY_WEIGHT ': body_weight_kg
+  BODY_WGTH: body_weight_kg
+  CAUSE_OF_DEATH: cause_of_death
+  'CLAW_LESIONS ': claw_lesions_class
+  CLAW_LESION_CL: claw_lesions_class
+  CRONIC_CHOLANGIOHEPATITIS: cronic_cholangiohepatitis_y_n
+  FCST: finding_circumstances
+  'INTESTINAL_ULCER ': intestinal_ulcer_class
+  INTEST_ULCER_CL: intestinal_ulcer_class
+  KIDNEY_GLOMERULAR_CHANGE: kidney_glomerular_change_class
+  KIDNEY_TUBULAR_HYPERPLASIA: kidney_tubular_hyperplasia_class
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  'MATRIX ': matrix_analysed_code
+  MATRX: matrix_analysed_code
+  METDC: method_documentation
+  ORDERER: sample_orderer_code
+  'PARODONTITIS ': parodontitis_class
+  PARODONTITIS_CL: parodontitis_class
+  PNEUMONIA: pneumonia_y_n
+  PROJ: sample_project_code
+  'REGIONAL_SKIN_CHANGES ': regional_skin_changes_class
+  REG_SKIN_CHANGE_CL: regional_skin_changes_class
+  SDATE: visit_date
+  'SEXCO ': sex_code
+  SEXCODE: sex_code
+  SMPNO: sample_id
+  SMP_COMNT: sample_comment
+  STATN: reported_station_name
+  UTERUS_PREG: uterus_pregnant_y_n
+  'UTERUS_PREGNANT ': uterus_pregnant_y_n
+  UTERUS_STENOSIS_OCCLUSION: uterus_stenosis_occlusion_y_n
+  UTERUS_TUMOUR: uterus_tumour_y_n

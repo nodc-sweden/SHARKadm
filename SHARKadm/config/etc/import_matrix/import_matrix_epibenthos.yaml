@@ -1,0 +1,642 @@
+DIVETRANS:
+  '002': CREATE_VARIABLE.Soft clay cover.class
+  '002_0.06': CREATE_VARIABLE.Silt cover.class
+  '06_2': CREATE_VARIABLE.Sand cover.class
+  ABUND: COPY_VARIABLE_MULTIPLY.Abundance.ind/m2.4
+  ABUNDANCE: COPY_VARIABLE.Abundance.ind/m2
+  ALABO: analytical_laboratory_code
+  COMNT_SAMP: sample_comment
+  COMNT_SECTION: section_comment
+  COMNT_TRANS: transect_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  COVER: COPY_VARIABLE.Cover.%
+  COVER%: COPY_VARIABLE.Cover.%
+  COVERAGE%: COPY_VARIABLE.Cover.%
+  COVERP: COPY_VARIABLE.Cover.%
+  COVER_%: COPY_VARIABLE.Cover.%
+  COVER_1-4: COPY_VARIABLE.Cover.scale 1-4
+  COVER_1-5: COPY_VARIABLE.Cover.scale 1-5
+  COVER_1-7: COPY_VARIABLE.Cover.scale 1-7
+  COVER_BARE_SUBST: CREATE_VARIABLE.Bare substrate cover.class
+  COVER_COBBLE_COARSE_200_600: CREATE_VARIABLE.Cobble coarse cover.class
+  COVER_COBBLE_MEDIUM_60_200: CREATE_VARIABLE.Cobble medium cover.class
+  COVER_DEBR: CREATE_VARIABLE.Debris cover.class
+  COVER_DETRITUS: CREATE_VARIABLE.Detritus cover.class
+  COVER_GRAVEL_COARSE_20_60: CREATE_VARIABLE.Gravel coarse cover.class
+  COVER_GRAVEL_FINE+MEDIUM_2_20: CREATE_VARIABLE.Gravel fine medium cover.class
+  COVER_HARD_CLAY: CREATE_VARIABLE.Hard clay cover.class
+  COVER_LARGE_BOULDER_>600: CREATE_VARIABLE.Large boulder cover.class
+  COVER_ROCK: CREATE_VARIABLE.Rock cove.class
+  COVER_SEDIMENT_BOTTOM: CREATE_VARIABLE.Sediment cover.class
+  COVER_SHELL: CREATE_VARIABLE.Shell cover.class
+  COVER_SHELL_GRAVEL: CREATE_VARIABLE.Shell gravel cover.class
+  COVER_SILT_CLAY: CREATE_VARIABLE.Silt clay cover.class
+  COVER_UNIDENT_SUBST: CREATE_VARIABLE.Unidentified substrate cover.class
+  CRUIS: expedition_id
+  DEPOS: sediment_deposition_code
+  DEPOS%: CREATE_VARIABLE.Sediment deposition cover.%
+  FISKE_ID: visit_id
+  FLORA: fauna_flora_found
+  FNFLA: fauna_flora_found
+  LATIT: sample_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  METDC: method_documentation
+  METOA: analysis_method_code
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  NTYPE: station_N2000_code
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PROJ_NAME: sample_project_code
+  PURPM: monitoring_purpose_code
+  REFSK: method_reference_code
+  RHIZOMBIOMASSA (G DW/M2): COPY_VARIABLE.Rhizome biomass.g dry weight/m2
+  RLABO: reporting_institute_code
+  RPSNO: sample_part_id
+  SAMPLEID: sample_id
+  SAREA: sampler_area_m2
+  SDATE: visit_date
+  SECTION: sample_cluster
+  SECTIONMAX: section_end_depth_m
+  SECTIONMIN: section_start_depth_m
+  SECTIONSTA: section_distance_start_m
+  SECTIONSTO: section_distance_end_m
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SKOTTANTAL (ANTAL/M2): COPY_VARIABLE.Shoot density.ind/m2
+  SKOTTBIOMASSA (G DW/M2): COPY_VARIABLE.Shoot biomass.g dry weight/m2
+  "SKOTTL\xC4NGD MAX (CM)": COPY_VARIABLE.Max shoot length.cm
+  "SKOTTL\xC4NGD MEDEL (CM)": COPY_VARIABLE.Average shoot length.cm
+  "SKOTTL\xC4NGD MIN (CM)": COPY_VARIABLE.Min shoot length.cm
+  SLABO: sampling_laboratory_code
+  SMDEP: sample_depth_m
+  SMPDEP: sample_depth_m
+  SMTYP: sampler_type_code
+  SOCKERHALT (%): COPY_VARIABLE.Rhizome juice sugar content. % by volume
+  STATN: reported_station_name
+  STIME: sample_time
+  STRATUM: stratum_code
+  STRID: stratum_code
+  STTYP: water_land_station_type_code
+  SUBST: substrate_code
+  SUBST_COVER: substrate_cover
+  TAXNM: taxonomist
+  TOTCOVER: CREATE_VARIABLE.Total cover of all species.%
+  TOTCOVERAGE%: CREATE_VARIABLE.Total cover of all species.%
+  TRANS: transect_id
+  TRANSDIR: transect_direction_deg
+  TRANSL: transect_length_m
+  TRANSW: transect_width_m
+  TRANS_ID: transect_id
+  TRANS_LATIT_END_DD: transect_end_latitude_dd
+  TRANS_LATIT_START_DD: transect_start_latitude_dd
+  TRANS_LAT_END: transect_end_latitude_dd
+  TRANS_LAT_START: transect_start_latitude_dd
+  TRANS_LAT_STOP: transect_end_latitude_dd
+  TRANS_LONGI_END_DD: transect_end_longitude_dd
+  TRANS_LONGI_START_DD: transect_start_longitude_dd
+  TRANS_LONG_END: transect_end_longitude_dd
+  TRANS_LONG_START: transect_start_longitude_dd
+  TRANS_LONG_STOP: transect_end_longitude_dd
+  TRANS_MAX: transect_max_distance_m
+  TRANS_MIN: transect_min_distance_m
+  TRANS_START_DEP: transect_start_depth_m
+  TRANS_STOP_DEP: transect_stop_depth_m
+  "T\xE4thet i den \xE5lgr\xE4st\xE4ckta ytan": COPY_VARIABLE.Density in covered area.%
+  WADEP_COR: COPY_VARIABLE.Depth distribution (max depth).m
+  WATLD: water_level_deviation_m
+  WAVXP: wave_exposure_fetch
+  "Ytspecifik T\xE4ckning": COPY_VARIABLE.Substrate specific cover.%
+EB_ROV:
+  ? ''
+  : substrate_comment
+  ABUND CLASS: COPY_VARIABLE.Abundance class.class
+  Analysmetod (kod): analysis_method_code
+  Art-flagga: species_flag_code
+  "Best\xE4llare": sample_orderer_code
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  Dykare: diver_name
+  Dyntaxa-ID: dyntaxa_id
+  Fotografi-ID: image_name
+  Kommentar grus (prov): substrate_comment
+  "Kommentar h\xE4ll (prov)": substrate_comment
+  Kommentar mjukbotten (prov): sample_substrate_comnt_softbottom
+  Metoddokument: method_documentation
+  Metodkommentar: method_comment
+  Projekt: sample_project_code
+  Provkluster: sample_cluster
+  Provtagar-area (m2): sampler_area_m2
+  Provtagningsdatum (start): visit_date
+  Provtagningslaboratorium: sampling_laboratory_code
+  Serienummer: sample_series
+  Stationsfotografi (Y/N): station_photo
+  Stationskluster: station_cluster
+  Stationsnamn: reported_station_name
+  Taxonom: taxonomist
+  Transekt videofilmad (Y/N): transect_video
+  Transekt-ID: transect_id
+  Transektets minsta djup: transect_min_depth_m
+  Transektets slutlatitud (DD): transect_end_latitude_dd
+  Transektets slutlongitud (DD): transect_end_longitude_dd
+  Transektets startlatitud (DD): transect_start_latitude_dd
+  Transektets startlongitud (DD): transect_start_longitude_dd
+  "Transektets st\xF6rsta djup": transect_max_depth_m
+  "T\xE4ckningsgrad grus (prov)": sample_substrate_cover_gravel
+  "T\xE4ckningsgrad h\xE4ll (prov)": sample_substrate_cover_rock
+  "T\xE4ckningsgrad mjukbotten (prov)": sample_substrate_cover_softbottom
+  Vetenskapligt namn: reported_scientific_name
+  Videotolkad (Y/N): video_interpreted
+  "\xC5r": visit_year
+GRUNDA:
+  ABUNDANCE: COPY_VARIABLE.Abundance.ind/m2
+  ALABO: analytical_laboratory_code
+  "Avst\xE5nd fr\xE5n start": transect_min_distance_m
+  COMNT_SAMP: sample_comment
+  COMNT_SECTION: section_comment
+  COMNT_TRANS: transect_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  COVER%: COPY_VARIABLE.Cover.%
+  COVER_1-4: COPY_VARIABLE.Cover.scale 1-4
+  COVER_EST: COPY_VARIABLE.Cover.scale 1-4
+  CRUIS: expedition_id
+  DEPOS: sediment_deposition_code
+  DEPOS%: CREATE_VARIABLE.Sediment deposition cover.%
+  Djup i meter: sample_depth_m
+  FNFLA: fauna_flora_found
+  Inventerare: taxonomist
+  Kommentar: section_comment
+  LATIT: sample_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  Latitud: sample_reported_latitude
+  Longitud: sample_reported_longitude
+  "L\xE4ngd": transect_length_m
+  METDC: method_documentation
+  METOA: analysis_method_code
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  NTYPE: station_N2000_code
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  REFSK: method_reference_code
+  RLABO: reporting_institute_code
+  RPSNO: sample_part_id
+  SAMPLEID: sample_id
+  SAREA: sampler_area_m2
+  SDATE: visit_date
+  SECTION: sample_cluster
+  SECTIONMAX: section_end_depth_m
+  SECTIONMIN: section_start_depth_m
+  SECTIONSTA: section_distance_start_m
+  SECTIONSTO: section_distance_end_m
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SLABO: sampling_laboratory_code
+  SMDEP: sample_depth_m
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STIME: sample_time
+  STRID: stratum_code
+  STTYP: water_land_station_type_code
+  SUBST: substrate_code
+  SUBST_COVER: substrate_cover
+  Salthalt: CREATE_VARIABLE.Salinity.ppt
+  Siktdjup: secchi_depth_m
+  Slut latitud: transect_end_latitude_dd
+  Slut longitud: transect_end_longitude_dd
+  Slutpunkt: section_distance_end_m
+  Start latitud: transect_start_latitude_dd
+  Start longitud: transect_start_longitude_dd
+  Startdatum: visit_date
+  Startpunkt: section_distance_start_m
+  TALGAE: CREATE_VARIABLE.Cover class filamentous algae.class
+  TAXNM: taxonomist
+  TOTCOVERAGE%: CREATE_VARIABLE.Total cover of all species.%
+  TRANSDIR: transect_direction_deg
+  TRANSL: transect_length_m
+  TRANSW: transect_width_m
+  TRANS_ID: transect_id
+  TRANS_LAT_END: transect_end_latitude_dd
+  TRANS_LAT_START: transect_start_latitude_dd
+  TRANS_LONG_END: transect_end_longitude_dd
+  TRANS_LONG_START: transect_start_longitude_dd
+  TRANS_MAX: transect_max_distance_m
+  TRANS_MIN: transect_min_distance_m
+  TRANS_START_DEP: transect_start_depth_m
+  TRANS_STOP_DEP: transect_stop_depth_m
+  Temperatur: CREATE_VARIABLE.Temperature.C
+  Transekt: transect_id
+  "Tr\xE5dalger": CREATE_VARIABLE.Cover class filamentous algae.class
+  Turbiditet: CREATE_VARIABLE.Turbidity.NTU
+  "T\xE4ckningsgrad i procent": COPY_VARIABLE.Cover.%
+  "T\xE4ckningsgrad skala": COPY_VARIABLE.Cover.scale 1-4
+  Vikens_namn: TEMP.add_to_visit_comment
+  WADEP_COR: COPY_VARIABLE.Depth distribution (max depth).m
+  WATLD: water_level_deviation_m
+  WAVXP: wave_exposure_fetch
+  flagga: species_flag_code
+  hydrID: sample_id
+  kommentar: variable_comment
+  metodik: method_documentation
+  omgivningssnamn: reported_station_name
+  referens: visit_comment
+  rutarutID: sample_id
+  segmentsegmentID: sample_id
+  segmenttaxonkommentar: variable_comment
+  syfte: project_purpose
+  taxonID: dyntaxa_id
+  transektID: visit_id
+  undnamn: sample_project_code
+MARTRANS:
+  "Best\xE4llare": "NOT_USED.Best\xE4llare"
+  Datalager_version: NOT_USED.Datalager_version
+  Klient_version: NOT_USED.Klient_version
+  Kontaktperson: reported_by
+  Omfattning: NOT_USED.Omfattning
+  Rapporterande_organisation: reporting_institute_code
+  STIME: sample_time
+  Skapad_tid: NOT_USED.Skapad_tid
+  abundans: COPY_VARIABLE.# counted.ind
+  antal: COPY_VARIABLE.# counted.ind
+  antalklass: COPY_VARIABLE.Abundance class.class
+  avsnitt_kommentar: section_comment
+  avsnitt_slutavstand: section_distance_end_m
+  avsnitt_slutlatitud: section_end_latitude_dd
+  avsnitt_slutlongitud: section_end_longitude_dd
+  avsnitt_startlatitud: section_start_latitude_dd
+  avsnitt_startlongitud: section_start_longitude_dd
+  avsnittart_antal: COPY_VARIABLE.# counted.ind
+  avsnittart_antalklass: COPY_VARIABLE.Abundance class.class
+  avsnittart_bitmarkID: bitemark
+  avsnittart_kommentar: variable_comment
+  avsnittart_maxhojd: COPY_VARIABLE.Maximum height.m?
+  avsnittart_medelhojd: COPY_VARIABLE.Average height.cm?
+  avsnittart_nyrekrID: recruits
+  avsnittart_pavaxt: degree_biofouling
+  avsnittart_sflag: species_flag_code
+  avstand: section_distance_start_m
+  belagg: NOT_USED.provartbelagg
+  bitmarkID: COPY_VARIABLE.Bite marks.class
+  bitmarken: COPY_VARIABLE.Bite marks.class
+  bitmarken_beskrivning: variable_comment
+  bitmarken_bitmarken: variable_comment
+  dataursprung: NOT_USED.undersokningdataursprung
+  datum: visit_date
+  debris: section_debris_cover
+  djup: sample_depth_m
+  dykare: diver_name
+  ejfastsittande: detached
+  epibiotisk: epibiont
+  expgradID: NOT_USED.lokalexpgradID
+  exponeringsgrad_exponeringsgrad: station_exposure
+  fortplantningsorgan: COPY_VARIABLE.Reproductive organs.class
+  fortplantningsorgan_fortplantningsorgan: reproductive_organs
+  fortplorgID: COPY_VARIABLE.Reproductive organs.class
+  foto: taxon_photo
+  grupp: sample_cluster
+  gruppprovnr: sample_series
+  havsomradeID: NOT_USED.lokalhavsomradeID
+  havsomrade_TYP_NFS06: NOT_USED.lokalhavsomrade_TYP_NFS06
+  havsomrade_datum: NOT_USED.lokalhavsomrade_datum
+  havsomrade_namn: sea_area
+  inventerare: taxonomist
+  kalbotten: section_bare_substrate
+  kommentar: variable_comment
+  kompass: transect_direction_deg
+  labo_department: NOT_USED.tillfallelabo_department
+  labo_institute: NOT_USED.tillfallelabo_institute
+  latitud: sample_reported_latitude
+  longitud: sample_reported_longitude
+  lutning: bottom_slope_deg
+  markering: station_marking
+  maxdjup: COPY_VARIABLE.Species distribution max depth.m
+  metodik: method_comment
+  mindjup: COPY_VARIABLE.Species distribution min depth.m
+  namn: TEMP.add_to_visit_comment
+  nospecies: section_fauna_flora_found
+  nyrekrID: COPY_VARIABLE.Recruitment.class
+  nyrekrytering: COPY_VARIABLE.Recruitment.class
+  nyrekrytering_beskrivning: variable_comment
+  nyrekrytering_nyrekrytering: variable_comment
+  omgivningsnamn: station_cluster
+  pavaxt: degree_biofouling
+  posys: positioning_system_code
+  prov_djup: sample_depth_m
+  prov_foto: sample_photo_code
+  prov_grupp: sample_cluster
+  prov_kommentar: sample_comment
+  prov_latitud: sample_reported_latitude
+  prov_longitud: sample_reported_longitude
+  prov_nospecies: fauna_flora_found
+  prov_yta: sampler_area_m2
+  provart_abundans: COPY_VARIABLE.# counted.ind
+  provart_epibiotisk: epibiont
+  provart_foto: taxon_photo
+  provart_kommentar: variable_comment
+  provart_maxhojd: COPY_VARIABLE.Maximum height.m?
+  provart_medelhojd: COPY_VARIABLE.Average height.cm?
+  provart_sflag: species_flag_code
+  provart_tackningsgrad: COPY_VARIABLE.Cover.%
+  provart_taxonID: dyntaxa_id
+  provart_torrvikt: COPY_VARIABLE.Dry weight.g
+  provartstorlek_abundans: COPY_VARIABLE.# counted.ind
+  provartstorlek_torrvikt: COPY_VARIABLE.Dry weight.g
+  provnr: sample_id
+  redskap: NOT_USED.provredskap
+  redskapstypID: NOT_USED.provredskapstypID
+  redskapstyp_redskapstyp: sampler_type_code
+  referens: method_documentation
+  salthalt: CREATE_VARIABLE.Salinity
+  secchi: secchi_depth_m
+  secchiprefix: secchi_depth_quality_flag
+  sflag: species_flag_code
+  siltationID: sediment_deposition_code
+  siltation_siltation: sediment_comment
+  sizeclass: size_class
+  slabo: sampling_laboratory_code
+  slutavstand: section_distance_end_m
+  slutdjup: section_end_depth_m
+  slutlatitud: section_end_latitude_dd
+  slutlongitud: section_end_longitude_dd
+  sorterare: taxonomist
+  startavstand: section_distance_start_m
+  startdjup: section_start_depth_m
+  startlatitud: section_start_latitude_dd
+  startlongitud: section_start_longitude_dd
+  stnbet: reported_station_name
+  storleksklass_from: size_class_range_min
+  storleksklass_tom: size_class_range_max
+  substrat: substrate
+  substrat_substrat: sect_substrate
+  substratkod: sect_substrate_code
+  syfte: project_purpose
+  tackningsgrad: COPY_VARIABLE.Cover.%
+  taxonID: NOT_USED.transekttaxaminmaxtaxonID
+  taxon_namn: reported_scientific_name
+  temperatur: CREATE_VARIABLE.Temperature.C
+  torrvikt: COPY_VARIABLE.Dry weight.g
+  totalcover: CREATE_VARIABLE.Total cover of all species.%
+  transekt_kommentar: transect_comment
+  transektbredd: transect_width_m
+  transektnamn: transect_id
+  transekttaxaminmax_epibiotisk: epibiont
+  transekttaxaminmax_kommentar: variable_comment
+  transekttaxaminmax_maxdjup: COPY_VARIABLE.Species distribution max depth.m
+  transekttaxaminmax_mindjup: COPY_VARIABLE.Species distribution min depth.m
+  transekttaxaminmax_sflag: species_flag_code
+  transekttaxaminmax_taxonID: dyntaxa_id
+  undnamn: sample_project_code
+  vaghojd: wave_height_m
+  video: transect_video
+  videotolkad: video_interpreted
+  vindriktning: wind_direction_code
+  vindstyrka: wind_speed_ms
+  yta: sampler_area_m2
+PB_BIG_SQR:
+  Count: COPY_VARIABLE.# counted.ind
+  Cover: COPY_VARIABLE.Substrate specific cover.%
+  DatumStart: visit_date
+  Epifytisk: epibiont
+  "H\xE5rd": sample_substrate_cover_rock
+  Inventerare: taxonomist
+  Kommentar: visit_comment
+  Latitud: sample_reported_latitude
+  Lokal: reported_station_name
+  Longitud: sample_reported_longitude
+  Mjuk: sample_substrate_cover_softbottom
+  ProvKommentar: sample_comment
+  Provyta: sampler_area_m2
+  SFLAG: species_flag_code
+  STIME: sample_time
+  "Sedimentp\xE5lagring": sediment_deposition_code
+  Slabo: sampling_laboratory_code
+  Taxon: reported_scientific_name
+  Taxonkommentar: variable_comment
+  "Unders\xF6kning": sample_project_code
+  mittpunktsdjup: sample_depth_m
+PB_PROVFISKE:
+  ABUND: COPY_VARIABLE_MULTIPLY.Abundance.ind/m2.4
+  ALABO: analytical_laboratory_code
+  COMNT_SAMP: sample_comment
+  COMNT_TRANS: transect_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  COVER%: COPY_VARIABLE.Cover.%
+  COVERP: COPY_VARIABLE.Cover.%
+  COVER_1-4: COPY_VARIABLE.Cover.scale 1-4
+  COVER_1-5: COPY_VARIABLE.Cover.scale 1-5
+  COVER_1-7: COPY_VARIABLE.Cover.scale 1-7
+  CRUIS: expedition_id
+  DEPOS: sediment_deposition_code
+  DEPOS_COVER: CREATE_VARIABLE.Sediment deposition cover.%
+  FNFLA: fauna_flora_found
+  LATIT: sample_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  METDC: method_documentation
+  METOA: analysis_method_code
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  NTYPE: station_N2000_code
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  REFSK: method_reference_code
+  RHIZOMBIOMASSA (G DW/M2): COPY_VARIABLE.Rhizome biomass.g dry weight/m2
+  RLABO: reporting_institute_code
+  RPSNO: sample_part_id
+  SAMPLEID: sample_id
+  SAREA: sampler_area_m2
+  SDATE: visit_date
+  SECTIONMAX: section_end_depth_m
+  SECTIONMIN: section_start_depth_m
+  SECTIONSTA: section_distance_start_m
+  SECTIONSTO: section_distance_end_m
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SKOTTANTAL (ANTAL/M2): COPY_VARIABLE.Shoot density.ind/m2
+  SKOTTBIOMASSA (G DW/M2): COPY_VARIABLE.Shoot biomass.g dry weight/m2
+  "SKOTTL\xC4NGD MAX (CM)": COPY_VARIABLE.Max shoot length.cm
+  "SKOTTL\xC4NGD MEDEL (CM)": COPY_VARIABLE.Average shoot length.cm
+  "SKOTTL\xC4NGD MIN (CM)": COPY_VARIABLE.Min shoot length.cm
+  SLABO: sampling_laboratory_code
+  SMDEP: sample_depth_m
+  SMTYP: sampler_type_code
+  SOCKERHALT (%): COPY_VARIABLE.Rhizome juice sugar content. % by volume
+  STATN: reported_station_name
+  STIME: sample_time
+  STRID: stratum_code
+  SUBST: substrate_code
+  SUBST_COVER: COPY_VARIABLE.Substrate cover.%
+  TAXNM: taxonomist
+  TOTCOVER: CREATE_VARIABLE.Total cover of all species.%
+  TRANSDIR: transect_direction_deg
+  TRANSL: transect_length_m
+  TRANSW: transect_width_m
+  TRANS_ID: transect_id
+  TRANS_LAT_START: transect_start_latitude_dd
+  TRANS_LAT_STOP: transect_end_latitude_dd
+  TRANS_LONG_START: transect_start_longitude_dd
+  TRANS_LONG_STOP: transect_end_longitude_dd
+  TRANS_MAX: transect_max_distance_m
+  TRANS_MIN: transect_min_distance_m
+  TRANS_START_DEP: transect_start_depth_m
+  TRANS_STOP_DEP: transect_stop_depth_m
+  "T\xE4thet i den \xE5lgr\xE4st\xE4ckta ytan": COPY_VARIABLE.Density in covered area.%
+  WADEP_COR: COPY_VARIABLE.Depth distribution (max depth).m
+  WATLD: water_level_deviation_m
+  WAVXP: wave_exposure_fetch
+  "Ytspecifik T\xE4ckning": COPY_VARIABLE.Substrate specific cover.%
+PB_SECTION_SQR_REG:
+  ALABO: analytical_laboratory_code
+  COMNT_SECTION: section_comment
+  COMNT_TRANS: transect_comment
+  COMNT_VISIT: visit_comment
+  COVERAGE%: COPY_VARIABLE.Cover.%
+  COVER_%: COPY_VARIABLE.Cover.%
+  LATIT: section_start_latitude_dm
+  LATNM: reported_scientific_name
+  LONGI: section_start_longitude_dm
+  METDC: method_documentation
+  MYEAR: visit_year
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ_NAME: sample_project_code
+  SAREA: sampler_area_m2
+  SDATE: visit_date
+  SECTIONMAX: section_end_depth_m
+  SECTIONMIN: section_start_depth_m
+  SECTIONSTA: section_start_latitude_dm
+  SECTIONSTO: section_start_longitude_dm
+  SFLAG: species_flag_code
+  SLABO: sampling_laboratory_code
+  SMPDEP: sample_depth_m
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STRID: stratum_code
+  TAXNM: taxonomist
+  TOTCOVERAGE%: CREATE_VARIABLE.Total cover of all species.%
+  TRANS: transect_id
+  TRANSL: transect_length_m
+  TRANSW: transect_width_m
+  TRANS_LATIT_END_DD: transect_end_latitude_dd
+  TRANS_LATIT_START_DD: transect_start_latitude_dd
+  TRANS_LAT_END: transect_end_latitude_dm
+  TRANS_LAT_START: transect_start_latitude_dm
+  TRANS_LONGI_END_DD: transect_end_longitude_dd
+  TRANS_LONGI_START_DD: transect_start_longitude_dd
+  TRANS_LONG_END: transect_end_longitude_dm
+  TRANS_LONG_START: transect_start_longitude_dm
+PB_TMBL:
+  ABUND: COPY_VARIABLE_MULTIPLY.Abundance.ind/m2.4
+  ALABO: analytical_laboratory_code
+  ANA_RESP: analysed_by
+  COMNT: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  COVER: COPY_VARIABLE.Cover.%
+  COVERAGE%: COPY_VARIABLE.Cover.%
+  CRUIS: expedition_id
+  DEPOS: sediment_deposition_code
+  DEPOS%: CREATE_VARIABLE.Sediment deposition cover.%
+  DEPOS_: CREATE_VARIABLE.Sediment deposition cover.%
+  FLORA: fauna_flora_found
+  FNFLA: fauna_flora_found
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  METDC: method_documentation
+  METFP: preservation_method_code
+  METOA: analysis_method_code
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  POSYS*: positioning_system_code
+  PROJ: sample_project_code
+  PTEXT: variable_comment
+  PURPM: monitoring_purpose_code
+  RLABO: reporting_institute_code
+  RPSNO: sample_part_id
+  SAMPLEID: sample_id
+  SAREA: sampler_area_cm2
+  SDATE: visit_date
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SLABO: sampling_laboratory_code
+  SLDEID: image_name
+  SLIDEID: image_name
+  SMDEP: sample_depth_m
+  SMPDEP: sample_depth_m
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STRATUM: stratum_code
+  STRID: stratum_code
+  STTYP: water_land_station_type_code
+  Sample ID: sample_id
+  Sampleid: sample_id
+  Slideid: image_name
+  TOTCOVERAGE%: CREATE_VARIABLE.Total cover of all species.%
+  TRANS: transect_id
+  Transect: transect_id
+  WADEP: sample_depth_m
+  WATLD: water_level_deviation_m
+  WAVXP: wave_exposure_fetch
+PB_ZOSTERA:
+  ALABO: analytical_laboratory_code
+  COMNT_SAMP: sample_comment
+  COMNT_VISIT: visit_comment
+  COVERAGE%: COPY_VARIABLE.Cover.%
+  Datum: visit_date
+  Filmnummer: transect_video_name
+  Kommentar: visit_comment
+  LATIT: sample_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  Latitud: sample_reported_latitude
+  Lokal: reported_station_name
+  Longitud: sample_reported_longitude
+  METDC: method_documentation
+  MYEAR: visit_year
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PROJ_NAME: sample_project_code
+  "Procent av yta t\xE4ckt av \xE5lgr\xE4s": COPY_VARIABLE.Cover.%
+  REPLIKAT: sample_id
+  RHIZOMBIOMASSA (G DW/M2): COPY_VARIABLE.Rhizome biomass.g dry weight/m2
+  SAREA: sampler_area_m2
+  SDATE: visit_date
+  SFLAG: species_flag_code
+  SKOTTANTAL (ANTAL/M2): COPY_VARIABLE.Shoot density.ind/m2
+  SKOTTBIOMASSA (G DW/M2): COPY_VARIABLE.Shoot biomass.g dry weight/m2
+  "SKOTTL\xC4NGD MAX (CM)": COPY_VARIABLE.Max shoot length.cm
+  "SKOTTL\xC4NGD MEDEL (CM)": COPY_VARIABLE.Average shoot length.cm
+  "SKOTTL\xC4NGD MIN (CM)": COPY_VARIABLE.Min shoot length.cm
+  SLABO: sampling_laboratory_code
+  SMPDEP: sample_depth_m
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  SOCKERHALT (%): COPY_VARIABLE.Rhizome juice sugar content. % by volume
+  STATN: reported_station_name
+  TOTCOVERAGE%: CREATE_VARIABLE.Total cover of all species.%
+  "T\xE4thet i den \xE5lgr\xE4st\xE4ckta ytan": COPY_VARIABLE.Density in covered area.%
+  "Unders\xF6kning": sample_project_code
+  "Vattenst\xE5ndskorrigerat djup (m)": sample_depth_m
+  "Vattenst\xE5ndskorrigerat maxdjup": COPY_VARIABLE.Depth distribution (max depth).m
+  "Ytspecifik T\xE4ckning": COPY_VARIABLE.Substrate specific cover.%

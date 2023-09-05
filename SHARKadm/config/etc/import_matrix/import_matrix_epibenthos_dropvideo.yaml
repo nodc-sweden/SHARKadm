@@ -1,0 +1,82 @@
+DROPVIDEO:
+  '002': CREATE_VARIABLE.Section soft clay cover.class
+  '002_0.06': CREATE_VARIABLE.Section silt cover.class
+  '06_2': CREATE_VARIABLE.Section sand cover.class
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  ALABO: analytical_laboratory_code
+  ANADATE: analysis_date
+  COMNT_SAMP: section_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COVER_ANIMALIA_BURROWS: CREATE_VARIABLE.Section animalia burrows cover.class
+  COVER_ANIMALIA_TRACKS: CREATE_VARIABLE.Section animalia tracks cover.class
+  COVER_BARE_SUBST: CREATE_VARIABLE.Section bare substrate cover.class
+  COVER_BOULDER: CREATE_VARIABLE.Section boulder cover.class
+  COVER_COBBLE_COARSE_200_600: CREATE_VARIABLE.Section cobble coarse cover.class
+  COVER_COBBLE_MEDIUM_60_200: CREATE_VARIABLE.Section cobble medium cover.class
+  COVER_DEBR: CREATE_VARIABLE.Section debris cover.class
+  COVER_DETRITUS: CREATE_VARIABLE.Section detritus cover.class
+  COVER_EPI_ZOSTERA: CREATE_VARIABLE.Section epi zostera cover.class
+  COVER_GRAVEL: CREATE_VARIABLE.Section gravel cover.class
+  COVER_GRAVEL_COARSE_20_60: CREATE_VARIABLE.Section gravel coarse cover.class
+  COVER_GRAVEL_FINE+MEDIUM_2_20: CREATE_VARIABLE.Section gravel fine medium cover.class
+  COVER_HARD_CLAY: CREATE_VARIABLE.Section hard clay cover.class
+  COVER_LARGE_BOULDER_>600: CREATE_VARIABLE.Section large boulder cover.class
+  COVER_NASSARIUS_TRACKS: CREATE_VARIABLE.Section nassarius tracks cover.class
+  COVER_PAGURIDAE_TRACKS: CREATE_VARIABLE.Section paguridae tracks cover.class
+  COVER_ROCK: CREATE_VARIABLE.Section rock cover.class
+  COVER_SAND: CREATE_VARIABLE.Section sand cover.class
+  COVER_SEDIMENT_BOTTOM: CREATE_VARIABLE.Section sediment cover.class
+  COVER_SHELL: CREATE_VARIABLE.Section shell cover.class
+  COVER_SHELL_GRAVEL: CREATE_VARIABLE.Section shell gravel cover.class
+  COVER_SILT: CREATE_VARIABLE.Section silt cover.class
+  COVER_SILT_CLAY: CREATE_VARIABLE.Section silt clay cover.class
+  COVER_SILT_SOFT_CLAY: CREATE_VARIABLE.Section silt soft clay cover.class
+  COVER_STONE: CREATE_VARIABLE.Section stone cover.class
+  COVER_STONE_200_600: CREATE_VARIABLE.Section cobble coarse cover.class
+  COVER_STONE_60_200: CREATE_VARIABLE.Section cobble medium cover.class
+  COVER_UNANALYSABLE: CREATE_VARIABLE.Section unanalysable cover
+  COVER_UNIDENTIFIED_ALGAE: CREATE_VARIABLE.Section unidentified algae cover.class
+  COVER_UNIDENT_PLANTAE: CREATE_VARIABLE.Section unidentified plantae cover.class
+  COVER_UNIDENT_SUBST: CREATE_VARIABLE.Section unidentified substrate cover.class
+  DEPOS: CREATE_VARIABLE.Sediment depos cover.class
+  IMAGE_NAME: sample_id
+  IMAGE_STOP_TIME: image_stop_time
+  METDC: method_documentation
+  MYEAR: visit_year
+  NTTYPE: station_N2000_code
+  NTYPE: station_N2000_code
+  ORDERER: sample_orderer_code
+  PICT_NAME: sample_id
+  PICT_NUMB: sample_id
+  PICT_STOP_TIME: image_stop_time
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PROTO_WRIT: transect_protocol_writer
+  PROTO_WRITE: transect_protocol_writer
+  Q_SECCHI: secchi_depth_quality_flag
+  SAL: CREATE_VARIABLE.Salinity
+  SDATE: visit_date
+  SECCHI: secchi_depth_m
+  SLABO: sampling_laboratory_code
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  TRANS_ID: visit_id
+  TRANS_INTERPRET_TIME: transect_interpretation_time
+  TRANS_LAT_START: transect_start_latitude_dd
+  TRANS_LAT_START_DM: transect_start_latitude_dm
+  TRANS_LAT_STOP: transect_end_latitude_dd
+  TRANS_LAT_STOP_DM: transect_end_latitude_dm
+  TRANS_LONG_START: transect_start_longitude_dd
+  TRANS_LONG_START_DM: transect_start_longitude_dm
+  TRANS_LONG_STOP: transect_end_longitude_dd
+  TRANS_LONG_STOP_DM: transect_end_longitude_dm
+  TRANS_START_DEP: transect_start_depth_m
+  TRANS_STOP_DEP: transect_stop_depth_m
+  VIDEO_INTER: transect_video_interpreter
+  VID_NAME: transect_video_name
+  VISIT_COMNT: visit_comment
+  xxxIMAGE_NAME: image_sequence
+  xxxPICT_NAME: image_sequence
+  xxxPICT_NUMB: image_sequence

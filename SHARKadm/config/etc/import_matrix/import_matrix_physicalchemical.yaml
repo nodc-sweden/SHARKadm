@@ -1,0 +1,128 @@
+SHARKarchive:
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated_phyche
+  ADD_SMP: additional_sampling
+  AIRPRES: air_pressure_hpa
+  AIRTEMP: air_temperature_degc
+  AL: COPY_VARIABLE.Aluminium.ug/l
+  ALABO: analytical_laboratory_code
+  ALKY: COPY_VARIABLE.Alkalinity.mmol/kg
+  ALKY_2: COPY_VARIABLE.Alkalinity_2.mmol/l
+  AMON: COPY_VARIABLE.Ammonium NH4-N.umol/l
+  CDOM: COPY_VARIABLE.Coloured dissolved organic matter CDOM.1/m
+  CLOUD: cloud_observation_code
+  CNDC_25: COPY_VARIABLE.Conductivity_25 bottle.mS/m
+  CNDC_CTD: COPY_VARIABLE.Conductivity CTD.mS/m
+  COMNT_SAMP: sample_comment
+  COMNT_SMPM: sampling_method_comment_phyche
+  COMNT_SP: sample_comment
+  COMNT_VISIT: visit_comment
+  COMT_SMPM: sampling_method_comment_phyche
+  CPHL: COPY_VARIABLE.Chlorophyll-a bottle.ug/l
+  CRUISE_NO: expedition_id
+  CURDIR: COPY_VARIABLE.Current direction.deca degrees
+  CURVEL: COPY_VARIABLE.Current velocity.cm/s
+  DEPH: sample_depth_m
+  DETLI: detection_limit
+  DOC: COPY_VARIABLE.Dissolved organic carbon DOC.umol/l
+  DOXY_BTL: COPY_VARIABLE.Dissolved oxygen O2 bottle.ml/l
+  DOXY_CTD: COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l
+  EDATE: sample_enddate
+  ETIME: sample_endtime
+  H2S: COPY_VARIABLE.Hydrogen sulphide H2S.umol/l
+  HUMUS: COPY_VARIABLE.Humus.ug/l
+  ICEOB: ice_observation_code
+  LATIT: visit_reported_latitude
+  LIGNIN: COPY_VARIABLE.Lignin.mg/l
+  LMQNT: quantification_limit
+  LONGI: visit_reported_longitude
+  MAXDEPH: sample_max_depth_m
+  METCU: method_calculation_uncertainty
+  METOA: analysis_method_code
+  MET_COMNT: variable_comment
+  MINDEPH: sample_min_depth_m
+  MPROG: monitoring_program_code
+  MYEAR: visit_year
+  NTOT: COPY_VARIABLE.Total Nitrogen Tot-N.umol/l
+  NTRA: COPY_VARIABLE.Nitrate NO3-N.umol/l
+  NTRI: COPY_VARIABLE.Nitrite NO2-N.umol/l
+  NTRZ: COPY_VARIABLE.Nitrite+Nitrate NO2+NO3-N.umol/l
+  ORDERER: sample_orderer_code
+  PH: COPY_VARIABLE.pH.
+  PHOS: COPY_VARIABLE.Phosphate PO4-P.umol/l
+  PH_LAB: COPY_VARIABLE.pH Laboratory.
+  PH_LAB_TEMP: COPY_VARIABLE.Temperature pH Laboratory.C
+  POC: COPY_VARIABLE.Particulate organic carbon POC.umol/l
+  PON: COPY_VARIABLE.Particulate organic nitrogen PON.umol/l
+  POSYS: positioning_system_code
+  PRES_CTD: COPY_VARIABLE.Pressure CTD.dbar
+  PROJ: sample_project_code
+  PROJ_CODE: sample_project_code
+  PTOT: COPY_VARIABLE.Total phosphorus Tot-P.umol/l
+  Q_AL: QFLAG.Aluminium
+  Q_ALKY: QFLAG.Alkalinity
+  Q_ALKY_2: QFLAG.Alkalinity_2
+  Q_AMON: QFLAG.Ammonium NH4-N
+  Q_CDOM: QFLAG.Coloured dissolved organic matter CDOM
+  Q_CNDC_25: QFLAG.Conductivity_25 bottle
+  Q_CNDC_CTD: QFLAG.Conductivity CTD
+  Q_CPHL: QFLAG.Chlorophyll-a bottle
+  Q_CURDIR: QFLAG.Current direction
+  Q_CURVEL: QFLAG.Current velocity
+  Q_DOC: QFLAG.Dissolved organic carbon DOC
+  Q_DOXY_BTL: QFLAG.Dissolved oxygen O2 bottle
+  Q_DOXY_CTD: QFLAG.Dissolved oxygen O2 CTD
+  Q_H2S: QFLAG.Hydrogen sulphide H2S
+  Q_HUMUS: QFLAG.Humus
+  Q_LIGNIN: QFLAG.Lignin
+  Q_NTOT: QFLAG.Total Nitrogen Tot-N.umol/l
+  Q_NTRA: QFLAG.Nitrate NO3-N
+  Q_NTRI: QFLAG.Nitrite NO2-N
+  Q_NTRZ: QFLAG.Nitrite+Nitrate NO2+NO3-N
+  Q_PH: QFLAG.pH
+  Q_PHOS: QFLAG.Phosphate PO4-P
+  Q_PH_LAB: QFLAG.pH Laboratory
+  Q_PH_LAB_TEMP: QFLAG.Temperature pH Laboratory
+  Q_POC: QFLAG.Particulate organic carbon POC
+  Q_PON: QFLAG.Particulate organic nitrogen PON
+  Q_PRES_CTD: QFLAG.Pressure CTD
+  Q_PTOT: QFLAG.Total phosphorus Tot-P
+  Q_SALT_BTL: QFLAG.Salinity bottle
+  Q_SALT_CTD: QFLAG.Salinity CTD
+  Q_SECCHI: QFLAG.Secchi depth
+  Q_SIO3-SI: QFLAG.Silicate SiO3-Si
+  Q_TEMP_BTL: QFLAG.Temperature bottle
+  Q_TEMP_CTD: QFLAG.Temperature CTD
+  Q_TOC: QFLAG.Total organic carbon TOC
+  Q_TURB: QFLAG.Turbidity TURB
+  Q_UREA: QFLAG.Urea
+  Q_YELLOW: QFLAG.Yellow substance
+  RANA: analysis_range
+  REFSK_ANA: analysis_method_reference_code
+  REFSK_SMP: sampling_method_reference_code_phyche
+  SALT_BTL: COPY_VARIABLE.Salinity bottle.o/oo psu
+  SALT_CTD: COPY_VARIABLE.Salinity CTD.o/oo psu
+  SDATE: visit_date
+  SEAST: wave_observation_code
+  SECCHI: COPY_VARIABLE.Secchi depth.m
+  SERNO: visit_id
+  SHIPC: platform_code
+  SIO3-SI: COPY_VARIABLE.Silicate SiO3-Si.umol/l
+  SLABO: sampling_laboratory_code_phyche
+  SMPNO: sample_id
+  SMTYP: sampler_type_code_phyche
+  STATN: reported_station_name
+  STIME: sample_time
+  TEMP_BTL: COPY_VARIABLE.Temperature bottle.C
+  TEMP_CTD: COPY_VARIABLE.Temperature CTD.C
+  TOC: COPY_VARIABLE.Total organic carbon TOC.mg/l
+  TURB: COPY_VARIABLE.Turbidity TURB.FNU
+  UNCERT: estimation_uncertainty
+  UREA: COPY_VARIABLE.Urea.umol/l
+  WADEP: water_depth_m
+  WAVES: wave_observation_code
+  WEATH: weather_observation_code
+  WINDIR: wind_direction_code
+  WINDR: wind_direction_code
+  WINSP: wind_speed_ms
+  YELLOW: COPY_VARIABLE.Yellow substance.1/l

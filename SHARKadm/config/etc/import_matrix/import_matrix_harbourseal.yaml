@@ -1,0 +1,36 @@
+Hseal:
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  ALABO: analytical_laboratory_code
+  Area: sea_region
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: sample_comment
+  COUNT: COPY_VARIABLE.# counted.ind
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  FNFLA: fauna_flora_found
+  FOTOID: image_id
+  IMAGE_ID: image_id
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  METDC: method_documentation
+  MPROG: monitoring_program_code
+  MYEAR: visit_year
+  OBSDIST: observation_distance_m
+  OBSERV: sampled_by
+  OBSPOINT: obspoint
+  ORDERER: sample_orderer_code
+  PLATSKOD: reported_station_name
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  Plats: reported_station_name
+  REGION: sea_region
+  SDATE: visit_date
+  SFLAG: species_flag_code
+  SLABO: sampling_laboratory_code
+  SMP_BY: sampled_by
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STIME: sample_time
+  TAXNM: taxonomist

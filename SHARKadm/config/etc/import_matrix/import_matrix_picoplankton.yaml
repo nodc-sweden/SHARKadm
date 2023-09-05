@@ -1,0 +1,148 @@
+Pico:
+  (mg/m3): COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000
+  ABUND: COPY_VARIABLE.Abundance.ind/l
+  ABUND (c/l): COPY_VARIABLE.Abundance.ind/l
+  ABUND_CLASS: COPY_VARIABLE.Abundance class.class
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  AIRPRES: air_pressure_hpa
+  AIRTEMP: air_temperature_degc
+  ALABO: analytical_laboratory_code
+  ANADATE: analysis_date
+  ANALYSISTYPE: method_comment
+  BIOVOL: COPY_VARIABLE.Biovolume concentration.mm3/l
+  BIOVOLYM (mg/m3): COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000
+  BIOVOLYM (um3/l): COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000000000
+  CEVOL: reported_cell_volume_um3
+  CLOUD: cloud_observation_code
+  COEFF: coefficient
+  COMNT: TEMP.add_to_variable_comment
+  COMNT_EXP: TEMP.expedition_comment
+  COMNT_SAMP: sample_comment
+  COMNT_SMP: sample_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNT: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  COUNTNR: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  COUNTPROG: counter_program
+  CRUIS: cruise_start_serno
+  C_CONC: COPY_VARIABLE.Carbon concentration.ugC/l
+  EXPID: expedition_id
+  FILTVOL: sedimentation_volume_ml
+  ICEOB: ice_observation_code
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LAT_DEG: latitude_deg
+  LAT_DM: visit_reported_latitude
+  LONGI: visit_reported_longitude
+  LONG_DEG: longitude_deg
+  LONG_DM: visit_reported_longitude
+  Latitude_deg: latitude_deg
+  Latitude_min: latitude_min
+  Latitude_mm: latitude_min
+  Longitude_deg: longitude_deg
+  Longitude_min: longitude_min
+  Longitude_mm: longitude_min
+  MAGNI: magnification
+  MESHS: mesh_size_um
+  METDC: method_documentation
+  METFP: preservation_method_code
+  METOA: analysis_method_code
+  MNDEP: sample_min_depth_m
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MXDEP: sample_max_depth_m
+  MYEAR: visit_year
+  ORDERER: sample_orderer_code
+  PDMET: plankton_sampling_method_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  QFLAG: QFLAG.Biovolume concentration
+  Q_SECCHI: secchi_depth_quality_flag
+  REFSK: method_reference_code
+  REPLI_NO: replicate_no
+  RLABO: reporting_institute_code
+  SDATE: visit_date
+  SDTIM: sedimentation_time_h
+  SDVOL: sedimentation_volume_ml
+  SEAST: wave_observation_code
+  SECCHI: secchi_depth_m
+  SERIES: sample_series
+  SERNO: sample_series
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SIZCL: size_class
+  SIZCL_MAX: size_max_um
+  SIZCL_MIN: size_min_um
+  SIZRF: size_class_ref_list_code
+  SLABO: sampling_laboratory_code
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  SMVOL: sampled_volume_l
+  STATN: reported_station_name
+  STIME: sample_time
+  Size: size_class
+  TAXNM: taxonomist
+  TRPHY: trophic_type_code
+  WADEP: water_depth_m
+  WATLD: water_level_deviation_m
+  WAVELENGTH_EM: wavelength_emission
+  WAVELENGTH_EX: wavelength_excitation
+  WAVES: wave_observation_code
+  WAVHT: wave_height_m
+  WAVXP: wave_exposure_fetch
+  WEATH: weather_observation_code
+  WINDIR: wind_direction_code
+  WINDR: wind_direction_code
+  WINSP: wind_speed_ms
+  WLTYP: water_land_station_type_code
+  mg/m3: COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000
+  mgC/m3: COPY_VARIABLE.Carbon concentration.ugC/l
+  pgC/l: COPY_VARIABLE_DIVIDE.Carbon concentration.ugC/l.1000000
+  ugC/m3: COPY_VARIABLE_DIVIDE.Carbon concentration.ugC/l.1000
+Pico_FCM:
+  ABUND: COPY_VARIABLE.Abundance.ind/l
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  ALABO: analytical_laboratory_code
+  ANADATE: analysis_date
+  BIOVOL: COPY_VARIABLE.Biovolume concentration.mm3/l
+  CEVOL: reported_cell_volume_um3
+  CEVOL_UM3: reported_cell_volume_um3
+  COEFF_C: coefficient_fgC_cell
+  COMNT_SMP: sample_comment
+  COMNT_VAR: variable_comment
+  COUNT: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  C_CONC: COPY_VARIABLE.Carbon concentration.ugC/l
+  EXPID: expedition_id
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  METDC: method_documentation
+  METFP: preservation_method_code
+  METOA: analysis_method_code
+  MNDEP: sample_min_depth_m
+  MPROG: monitoring_program_code
+  MXDEP: sample_max_depth_m
+  MYEAR: visit_year
+  ORDERER: sample_orderer_code
+  PDMET: plankton_sampling_method_code
+  PICOPLANKTON_TYPE: picotype
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  REFSK: method_reference_code
+  REPLI_NO: replicate_no
+  SDATE: visit_date
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SLABO: sampling_laboratory_code
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  SMVOL: sampled_volume_l
+  STATN: reported_station_name
+  STIME: sample_time
+  TRPHY: trophic_type_code
+  WADEP: water_depth_m
+  mgC/m3: COPY_VARIABLE.Carbon concentration.ugC/l

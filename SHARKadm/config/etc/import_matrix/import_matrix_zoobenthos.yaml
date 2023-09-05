@@ -1,0 +1,171 @@
+ZB:
+  ABUND: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  AIRPRES: air_pressure_hpa
+  AIRTEMP: air_temperature_degc
+  ALABO: analytical_laboratory_code
+  ANADATE: analysis_date
+  ANARESP: analysed_by
+  BESID: visit_id
+  CLOUD: cloud_observation_code
+  COLOUR_SED_C: CREATE_VARIABLE.Sediment colour code.Rock Color Chart
+  COMNT: add_to_variable_comment
+  COMNT_AB: variable_comment
+  COMNT_ABUB: variable_comment
+  COMNT_SAMP: sample_comment
+  COMNT_SITE: visit_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNT: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  COUNTNR: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  CPORT: counted_portions
+  DEPH: sample_depth_m
+  DOXY: CREATE_VARIABLE.Bottom water dissolved oxygen.mg/l
+  FAUNA: fauna_flora_found
+  FINFL: factors_influencing_code
+  FNFLA: fauna_flora_found
+  H2S_SMELL: CREATE_VARIABLE.H2S smell
+  HSUL: CREATE_VARIABLE.H2S smell
+  HSUL_SMELL: CREATE_VARIABLE.H2S smell
+  ICEOB: ice_observation_code
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LOGIN: CREATE_VARIABLE.Loss on ignition.% dw
+  LOIGN: CREATE_VARIABLE.Loss on ignition.% dw
+  LONGI: visit_reported_longitude
+  MESHS: lower_mesh_size_um
+  MESH_LOWER: lower_mesh_size_um
+  MESH_UPPER: upper_mesh_size_um
+  METDC: method_documentation
+  METDOC: method_documentation
+  METFP: preservation_method_code
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  NOT_QUANTIFIED_OBSERVATION: COPY_VARIABLE.Non-quantified observation.observed
+  NPORT: number_of_portions
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PSAL: COPY_VARIABLE.Salinity.ppt
+  PURPM: monitoring_purpose_code
+  QFLAG: quality_flag
+  Q_SECCHI: secchi_depth_quality_flag
+  REDOX: COPY_VARIABLE.Redox potential.mV
+  REFSK: method_reference_code
+  RLABO: reporting_institute_code
+  SAREA: sampler_area_cm2
+  SAREA_CM2: sampler_area_cm2
+  SAREA_M2: sampler_area_cm2.MULTIPLY.10000
+  SDATE: visit_date
+  SDTYP: sediment_type
+  SEAST: wave_observation_code
+  SECCHI: secchi_depth_m
+  SEDDEPTH: TEMP.sample_part_min_max_cm
+  SED_DW_%: CREATE_VARIABLE.Sediment dry weight content.%
+  SERNO: visit_id
+  SFLAG: species_flag_code
+  SHIPC: platform_code
+  SLABO: sampling_laboratory_code
+  SMLNK: TEMP.sample_link
+  SMPDEP: sample_depth_m
+  SMPLAT: sample_reported_latitude
+  SMPLONG: sample_reported_longitude
+  SMPNO: sample_id
+  SMPSTIME: sample_time
+  SMTYP: sampler_type_code
+  SMVOL: sampled_volume_l
+  SPMAX: sample_part_min_cm
+  SPMIN: sample_part_max_cm
+  STAGE: dev_stage_code
+  STATN: reported_station_name
+  STIME: sample_time
+  TAXNM: taxonomist
+  TEMP: COPY_VARIABLE.Temperature.C
+  TOTAL FOSFOR (mg/kg TS): CREATE_VARIABLE.Sediment phosphorus content.mg/kg dried
+    sediment
+  "TOTAL KV\xC4VE (mg/kg TS)": CREATE_VARIABLE.Sediment nitrogen content.mg/kg dried
+    sediment
+  VFLAG: quality_flag
+  WADEP: water_depth_m
+  WATER_CONT_SED: COPY_VARIABLE.Sediment water content.% ww
+  WAVES: wave_observation_code
+  WAVHT: wave_height_m
+  WEATH: wave_observation_code
+  WETWT: COPY_VARIABLE_DIVIDE.Wet weight.g/analysed sample fraction.1000
+  WINDIR: wind_direction_code
+  WINDIR_CODE: wind_direction_code
+  WINDR: wind_direction_code
+  WINSP: wind_speed_ms
+  WLTYP: water_land_station_type_code
+ZB_BEDA:
+  COUNT: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  METDC: method_documentation
+  METFP: preservation_method_code
+  Mprog: monitoring_program_code
+  Niv: sample_part_min_cm
+  ORDERER: sample_orderer_code
+  OXID_L: oxidized_layer_cm
+  SMTYP: sampler_type_code
+  "Unders\xF6kning": sample_project_code
+  abundans: COPY_VARIABLE.# counted.ind/analysed sample fraction
+  ackrediterad: sampling_laboratory_accreditated
+  alabo: analytical_laboratory_code
+  askfritorrvikt: COPY_VARIABLE.Ash-free dry weight.g/analysed sample fraction
+  atvvprefix: QFLAG.Ash-free dry weight
+  "best\xE4llare": sample_orderer_code
+  cport: counted_portions
+  datum: NOT_USED.taxon_datum
+  djup: water_depth_m
+  faltkommentar: sample_comment
+  glodforlust: COPY_VARIABLE.Loss on ignition.% dw
+  h2s: CREATE_VARIABLE.H2S smell
+  huggyta: sampler_area_cm2.MULTIPLY.10000
+  huggyta_cm2: sampler_area_cm2
+  kluster: station_cluster
+  kommentar: add_to_variable_comment
+  labkommentar: add_to_variable_comment
+  latitud: visit_reported_latitude
+  longitud: visit_reported_longitude
+  metodik: method_documentation
+  namn: reported_scientific_name
+  nedreNiv: sample_part_max_cm
+  nedreSall: lower_mesh_size_um.MULTIPLY.1000
+  nedreniv: sample_part_max_cm
+  nedresall: lower_mesh_size_um
+  noFauna: fauna_flora_found
+  nport: number_of_portions
+  ovreNiv: sample_part_min_cm
+  ovreSall: upper_mesh_size_um.MULTIPLY.1000
+  ovreniv: sample_part_min_cm
+  ovresall: upper_mesh_size_um
+  oxideratskikt: oxidized_layer_cm
+  posys: positioning_system_code
+  provNr: sample_id
+  provdjup: sample_depth_m
+  provnr: sample_part_id
+  provvolym: sampled_volume_l
+  redox: COPY_VARIABLE.Redox potential.mV
+  salinitet: COPY_VARIABLE.Bottom water salinity.
+  sedfargkod: COPY_VARIABLE.Sediment colour code.Rock Color Chart
+  sedimentbeskrivning: sediment_type
+  sflag: species_flag_code
+  shipc: platform_code
+  slabo: sampling_laboratory_code
+  sorteratAv: taxonomist
+  stnbet: reported_station_name
+  syrehalt: COPY_VARIABLE.Bottom water dissolved oxygen.mg/l
+  syremattnad: COPY_VARIABLE.Bottom water oxygen saturation.%
+  taxonID: dyntaxa_id
+  temperatur: COPY_VARIABLE.Bottom water temperature.C
+  torrvikt: COPY_VARIABLE.Dry weight.g/analysed sample fraction
+  tvprefix: QFLAG.Dry weight
+  uppdragsgivare: sample_orderer_code
+  vaghojd: wave_height_m
+  vattenhalt: COPY_VARIABLE.Sediment water content.% ww
+  vatvikt: COPY_VARIABLE.Wet weight.g/analysed sample fraction
+  viktprocent: COPY_VARIABLE.Sediment sieve fraction.%
+  vindhastighet: wind_speed_ms
+  vindriktning: wind_direction_code
+  vvprefix: QFLAG.Wet weight

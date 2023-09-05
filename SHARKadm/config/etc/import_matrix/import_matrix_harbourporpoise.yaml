@@ -1,0 +1,88 @@
+MNHS:
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  ALABO: analytical_laboratory_code
+  COMNT_SAMP: sample_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  DEPH: sample_depth_m
+  EDATE: visit_enddate
+  ETIME: sample_endtime
+  LATIT: sample_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  METDC: method_documentation
+  MPROG: monitoring_program_code
+  MYEAR: visit_year
+  ODATE: observation_date
+  ORDERER: sample_orderer_code
+  OTIME: observation_time
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  RAW: sample_id
+  SDATE: visit_date
+  SLABO: sampling_laboratory_code
+  SMPDEP: sample_depth_m
+  SMPDEPTH: sample_depth_m
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STIME: sample_time
+  UNANA: sample_id
+  WADEP: water_depth_m
+  WADEPTH: water_depth_m
+  calc_by_dc: calc_by_dc
+  porpoise_positive_minutes: COPY_VARIABLE.Detection positive minutes per day.Detection
+    minutes/day
+MNHS_2023:
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  ALABO: analytical_laboratory_code
+  COMNT_SAMP: sample_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  DEPH: sample_depth_m
+  DPD_month_perc: COPY_VARIABLE.Detection positive days per month.%
+  DPM: NOT_USED.DPM
+  DPM_day_sum: COPY_VARIABLE.Detection positive minutes per day.Detection minutes/day
+  EDATE: visit_logger_enddate
+  EN_TIME: visit_logger_endtime
+  ETIME: visit_logger_endtime
+  LATIT: sample_reported_latitude
+  LATIT_prov: NOT_USED.LATIT_prov
+  LATNM: reported_scientific_name
+  LONGI: sample_reported_longitude
+  LONGI_prov: NOT_USED.LONGI_prov
+  MAXSMPDEPTH: sample_max_depth_m
+  METDC: method_documentation
+  MINSMPDEPTH: sample_min_depth_m
+  MPROG: monitoring_program_code
+  MYEAR: visit_year
+  ODATE: visit_date
+  ORDERER: sample_orderer_code
+  OTIME: NOT_USED.observation_time
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  QFLAG: quality_flag
+  RAW: sample_id
+  SDATE: visit_logger_startdate
+  SLABO: sampling_laboratory_code
+  SMPDEP: sample_depth_m
+  SMPDEPTH: sample_depth_m
+  SMPNO: sample_id
+  SMTYP: sampler_type_code
+  STATN: reported_station_name
+  STIME: visit_logger_starttime
+  ST_TIME: visit_logger_starttime
+  UNANA: sample_id
+  WADEP: water_depth_m
+  WADEPTH: water_depth_m
+  calc_by_dc: calc_by_dc
+  deployment_period_key: NOT_USED.deployment_period_key
+  monitored_days_in_month: deployed_days_per_month
+  percent_per_month: COPY_VARIABLE.Detection positive days per month.%
+  porpoise_positive_minutes: COPY_VARIABLE.Detection positive minutes per day.Detection
+    minutes/day
+  positive_minutes: COPY_VARIABLE.Detection positive minutes per day.Detection minutes/day

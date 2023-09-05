@@ -1,0 +1,86 @@
+Greyseal:
+  ' WINSP_MS': wind_speed_ms
+  ACKR_ANA: analytical_laboratory_accreditated
+  ACKR_SMP: sampling_laboratory_accreditated
+  AIRPRES: air_pressure_hpa
+  AIRTEMP: air_temperature_degc
+  ALABO: analytical_laboratory_code
+  ANADATE: analysis_date
+  Area: sea_region
+  CLOUD: cloud_observation_code
+  COMNT: variable_comment
+  COMNT_SAMP: sample_comment
+  COMNT_VAR: variable_comment
+  COMNT_VISIT: visit_comment
+  COUNT: COPY_VARIABLE.# counted.ind
+  COUNTNR: COPY_VARIABLE.# counted.ind
+  COUNTY: county
+  COUNT_L: 'COPY_VARIABLE.Total # counted on land.ind'
+  COUNT_LW: COPY_VARIABLE.# counted.ind
+  COUNT_W: 'COPY_VARIABLE.Total # counted in water.ind'
+  COUNT_YOUN: COPY_VARIABLE.# pups counted on land.ind
+  EXPID: expedition_id
+  FNFLA: fauna_flora_found
+  FOTOID: image_id
+  ICEOB: ice_observation_code
+  IMAGE_ID: image_id
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  MDATE: visit_date
+  METDC: method_documentation
+  MPROG: monitoring_program_code
+  MSTAT: monitoring_station_type_code
+  MYEAR: visit_year
+  OBSDIST: observation_distance_m
+  OBSERV: sampled_by
+  OBSNO: sample_id
+  OBSPOINT: obspoint
+  OBSTIME: sample_time
+  ORDERER: sample_orderer_code
+  POSYS: positioning_system_code
+  PROJ: sample_project_code
+  PURPM: monitoring_purpose_code
+  REFSK: method_reference_code
+  REGION: sea_region
+  SDATE: visit_date
+  SLABO: sampling_laboratory_code
+  SMPNO: sample_id
+  SMP_BY: sampled_by
+  SMTYP: sampler_type_code
+  'STATN ': reported_station_name
+  STIME: sample_time
+  SUBSITE: reported_station_name
+  WAVES: wave_observation_code
+  WEATH: weather_observation_code
+  WEATHER: weather_observation_code
+  WINDIR: wind_direction_code
+  WINDR_NWES: wind_direction_code
+  'WINSP ': wind_speed_ms
+Gseal:
+  ACKR_SMP: sampling_laboratory_accreditated
+  Area: sea_region
+  COMNT: variable_comment
+  COUNTY: county
+  COUNT_L: 'COPY_VARIABLE.Total # counted on land.ind'
+  COUNT_LW: COPY_VARIABLE.# counted.ind
+  COUNT_W: 'COPY_VARIABLE.Total # counted in water.ind'
+  COUNT_YOUN: COPY_VARIABLE.# pups counted on land.ind
+  EXPID: expedition_id
+  LATIT: visit_reported_latitude
+  LATNM: reported_scientific_name
+  LONGI: visit_reported_longitude
+  MDATE: visit_date
+  MYEAR: visit_year
+  OBSDIST: observation_distance_m
+  OBSERV: sampled_by
+  OBSNO: sample_id
+  OBSPOINT: obspoint
+  ORDERER: sample_orderer_code
+  PROJ: sample_project_code
+  REGION: sea_region
+  SLABO: sampling_laboratory_code
+  STATN: reported_station_name
+  WEATHER: weather_observation_code
+  WINDR_NWES: wind_direction_code
+  WINSP_MS: wind_speed_ms
