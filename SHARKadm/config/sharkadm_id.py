@@ -17,6 +17,9 @@ class SharkadmIdLevelHandler:
         self._id_columns: list[str] = []
         self._load_id_columns()
 
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__} with data type "{self._data_type}" and level "{self._level}"'
+
     @property
     def data_type(self) -> str:
         return self._data_type
@@ -59,6 +62,9 @@ class SharkadmIdConfig:
         self._config = {}
         self._load_config()
 
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__} handling config file: "{self._config_path}"'
+
     def _load_config(self):
         with open(self._config_path) as fid:
             self._config = yaml.safe_load(fid)
@@ -84,6 +90,9 @@ class SharkadmIdHandler:
         self._directory: pathlib.Path = pathlib.Path(directory)
         self._id_objects: dict[str, dict[str, SharkadmIdHandler]] = {}
         self._load_sharkadm_id_objects()
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__} for directory: {self._directory}'
 
     def _load_sharkadm_id_objects(self) -> None:
         self._id_objects = {}

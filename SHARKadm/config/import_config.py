@@ -16,6 +16,9 @@ class ImportMapper:
         self._import_column = import_column
         self._data = data
 
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__} with data type "{self._data_type}" and column "{self._import_column}"'
+
     @property
     def data_type(self) -> str:
         return self._data_type
@@ -48,6 +51,9 @@ class ImportMatrixConfig:
         self._validate()
 
         self._load_file()
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__} with data type "{self._data_type}": {self._path}'
 
     def _validate(self) -> None:
         if self.data_type not in self._path.stem.lower():
