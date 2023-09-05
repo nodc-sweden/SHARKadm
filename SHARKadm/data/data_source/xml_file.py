@@ -1,5 +1,6 @@
 import logging
 import xml.etree.ElementTree as ET
+import numpy as np
 
 import pandas as pd
 
@@ -17,7 +18,6 @@ class XmlDataFile(DataFile):
                 XmlDataFile.extract_data_from_element(el, data)
             else:
                 data[el.tag] = el.text
-                # data[el.tag] = f'{el.tag}.{el.text}'
 
     def _load_file(self) -> None:
         tree = ET.parse(self._path)

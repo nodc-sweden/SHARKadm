@@ -33,8 +33,8 @@ def load_dataset(
     data_file.map_header(import_header_mapper)
 
     d_holder = data_holder.DataHolder(data_type=d_note.data_type,
-                                     column_info=column_info,
-                                     id_handler=id_handler,
+                                     # column_info=column_info,
+                                     # id_handler=id_handler,
                                      dataset_name=dataset_directory.name)
 
     d_holder.add_data_source(data_file)
