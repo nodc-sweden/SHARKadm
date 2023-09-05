@@ -7,7 +7,7 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-from . import utils
+from .data_type_mapper import DataTypeMapper
 
 
 class ImportMapper:
@@ -39,9 +39,10 @@ class ImportMatrixConfig:
     def __init__(self,
                  path: str | pathlib.Path,
                  data_type: str = None,
-                 encoding: str = 'cp1252') -> None:
+                 encoding: str = 'cp1252',
+                 data_type_mapper: DataTypeMapper = None) -> None:
         self._path = pathlib.Path(path)
-        self._data_type = utils.get_data_type_mapping(data_type)
+        self._data_type = data_type_mapper.get(data_type)
         if self._data_type != data_type:
             logger.warning(f'Data type has been mapped: {data_type} -> {self._data_type}')
         self._encoding = encoding

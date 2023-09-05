@@ -2,7 +2,7 @@ import logging
 import pathlib
 import yaml
 
-from . import utils
+from .data_type_mapper import DataTypeMapper
 
 logger = logging.getLogger(__name__)
 
@@ -102,8 +102,9 @@ class SharkadmIdHandler:
             
     def get_level_handler(self,
                           data_type: str = None,
-                          level: str = None) -> SharkadmIdLevelHandler | None:
-        data_type = utils.get_data_type_mapping(data_type)
+                          level: str = None,
+                          data_type_mapper: DataTypeMapper = None) -> SharkadmIdLevelHandler | None:
+        data_type = data_type_mapper.get(data_type)
         if level not in self._id_objects[data_type]:
             return
         return self._id_objects[data_type][level]
