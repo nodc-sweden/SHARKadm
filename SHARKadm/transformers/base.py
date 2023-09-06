@@ -18,6 +18,10 @@ class DataHolderProtocol(Protocol):
 
 class Transformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
+
+    def __repr__(self) -> str:
+        return f'Transformer: {self.__class__.__name__}'
+
     @abstractmethod
     def transform(self, data_holder: DataHolderProtocol) -> None:
         ...

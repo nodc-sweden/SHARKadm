@@ -18,6 +18,10 @@ class DataHolderProtocol(Protocol):
 
 class Validator(ABC):
     """Abstract base class used as a blueprint to validate/tidy/check data in a DataHolder"""
+
+    def __repr__(self) -> str:
+        return f'Validator: {self.__class__.__name__}'
+
     @abstractmethod
     def validate(self, data_holder: DataHolderProtocol) -> None:
         ...

@@ -1,5 +1,5 @@
 from .base import Transformer, DataHolderProtocol
-
+from SHARKadm import adm_logger
 
 class ReplaceCommaWithDot(Transformer):
     apply_on_columns = [
@@ -8,9 +8,10 @@ class ReplaceCommaWithDot(Transformer):
     ]
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
+        adm_logger.log_transformation('test', 'test igen')
         for col in self.apply_on_columns:
             data_holder.data[col] = data_holder.data[col].apply(self.convert)
 
     @staticmethod
-    def convert(x):
+    def convert(x) -> str:
         return x.replace(',', '.')
