@@ -6,6 +6,7 @@ import pandas as pd
 from SHARKadm.config.sharkadm_id import SharkadmIdLevelHandler
 from SHARKadm.data.data_source.common import DataFile
 from SHARKadm.transformers import Transformer
+from SHARKadm.validators import Validator
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ class DataHolder:
         self._data: pd.DataFrame = pd.DataFrame()
 
         self._transformers: list[Transformer] = []
+        self._validators: list[Validator] = []
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self._data_type}": {self._dataset_name}'
@@ -65,13 +67,22 @@ class DataHolder:
         self._import_data_source(data_source)
 
     def add_transformers(self, *args: Transformer) -> None:
-        """Add one ore more Transformers to the data holder"""
+        """Add one or more Transformers to the data holder"""
         self._transformers.extend(args)
 
     def transform(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
             trans.transform(self)
+
+    def add_validators(self, *args: Validator) -> None:
+        """Add one or more Validators to the data holder"""
+        self._validators.extend(args)
+
+    def validate(self) -> None:
+        """Runs all validator objects in self._validators"""
+        for trans in self._validators:
+            trans.validate(self)
 
     def _import_data_source(self, data_source: DataFile) -> None:
         """Add new data source to self._data"""
