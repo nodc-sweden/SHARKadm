@@ -5,13 +5,14 @@ import pandas as pd
 from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
 
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
+class AddPositionToAllLevels(Transformer):
+    lat_to_sync = [
+        'sample_reported_latitude',
+    ]  # In order of prioritization
 
-class AddDateAndTimeToAllLevels(Transformer):
-    dates_to_sync = [
-        'sample_date',
-        'visit_date'
+    lon_to_sync = [
+        'sample_reported_longitude',
     ]  # In order of prioritization
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
@@ -23,7 +24,7 @@ class AddDateAndTimeToAllLevels(Transformer):
             return row[par]
         for date_par in self.dates_to_sync:
             if row.get(date_par):
-                adm_logger.log_transformation(f'Added {par} from {date_par}')
+                adm_logger.log_transformation(f'Added {par} from {date_par}', 'test')
                 return row[date_par]
         return ''
 
@@ -37,21 +38,3 @@ class AddDatetime(Transformer):
     @staticmethod
     def to_datetime(x: str) -> datetime.datetime:
         return datetime.datetime.strptime(x, DATETIME_FORMAT)
-
-
-class AddSampleMonth(Transformer):
-
-    def transform(self, data_holder: DataHolderProtocol) -> None:
-        if 'datetime' not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Missing column: datetime')
-            return
-        data_holder.data['sample_month'] = data_holder.data['datetime'].apply(lambda x, dh=data_holder:
-                                                                              self.get_month(x, dh))
-
-    @staticmethod
-    def get_month(x: datetime.datetime, data_holder: DataHolderProtocol) -> str:
-        if not x:
-            adm_logger.log_transformation(f'Missing datetime in {data_holder}')
-            return ''
-        return str(x.month)
-
