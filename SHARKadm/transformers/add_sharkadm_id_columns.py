@@ -4,6 +4,8 @@ from SHARKadm.config import data_type_mapper
 from SHARKadm.config import sharkadm_id
 from .base import Transformer, DataHolderProtocol
 
+import hashlib
+
 
 class AddSharkadmIdToColumns(Transformer):
 
@@ -36,5 +38,11 @@ class AddSharkadmIdToColumns(Transformer):
             if not id_handler:
                 # new_data[f'sharkadm_{level}_id'] = ''
                 continue
-            data_holder.data[f'sharkadm_{level}_id'] = data_holder.data.apply(lambda row: id_handler.get_id(row),
-                                                                              axis=1)
+            col_name = f'sharkadm_{level}_id'
+            col_name_md5 = f'{col_name}_md5'
+            data_holder.data[col_name] = data_holder.data.apply(lambda row: id_handler.get_id(row), axis=1)
+            data_holder.data[col_name_md5] = data_holder.data[col_name].apply(self.get_md5)
+
+    @staticmethod
+    def get_md5(x) -> str:
+        return hashlib.md5(x.encode('utf-8')).hexdigest()
