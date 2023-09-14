@@ -16,16 +16,27 @@ class AddPositionToAllLevels(Transformer):
     ]  # In order of prioritization
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
-        for par in self.dates_to_sync:
-            data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_and_add(p, row), axis=1)
+        for par in self.lat_to_sync:
+            data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lat(p, row), axis=1)
+        for par in self.lon_to_sync:
+            data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lon(p, row), axis=1)
 
-    def check_and_add(self, par: str, row: pd.Series) -> str:
+    def check_lat(self, par: str, row: pd.Series) -> str:
         if row.get(par):
             return row[par]
-        for date_par in self.dates_to_sync:
-            if row.get(date_par):
-                adm_logger.log_transformation(f'Added {par} from {date_par}', 'test')
-                return row[date_par]
+        for lat_par in self.lat_to_sync:
+            if row.get(lat_par):
+                adm_logger.log_transformation(f'Added {par} from {lat_par}', 'test')
+                return row[lat_par]
+        return ''
+
+    def check_lon(self, par: str, row: pd.Series) -> str:
+        if row.get(par):
+            return row[par]
+        for lon_par in self.lon_to_sync:
+            if row.get(lon_par):
+                adm_logger.log_transformation(f'Added {par} from {lon_par}')
+                return row[lon_par]
         return ''
 
 

@@ -43,7 +43,7 @@ class AddSampleMonth(Transformer):
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
         if 'datetime' not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Missing column: datetime')
+            adm_logger.log_transformation(f'Missing key: datetime')
             return
         data_holder.data['sample_month'] = data_holder.data['datetime'].apply(lambda x, dh=data_holder:
                                                                               self.get_month(x, dh))

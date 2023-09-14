@@ -7,7 +7,7 @@ from .base import Transformer, DataHolderProtocol
 import hashlib
 
 
-class AddSharkadmIdToColumns(Transformer):
+class CustomAddSharkadmIdToColumns(Transformer):
 
     def __init__(self,
                  column_info: column_info.ColumnInfoConfig = None,
@@ -18,16 +18,16 @@ class AddSharkadmIdToColumns(Transformer):
         self._id_handler = id_handler
         self._d_type_mapper = d_type_mapper
 
-    @classmethod
-    def from_default_config(cls):
-        col_info = config.get_column_info_config()
-        id_handler = config.get_sharkadm_id_handler()
-        d_type_mapper = config.get_data_type_mapper()
-        return AddSharkadmIdToColumns(
-            column_info=col_info,
-            id_handler=id_handler,
-            d_type_mapper=d_type_mapper
-        )
+    # @classmethod
+    # def from_default_config(cls):
+    #     col_info = config.get_column_info_config()
+    #     id_handler = config.get_sharkadm_id_handler()
+    #     d_type_mapper = config.get_data_type_mapper()
+    #     return CustomAddSharkadmIdToColumns(
+    #         column_info=col_info,
+    #         id_handler=id_handler,
+    #         d_type_mapper=d_type_mapper
+    #     )
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
         """sharkadm_id in taken from self._id_handler"""
@@ -46,3 +46,20 @@ class AddSharkadmIdToColumns(Transformer):
     @staticmethod
     def get_md5(x) -> str:
         return hashlib.md5(x.encode('utf-8')).hexdigest()
+
+
+class AddSharkadmIdToColumns(Transformer):
+
+    def __init__(self) -> None:
+        col_info = config.get_column_info_config()
+        id_handler = config.get_sharkadm_id_handler()
+        d_type_mapper = config.get_data_type_mapper()
+        self._trans = CustomAddSharkadmIdToColumns(
+            column_info=col_info,
+            id_handler=id_handler,
+            d_type_mapper=d_type_mapper
+        )
+
+    def transform(self, data_holder: DataHolderProtocol) -> None:
+        self._trans.transform(data_holder)
+
