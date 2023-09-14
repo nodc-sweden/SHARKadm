@@ -11,7 +11,7 @@ def load_dataset(
             data_file_name: str = None,
             data_source_class: data_source.DataFile = None
         ) -> data_holder.DataHolder | None:
-    """Loads a txt based dataset"""
+
     dataset_directory = pathlib.Path(data_source_directory)
 
     delivery_note_path = pathlib.Path(dataset_directory, 'processed_data', 'delivery_note.txt')
@@ -42,6 +42,7 @@ def load_dataset(
 
 
 def load_xml_dataset(directory: str | pathlib.Path) -> data_holder.DataHolder | None:
+    """Loads a xml based dataset"""
     return load_dataset(
         data_source_directory=directory,
         data_file_name='data.xml',
@@ -50,6 +51,7 @@ def load_xml_dataset(directory: str | pathlib.Path) -> data_holder.DataHolder | 
 
 
 def load_txt_dataset(directory: str | pathlib.Path) -> data_holder.DataHolder | None:
+    """Loads a txt based dataset"""
     return load_dataset(
         data_source_directory=directory,
         data_file_name='data.txt',

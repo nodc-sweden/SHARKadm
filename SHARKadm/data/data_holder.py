@@ -66,23 +66,33 @@ class DataHolder:
             raise ValueError(msg)
         self._import_data_source(data_source)
 
-    def add_transformers(self, *args: Transformer) -> None:
+    def set_transformers(self, *args: Transformer) -> None:
         """Add one or more Transformers to the data holder"""
         self._transformers.extend(args)
 
-    def transform(self) -> None:
+    def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
             trans.transform(self)
 
-    def add_validators(self, *args: Validator) -> None:
-        """Add one or more Validators to the data holder"""
+    def transform(self, *transformers: Transformer) -> 'DataHolder':
+        for trans in transformers:
+            trans.transform(self)
+        return self
+
+    def set_validators(self, *args: Validator) -> None:
+        """Sets one or more Validators to the data holder"""
         self._validators.extend(args)
 
-    def validate(self) -> None:
-        """Runs all validator objects in self._validators"""
-        for trans in self._validators:
-            trans.validate(self)
+    def validate_all(self) -> None:
+        """Runs all set validator objects in self._validators"""
+        for val in self._validators:
+            val.validate(self)
+
+    def validate(self, *validators: Validator) -> 'DataHolder':
+        for val in validators:
+            val.validate(self)
+        return self
 
     def _import_data_source(self, data_source: DataFile) -> None:
         """Add new data source to self._data"""
