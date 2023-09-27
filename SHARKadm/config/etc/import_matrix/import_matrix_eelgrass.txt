@@ -1,0 +1,219 @@
+cluster.table.column	EELGRASS
+dataset.reporting_institute_code	RLABO
+dataset.reported_by	
+visit.visit_id	
+visit.visit_year	MYEAR
+visit.visit_date	SDATE<or>Datum
+visit.reported_station_name	STATN<or>Lokal
+visit.visit_comment	COMNT_VISIT<or>Kommentar
+visit.TEMP.add_to_visit_comment	
+visit.expedition_id	
+visit.station_N2000_code	
+visit.platform_code	SHIPC
+visit.station_marking	
+visit.station_photo	
+visit.station_cluster	
+visit.water_land_station_type_code	
+visit.sea_area	
+visit.monitoring_purpose_code	PURPM
+visit.wind_speed_ms	
+visit.wave_height_m	
+visit.wind_direction_code	
+visit.water_level_deviation_m	
+visit.wave_exposure_fetch	WAVXP
+visit.station_exposure	
+visit.visit_reported_latitude	
+visit.visit_reported_longitude	
+visit.positioning_system_code	POSYS
+sample.sample_time	STIME
+sample.sample_reported_latitude	LATIT<or>Latitud
+sample.sample_reported_longitude	LONGI<or>Longitud
+sample.sample_id	SMPNO
+variable.sample_part_id	
+sample.sample_series	
+sample.sample_depth_m	SMPDEP<or>Vattenståndskorrigerat djup (m)<or>SMDEP
+sample.sample_project_code	PROJ_NAME<or>Undersökning<or>PROJ
+sample.project_purpose	
+sample.sample_orderer_code	ORDERER
+sample.monitoring_program_code	MPROG
+sample.sampling_laboratory_code	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP
+sample.method_documentation	METDC
+sample.sample_comment	COMNT_SAMP
+sample.sample_cluster	
+sample.bottom_slope_deg	
+sample.sample_substrate_cover_softbottom	
+sample.sample_substrate_cover_gravel	
+sample.sample_substrate_cover_rock	
+sample.sample_substrate_comnt_rock	
+sample.sample_substrate_comnt_gravel	
+sample.sample_substrate_comnt_softbottom	
+TEMP.substrate	
+TEMP.substrate_code	
+TEMP.substrate_cover	
+TEMP.substrate_comment	
+visit.transect_id	
+sample.transect_id	
+sample.transect_start_latitude_dm	
+sample.transect_start_longitude_dm	
+sample.transect_end_latitude_dm	
+sample.transect_end_longitude_dm	
+sample.transect_start_latitude_dd	
+sample.transect_start_longitude_dd	
+sample.transect_end_latitude_dd	
+sample.transect_end_longitude_dd	
+sample.transect_direction_deg	
+sample.transect_min_distance_m	
+sample.transect_max_distance_m	
+sample.transect_min_depth_m	
+sample.transect_max_depth_m	
+sample.transect_start_depth_m	
+sample.transect_stop_depth_m	
+sample.transect_length_m	
+visit.transect_width_m	
+sample.diver_name	
+sample.transect_video	
+sample.transect_video_name	Filmnummer
+sample.transect_video_interpreter	
+sample.transect_protocol_writer	
+sample.transect_interpretation_time	
+sample.transect_cover_soft_bottom	
+sample.transect_cover_hard_bottom	
+sample.transect_comment	
+sample.section_start_latitude_dm	
+sample.section_start_longitude_dm	
+sample.section_start_latitude_dd	
+sample.section_start_longitude_dd	
+sample.section_end_latitude_dd	
+sample.section_end_longitude_dd	
+sample.section_start_depth_m	
+sample.section_end_depth_m	
+sample.section_distance_start_m	
+sample.section_distance_end_m	
+sample.section_start_interpretation	
+sample.section_stop_interpretation	
+sample.section_fauna_flora_found	
+sample.section_debris_cover	
+sample.section_bare_substrate	
+sample.section_transect	
+TEMP.sect_substrate	
+TEMP.sect_substrate_code	
+TEMP.sect_substrate_cover	
+TEMP.sect_substrate_comment	
+sample.section_comment	
+sample.sampler_type_code	SMTYP
+sample.sampler_area_m2	SAREA
+sample.sampler_area_cm2	
+sample.video_interpreted	
+sample.sediment_deposition_code	
+sample.fauna_flora_found	FNFLA
+sample.image_name	
+sample.image_stop_time	
+sample.sample_photo_code	
+sample.sample_reported_latitude	
+sample.sample_reported_longitude	
+sample.method_comment	
+variable.analysis_method_code	
+sample.method_reference_code	REFSK
+variable.analytical_laboratory_code	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA
+variable.analysed_by	
+variable.variable_comment	
+variable.dyntaxa_id	
+variable.size_class	
+variable.species_flag_code	SFLAG
+variable.stratum_code	
+variable.reported_scientific_name	LATNM
+variable.taxonomist	TAXNM
+variable.size_class_range_min	
+variable.size_class_range_max	
+variable.epibiont	
+variable.degree_biofouling	
+variable.bitemark	
+variable.reproductive_organs	
+variable.recruits	
+variable.detached	
+variable.taxon_photo	
+variable.substrate_code	
+variable.preservation_method_code	
+visit.monitoring_station_type_code	MSTAT
+variable.COPY_VARIABLE.# counted.ind	
+variable.COPY_VARIABLE_MULTIPLY.Abundance.ind/m2.4	
+sample.CREATE_VARIABLE.Cover class filamentous algae.class	
+variable.COPY_VARIABLE.Cover (%).%	COVERAGE%<or>Procent av yta täckt av ålgräs
+sample.CREATE_VARIABLE.Total cover of all species (%).%	TOTCOVERAGE%
+sample.CREATE_VARIABLE.Temperature.C	
+sample.CREATE_VARIABLE.Turbidity.NTU	
+sample.CREATE_VARIABLE.Salinity.ppt	
+variable.COPY_VARIABLE.Maximum height.m?	
+variable.COPY_VARIABLE.Average height.cm?	
+variable.COPY_VARIABLE.Reproductive organs.class	
+variable.COPY_VARIABLE.Bite marks.class	
+variable.COPY_VARIABLE.Recruitment.class	
+variable.COPY_VARIABLE.Shoot density.ind/m2	SKOTTANTAL (ANTAL/M2)
+variable.COPY_VARIABLE.Shoot biomass.g dry weight/m2	SKOTTBIOMASSA (G DW/M2)
+variable.COPY_VARIABLE.Min shoot length.cm	SKOTTLÄNGD MIN (CM)
+variable.COPY_VARIABLE.Max shoot length.cm	SKOTTLÄNGD MAX (CM)
+variable.COPY_VARIABLE.Average shoot length.cm	SKOTTLÄNGD MEDEL (CM)
+variable.COPY_VARIABLE.Rhizome biomass.g dry weight/m2	RHIZOMBIOMASSA (G DW/M2)
+variable.COPY_VARIABLE.Rhizome juice sugar content. % by volume	SOCKERHALT (%)
+visit.secchi_depth_quality_flag	
+visit.secchi_depth_m	
+sample.CREATE_VARIABLE.Temperature.C	
+sample.CREATE_VARIABLE.Salinity.	
+sample.CREATE_VARIABLE.Sediment deposition cover (%).%	
+variable.COPY_VARIABLE.Species distribution min depth.m	
+variable.COPY_VARIABLE.Species distribution max depth.m	
+variable.COPY_VARIABLE.Dry weight.g	
+variable.COPY_VARIABLE.Abundance class.class	
+variable.COPY_VARIABLE.Depth distribution (max depth).m	WADEP_COR<or>Vattenståndskorrigerat maxdjup
+variable.COPY_VARIABLE.Density in covered area.%	Täthet i den ålgrästäckta ytan
+variable.COPY_VARIABLE.Substrate specific cover.%	Ytspecifik Täckning
+variable.COPY_VARIABLE.Substrate cover.%	
+variable.COPY_VARIABLE.Cover 1_4	
+variable.COPY_VARIABLE.Cover 1_5	
+variable.COPY_VARIABLE.Cover 1_7	
+sample.CREATE_VARIABLE.sediment_cover_class	
+sample.CREATE_VARIABLE.hard_clay_cover_class	
+sample.CREATE_VARIABLE.soft_clay_cover_class	
+sample.CREATE_VARIABLE.silt_cover_class	
+sample.CREATE_VARIABLE.sand_cover_class	
+sample.CREATE_VARIABLE.silt_clay_cover_class	
+sample.CREATE_VARIABLE.gravel_fine_medium_cover_class	
+sample.CREATE_VARIABLE.gravel_coarse_cover_class	
+sample.CREATE_VARIABLE.cobble_medium_cover_class	
+sample.CREATE_VARIABLE.cobble_coarse_cover_class	
+sample.CREATE_VARIABLE.large_boulder_cover_class	
+sample.CREATE_VARIABLE.rock_cover_class	
+sample.CREATE_VARIABLE.shell_gravel_cover_class	
+sample.CREATE_VARIABLE.shell_cover_class	
+sample.CREATE_VARIABLE.bare_substrate_cover_class	
+sample.CREATE_VARIABLE.debris_cover_class	
+sample.CREATE_VARIABLE.detritus_cover_class	
+sample.CREATE_VARIABLE.unidentified_substrate_cover_class	
+dataset.NOT_USED.Datalager_version	
+dataset.NOT_USED.Beställare	
+dataset.NOT_USED.Klient_version	
+dataset.NOT_USED.Skapad_tid	
+dataset.NOT_USED.Omfattning	
+dataset.NOT_USED.undersokningdataursprung	
+dataset.NOT_USED.avsnittartbelagg	
+visit.NOT_USED.lokalhavsomradeID	
+visit.NOT_USED.lokalhavsomrade_datum	
+visit.NOT_USED.lokalhavsomrade_TYP_NFS06	
+visit.NOT_USED.lokalexpgradID	
+visit.NOT_USED.tillfallelabo_department	
+visit.NOT_USED.tillfallelabo_institute 	
+variable.NOT_USED.provartbelagg	
+variable.NOT_USED.transekttaxaminmaxtaxonID	
+sample.NOT_USED.provredskap	
+sample.NOT_USED.provredskapstypID	
+sample.sediment_comment	
+visit.TEMP.add_to_visit_comment	
+variable.sample_latitude	SMP_LATIT
+variable.sample_longitude	SMP_LONGI
+variable.distributionmax_depth	DISTRMAX_DEP
+sample.sample_series_no	SMPSERNO
+visit.water_depth_m	WADEP
+visit.water_level_deviation_m	WATLD
+	

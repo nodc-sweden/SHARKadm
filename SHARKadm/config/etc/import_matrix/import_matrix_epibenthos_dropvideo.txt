@@ -1,0 +1,72 @@
+cluster.table.column	DROPVIDEO
+visit.visit_year	MYEAR
+visit.visit_date	SDATE
+visit.reported_station_name	STATN
+visit.station_N2000_code	NTYPE<or>NTTYPE
+sample.sample_project_code	PROJ
+sample.sample_orderer_code	ORDERER
+sample.sampling_laboratory_code	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP
+sample.method_documentation	METDC
+visit.visit_comment	VISIT_COMNT<or>COMNT_VISIT
+visit.visit_id	TRANS_ID
+sample.transect_start_latitude_dd	TRANS_LAT_START
+sample.transect_start_longitude_dd	TRANS_LONG_START
+sample.transect_end_latitude_dd	TRANS_LAT_STOP
+sample.transect_end_longitude_dd	TRANS_LONG_STOP
+sample.transect_start_depth_m	TRANS_START_DEP
+sample.transect_stop_depth_m	TRANS_STOP_DEP
+sample.transect_start_latitude_dm	TRANS_LAT_START_DM
+sample.transect_start_longitude_dm	TRANS_LONG_START_DM
+sample.transect_end_latitude_dm	TRANS_LAT_STOP_DM
+sample.transect_end_longitude_dm	TRANS_LONG_STOP_DM
+visit.positioning_system_code	POSYS
+sample.transect_video_name	VID_NAME
+sample.transect_video_interpreter	VIDEO_INTER
+sample.transect_protocol_writer	PROTO_WRIT<or>PROTO_WRITE
+sample.transect_interpretation_time	TRANS_INTERPRET_TIME
+sample.CREATE_VARIABLE.Section sediment cover.class	COVER_SEDIMENT_BOTTOM
+sample.CREATE_VARIABLE.Section hard clay cover.class	COVER_HARD_CLAY
+sample.CREATE_VARIABLE.Section soft clay cover.class	COVER_SOFT_CLAY_<0.002
+sample.CREATE_VARIABLE.Section silt cover.class	COVER_SILT_0.002_0.06
+sample.CREATE_VARIABLE.Section silt clay cover.class	COVER_SILT_CLAY
+sample.CREATE_VARIABLE.Section silt soft clay cover.class	COVER_SILT_SOFT_CLAY
+sample.CREATE_VARIABLE.Section silt cover.class	COVER_SILT
+sample.CREATE_VARIABLE.Section sand cover.class	COVER_SAND_0.06_2<or>COVER_SAND
+sample.CREATE_VARIABLE.Section gravel fine medium cover.class	COVER_GRAVEL_FINE+MEDIUM_2_20
+sample.CREATE_VARIABLE.Section gravel coarse cover.class	COVER_GRAVEL_COARSE_20_60
+sample.CREATE_VARIABLE.Section cobble medium cover.class	COVER_COBBLE_MEDIUM_60_200<or>COVER_STONE_60_200
+sample.CREATE_VARIABLE.Section cobble coarse cover.class	COVER_COBBLE_COARSE_200_600<or>COVER_STONE_200_600
+sample.CREATE_VARIABLE.Section large boulder cover.class	COVER_LARGE_BOULDER_>600
+sample.CREATE_VARIABLE.Section rock cover.class	COVER_ROCK
+sample.CREATE_VARIABLE.Section shell gravel cover.class	COVER_SHELL_GRAVEL
+sample.CREATE_VARIABLE.Section shell cover.class	COVER_SHELL
+sample.CREATE_VARIABLE.Section bare substrate cover.class	COVER_BARE_SUBST
+sample.CREATE_VARIABLE.Section debris cover.class	COVER_DEBR
+sample.CREATE_VARIABLE.Section detritus cover.class	COVER_DETRITUS
+sample.CREATE_VARIABLE.Section unidentified substrate cover.class	COVER_UNIDENT_SUBST
+sample.CREATE_VARIABLE.Section epi zostera cover.class	COVER_EPI_ZOSTERA
+sample.CREATE_VARIABLE.Section unidentified plantae cover.class	COVER_UNIDENT_PLANTAE
+sample.CREATE_VARIABLE.Section nassarius tracks cover.class	COVER_NASSARIUS_TRACKS
+sample.CREATE_VARIABLE.Section paguridae tracks cover.class	COVER_PAGURIDAE_TRACKS
+sample.CREATE_VARIABLE.Section animalia burrows cover.class	COVER_ANIMALIA_BURROWS
+sample.CREATE_VARIABLE.Section animalia tracks cover.class	COVER_ANIMALIA_TRACKS
+sample.CREATE_VARIABLE.Section unidentified algae cover.class	COVER_UNIDENTIFIED_ALGAE
+sample.CREATE_VARIABLE.Section unanalysable cover	COVER_UNANALYSABLE
+sample.sample_id	PICT_NAME<or>PICT_NUMB<or>IMAGE_NAME
+variable.image_sequence	xxxPICT_NAME<or>xxxPICT_NUMB<or>xxxIMAGE_NAME
+variable.section_comment	COMNT_SAMP
+sample.sampler_type_code	SMTYP
+variable.image_stop_time	PICT_STOP_TIME<or>IMAGE_STOP_TIME
+sample.CREATE_VARIABLE.Sediment depos cover.class	DEPOS
+visit.secchi_depth_m	SECCHI
+visit.secchi_depth_quality_flag	Q_SECCHI
+sample.CREATE_VARIABLE.Salinity	SAL
+variable.analytical_laboratory_code	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA
+variable.analysis_date	ANADATE
+variable.variable_comment	COMNT_VAR
+	
+sample.CREATE_VARIABLE.Section boulder cover.class	COVER_BOULDER
+sample.CREATE_VARIABLE.Section gravel cover.class	COVER_GRAVEL
+sample.CREATE_VARIABLE.Section stone cover.class	COVER_STONE

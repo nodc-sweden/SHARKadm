@@ -2,7 +2,7 @@ import pathlib
 
 from .import_config import ImportMatrixConfig
 from .column_info import ColumnInfoConfig
-from .sharkadm_id import SharkadmIdHandler
+from .sharkadm_id import SharkadmIdsHandler
 from .data_type_mapper import DataTypeMapper
 
 THIS_DIR = pathlib.Path(__file__).parent
@@ -38,7 +38,7 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
 
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
     config_directory = config_directory or ID_CONFIG_DIRECTORY
-    return SharkadmIdHandler(config_directory)
+    return SharkadmIdsHandler(config_directory)
 
 
 def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:

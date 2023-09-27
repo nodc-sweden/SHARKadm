@@ -1,0 +1,8 @@
+data_type: physicalchemical
+levels:
+  sample:
+    - visit_year
+    - platfrom_code
+    - visit_id
+    - sample_min_depth_m
+    - sample_max_depth_m

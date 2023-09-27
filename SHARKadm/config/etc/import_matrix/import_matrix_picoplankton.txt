@@ -1,0 +1,89 @@
+cluster.table.column	Pico	Pico_FCM
+dataset.reporting_institute_code	RLABO	
+sample.method_comment	ANALYSISTYPE	
+sample.method_documentation	METDC	METDC
+sample.method_reference_code	REFSK	REFSK
+sample.monitoring_program_code	MPROG	MPROG
+sample.sample_orderer_code	ORDERER	ORDERER
+sample.plankton_sampling_method_code	PDMET	PDMET
+sample.sample_project_code	PROJ	PROJ
+sample.sample_comment	COMNT_SMP<or>COMNT_SAMP	COMNT_SMP
+sample.sample_id	SMPNO	SMPNO
+sample.sample_max_depth_m	MXDEP	MXDEP
+sample.sample_min_depth_m	MNDEP	MNDEP
+sample.sample_series	SERNO<or>SERIES	
+sample.sample_time	STIME	STIME
+sample.sampled_volume_l	SMVOL	SMVOL
+sample.sampler_type_code	SMTYP	SMTYP
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP
+sample.sampling_laboratory_code	SLABO	SLABO
+variable.QFLAG.Biovolume concentration	QFLAG	
+visit.secchi_depth_quality_flag	Q_SECCHI	
+variable.analysis_date	ANADATE	ANADATE
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA
+variable.analytical_laboratory_code	ALABO	ALABO
+variable.TEMP.add_to_variable_comment	COMNT	
+variable.coefficient	COEFF	
+variable.wavelength_excitation	WAVELENGTH_EX	
+variable.wavelength_emission	WAVELENGTH_EM	
+variable.COPY_VARIABLE.# counted.ind/analysed sample fraction	COUNTNR<or>COUNT	COUNT
+variable.COPY_VARIABLE.Abundance class.class	ABUND_CLASS	
+variable.COPY_VARIABLE.Abundance.ind/l	ABUND (c/l)<or>ABUND	ABUND
+variable.COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000	mg/m3<or>(mg/m3)<or>BIOVOLYM (mg/m3)	
+variable.COPY_VARIABLE.Biovolume concentration.mm3/l	BIOVOL	BIOVOL
+variable.COPY_VARIABLE_DIVIDE.Carbon concentration.ugC/l.1000	ugC/m3	
+variable.COPY_VARIABLE_DIVIDE.Carbon concentration.ugC/l.1000000	pgC/l	
+variable.COPY_VARIABLE.Carbon concentration.ugC/l	C_CONC<or>mgC/m3	C_CONC<or>mgC/m3
+variable.COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000000000	BIOVOLYM (um3/l)	
+variable.counter_program	COUNTPROG	
+variable.magnification	MAGNI	
+variable.mesh_size_um	MESHS	
+variable.analysis_method_code	METOA	METOA
+variable.preservation_method_code	METFP	METFP
+variable.reported_cell_volume_um3	CEVOL	CEVOL<or>CEVOL_UM3
+variable.reported_scientific_name	LATNM	LATNM
+variable.sample_part_id		
+variable.sedimentation_time_h	SDTIM	
+variable.sedimentation_volume_ml	SDVOL<or>FILTVOL	
+variable.size_class	SIZCL<or>Size	
+variable.size_max_um	SIZCL_MAX	
+variable.size_min_um	SIZCL_MIN	
+variable.size_class_ref_list_code	SIZRF	
+variable.species_flag_code	SFLAG	SFLAG
+variable.taxonomist	TAXNM	
+variable.trophic_type_code	TRPHY	TRPHY
+variable.variable_comment	COMNT_VAR	COMNT_VAR
+visit.air_pressure_hpa	AIRPRES	
+visit.air_temperature_degc	AIRTEMP	
+visit.cloud_observation_code	CLOUD	
+visit.cruise_start_serno	CRUIS	
+visit.expedition_id	EXPID	EXPID
+visit.ice_observation_code	ICEOB	
+visit.visit_reported_latitude	LATIT<or>LAT_DM	LATIT
+visit.visit_reported_longitude	LONGI<or>LONG_DM	LONGI
+visit.latitude_deg	LAT_DEG<or>Latitude_deg	
+visit.latitude_min	Latitude_min<or>Latitude_mm	
+visit.longitude_deg	LONG_DEG<or>Longitude_deg	
+visit.longitude_min	Longitude_min<or>Longitude_mm	
+visit.monitoring_purpose_code	PURPM	PURPM
+visit.platform_code	SHIPC	SHIPC
+visit.positioning_system_code	POSYS	POSYS
+visit.reported_station_name	STATN	STATN
+visit.wave_observation_code	SEAST<or>WAVES	
+visit.secchi_depth_m	SECCHI	
+visit.monitoring_station_type_code	MSTAT	
+visit.TEMP.expedition_comment	COMNT_EXP	
+visit.water_depth_m	WADEP	WADEP
+visit.water_land_station_type_code	WLTYP	
+visit.water_level_deviation_m	WATLD	
+visit.wave_exposure_fetch	WAVXP	
+visit.wave_height_m	WAVHT	
+visit.weather_observation_code	WEATH	
+visit.wind_direction_code	WINDR<or>WINDIR	
+visit.wind_speed_ms	WINSP	
+visit.visit_comment	COMNT_VISIT	
+visit.visit_date	SDATE	SDATE
+visit.visit_year	MYEAR	MYEAR
+variable.picotype		PICOPLANKTON_TYPE
+variable.replicate_no	REPLI_NO	REPLI_NO
+variable.coefficient_fgC_cell		COEFF_C

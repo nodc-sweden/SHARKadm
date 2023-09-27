@@ -62,9 +62,29 @@ class ImportMatrixConfig:
             logger.error(msg)
             raise ValueError(msg)
 
-    def _load_file(self) -> None:
+    def _load_yaml_file(self) -> None:
+        # Not used
         with open(self._path, encoding=self._encoding) as fid:
             self._data = yaml.safe_load(fid)
+
+    def _load_file(self) -> None:
+        self._data = {}
+        header = []
+        with open(self._path, encoding=self._encoding) as fid:
+            for r, line in enumerate(fid):
+                if not line.strip():
+                    continue
+                split_line = [item.strip() for item in line.split('\t')]
+                if r == 0:
+                    header = split_line
+                    self._data = {key: {} for key in header[1:]}
+                    continue
+
+                for inst, par_str in zip(header[1:], split_line[1:]):
+                    if not par_str:
+                        continue
+                    for par in par_str.split('<or>'):
+                        self._data[inst][par.split('.', 1)[-1]] = split_line[0].split('.', 1)[-1]
 
     @property
     def data_type(self) -> str:

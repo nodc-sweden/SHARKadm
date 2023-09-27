@@ -1,0 +1,86 @@
+cluster.table.column	ZP_SUSE	ZP_REG	ZP_UMSC-SMHI	ZP_JELLY
+visit.visit_id	SERNO	SERNO	SEQNO<or>SERNO	SERNO
+visit.visit_year	MYEAR	MYEAR	MYEAR<or>MYYEAR	MYEAR
+visit.visit_date	SDATE	SDATE	SDATE	SDATE
+visit.reported_station_name	STATN	STATN	STATN	STATN
+visit.visit_comment	COMNT_SITE<or>COMT_VISIT<or>COMNT_VISIT	COMNT_SITE<or>COMT_VISIT<or>COMNT_VISIT	COMNT_SITE<or>COMNT_VISIT	COMNT_VISIT
+visit.expedition_id	CRUIS<or>EXPID<or>CRUISE_NO	CRUIS<or>EXPID<or>CRUISE_NO	CRUIS<or>EXPID<or>CRUISE_NO	EXPID<or>CRUISE_NO
+visit.platform_code	SHIPC	SHIPC	SHIPC	SHIPC
+visit.water_land_station_type_code	WLTYP	WLTYP	WLTYP	WLTYP
+visit.air_temperature_degc	AIRTEMP	AIRTEMP	AIRTEMP	AIRTEMP
+visit.air_pressure_hpa	AIRPRES	AIRPRES	AIRPRES	AIRPRES
+visit.wave_observation_code	WAVES<or>SEAST	WAVES<or>SEAST	WAVES<or>SEAST	WAVES<or>SEAST
+visit.secchi_depth_m	SECCHI	SECCHI	SECCHI	SECCHI
+visit.secchi_depth_quality_flag	Q_SECCHI	Q_SECCHI	Q_SECCHI	Q_SECCHI
+visit.monitoring_station_type_code	MSTAT	MSTAT	MSTAT	MSTAT
+visit.monitoring_purpose_code	PURPM	PURPM	PURPM	
+visit.water_depth_m	WADEP	WADEP	WADEP	WADEP
+visit.wind_speed_ms	WINSP	WINSP	WINSP	WINSP
+visit.wind_direction_code	WINDR<or>WINDIR	WINDR<or>WINDIR_CODE<or>WINDIR	WINDR<or>WINDIR	WINDR<or>WINDIR_CODE
+visit.cloud_observation_code	CLOUD	CLOUD	CLOUD	CLOUD
+visit.ice_observation_code	ICEOB	ICEOB	ICEOB	ICEOB
+visit.weather_observation_code	WEATH	WEATH	WEATH	WEATH
+visit.visit_reported_latitude	LATIT	LATIT	LATIT	LATIT
+visit.visit_reported_longitude	LONGI	LONGI	LONGI	LONGI
+visit.positioning_system_code	POSYS	POSYS	POSYS	POSYS
+visit.latitude_deg			Latitude_deg<or>LAT_DEG	
+visit.latitude_min			Latitude_min<or>LAT_MIN	
+visit.longitude_deg			Longitude_deg<or>LONG_DEG	
+visit.longitude_min			Longitude_min<or>LONG_MIN	
+sample.sample_id	SMPNO	SMPNO<or>SMPID	SMPNO<or>RPSNO	SMPNO<or>SMPID
+sample.sample_time	STIME	STIME	STIME	STIME
+sample.sample_min_depth_m	MNDEP	MNDEP	MNDEP	MNDEP
+sample.sample_max_depth_m	MXDEP	MXDEP	MXDEP	MXDEP
+sample.flowmeter_length_m	FLOW_READ	FLOW_READ	FLOW_READ	FLOW_READ
+sample.sample_project_code	PROJ<or>PROJ_NAME	PROJ<or>PROJ_NAME	PROJ<or>PROJ_NAME	PROJ<or>PROJ_NAME
+sample.sample_orderer_code	ORDERER	ORDERER	ORDERER	ORDERER
+sample.monitoring_program_code	MPROG	MPROG	MPROG	MPROG
+sample.sampling_laboratory_code	SLABO	SLABO	SLABO	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP
+sample.method_reference_code	REFSK	REFSK	REFSK	REFSK
+sample.method_documentation	METDC	METDC	METDC	METDC
+sample.sample_comment	COMNT_SAMPLE<or>COMNT_SAMP	COMNT_SAMPLE<or>COMNT_SAMP	COMNT_SAMP	COMNT_SAMPLE<or>COMNT_SAMP
+sample.sampler_type_code	SMTYP	SMTYP	SMTYP	SMTYP
+sample.sampled_volume_l	SMVOL	SMVOL	SMVOL	SMVOL
+sample.sampler_area_cm2	SAREA	SAREA	SAREA	SAREA
+sample.plankton_sampling_method_code	PDMET	PDMET	PDMET	PDMET
+sample.calculation_method	CLMET	CLMET	CLMET	CLMET
+sample.wire_angle_deg	WIRAN	WIRAN	WIRAN	WIRAN
+sample.sample_splitting_code	SPLIT	SPLIT	SPLIT	SPLIT
+variable.quality_flag	QFLAG<or>VFLAG	QFLAG<or>VFLAG	QFLAG	QFLAG<or>VFLAG
+variable.analytical_laboratory_code	ALABO	ALABO	ALABO	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA	ACKR_ANA	ACKR_ANA
+variable.analysis_date	ANADATE	ANADATE	ANADATE	ANADATE
+variable.analysed_by	ANA_RESP	ANA_RESP	ANA_RESP	ANA_RESP
+variable.variable_comment	COMNT_ABUN<or>COMNT_VAR	COMNT_ABUN<or>COMNT_VAR	COMNT_ABU<or>COMNT_VAR	COMNT_ABUN<or>COMNT_VAR
+variable.size_class			SIZCL	
+variable.species_flag_code	SFLAG	SFLAG	SFLAG	SFLAG
+variable.sex_code	SEXCO<or>SEXCODE	SEXCO<or>SEXCODE	SEXCO<or>SEX<or>SEXCODE	SEXCO<or>SEXCODE
+variable.dev_stage_code	STAGE	STAGE	STAGE	STAGE
+variable.counted_portions	CPORT	CPORT	CPORT	CPORT
+variable.magnification	MAGNI	MAGNI	MAGNI	MAGNI
+variable.reported_scientific_name	LATNM	LATNM	LATNM	LATNM
+variable.taxonomist	TAXNM	TAXNM	TAXNM	TAXNM
+variable.number_of_portions	NPORT	NPORT	NPORT	NPORT
+variable.size_min_um			SIZCL_MIN	
+variable.size_max_um			SIZCL_MAX	
+variable.length_mm				LENGTH
+variable.sample_part_id	SMPID			
+variable.preservation_method_code	METFP	METFP	METFP	METFP
+variable.mesh_size_um	MESHS	MESHS	MESHS	MESHS
+variable.COPY_VARIABLE.# counted.ind/analysed sample fraction	INDCOUNT<or>COUNTNR<or>COUNT	INDCOUNT<or>COUNTNR<or>COUNT	INDCOUNT<or>COUNTNR<or>COUNT	INDCOUNT<or>COUNTNR<or>COUNT
+variable.COPY_VARIABLE.Dry weight.mg/analysed sample fraction	DRYWT	DRYWT	DRYWT	DRYWT
+variable.COPY_VARIABLE_MULTIPLY.Wet weight.mg/analysed sample fraction.1000			WETWT	
+variable.COPY_VARIABLE.Wet weight.mg/analysed sample fraction		WETWT		
+variable.used_indwetwt.mg				WETWT
+variable.used_indwetwt.MULTIPLY.1000	INDWETWT<or>INDWETWT_g	INDWETWT	INDWETWT	INDWETWT<or>WETWT
+variable.used_indwetwt.DIVIDE.1000	INDWETWT_ug<or>WETWT	INDWETWT_ug		INDWETWT_ug
+variable.COPY_VARIABLE.Carbon content.ug/analysed sample fraction	CCONT	CCONT	CCONT	
+variable.COPY_VARIABLE.Carbon content.ug/m3		BMCCONT		BMCCONT
+variable.COPY_VARIABLE.Body length.mm				BODY_LGTH
+variable.COPY_VARIABLE.Length (mean).um		LENGTH_MEAN	LENGTH_AVERAGE<or>LENGTH_MEAN	
+variable.COPY_VARIABLE.Length (median).um		LENGTH_MEDIAN	LENGTH_MEDIAN	
+variable.COPY_VARIABLE.Abundance.ind/m2	ABUND/M2<or>ABUNDM2		ABUND/M2<or>ABUNDM2	
+variable.COPY_VARIABLE_MULTIPLY.Wet weight/area.mg/m2.1000	WETWTM2		WETWTM2	
+variable.COPY_VARIABLE.Abundance.ind/m3	ABUNDM3		ABUNDM3	ABUND
+variable.COPY_VARIABLE_MULTIPLY.Wet weight/volume.mg/m3.1000	WETWTM3		WETWTM3	WETWTM3

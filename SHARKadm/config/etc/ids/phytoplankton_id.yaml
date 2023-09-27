@@ -1,15 +1,11 @@
 data_type: phytoplankton
 levels:
-  location:
-    - visit_reported_latitude
-    - visit_reported_longitude
-  visit:
+  sample:
     - visit_year
     - platform_code
+    - visit_id
     - visit_date
-  sample:
     - sample_time
+    - reported_station_name
     - sample_min_depth_m
     - sample_max_depth_m
-  variable:
-    - reported_scientific_name

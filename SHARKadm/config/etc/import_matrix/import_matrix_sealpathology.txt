@@ -1,0 +1,34 @@
+cluster.table.column	Spat
+visit.visit_date	SDATE
+visit.reported_station_name	STATN
+visit.visit_reported_latitude	LATIT
+visit.visit_reported_longitude	LONGI
+sample.sample_orderer_code	ORDERER
+sample.sample_id	SMPNO
+sample.method_documentation	METDC
+sample.sample_comment	SMP_COMNT
+sample.cause_of_death	CAUSE_OF_DEATH
+sample.finding_circumstances	FCST
+variable.analytical_laboratory_code	ALABO
+variable.sex_code	SEXCO <or>SEXCODE
+sample.sample_project_code	PROJ
+variable.reported_scientific_name	LATNM
+variable.matrix_analysed_code	MATRIX <or>MATRX
+variable.age_years	AGE
+variable.body_length_cm	BODY_LENGTH <or>BODY_LGTH
+variable.body_weight_kg	BODY_WEIGHT <or>BODY_WGTH
+variable.blubber_thickness_cm	BLUBBER_THICKNESS <or>BLUBB_THICK
+variable.autolysis_class	AUTOLYSIS <or>AUTOLYSIS_CL
+variable.regional_skin_changes_class	REGIONAL_SKIN_CHANGES <or>REG_SKIN_CHANGE_CL
+variable.claw_lesions_class	CLAW_LESIONS <or>CLAW_LESION_CL
+variable.parodontitis_class	PARODONTITIS <or>PARODONTITIS_CL
+variable.cronic_cholangiohepatitis_y_n	CRONIC_CHOLANGIOHEPATITIS
+variable.intestinal_ulcer_class	INTESTINAL_ULCER <or>INTEST_ULCER_CL
+variable.pneumonia_y_n	PNEUMONIA
+variable.arteriosclerosis_class	ARTERIOSCLEROSIS <or>ARTERIOSCLEROSIS_CL
+variable.adreno_cort_hyperplasia_class	ADRENO_CORT-HYPERPLASIA <or>ADRENO_CORTHYPERPLASIA_CL
+variable.kidney_glomerular_change_class	KIDNEY_GLOMERULAR_CHANGE
+variable.kidney_tubular_hyperplasia_class	KIDNEY_TUBULAR_HYPERPLASIA
+variable.uterus_pregnant_y_n	UTERUS_PREGNANT <or>UTERUS_PREG
+variable.uterus_stenosis_occlusion_y_n	UTERUS_STENOSIS_OCCLUSION
+variable.uterus_tumour_y_n	UTERUS_TUMOUR

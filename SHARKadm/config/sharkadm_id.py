@@ -8,11 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 class SharkadmIdLevelHandler:
-
+    """Id handler for a single datatype and specific level"""
     def __init__(self, data_type: str, level: str, config: dict):
         self._data_type = data_type
         self._level: str = level
-        self._all_levels: list = []
         self._config: dict = config
         self._id_columns: list[str] = []
         self._load_id_columns()
@@ -29,23 +28,11 @@ class SharkadmIdLevelHandler:
         return self._level
 
     @property
-    def included_levels(self) -> list[str]:
-        return self._all_levels
-
-    @property
     def id_columns(self) -> list[str]:
         return self._id_columns
 
     def _load_id_columns(self) -> None:
-        self._id_columns = []
-        self._all_levels = []
-        for current_level, keys in self._config['levels'].items():
-            if not keys:
-                continue
-            self._id_columns.extend(keys)
-            self._all_levels.append(current_level)
-            if current_level == self.level:
-                break
+        self._id_columns = self._config['levels'][self.level]
 
     def get_id(self, data: dict) -> str:
         """Returns the id based on the given data"""
@@ -56,7 +43,7 @@ class SharkadmIdLevelHandler:
 
 
 class SharkadmIdConfig:
-
+    """Config id handler fo a single datatype (single config file)"""
     def __init__(self, config_path: pathlib.Path):
         self._config_path = config_path
         self._config = {}
@@ -85,10 +72,11 @@ class SharkadmIdConfig:
         return objs
 
 
-class SharkadmIdHandler:
+class SharkadmIdsHandler:
+    """Handler for ids for all data types"""
     def __init__(self, directory: str | pathlib.Path):
         self._directory: pathlib.Path = pathlib.Path(directory)
-        self._id_objects: dict[str, dict[str, SharkadmIdHandler]] = {}
+        self._id_objects: dict[str, dict[str, SharkadmIdLevelHandler]] = {}
         self._load_sharkadm_id_objects()
 
     def __repr__(self) -> str:

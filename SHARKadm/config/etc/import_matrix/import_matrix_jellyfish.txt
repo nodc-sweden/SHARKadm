@@ -1,0 +1,75 @@
+cluster.table.column	NAT	ZP_JELLY
+visit.visit_id	SERNO	SERNO
+visit.visit_year	MYEAR	MYEAR
+visit.visit_date	SDATE	SDATE
+visit.reported_station_name	STATN	STATN
+visit.visit_comment	COMNT_VISIT	COMNT_VISIT
+visit.expedition_id	EXPID<or>CRUISE_NO	EXPID<or>CRUISE_NO
+visit.platform_code	SHIPC	SHIPC
+visit.water_land_station_type_code	WLTYP	WLTYP
+visit.air_temperature_degc	AIRTEMP	AIRTEMP
+visit.air_pressure_hpa	AIRPRES	AIRPRES
+visit.wave_observation_code	WAVES<or>SEAST	WAVES<or>SEAST
+visit.secchi_depth_m	SECCHI	SECCHI
+visit.secchi_depth_quality_flag	Q_SECCHI	Q_SECCHI
+visit.monitoring_station_type_code	MSTAT	MSTAT
+visit.water_depth_m	WADEP	WADEP
+visit.wind_speed_ms	WINSP	WINSP
+visit.wind_direction_code	WINDR<or>WINDIR_CODE<or>WINDIR	WINDR<or>WINDIR_CODE
+visit.cloud_observation_code	CLOUD	CLOUD
+visit.ice_observation_code	ICEOB	ICEOB
+visit.weather_observation_code	WEATH	WEATH
+visit.visit_reported_latitude	LATIT	LATIT
+visit.visit_reported_longitude	LONGI	LONGI
+visit.positioning_system_code	POSYS	POSYS
+sample.sample_id	SMPNO<or>SMPID	SMPNO<or>SMPID
+sample.sample_time	STIME	STIME
+sample.sample_min_depth_m	MNDEP	MNDEP
+sample.sample_max_depth_m	MXDEP	MXDEP
+sample.flowmeter_length_m	FLOW_READ	FLOW_READ
+sample.sample_project_code	PROJ<or>PROJ_NAME	PROJ<or>PROJ_NAME
+sample.sample_orderer_code	ORDERER	ORDERER
+sample.monitoring_program_code	MPROG	MPROG
+sample.sampling_laboratory_code	SLABO	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP
+sample.method_reference_code	REFSK	REFSK
+sample.method_documentation	METDC	METDC
+sample.sample_comment	COMNT_SAMPLE<or>COMNT_SAMP	COMNT_SAMPLE<or>COMNT_SAMP
+sample.sampler_type_code	SMTYP	SMTYP
+sample.sampled_volume_l	SMVOL	SMVOL
+sample.sampler_area_m2	SAREA	
+sample.sampler_area_cm2		SAREA
+sample.plankton_sampling_method_code	PDMET	PDMET
+sample.calculation_method	CLMET	CLMET
+sample.wire_angle_deg	WIRAN	WIRAN
+sample.sample_splitting_code	SPLIT	SPLIT
+variable.quality_flag	QFLAG<or>VFLAG	QFLAG<or>VFLAG
+variable.analytical_laboratory_code	ALABO	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA
+variable.analysis_date	ANADATE	ANADATE
+variable.analysed_by	ANA_RESP	ANA_RESP
+variable.variable_comment	COMNT_ABUN<or>COMNT_VAR	COMNT_ABUN<or>COMNT_VAR
+variable.species_flag_code	SFLAG	SFLAG
+variable.sex_code	SEXCO<or>SEXCODE	SEXCO<or>SEXCODE
+variable.dev_stage_code	STAGE	STAGE
+variable.counted_portions	CPORT	CPORT
+variable.magnification	MAGNI	MAGNI
+variable.reported_scientific_name	LATNM	LATNM
+variable.taxonomist	TAXNM	TAXNM
+variable.number_of_portions	NPORT	NPORT
+variable.preservation_method_code	METFP	METFP
+variable.mesh_size_um	MESHS	MESHS
+variable.COPY_VARIABLE.# counted.ind/analysed sample fraction	INDCOUNT<or>COUNTNR<or>COUNT	INDCOUNT<or>COUNTNR<or>COUNT
+variable.COPY_VARIABLE.Wet weight.g	WETWT	
+variable.COPY_VARIABLE.Carbon content.mg/m3	BMCCONT	
+variable.COPY_VARIABLE.Carbon content.ug/m3		BMCCONT
+variable.COPY_VARIABLE.Abundance.ind/m3	ABUND	ABUND
+variable.COPY_VARIABLE.Wet weight/volume.g/m3	WETWTM3	WETWTM3
+variable.COPY_VARIABLE.Displacement volume.ml	DISPLA	
+variable.COPY_VARIABLE.Length mean.mm	LENGTH_MEAN	
+variable.COPY_VARIABLE.Length median.mm	LENGTH_MEDIAN	
+variable.COPY_VARIABLE.Length.mm	LENGTH	LENGTH
+		
+		
+		
+		

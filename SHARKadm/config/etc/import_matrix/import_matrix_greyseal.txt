@@ -1,0 +1,47 @@
+cluster.table.column	Gseal	Greyseal
+visit.visit_year	MYEAR	MYEAR
+visit.reported_station_name	STATN	STATN <or>SUBSITE
+sample.sample_project_code	PROJ	PROJ
+sample.sample_orderer_code	ORDERER	ORDERER
+visit.expedition_id	EXPID	EXPID
+visit.visit_date	MDATE	SDATE<or>MDATE
+visit.visit_reported_latitude	LATIT	LATIT
+visit.visit_reported_longitude	LONGI	LONGI
+visit.positioning_system_code		POSYS
+visit.county	COUNTY	COUNTY
+visit.sea_region	REGION<or>Area	REGION<or>Area
+visit.monitoring_station_type_code		MSTAT
+visit.monitoring_purpose_code		PURPM
+sample.monitoring_program_code		MPROG
+visit.visit_comment		COMNT_VISIT
+visit.wind_direction_code	WINDR_NWES	WINDIR<or>WINDR_NWES
+visit.wind_speed_ms	WINSP_MS	WINSP <or> WINSP_MS
+visit.air_temperature_degc		AIRTEMP
+visit.air_pressure_hpa		AIRPRES
+visit.weather_observation_code	WEATHER	WEATH<or>WEATHER
+visit.cloud_observation_code		CLOUD
+visit.wave_observation_code		WAVES
+visit.ice_observation_code		ICEOB
+sample.sample_time		STIME<or>OBSTIME
+sample.fauna_flora_found		FNFLA
+sample.sampling_laboratory_code	SLABO	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP
+sample.sampler_type_code		SMTYP
+sample.sampled_by	OBSERV	SMP_BY<or>OBSERV
+visit.obspoint	OBSPOINT	OBSPOINT
+visit.observation_distance_m	OBSDIST	OBSDIST
+sample.image_id		FOTOID<or>IMAGE_ID
+sample.sample_id	OBSNO	SMPNO<or>OBSNO
+sample.sample_comment		COMNT_SAMP
+variable.reported_scientific_name	LATNM	LATNM
+variable.COPY_VARIABLE.# counted.ind		COUNTNR<or>COUNT
+variable.COPY_VARIABLE.# counted.ind	COUNT_LW	COUNT_LW
+variable.COPY_VARIABLE.Total # counted on land.ind	COUNT_L	COUNT_L
+variable.COPY_VARIABLE.Total # counted in water.ind	COUNT_W	COUNT_W
+variable.COPY_VARIABLE.# pups counted on land.ind	COUNT_YOUN	COUNT_YOUN
+variable.analytical_laboratory_code		ALABO
+variable.analytical_laboratory_accreditated		ACKR_ANA
+variable.analysis_date		ANADATE
+sample.method_documentation		METDC
+sample.method_reference_code		REFSK
+variable.variable_comment	COMNT	COMNT_VAR<or>COMNT

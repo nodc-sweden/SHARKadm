@@ -1,0 +1,45 @@
+cluster.table.column	MNHS	MNHS_2023
+visit.visit_year	MYEAR	MYEAR
+visit.reported_station_name	STATN	STATN
+sample.sample_project_code	PROJ	PROJ
+sample.sample_orderer_code	ORDERER	ORDERER
+visit.visit_date	SDATE	ODATE
+visit.visit_enddate	EDATE	
+sample.sample_time	STIME	
+sample.sample_endtime	ETIME	
+visit.positioning_system_code	POSYS	POSYS
+visit.monitoring_purpose_code	PURPM	PURPM
+sample.monitoring_program_code	MPROG	MPROG
+visit.visit_comment	COMNT_VISIT	COMNT_VISIT
+sample.sampling_laboratory_code	SLABO	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP
+sample.sampler_type_code	SMTYP	SMTYP
+sample.method_documentation	METDC	METDC
+sample.sample_comment	COMNT_SAMP	COMNT_SAMP
+variable.reported_scientific_name	LATNM	LATNM
+variable.observation_date	ODATE	
+variable.observation_time	OTIME	
+variable.analytical_laboratory_code	ALABO	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA
+variable.variable_comment	COMNT_VAR	COMNT_VAR
+sample.sample_reported_latitude	LATIT	LATIT
+sample.sample_reported_longitude	LONGI	LONGI
+variable.COPY_VARIABLE.Detection positive minutes per day.Detection minutes/day	porpoise_positive_minutes	porpoise_positive_minutes<or>positive_minutes<or>DPM_day_sum
+variable.COPY_VARIABLE.Detection positive days per month.%		percent_per_month<or>DPD_month_perc
+variable.calc_by_dc	calc_by_dc	calc_by_dc
+visit.water_depth_m	WADEP<or>WADEPTH	WADEP<or>WADEPTH
+sample.sample_depth_m	SMPDEP<or>DEPH<or>SMPDEPTH	SMPDEP<or>DEPH<or>SMPDEPTH
+sample.sample_id	SMPNO<or>RAW<or>UNANA	SMPNO<or>RAW<or>UNANA
+sample.sample_max_depth_m		MAXSMPDEPTH
+sample.sample_min_depth_m		MINSMPDEPTH
+sample.deployed_days_per_month		monitored_days_in_month
+visit.NOT_USED.deployment_period_key		deployment_period_key
+visit.visit_logger_startdate		SDATE
+visit.visit_logger_enddate		EDATE
+visit.visit_logger_starttime		STIME<or>ST_TIME
+visit.visit_logger_endtime		ETIME<or>EN_TIME
+visit.NOT_USED.DPM		DPM
+visit.NOT_USED.LATIT_prov		LATIT_prov
+visit.NOT_USED.LONGI_prov		LONGI_prov
+visit.NOT_USED.observation_time		OTIME
+variable.quality_flag		QFLAG
