@@ -18,6 +18,10 @@ class DeliveryNote:
             for line in fid:
                 if not line.strip():
                     continue
+                if ':' not in line:
+                    # Belongs to previous row
+                    self._data[key] = f'{self._data[key]} {line.strip()}'
+                    continue
                 key, value = [item.strip() for item in line.split(':', 1)]
                 self._data[key] = value
                 if key == 'format':

@@ -11,7 +11,7 @@ class CustomAddSharkadmIdToColumns(Transformer):
 
     def __init__(self,
                  column_info: column_info.ColumnInfoConfig = None,
-                 id_handler: sharkadm_id.SharkadmIdHandler = None,
+                 id_handler: sharkadm_id.SharkadmIdsHandler = None,
                  d_type_mapper: data_type_mapper.DataTypeMapper = None,
                  ) -> None:
         self._column_info = column_info

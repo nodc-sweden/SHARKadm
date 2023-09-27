@@ -48,9 +48,10 @@ def convert_column_info_to_yaml(input_path, output_path, **kwargs):
 
 def convert_translate_codes(input_path, output_path, **kwargs):
     """Translates the old translate_codes.txt file to the new yaml format"""
+    encoding = kwargs.get('encoding', 'cp1252')
     data = {}
     header = []
-    with open(input_path, encoding=kwargs.get('encoding', 'cp1252')) as fid:
+    with open(input_path, encoding=encoding) as fid:
         for r, line in enumerate(fid):
             if not line.strip():
                 continue
@@ -68,6 +69,6 @@ def convert_translate_codes(input_path, output_path, **kwargs):
             for key in ['short_name', 'swedish_name', 'english_name']:
                 data[internal_key][internal_value][key] = line_dict[key]
 
-    with open(output_path, 'w') as fid:
-        yaml.safe_dump(data, fid, encoding=kwargs.get('encoding', 'cp1252'))
+    with open(output_path, 'w', encoding=encoding) as fid:
+        yaml.safe_dump(data, fid)
 

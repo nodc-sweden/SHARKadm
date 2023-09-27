@@ -35,6 +35,5 @@ class XmlDataFile(DataFile):
                 und_data[element.tag] = element.text
 
         self._data = pd.DataFrame.from_dict(rows, orient='columns')
-        self._original_header = list(self._data.columns)
 
 

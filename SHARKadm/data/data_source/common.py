@@ -23,6 +23,8 @@ class DataFile(ABC):
         self._data: pd.DataFrame = pd.DataFrame()
 
         self._load_file()
+        self._add_source_to_data()
+        self._save_original_header()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self._data_type}": {self._path}'
@@ -30,6 +32,12 @@ class DataFile(ABC):
     @abstractmethod
     def _load_file(self) -> None:
         ...
+
+    def _add_source_to_data(self) -> None:
+        self._data['source'] = self.source
+
+    def _save_original_header(self) -> None:
+        self._original_header = list(self._data.columns)
 
     @property
     def data_type(self) -> str:

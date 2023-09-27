@@ -3,7 +3,6 @@ import logging
 
 import pandas as pd
 
-from SHARKadm.config.sharkadm_id import SharkadmIdLevelHandler
 from SHARKadm.data.data_source.common import DataFile
 from SHARKadm.transformers import Transformer
 from SHARKadm.validators import Validator
@@ -11,26 +10,26 @@ from SHARKadm.validators import Validator
 logger = logging.getLogger(__name__)
 
 
-class LevelData:
-
-    def __init__(self, level_handler: SharkadmIdLevelHandler) -> None:
-        self._level_handler = level_handler
-        self._data: dict = {}
-
-    @property
-    def level(self) -> str:
-        return self._level_handler.level
-
-    @property
-    def sharkadm_id(self) -> str:
-        return self._level_handler.get_id(self._data)
-
-    def add_data(self, col: str, value: str):
-        if self._data.get(col):
-            msg = f'Column {col} already added to data'
-            logger.error(msg)
-            raise KeyError(msg)
-        self._data[col] = value
+# class LevelData:
+#
+#     def __init__(self, level_handler: SharkadmIdLevelHandler) -> None:
+#         self._level_handler = level_handler
+#         self._data: dict = {}
+#
+#     @property
+#     def level(self) -> str:
+#         return self._level_handler.level
+#
+#     @property
+#     def sharkadm_id(self) -> str:
+#         return self._level_handler.get_id(self._data)
+#
+#     def add_data(self, col: str, value: str):
+#         if self._data.get(col):
+#             msg = f'Column {col} already added to data'
+#             logger.error(msg)
+#             raise KeyError(msg)
+#         self._data[col] = value
 
 
 class DataHolder:
@@ -46,7 +45,8 @@ class DataHolder:
         self._data: pd.DataFrame = pd.DataFrame()
 
         self._transformers: list[Transformer] = []
-        self._validators: list[Validator] = []
+        self._validators_before: list[Validator] = []
+        self._validators_after: list[Validator] = []
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self._data_type}": {self._dataset_name}'
@@ -54,6 +54,10 @@ class DataHolder:
     @property
     def data(self) -> pd.DataFrame:
         return self._data
+
+    @property
+    def columns(self) -> list[str]:
+        return sorted(self.data.columns)
 
     @property
     def data_type(self) -> str:
@@ -68,11 +72,12 @@ class DataHolder:
 
     def set_transformers(self, *args: Transformer) -> None:
         """Add one or more Transformers to the data holder"""
-        self._transformers.extend(args)
+        self._transformers = args
 
     def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
+            print(f'{trans=}')
             trans.transform(self)
 
     def transform(self, *transformers: Transformer) -> 'DataHolder':
@@ -80,19 +85,38 @@ class DataHolder:
             trans.transform(self)
         return self
 
-    def set_validators(self, *args: Validator) -> None:
+    def set_validators_before(self, *args: Validator) -> None:
         """Sets one or more Validators to the data holder"""
-        self._validators.extend(args)
+        self._validators_before = args
 
-    def validate_all(self) -> None:
-        """Runs all set validator objects in self._validators"""
-        for val in self._validators:
+    def validate_before_all(self) -> None:
+        """Runs all set validator objects in self._validators_before"""
+        for val in self._validators_before:
             val.validate(self)
 
-    def validate(self, *validators: Validator) -> 'DataHolder':
+    def validate_before(self, *validators: Validator) -> 'DataHolder':
         for val in validators:
             val.validate(self)
         return self
+
+    def set_validators_after(self, *args: Validator) -> None:
+        """Sets one or more Validators to the data holder"""
+        self._validators_after = args
+
+    def validate_after_all(self) -> None:
+        """Runs all set validator objects in self._validators_after"""
+        for val in self._validators_after:
+            val.validate(self)
+
+    def validate_after(self, *validators: Validator) -> 'DataHolder':
+        for val in validators:
+            val.validate(self)
+        return self
+
+    def start_data_handling(self):
+        self.validate_before_all()
+        self.transform_all()
+        self.validate_after_all()
 
     def _import_data_source(self, data_source: DataFile) -> None:
         """Add new data source to self._data"""
