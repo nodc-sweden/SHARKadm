@@ -4,6 +4,7 @@ import logging
 from SHARKadm.data.data_holder import DataHolder
 from SHARKadm.transformers import Transformer
 from SHARKadm.validators import Validator
+from SHARKadm.exporters import Exporter
 
 import pandas as pd
 
@@ -46,6 +47,7 @@ class SHARKadmController:
         self._transformers: list[Transformer] = []
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
+        self._exporters: list[Exporter] = []
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self.data_type}": {self.dataset_name}'
@@ -106,6 +108,21 @@ class SHARKadmController:
     def validate_after(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
             val.validate(self._data_holder)
+        return self
+
+    def set_exporters(self, *args: Exporter) -> None:
+        """Add one or more Exporters to the data holder"""
+        self._exporters = args
+
+    def export_all(self) -> None:
+        """Runs all export objects in self._exporters"""
+        for trans in self._exporters:
+            print(f'{trans=}')
+            trans.export(self._data_holder)
+
+    def export(self, *exporters: Exporter) -> 'SHARKadmController':
+        for trans in exporters:
+            trans.export(self._data_holder)
         return self
 
     def start_data_handling(self):

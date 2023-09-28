@@ -1,8 +1,7 @@
-import pathlib
 import logging
 
-from .base import ArchiveBase
 from SHARKadm.data import data_source
+from .base import ArchiveBase
 
 logger = logging.getLogger(__name__)
 
@@ -27,4 +26,4 @@ class PhytoplanktonArchive(ArchiveBase):
         d_source = data_source.TxtRowFormatDataFile(path=data_file_path, data_type=self.delivery_note.data_type)
         d_source.map_header(self.import_matrix_mapper)
 
-        self._concat_data_source(d_source)
+        self._set_data_source(d_source)

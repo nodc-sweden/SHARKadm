@@ -27,6 +27,8 @@ class ArchiveBase(DataHolder, ABC):
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
 
+        self._data_sources = {}
+
         self._initiate()
         self._load_delivery_note()
         self._load_import_matrix()
@@ -81,15 +83,27 @@ class ArchiveBase(DataHolder, ABC):
             logger.error(msg)
             raise ValueError(msg)
 
+    def _get_data_from_data_source(self, data_source: data_source.DataFile) -> pd.DataFrame:
+        data = data_source.get_data().copy(deep=True)  # Do we need a copy?
+        data.fillna('', inplace=True)
+        data.reset_index(inplace=True, drop=True)
+        return data
+
     def _concat_data_source(self, data_source: data_source.DataFile) -> None:
         self._check_data_source(data_source)
+        self._data_sources[str(data_source)] = data_source
         """Concats new data source to self._data"""
-        new_data = data_source.get_data().copy(deep=True)
+        new_data = self._get_data_from_data_source(data_source)
         new_data['data_source'] = data_source.source
         new_data['dataset_name'] = self._dataset_name
         self._data = pd.concat([self._data, new_data])
         self._data.fillna('', inplace=True)
         self._data.reset_index(inplace=True)
+
+    def _set_data_source(self, data_source: data_source.DataFile) -> None:
+        self._check_data_source(data_source)
+        self._data_sources[str(data_source)] = data_source
+        self._data = self._get_data_from_data_source(data_source)
 
     @abstractmethod
     def _load_data(self):

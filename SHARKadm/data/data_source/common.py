@@ -66,6 +66,10 @@ class DataFile(ABC):
         self._data.columns = mapped_header
         self._header_mapper = mapper
 
+    @property
+    def data(self) -> pd.DataFrame:
+        return self.get_data()
+
     def get_data(self) -> pd.DataFrame:
         return self._data
 

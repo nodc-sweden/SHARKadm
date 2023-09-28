@@ -1,13 +1,12 @@
-import pathlib
 import logging
 
-from .base import ArchiveBase
 from SHARKadm.data import data_source
+from .base import ArchiveBase
 
 logger = logging.getLogger(__name__)
 
 
-class PhytoplanktonArchive(ArchiveBase):
+class EpibenthosArchive(ArchiveBase):
     _data_type = 'Epibenthos'
 
     def _load_data(self) -> None:
