@@ -1,14 +1,13 @@
-import pathlib
+import logging
+
 import pandas as pd
 
 from .common import DataFile
-import logging
-
 
 logger = logging.getLogger(__name__)
 
 
-class TxtColumnDataFile(DataFile):
+class TxtRowFormatDataFile(DataFile):
 
     def _load_file(self) -> None:
         self._data = pd.read_csv(self._path, encoding=self._encoding, sep='\t', dtype=str)

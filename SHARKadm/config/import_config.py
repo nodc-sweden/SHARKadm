@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 from .data_type_mapper import DataTypeMapper
 
 
-class ImportMapper:
+class ImportMatrixMapper:
     def __init__(self, data_type: str,  import_column: str, data: dict):
         self._data_type = data_type
         self._import_column = import_column
@@ -27,7 +27,7 @@ class ImportMapper:
     def import_column(self) -> str:
         return self._import_column
 
-    def get_internal_name(self, external_par):
+    def get_internal_name(self, external_par: str) -> str:
         if not self._data.get(external_par):
             logger.warning(f'Could not map parameter "{external_par}" using mapping column "{self.import_column}" for data_type "{self.data_type}"')
             return external_par
@@ -121,9 +121,9 @@ class ImportMatrixConfig:
         """Returns a sorted list of all levels found in the config file"""
         return sorted(set([item.split('.', 1)[0] for item in self.all_internal_parameters_with_level]))
 
-    def get_mapper(self, import_column: str) -> ImportMapper:
+    def get_mapper(self, import_column: str) -> ImportMatrixMapper:
         """Returns a mapper object for the given institute. Creates it if not found"""
-        return self._mappers.setdefault(import_column, ImportMapper(self.data_type, import_column, self._data[import_column]))
+        return self._mappers.setdefault(import_column, ImportMatrixMapper(self.data_type, import_column, self._data[import_column]))
 
     def get(self, import_column: str, external_par: str) -> str:
         """Returns the internal parameter name for the given institute and external parameter name"""

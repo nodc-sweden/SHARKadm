@@ -3,7 +3,15 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import pathlib
 
-from SHARKadm.config.import_config import ImportMapper
+from typing import Protocol
+
+# from SHARKadm.config.import_config import ImportMatrixMapper
+
+
+class ImportMapper(Protocol):
+
+    def get_internal_name(self, external_par: str) -> str:
+        ...
 
 
 class DataFile(ABC):
@@ -41,7 +49,7 @@ class DataFile(ABC):
 
     @property
     def data_type(self) -> str:
-        return self._data_type
+        return self._data_type.lower()
 
     @property
     def source(self) -> str:
