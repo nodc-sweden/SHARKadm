@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from SHARKadm import config
+from SHARKadm.config import get_data_type_mapper
 from SHARKadm.config.import_config import ImportMatrixConfig
 from SHARKadm.config.import_config import ImportMatrixMapper
 from SHARKadm.data import data_source
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class ArchiveBase(DataHolder, ABC):
     _data_type: str | None = None
+    _data_format: str | None = None
 
     def __init__(self, archive_root_directory: str | pathlib.Path = None):
         self._archive_root_directory = pathlib.Path(archive_root_directory)
@@ -26,6 +28,7 @@ class ArchiveBase(DataHolder, ABC):
         self._delivery_note: delivery_note.DeliveryNote | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
+        # self._data_type_mapper = get_data_type_mapper()
 
         self._data_sources = {}
 
@@ -43,7 +46,12 @@ class ArchiveBase(DataHolder, ABC):
 
     @property
     def data_type(self) -> str:
+        # return self._data_type_mapper.get(self.data_format)
         return self._data_type.lower()
+
+    @property
+    def data_format(self) -> str:
+        return self._data_format.lower()
 
     @property
     def dataset_name(self) -> str:
@@ -77,33 +85,48 @@ class ArchiveBase(DataHolder, ABC):
         self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
 
+    def _add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
+        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
+        for col in columns_to_use:
+            if new_column not in self._data.columns:
+                self._data[new_column] = self._data[col]
+            else:
+                self._data[new_column] = self._data[new_column] + self._data[col]
+
     def _check_data_source(self, data_source: data_source.DataFile) -> None:
+        #if self._data_type_mapper.get(data_source.data_type) != self._data_type_mapper.get(self.data_type):
         if data_source.data_type != self.data_type:
             msg = f'Data source {data_source} is not of type {self.data_type}'
             logger.error(msg)
             raise ValueError(msg)
 
-    def _get_data_from_data_source(self, data_source: data_source.DataFile) -> pd.DataFrame:
+    @staticmethod
+    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
         data = data_source.get_data().copy(deep=True)  # Do we need a copy?
         data.fillna('', inplace=True)
         data.reset_index(inplace=True, drop=True)
         return data
 
-    def _concat_data_source(self, data_source: data_source.DataFile) -> None:
-        self._check_data_source(data_source)
-        self._data_sources[str(data_source)] = data_source
-        """Concats new data source to self._data"""
-        new_data = self._get_data_from_data_source(data_source)
-        new_data['data_source'] = data_source.source
-        new_data['dataset_name'] = self._dataset_name
-        self._data = pd.concat([self._data, new_data])
-        self._data.fillna('', inplace=True)
-        self._data.reset_index(inplace=True)
+    # def _concat_data_source(self, data_source: data_source.DataFile) -> None:
+    #     self._check_data_source(data_source)
+    #     self._data_sources[str(data_source)] = data_source
+    #     """Concats new data source to self._data"""
+    #     new_data = self._get_data_from_data_source(data_source)
+    #     new_data['data_source'] = data_source.source
+    #     new_data['dataset_name'] = self._dataset_name
+    #     self._data = pd.concat([self._data, new_data])
+    #     self._data.fillna('', inplace=True)
+    #     self._data.reset_index(inplace=True, drop=True)
 
     def _set_data_source(self, data_source: data_source.DataFile) -> None:
+        """Sets a single data source to self._data"""
+        self._add_data_source(data_source)
+        self._data = self._get_data_from_data_source(data_source)
+
+    def _add_data_source(self, data_source: data_source.DataFile) -> None:
+        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
-        self._data = self._get_data_from_data_source(data_source)
 
     @abstractmethod
     def _load_data(self):

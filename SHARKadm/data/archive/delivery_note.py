@@ -8,7 +8,7 @@ class DeliveryNote:
         self._path: pathlib.Path = pathlib.Path(path)
         self._encoding: str = encoding
         self._data: dict = {}
-        self._data_type: str = None
+        self._data_format: str = None
         self._import_matrix_key: str = None
 
         self._load_file()
@@ -26,12 +26,16 @@ class DeliveryNote:
                 self._data[key] = value
                 if key == 'format':
                     parts = [item.strip() for item in value.split(':')]
-                    self._data_type = parts[0]
+                    self._data_format = parts[0]
                     self._import_matrix_key = parts[1]
 
     @property
     def data_type(self) -> str:
-        return self._data_type.lower()
+        return self._data['datatyp'].lower()
+
+    @property
+    def data_format(self) -> str:
+        return self._data_format.lower()
 
     @property
     def import_matrix_key(self) -> str:

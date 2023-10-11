@@ -8,6 +8,10 @@ from SHARKadm.data.archive import delivery_note
 logger = logging.getLogger(__name__)
 
 
+def get_data_handler_object():
+    pass
+
+
 # def get_phytoplankton_archive(archive_directory):
 #     pass
 #

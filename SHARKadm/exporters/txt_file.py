@@ -13,5 +13,5 @@ class TxtAsIs(Exporter):
     def __repr__(self) -> str:
         return f'Exporter: {self.__class__.__name__}'
 
-    def export(self, data_holder: DataHolderProtocol) -> None:
+    def _export(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data.to_csv(self._path, encoding=self._encoding, sep='\t', index=False)

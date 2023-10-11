@@ -8,7 +8,17 @@ class AddCalculatedSamplerArea(Transformer):
     section_distance_end_par = 'section_distance_end_m'
     transect_width_par = 'transect_width_m'
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        cols = '\n'.join([
+            self.sampler_area_par,
+            self.section_distance_start_par,
+            self.section_distance_end_par,
+            self.transformer_name
+        ])
+        return f"Calculates sampler area using columns:\n{cols}"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.sampler_area_par] = data_holder.data.apply(lambda row: self.calculate(row), axis=1)
 
     def calculate(self, row) -> str:

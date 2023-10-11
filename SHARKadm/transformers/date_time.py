@@ -14,7 +14,11 @@ class AddDateAndTimeToAllLevels(Transformer):
         'visit_date'
     ]  # In order of prioritization
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        return 'Adds date and time column to all levels'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in self.dates_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_and_add(p, row), axis=1)
 
@@ -31,7 +35,11 @@ class AddDateAndTimeToAllLevels(Transformer):
 class AddDatetime(Transformer):
     datetime_source_column = 'sample_date'
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        return f'Adds column datetime. Time is taken from {self.datetime_source_column}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data['datetime'] = data_holder.data[self.datetime_source_column].apply(self.to_datetime)
 
     @staticmethod
@@ -41,7 +49,11 @@ class AddDatetime(Transformer):
 
 class AddSampleMonth(Transformer):
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        return f'Adds month column to date. Month is taken from the datetime column and will overwrite old value'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'datetime' not in data_holder.data.columns:
             adm_logger.log_transformation(f'Missing key: datetime')
             return

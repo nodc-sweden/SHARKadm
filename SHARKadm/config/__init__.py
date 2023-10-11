@@ -33,7 +33,8 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
         if d_type_mapper.get(data_type) in path.name:
             return ImportMatrixConfig(path,
                                       data_type=data_type,
-                                      data_type_mapper=d_type_mapper)
+                                      #data_type_mapper=d_type_mapper
+                                      )
 
 
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):

@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class PhytoplanktonArchive(ArchiveBase):
     _data_type = 'Phytoplankton'
+    _data_format = 'Phytoplankton'
 
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / 'data.txt'

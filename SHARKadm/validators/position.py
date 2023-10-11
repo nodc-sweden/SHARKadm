@@ -10,7 +10,7 @@ class CheckIfLatLonIsSwitched(Validator):
     lat_col = 'latitude'
     lon_col = 'longitude'
 
-    def validate(self, data_holder: DataHolderProtocol) -> None:
+    def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.unique_column not in data_holder.data.columns:
             adm_logger.log_validation(f'Could not check unique sample id. No column named {self.unique_column}',
                                       level='error')

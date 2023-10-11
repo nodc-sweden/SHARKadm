@@ -1,40 +1,13 @@
-
 import logging
-
-from SHARKadm.data.data_holder import DataHolder
-from SHARKadm.transformers import Transformer
-from SHARKadm.validators import Validator
-from SHARKadm.exporters import Exporter
 
 import pandas as pd
 
-from typing import Protocol
+from SHARKadm.data.data_holder import DataHolder
+from SHARKadm.exporters import Exporter
+from SHARKadm.transformers import Transformer
+from SHARKadm.validators import Validator
 
 logger = logging.getLogger(__name__)
-
-
-
-
-# class LevelData:
-#
-#     def __init__(self, level_handler: SharkadmIdLevelHandler) -> None:
-#         self._level_handler = level_handler
-#         self._data: dict = {}
-#
-#     @property
-#     def level(self) -> str:
-#         return self._level_handler.level
-#
-#     @property
-#     def sharkadm_id(self) -> str:
-#         return self._level_handler.get_id(self._data)
-#
-#     def add_data(self, col: str, value: str):
-#         if self._data.get(col):
-#             msg = f'Column {col} already added to data'
-#             logger.error(msg)
-#             raise KeyError(msg)
-#         self._data[col] = value
 
 
 class SHARKadmController:
@@ -74,11 +47,12 @@ class SHARKadmController:
     def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
-            print(f'{trans=}')
+            logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
 
     def transform(self, *transformers: Transformer) -> 'SHARKadmController':
         for trans in transformers:
+            logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
         return self
 
@@ -89,10 +63,12 @@ class SHARKadmController:
     def validate_before_all(self) -> None:
         """Runs all set validator objects in self._validators_before"""
         for val in self._validators_before:
+            logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
 
     def validate_before(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
+            logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
         return self
 
@@ -103,10 +79,12 @@ class SHARKadmController:
     def validate_after_all(self) -> None:
         """Runs all set validator objects in self._validators_after"""
         for val in self._validators_after:
+            logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
 
     def validate_after(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
+            logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
         return self
 
@@ -116,17 +94,19 @@ class SHARKadmController:
 
     def export_all(self) -> None:
         """Runs all export objects in self._exporters"""
-        for trans in self._exporters:
-            print(f'{trans=}')
-            trans.export(self._data_holder)
+        for exp in self._exporters:
+            logger.debug(f'Running exporter: {exp}')
+            exp.export(self._data_holder)
 
     def export(self, *exporters: Exporter) -> 'SHARKadmController':
-        for trans in exporters:
-            trans.export(self._data_holder)
+        for exp in exporters:
+            logger.debug(f'Running exporter: {exp}')
+            exp.export(self._data_holder)
         return self
 
     def start_data_handling(self):
         self.validate_before_all()
         self.transform_all()
         self.validate_after_all()
+        self.export_all()
 

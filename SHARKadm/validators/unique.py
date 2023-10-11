@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class ValidateUniqueSampleId(Validator):
     unique_column = 'sharkadm_sample_id'
 
-    def validate(self, data_holder: DataHolderProtocol) -> None:
+    def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.unique_column not in data_holder.data.columns:
             adm_logger.log_validation(f'Could not check unique sample id. No column named {self.unique_column}',
                                       level='error')

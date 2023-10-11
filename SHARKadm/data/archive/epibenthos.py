@@ -6,8 +6,9 @@ from .base import ArchiveBase
 logger = logging.getLogger(__name__)
 
 
-class EpibenthosArchive(ArchiveBase):
+class EpibenthosMartransArchive(ArchiveBase):
     _data_type = 'Epibenthos'
+    _data_format = 'EpibenthosMartrans'
 
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / 'data.xml'
@@ -26,4 +27,4 @@ class EpibenthosArchive(ArchiveBase):
         d_source = data_source.XmlDataFile(path=data_file_path, data_type=self.delivery_note.data_type)
         d_source.map_header(self.import_matrix_mapper)
 
-        self._concat_data_source(d_source)
+        self._set_data_source(d_source)

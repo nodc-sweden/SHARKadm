@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from SHARKadm.data.data_source.common import DataFile
+from SHARKadm.data.data_source.base import DataFile
 
 logger = logging.getLogger(__name__)
 

@@ -17,7 +17,11 @@ class AddPositionToAllLevels(Transformer):
         'visit_reported_longitude'
     ]  # In order of prioritization
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        return f'Adds position to all levels if not present'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in self.lat_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lat(p, row), axis=1)
         for par in self.lon_to_sync:

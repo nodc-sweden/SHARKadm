@@ -7,16 +7,20 @@ from .base import Transformer, DataHolderProtocol
 import hashlib
 
 
-class CustomAddSharkadmIdToColumns(Transformer):
+class CustomAddSharkadmId(Transformer):
 
     def __init__(self,
                  column_info: column_info.ColumnInfoConfig = None,
                  id_handler: sharkadm_id.SharkadmIdsHandler = None,
-                 d_type_mapper: data_type_mapper.DataTypeMapper = None,
+                 #d_type_mapper: data_type_mapper.DataTypeMapper = None,
                  ) -> None:
         self._column_info = column_info
         self._id_handler = id_handler
-        self._d_type_mapper = d_type_mapper
+        #self._d_type_mapper = d_type_mapper
+
+    @property
+    def transformer_description(self) -> str:
+        return 'Adds custom md5 sharkadm_id'
 
     # @classmethod
     # def from_default_config(cls):
@@ -29,12 +33,13 @@ class CustomAddSharkadmIdToColumns(Transformer):
     #         d_type_mapper=d_type_mapper
     #     )
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         """sharkadm_id in taken from self._id_handler"""
         for level in self._column_info.all_levels:
             id_handler = self._id_handler.get_level_handler(data_type=data_holder.data_type,
                                                             level=level,
-                                                            data_type_mapper=self._d_type_mapper)
+                                                            #data_type_mapper=self._d_type_mapper
+                                                            )
             if not id_handler:
                 # new_data[f'sharkadm_{level}_id'] = ''
                 continue
@@ -48,18 +53,22 @@ class CustomAddSharkadmIdToColumns(Transformer):
         return hashlib.md5(x.encode('utf-8')).hexdigest()
 
 
-class AddSharkadmIdToColumns(Transformer):
+class AddSharkadmId(Transformer):
 
     def __init__(self) -> None:
         col_info = config.get_column_info_config()
         id_handler = config.get_sharkadm_id_handler()
         d_type_mapper = config.get_data_type_mapper()
-        self._trans = CustomAddSharkadmIdToColumns(
+        self._trans = CustomAddSharkadmId(
             column_info=col_info,
             id_handler=id_handler,
             d_type_mapper=d_type_mapper
         )
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    @property
+    def transformer_description(self) -> str:
+        return 'Adds md5 sharkadm_id'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
         self._trans.transform(data_holder)
 

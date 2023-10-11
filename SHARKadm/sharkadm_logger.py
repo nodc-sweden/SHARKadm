@@ -14,6 +14,7 @@ class SHARKadmLogger:
 
         self._transformations: dict = dict((lev, {}) for lev in self._levels)
         self._validations: dict = dict((lev, {}) for lev in self._levels)
+        self._workflow: list = list()
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -22,6 +23,9 @@ class SHARKadmLogger:
             logger.error(msg)
             raise KeyError(msg)
         return level
+
+    def log_workflow(self, msg: str) -> None:
+        self._workflow.append(msg)
 
     def log_transformation(self, msg: str, level: str = 'info') -> None:
         level = self._check_level(level)

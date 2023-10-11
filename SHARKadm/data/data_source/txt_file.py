@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 
-from .common import DataFile
+from .base import DataFile
 
 logger = logging.getLogger(__name__)
 

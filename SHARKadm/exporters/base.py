@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Protocol
+
 import pandas as pd
+
+from SHARKadm import adm_logger
 
 
 class DataHolderProtocol(Protocol):
@@ -19,9 +22,20 @@ class DataHolderProtocol(Protocol):
 class Exporter(ABC):
     """Abstract base class used as a blueprint for exporting stuff in a DataHolder"""
 
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
+
     def __repr__(self) -> str:
         return f'Exporter: {self.__class__.__name__}'
 
-    @abstractmethod
+    @property
+    def workflow_message(self) -> str:
+        return f'Applying exporter: {self.__class__.__name__}'
+    
     def export(self, data_holder: DataHolderProtocol) -> None:
+        adm_logger.log_workflow(self.workflow_message)
+        self._export(data_holder=data_holder)
+
+    @abstractmethod
+    def _export(self, data_holder: DataHolderProtocol) -> None:
         ...

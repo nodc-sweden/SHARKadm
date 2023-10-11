@@ -39,10 +39,11 @@ class ImportMatrixConfig:
     def __init__(self,
                  path: str | pathlib.Path,
                  data_type: str = None,
-                 encoding: str = 'cp1252',
-                 data_type_mapper: DataTypeMapper = None) -> None:
+                 encoding: str = 'cp1252') -> None:
+                 # data_type_mapper: DataTypeMapper = None) -> None:
         self._path = pathlib.Path(path)
-        self._data_type = data_type_mapper.get(data_type)
+        # self._data_type = data_type_mapper.get(data_type)
+        self._data_type = data_type
         if self._data_type != data_type:
             logger.warning(f'Data type has been mapped: {data_type} -> {self._data_type}')
         self._encoding = encoding

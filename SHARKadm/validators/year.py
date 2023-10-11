@@ -3,7 +3,7 @@ from .base import Validator, DataHolderProtocol
 
 class ValidateYearNrDigits(Validator):
 
-    def validate(self, data_holder: DataHolderProtocol) -> None:
+    def _validate(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data['year'] = data_holder.data['year'].apply(self.check)
 
     @staticmethod
