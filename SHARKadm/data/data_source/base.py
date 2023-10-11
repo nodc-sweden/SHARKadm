@@ -35,7 +35,7 @@ class DataFile(ABC):
         self._save_original_header()
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} with data type "{self._data_type}": {self._path}'
+        return f'{self.__class__.__name__} with data type "{self.data_type}": {self._path}'
 
     @abstractmethod
     def _load_file(self) -> None:
@@ -65,6 +65,14 @@ class DataFile(ABC):
             mapped_header.append(mapper.get_internal_name(item))
         self._data.columns = mapped_header
         self._header_mapper = mapper
+
+    def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
+        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
+        for col in columns_to_use:
+            if new_column not in self._data.columns:
+                self._data[new_column] = self._data[col]
+            else:
+                self._data[new_column] = self._data[new_column] + self._data[col]
 
     @property
     def data(self) -> pd.DataFrame:
