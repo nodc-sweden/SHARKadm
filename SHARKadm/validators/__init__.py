@@ -4,6 +4,7 @@ import pathlib
 from .base import Validator
 from .year import ValidateYearNrDigits
 from .unique import ValidateUniqueSampleId
+from .columns import ValidateColumnViewColumnsNotInDataset
 
 
 def get_validator_list() -> list[Type[Validator]]:

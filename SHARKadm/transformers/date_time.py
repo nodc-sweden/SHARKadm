@@ -76,5 +76,5 @@ class AddMonth(Transformer):
         if not x:
             adm_logger.log_transformation(f'Missing datetime in {data_holder}')
             return ''
-        return str(x.month)
+        return str(x.month).zfill(2)
 

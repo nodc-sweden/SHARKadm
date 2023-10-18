@@ -13,11 +13,17 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .position import AddPositionToAllLevels
+from .position import AddPositionDM
+from .position import AddPositionDD
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .station import AddStationInfo
 from .delivery_note_info import AddStatus
 from .project_code import AddSwedishProjectName
 from .project_code import AddEnglishProjectName
+from .laboratory import AddSwedishSampleOrderer
+from .laboratory import AddEnglishSampleOrderer
+from .laboratory import AddSwedishSamplingLaboratory
+from .laboratory import AddEnglishSamplingLaboratory
 
 
 def get_transformer_list() -> list[str]:

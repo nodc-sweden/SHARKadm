@@ -1,4 +1,5 @@
 import pathlib
+import functools
 
 from .import_config import ImportMatrixConfig
 from .column_info import ColumnInfoConfig
@@ -17,11 +18,13 @@ DEFAULT_COLUMN_VIEWS_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_views.txt')
 # DEFAULT_DATA_TYPE_MAPPING_PATH = pathlib.Path(THIS_DIR, 'etc', 'data_type_mapping.yaml')
 
 
+@functools.cache
 def get_column_info_config(path: str | pathlib.Path = None) -> ColumnInfoConfig:
     path = path or DEFAULT_COLUMN_INFO_PATH
     return ColumnInfoConfig(path)
 
 
+@functools.cache
 def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
     path = path or DEFAULT_COLUMN_VIEWS_PATH
     return ColumnViews(path)
@@ -31,7 +34,7 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 #     directory = directory or DEFAULT_IMPORT_MATRIX_DIRECTORY
 #     return [path.stem.split('_', 2)[-1] for path in pathlib.Path(directory).iterdir()]
 
-
+@functools.cache
 def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = None,
                              data_type_mapping_path: str | pathlib.Path = None) -> ImportMatrixConfig:
     directory = directory or DEFAULT_IMPORT_MATRIX_DIRECTORY
@@ -45,6 +48,7 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
                                       )
 
 
+@functools.cache
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
     config_directory = config_directory or ID_CONFIG_DIRECTORY
     return SharkadmIdsHandler(config_directory)
