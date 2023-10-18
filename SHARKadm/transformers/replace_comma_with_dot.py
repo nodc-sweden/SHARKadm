@@ -9,7 +9,7 @@ class ReplaceCommaWithDot(Transformer):
     ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:
-        super().__init__(apply_on_columns=apply_on_columns)
+        super().__init__()
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
 
