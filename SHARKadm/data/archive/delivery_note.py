@@ -13,6 +13,9 @@ class DeliveryNote:
 
         self._load_file()
 
+    def __getitem__(self, item: str) -> str:
+        return self._data[item]
+
     def _load_file(self) -> None:
         with open(self._path, encoding=self._encoding) as fid:
             for line in fid:

@@ -13,8 +13,8 @@ class ReplaceCommaWithDot(Transformer):
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         cols = '\n'.join(self.default_columns)
         return f'Replaces comma with dot for the given columns. Columns that should be modified can be given in the ' \
                f'constructor. This object will modify the following columns:\n{cols}'

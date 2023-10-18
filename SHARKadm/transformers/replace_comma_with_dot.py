@@ -13,8 +13,8 @@ class ReplaceCommaWithDot(Transformer):
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return f'Adds position to all levels if not present'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:

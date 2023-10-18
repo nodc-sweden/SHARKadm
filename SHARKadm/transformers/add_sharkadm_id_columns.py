@@ -18,8 +18,8 @@ class CustomAddSharkadmId(Transformer):
         self._id_handler = id_handler
         #self._d_type_mapper = d_type_mapper
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return 'Adds custom md5 sharkadm_id'
 
     # @classmethod
@@ -47,6 +47,7 @@ class CustomAddSharkadmId(Transformer):
             col_name_md5 = f'{col_name}_md5'
             data_holder.data[col_name] = data_holder.data.apply(lambda row: id_handler.get_id(row), axis=1)
             data_holder.data[col_name_md5] = data_holder.data[col_name].apply(self.get_md5)
+        data_holder.data['shark_sample_id_md5'] = data_holder.data['sharkadm_sample_id_md5']
 
     @staticmethod
     def get_md5(x) -> str:
@@ -54,19 +55,19 @@ class CustomAddSharkadmId(Transformer):
 
 
 class AddSharkadmId(Transformer):
-
     def __init__(self) -> None:
+        super().__init__()
         col_info = config.get_column_info_config()
         id_handler = config.get_sharkadm_id_handler()
-        d_type_mapper = config.get_data_type_mapper()
+        # d_type_mapper = config.get_data_type_mapper()
         self._trans = CustomAddSharkadmId(
             column_info=col_info,
             id_handler=id_handler,
-            d_type_mapper=d_type_mapper
+            # d_type_mapper=d_type_mapper
         )
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return 'Adds md5 sharkadm_id'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:

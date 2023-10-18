@@ -37,10 +37,10 @@ class Transformer(ABC):
         """Short name of the transformer"""
         return self.__class__.__name__
 
-    @property
+    @staticmethod
     @abstractmethod
-    def transformer_description(self) -> str:
-        """Verbal description about what the transformer is doing"""
+    def get_transformer_description() -> str:
+        """Verbal description describing what the transformer is doing"""
         ...
 
     def transform(self, data_holder: DataHolderProtocol) -> None:

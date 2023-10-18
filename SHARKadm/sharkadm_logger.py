@@ -12,6 +12,14 @@ class SHARKadmLogger:
             'error'
         ]
 
+        self._transformations: dict = dict()
+        self._validations: dict = dict()
+        self._workflow: list = list()
+
+        self._initiate_log()
+
+    def _initiate_log(self) -> None:
+        """Initiate the log"""
         self._transformations: dict = dict((lev, {}) for lev in self._levels)
         self._validations: dict = dict((lev, {}) for lev in self._levels)
         self._workflow: list = list()
@@ -37,3 +45,10 @@ class SHARKadmLogger:
         self._validations[level].setdefault(msg, 0)
         self._validations[level][msg] += 1
 
+    def reset_log(self) -> None:
+        """Resets all entries to the log"""
+        logger.info(f'Resetting {self.__class__.__name__}')
+        self._initiate_log()
+
+
+adm_logger = SHARKadmLogger()

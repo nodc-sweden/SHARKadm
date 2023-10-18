@@ -6,8 +6,9 @@ from .base import Exporter, DataHolderProtocol
 class PrintDataFrame(Exporter):
     """Prints the dataframe on screen"""
 
-    def __repr__(self) -> str:
-        return f'Exporter: {self.__class__.__name__}'
+    @staticmethod
+    def get_exporter_description() -> str:
+        return 'Prints data on screen'
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
         print(data_holder.data)

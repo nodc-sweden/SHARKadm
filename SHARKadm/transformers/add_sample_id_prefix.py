@@ -5,9 +5,9 @@ from SHARKadm import adm_logger
 class AddSampleIdPrefix(Transformer):
     key_to_add = 'sample_id_prefix'
 
-    @property
-    def transformer_description(self) -> str:
-        return f"Sets {self.key_to_add} from data source column"
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f"Sets sample_id_prefix from data source column"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'source' not in data_holder.data.columns:

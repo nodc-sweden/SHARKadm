@@ -28,6 +28,12 @@ class Validator(ABC):
     def __repr__(self) -> str:
         return f'Validator: {self.__class__.__name__}'
 
+    @staticmethod
+    @abstractmethod
+    def get_validator_description() -> str:
+        """Verbal description describing what the validator is doing"""
+        ...
+
     @property
     def workflow_message(self) -> str:
         return f'Applying validator: {self.__class__.__name__}'
@@ -39,3 +45,4 @@ class Validator(ABC):
     @abstractmethod
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         ...
+

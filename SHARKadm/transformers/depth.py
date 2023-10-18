@@ -8,9 +8,9 @@ class AddSampleMinAndMaxDepth(Transformer):
     min_depth_par = 'sample_min_depth_m'
     max_depth_par = 'sample_max_depth_m'
 
-    @property
-    def transformer_description(self) -> str:
-        return f'Adds min and max depth if missing. Depth is set from {self.depth_par}'
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Adds min and max depth if missing. Depth is set from sample_depth_m'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in [self.min_depth_par, self.max_depth_par]:
@@ -31,8 +31,8 @@ class AddSectionStartAndEndDepth(Transformer):
     section_start_depth_par = 'section_start_depth_m'
     section_end_depth_par = 'section_end_depth_m'
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return f'Adds section start and end depth'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -64,8 +64,8 @@ class ReorderSampleMinAndMaxDepth(Transformer):
     min_depth_par = 'sample_min_depth_m'
     max_depth_par = 'sample_max_depth_m'
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return f'Reorders sample min and max depth if they are in wrong order.'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:

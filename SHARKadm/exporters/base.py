@@ -28,6 +28,12 @@ class Exporter(ABC):
     def __repr__(self) -> str:
         return f'Exporter: {self.__class__.__name__}'
 
+    @staticmethod
+    @abstractmethod
+    def get_exporter_description() -> str:
+        """Verbal description describing what the exporter is doing"""
+        ...
+
     @property
     def workflow_message(self) -> str:
         return f'Applying exporter: {self.__class__.__name__}'

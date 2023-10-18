@@ -5,7 +5,10 @@ import pandas as pd
 from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
 
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+DATETIME_FORMATS = [
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d'
+]
 
 
 class AddDateAndTimeToAllLevels(Transformer):
@@ -14,8 +17,8 @@ class AddDateAndTimeToAllLevels(Transformer):
         'visit_date'
     ]  # In order of prioritization
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return 'Adds date and time column to all levels'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -35,30 +38,38 @@ class AddDateAndTimeToAllLevels(Transformer):
 class AddDatetime(Transformer):
     datetime_source_column = 'sample_date'
 
-    @property
-    def transformer_description(self) -> str:
-        return f'Adds column datetime. Time is taken from {self.datetime_source_column}'
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Adds column datetime. Time is taken from sample_date'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data['datetime'] = data_holder.data[self.datetime_source_column].apply(self.to_datetime)
 
     @staticmethod
     def to_datetime(x: str) -> datetime.datetime:
-        return datetime.datetime.strptime(x, DATETIME_FORMAT)
+        for form in DATETIME_FORMATS:
+            try:
+                return datetime.datetime.strptime(x, form)
+            except ValueError:
+                continue
 
 
-class AddSampleMonth(Transformer):
+class AddMonth(Transformer):
+    month_columns = [
+        'sample_month',
+        'visit_month'
+    ]
 
-    @property
-    def transformer_description(self) -> str:
+    @staticmethod
+    def get_transformer_description() -> str:
         return f'Adds month column to date. Month is taken from the datetime column and will overwrite old value'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'datetime' not in data_holder.data.columns:
             adm_logger.log_transformation(f'Missing key: datetime')
             return
-        data_holder.data['sample_month'] = data_holder.data['datetime'].apply(lambda x, dh=data_holder:
-                                                                              self.get_month(x, dh))
+        for col in self.month_columns:
+            data_holder.data[col] = data_holder.data['datetime'].apply(lambda x, dh=data_holder: self.get_month(x, dh))
 
     @staticmethod
     def get_month(x: datetime.datetime, data_holder: DataHolderProtocol) -> str:

@@ -17,8 +17,15 @@ class AddPositionToAllLevels(Transformer):
         'visit_reported_longitude'
     ]  # In order of prioritization
 
-    @property
-    def transformer_description(self) -> str:
+    def __init__(self, lat_to_sync: list[str] | None = None, lon_to_sync: list[str] | None = None, **kwargs):
+        super().__init__(**kwargs)
+        if lat_to_sync:
+            self.lat_to_sync = lat_to_sync
+        if lon_to_sync:
+            self.lon_to_sync = lon_to_sync
+
+    @staticmethod
+    def get_transformer_description() -> str:
         return f'Adds position to all levels if not present'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:

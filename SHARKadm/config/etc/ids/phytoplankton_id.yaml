@@ -3,7 +3,6 @@ levels:
   sample:
     - visit_year
     - platform_code
-    - visit_id
     - visit_date
     - sample_time
     - reported_station_name
