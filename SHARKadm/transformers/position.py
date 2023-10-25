@@ -129,4 +129,5 @@ class AddPositionDD(Transformer):
     @staticmethod
     def _split_pos(x):
         x = x.replace(' ', '')
-        return f'{x[:2]} {x[2:]}'
+        return x
+        # return f'{x[:2]}{x[2:]}'

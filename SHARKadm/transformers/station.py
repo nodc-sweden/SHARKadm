@@ -1,6 +1,6 @@
-from .base import Transformer, DataHolderProtocol
-from micro.stations import get_default_station_object
+from stations.station_file import get_station_object
 from SHARKadm import adm_logger
+from .base import Transformer, DataHolderProtocol
 
 
 class AddStationInfo(Transformer):
@@ -8,7 +8,7 @@ class AddStationInfo(Transformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._stations = get_default_station_object()
+        self._stations = get_station_object()
         self._loaded_stations_info = {}
 
     @staticmethod
