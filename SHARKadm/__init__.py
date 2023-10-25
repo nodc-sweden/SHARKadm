@@ -6,6 +6,7 @@ from SHARKadm.exporters import get_exporters_description_text
 
 
 def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None:
+    """Writes a summary of validators, transformers and exporters to file"""
     path = pathlib.Path(path)
     if path.is_dir():
         path = path / 'SHARKadm_operations.txt'
