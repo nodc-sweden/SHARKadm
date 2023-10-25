@@ -7,6 +7,7 @@ from .shark_data_txt_file import SHARKdataTxt
 from .shark_metadata_auto import SHARKMetadataAuto
 from .txt_file import TxtAsIs
 from .zip_archive import ZipArchive
+from .html_station_map import HtmlStationMap
 
 
 def get_exporter_list() -> list[str]:

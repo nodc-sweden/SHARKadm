@@ -18,6 +18,11 @@ class DataHolderProtocol(Protocol):
     def data_type(self) -> str:
         ...
 
+    @property
+    @abstractmethod
+    def dataset_name(self) -> str:
+        ...
+
 
 class Exporter(ABC):
     """Abstract base class used as a blueprint for exporting stuff in a DataHolder"""

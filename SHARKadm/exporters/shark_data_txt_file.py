@@ -22,6 +22,5 @@ class SHARKdataTxt(Exporter):
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
         column_list = self._column_views.get_columns_for_view(view=data_holder.data_type)
-        print(f'{data_holder.data.columns=}')
         data = data_holder.data[column_list]
         data.to_csv(self._path, encoding=self._encoding, sep='\t', index=False)

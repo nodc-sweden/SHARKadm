@@ -5,6 +5,7 @@ import os
 import pathlib
 from SHARKadm.data.archive import ArchiveBase
 from SHARKadm import exporters
+from SHARKadm import utils
 
 from .base import Exporter, DataHolderProtocol
 
@@ -27,7 +28,8 @@ class ZipArchive(Exporter):
 
     @property
     def _temp_zip_directory(self) -> pathlib.Path:
-        return pathlib.Path.home() / '_temp_sharkadm' / f'{self._metadata_auto.dataset_file_name.split(".")[0]}'
+        return utils.get_temp_directory(f'{self._metadata_auto.dataset_file_name.split(".")[0]}')
+        # return pathlib.Path.home() / '_temp_sharkadm' / f'{self._metadata_auto.dataset_file_name.split(".")[0]}'
 
     @property
     def _save_zip_directory(self) -> pathlib.Path:
