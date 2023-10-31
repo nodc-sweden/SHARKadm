@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def decdeg_to_decmin(pos: float | str, nr_decimals: int = 2):
+def decdeg_to_decmin(pos: float | str, nr_decimals: int = 2, with_space: bool = False):
     pos = float(pos)
     deg = np.floor(pos)
     minute = pos % deg * 60.0
@@ -9,6 +9,9 @@ def decdeg_to_decmin(pos: float | str, nr_decimals: int = 2):
         output = ('%%2.%sf' % nr_decimals % (deg * 100.0 + minute))
     else:
         output = str(deg * 100.0 + minute)
+    if with_space:
+        a, b = output.split('.')
+        output = f'{a[:-2]} {a[-2:]}.{b}'
     return output
 
 

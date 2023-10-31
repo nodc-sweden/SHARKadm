@@ -1,12 +1,12 @@
 import logging
 
 from SHARKadm.data import data_source
-from .base import ArchiveBase
+from .archive_data_holder import ArchiveDataHolder
 
 logger = logging.getLogger(__name__)
 
 
-class EpibenthosMartransArchive(ArchiveBase):
+class EpibenthosMartransArchiveDataHolder(ArchiveDataHolder):
     _data_type = 'Epibenthos'
     _data_format = 'EpibenthosMartrans'
 

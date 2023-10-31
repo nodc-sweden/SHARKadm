@@ -15,7 +15,7 @@ from SHARKadm.data.data_holder import DataHolder
 logger = logging.getLogger(__name__)
 
 
-class ArchiveBase(DataHolder, ABC):
+class ArchiveDataHolder(DataHolder, ABC):
     _data_type: str | None = None
     _data_format: str | None = None
 
@@ -140,8 +140,8 @@ class ArchiveBase(DataHolder, ABC):
 
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
-        data = data_source.get_data().copy(deep=True)  # Do we need a copy?
-        data.fillna('', inplace=True)
+        data = data_source.get_data()
+        data = data.fillna('')
         data.reset_index(inplace=True, drop=True)
         return data
 

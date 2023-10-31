@@ -1,7 +1,7 @@
 import datetime
 import pathlib
 
-from SHARKadm.data.archive import ArchiveBase
+from SHARKadm.data.archive import ArchiveDataHolder
 from .base import Exporter
 
 
@@ -15,14 +15,14 @@ class SHARKMetadataAuto(Exporter):
         if path:
             self._path = pathlib.Path(path)
         self._encoding = kwargs.get('encoding', 'cp1252')
-        self._data_holder: ArchiveBase | None = None
+        self._data_holder: ArchiveDataHolder | None = None
 
     @staticmethod
     def get_exporter_description() -> str:
         return 'Creates the shark_metadata_auto file'
 
     @property
-    def data_holder(self) -> ArchiveBase:
+    def data_holder(self) -> ArchiveDataHolder:
         return self._data_holder
 
     @property
@@ -73,7 +73,7 @@ class SHARKMetadataAuto(Exporter):
     def max_latitude(self) -> str:
         return self.data_holder.max_latitude
 
-    def set_data_holder(self, data_holder: ArchiveBase) -> None:
+    def set_data_holder(self, data_holder: ArchiveDataHolder) -> None:
         self._data_holder = data_holder
 
     def create_file(self, path: pathlib.Path | str = None) -> None:
@@ -95,7 +95,7 @@ class SHARKMetadataAuto(Exporter):
         with open(path, 'w') as fid:
             fid.write('\n'.join(lines))
 
-    def _export(self, data_holder: ArchiveBase) -> None:
+    def _export(self, data_holder: ArchiveDataHolder) -> None:
         self.set_data_holder(data_holder=data_holder)
         self.create_file()
 

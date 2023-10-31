@@ -58,15 +58,15 @@ class ColumnInfoConfig:
             levels.add(info['node_level'])
         return sorted([lev for lev in levels if lev])
 
-    @functools.cache
-    def get_level(self, parameter: str) -> str:
-        """Returns the level for the given parameter"""
-        return self._data[parameter]['node_level']
-
-    def get_format(self, parameter: str) -> str:
-        """Returns the format for the given parameter"""
-        return self._data[parameter]['format']
-
-    def get_level_config(self, node_level: str) -> LevelColumnInfoConfig:
-        return self._levels.get(node_level)
+    # @functools.cache
+    # def get_level(self, parameter: str) -> str:
+    #     """Returns the level for the given parameter"""
+    #     return self._data[parameter]['node_level']
+    #
+    # def get_format(self, parameter: str) -> str:
+    #     """Returns the format for the given parameter"""
+    #     return self._data[parameter]['format']
+    #
+    # def get_level_config(self, node_level: str) -> LevelColumnInfoConfig:
+    #     return self._levels.get(node_level)
 

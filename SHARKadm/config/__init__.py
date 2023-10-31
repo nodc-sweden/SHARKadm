@@ -6,16 +6,26 @@ from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
 from .sharkadm_id import SharkadmIdsHandler
 from .data_type_mapper import DataTypeMapper
+from .physical_chemical_mapper import PhysicalChemicalMapper
+
 
 THIS_DIR = pathlib.Path(__file__).parent
 
 ID_CONFIG_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'ids')
 DEFAULT_IMPORT_MATRIX_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'import_matrix')
 
+DEFAULT_PHYSICAL_CHEMICAL_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'physical_chemical_mapping.txt')
+
 DEFAULT_COLUMN_INFO_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_info.yaml')
 DEFAULT_COLUMN_VIEWS_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_views.txt')
 
 # DEFAULT_DATA_TYPE_MAPPING_PATH = pathlib.Path(THIS_DIR, 'etc', 'data_type_mapping.yaml')
+
+
+@functools.cache
+def get_physical_chemical_mapper(path: str | pathlib.Path = None) -> PhysicalChemicalMapper:
+    path = path or DEFAULT_PHYSICAL_CHEMICAL_MAPPER
+    return PhysicalChemicalMapper(path)
 
 
 @functools.cache

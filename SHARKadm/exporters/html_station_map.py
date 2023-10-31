@@ -16,9 +16,6 @@ class HtmlStationMap(Exporter):
                  directory: str | pathlib.Path | None = None,
                  open_map: bool = False,
                  **kwargs):
-        print(f'{kwargs=}')
-        print(f'{open_map=}')
-        super().__init__(**kwargs)
         self._file_name = file_name
         self._directory = directory
         self._open_map = open_map

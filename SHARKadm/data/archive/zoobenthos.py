@@ -1,12 +1,12 @@
 import logging
 
 from SHARKadm.data import data_source
-from .base import ArchiveBase
+from .archive_data_holder import ArchiveDataHolder
 
 logger = logging.getLogger(__name__)
 
 
-class ZoobenthosArchiveSkv(ArchiveBase):
+class ZoobenthosArchiveSkvDataHolder(ArchiveDataHolder):
     _data_type = 'Zoobenthos'
     _data_format = 'Zoobenthos'
 

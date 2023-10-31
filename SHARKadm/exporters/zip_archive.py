@@ -3,7 +3,7 @@ import logging
 import shutil
 import os
 import pathlib
-from SHARKadm.data.archive import ArchiveBase
+from SHARKadm.data.archive import ArchiveDataHolder
 from SHARKadm import exporters
 from SHARKadm import utils
 
@@ -19,7 +19,7 @@ class ZipArchive(Exporter):
         if not self._save_to_directory.iterdir():
             raise NotADirectoryError(self._save_to_directory)
         self._encoding = kwargs.get('encoding', 'cp1252')
-        self._data_holder: ArchiveBase | None = None
+        self._data_holder: ArchiveDataHolder | None = None
         self._metadata_auto: exporters.SHARKMetadataAuto | None = None
 
     @staticmethod
@@ -46,7 +46,7 @@ class ZipArchive(Exporter):
             except Exception as e:
                 logging.debug(f'Failed to delete {path}. Reason: {e}')
 
-    def _export(self, data_holder: ArchiveBase) -> None:
+    def _export(self, data_holder: ArchiveDataHolder) -> None:
         self._data_holder = data_holder
         self._load_metadata_auto_object()
         self._reset_temp_zip_directory()

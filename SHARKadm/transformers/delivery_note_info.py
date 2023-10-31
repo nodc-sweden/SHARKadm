@@ -3,7 +3,7 @@
 import pathlib
 
 from .base import Transformer, DataHolderProtocol
-from SHARKadm.data.archive import ArchiveBase
+from SHARKadm.data.archive import ArchiveDataHolder
 from SHARKadm.utils import yaml_data
 
 DELIVERY_NOTE_CONFIG_PATH = pathlib.Path(__file__).parent / 'etc' / 'delivery_note.yaml'
@@ -23,7 +23,7 @@ class AddStatus(Transformer):
     def get_transformer_description() -> str:
         return f'Adds status columns'
 
-    def _transform(self, data_holder: ArchiveBase) -> None:
+    def _transform(self, data_holder: ArchiveDataHolder) -> None:
         checked_by = data_holder.delivery_note['data kontrollerad av']
         data = dict()
         if data_holder.data_type.lower() in self.physical_chemical_keys:

@@ -89,11 +89,11 @@ class AddPositionDM(Transformer):
 
     def _get_lat(self, row):
         lat = row[self.lat_source_col]
-        return self._cached_lat.setdefault(lat, position.decdeg_to_decmin(lat))
+        return self._cached_lat.setdefault(lat, position.decdeg_to_decmin(lat, nr_decimals=2, with_space=True))
 
     def _get_lon(self, row):
         lon = row[self.lon_source_col]
-        return self._cached_lon.setdefault(lon, position.decdeg_to_decmin(lon))
+        return self._cached_lon.setdefault(lon, position.decdeg_to_decmin(lon, nr_decimals=2, with_space=True))
 
 
 class AddPositionDD(Transformer):
@@ -129,5 +129,6 @@ class AddPositionDD(Transformer):
     @staticmethod
     def _split_pos(x):
         x = x.replace(' ', '')
+        x = ('%%2.%sf' % 5 % float(x))
         return x
         # return f'{x[:2]}{x[2:]}'

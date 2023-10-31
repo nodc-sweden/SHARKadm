@@ -9,21 +9,23 @@ from .datatype import AddDatatype
 from .date_time import AddDateAndTimeToAllLevels
 from .date_time import AddDatetime
 from .date_time import AddMonth
+from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
-from .position import AddPositionToAllLevels
-from .position import AddPositionDM
+from .laboratory import AddEnglishSampleOrderer
+from .laboratory import AddEnglishSamplingLaboratory
+from .laboratory import AddSwedishSampleOrderer
+from .laboratory import AddSwedishSamplingLaboratory
+from .map_header import ArchiveMapper
+from .map_header import PhysicalChemicalMapper
 from .position import AddPositionDD
+from .position import AddPositionDM
+from .position import AddPositionToAllLevels
+from .project_code import AddEnglishProjectName
+from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .station import AddStationInfo
-from .delivery_note_info import AddStatus
-from .project_code import AddSwedishProjectName
-from .project_code import AddEnglishProjectName
-from .laboratory import AddSwedishSampleOrderer
-from .laboratory import AddEnglishSampleOrderer
-from .laboratory import AddSwedishSamplingLaboratory
-from .laboratory import AddEnglishSamplingLaboratory
 
 
 def get_transformer_list() -> list[str]:

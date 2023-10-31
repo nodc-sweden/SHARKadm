@@ -1,16 +1,16 @@
 import pathlib
 from typing import Type
 
-from .base import ArchiveBase
-from .epibenthos import EpibenthosMartransArchive
-from .pythonplankton import PhytoplanktonArchive
-from .zoobenthos import ZoobenthosArchiveSkv
+from .archive_data_holder import ArchiveDataHolder
+from .epibenthos import EpibenthosMartransArchiveDataHolder
+from .pythonplankton import PhytoplanktonArchiveDataHolder
+from .zoobenthos import ZoobenthosArchiveSkvDataHolder
 from .delivery_note import DeliveryNote
 
-object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveBase.__subclasses__())
+object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
 
 
-def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveBase:
+def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote(path / 'processed_data/delivery_note.txt')
     # print(f'{object_mapping=}')
