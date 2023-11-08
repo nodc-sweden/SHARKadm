@@ -28,6 +28,7 @@ from .replace_comma_with_dot import ReplaceCommaWithDot
 from .station import AddStationInfo
 import inspect
 
+from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
 def get_transformer_list() -> list[str]:
@@ -64,11 +65,12 @@ def get_transformers_info() -> dict:
         result[name] = dict()
         result[name]['name'] = name
         result[name]['description'] = tran.get_transformer_description()
-        result[name]['kwargs'] = dict()
-        for key, value in inspect.signature(tran.__init__).parameters.items():
-            if key in ['self', 'kwargs']:
-                continue
-            result[name]['kwargs'][key] = value.default
+        result[name]['kwargs'] = get_kwargs_for_class(tran)
+        # result[name]['kwargs'] = dict()
+        # for key, value in inspect.signature(tran.__init__).parameters.items():
+        #     if key in ['self', 'kwargs']:
+        #         continue
+        #     result[name]['kwargs'][key] = value.default
     return result
 
 

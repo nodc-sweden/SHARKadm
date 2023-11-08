@@ -7,6 +7,7 @@ from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
 from .sharkadm_id import SharkadmIdsHandler
 from .data_type_mapper import DataTypeMapper
+from .delivery_note_mapper import DeliveryNoteMapper
 from .physical_chemical_mapper import PhysicalChemicalMapper
 
 
@@ -20,6 +21,8 @@ ID_CONFIG_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'ids')
 DEFAULT_IMPORT_MATRIX_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'import_matrix')
 
 DEFAULT_PHYSICAL_CHEMICAL_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'physical_chemical_mapping.txt')
+
+DEFAULT_DELIVERY_NOTE_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'delivery_note_mapper.txt')
 
 DEFAULT_COLUMN_INFO_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_info.yaml')
 DEFAULT_COLUMN_VIEWS_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_views.txt')
@@ -70,9 +73,10 @@ def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
     return SharkadmIdsHandler(config_directory)
 
 
-# def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:
-#     path = path or DEFAULT_DATA_TYPE_MAPPING_PATH
-#     return DataTypeMapper(path)
+@functools.cache
+def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMapper:
+    path = path or DEFAULT_DELIVERY_NOTE_MAPPER
+    return DeliveryNoteMapper(path)
 
 
 if __name__ == '__main__':

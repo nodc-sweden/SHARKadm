@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+import datetime
+import openpyxl
 import logging
 import pathlib
 from abc import ABC, abstractmethod
@@ -5,6 +8,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from SHARKadm import config
+from SHARKadm import adm_logger
 # from SHARKadm.config import get_data_type_mapper
 from SHARKadm.config.import_config import ImportMatrixConfig
 from SHARKadm.config.import_config import ImportMatrixMapper
@@ -15,14 +19,14 @@ from SHARKadm.data.data_holder import DataHolder
 logger = logging.getLogger(__name__)
 
 
-class ArchiveDataHolder(DataHolder, ABC):
+class DvTemplateDataHolder(DataHolder, ABC):
     _data_type: str | None = None
     _data_format: str | None = None
 
     _date_str_format = '%Y-%m-%d'
 
-    def __init__(self, archive_root_directory: str | pathlib.Path = None):
-        self._archive_root_directory = pathlib.Path(archive_root_directory)
+    def __init__(self, template_path: str | pathlib.Path = None):
+        self._template_path = pathlib.Path(template_path)
 
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
@@ -41,10 +45,10 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     @staticmethod
     def get_data_holder_description() -> str:
-        return """Holds data from an archive"""
+        return """Holds data from a Data host delivery templates"""
 
     def _initiate(self) -> None:
-        self._dataset_name = self.archive_root_directory.name
+        self._dataset_name = self.template_path.name
 
     @property
     def data(self) -> pd.DataFrame:
@@ -64,16 +68,16 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self._dataset_name
 
     @property
-    def archive_root_directory(self) -> pathlib.Path:
-        return self._archive_root_directory
+    def template_path(self) -> pathlib.Path:
+        return self._template_path
 
     @property
     def received_data_directory(self) -> pathlib.Path:
-        return self.archive_root_directory / 'received_data'
+        return self.template_path / 'received_data'
 
     @property
     def processed_data_directory(self) -> pathlib.Path:
-        return self.archive_root_directory / 'processed_data'
+        return self.template_path / 'processed_data'
 
     @property
     def delivery_note_path(self) -> pathlib.Path:
@@ -120,12 +124,20 @@ class ArchiveDataHolder(DataHolder, ABC):
         return str(max(self.data['sample_reported_latitude'].astype(float)))
 
     def _load_delivery_note(self) -> None:
-        self._delivery_note = delivery_note.DeliveryNote.from_txt_file(self.delivery_note_path)
+        self._delivery_note = delivery_note.DeliveryNote.from_dv_template(self._template_path)
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
         self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
-        self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
+        if not self._import_matrix:
+            msg = f'Could not find import matrix for data_type: {self.delivery_note.data_type}'
+            adm_logger.log_workflow(msg)
+            return
+        try:
+            self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
+        except KeyError as e:
+            msg = f'Could not get import matrix mapper for import_matrix_key: {self.delivery_note.import_matrix_key}'
+            adm_logger.log_workflow(msg)
 
     def _add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
         """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
@@ -170,8 +182,21 @@ class ArchiveDataHolder(DataHolder, ABC):
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
-    @abstractmethod
     def _load_data(self):
-        ...
+        wb = openpyxl.load_workbook(self._template_path)
 
+        sheet_name = None
+        for name in ['data', 'Klistra in i denna']:
+            if name in wb.sheetnames:
+                sheet_name = name
+                break
+        if not sheet_name:
+            raise f'Could not find data sheet in file: {self._template_path}'
+
+        d_source = data_source.XlsxFormatDataFile(path=self._template_path, data_type=self.delivery_note.data_type,
+                                                  sheet_name=sheet_name)
+        if self._import_matrix_mapper:
+            d_source.map_header(self.import_matrix_mapper)
+
+        self._set_data_source(d_source)
 

@@ -30,6 +30,10 @@ class LimsDataHolder(DataHolder):
 
         self._load_data()
 
+    @staticmethod
+    def get_data_holder_description() -> str:
+        return """Holds data from a lims export"""
+
     @property
     def data_file_path(self) -> pathlib.Path:
         return self._lims_root_directory / 'Raw_data' / 'data.txt'

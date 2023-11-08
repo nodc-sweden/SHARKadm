@@ -1,143 +1,103 @@
 import pathlib
 import logging
+from typing import Type
+import inspect
 
-from SHARKadm import config
-from SHARKadm.data import data_source
-from SHARKadm.data.archive import delivery_note
+# from SHARKadm import config
+# from SHARKadm.data import data_source
+# from SHARKadm.data.archive import delivery_note
+
+
+from .data_holder import DataHolder
+from .archive import get_archive_data_holder, directory_is_archive
+from .lims import get_lims_data_holder, directory_is_lims
+from .dv_template import get_dv_template_data_holder
+
+from .archive import *
+from .lims import LimsDataHolder
+from .dv_template import DvTemplateDataHolder
 
 logger = logging.getLogger(__name__)
 
 
-def get_data_handler_object():
-    pass
+def get_data_holder_list() -> list[str]:
+    """Returns a sorted list of name of all available data_holders"""
+    return sorted([cls.__name__ for cls in DataHolder.__subclasses__()])
 
 
-# def get_phytoplankton_archive(archive_directory):
-#     pass
-#
-#
-# def load_dataset(
-#             data_source_directory: str | pathlib.Path = None,
-#             data_file_name: str = None,
-#             data_source_class: data_source.DataFile = None
-#         ) -> data_holder.SHARKadmController | None:
-#
-#     dataset_directory = pathlib.Path(data_source_directory)
-#
-#     delivery_note_path = pathlib.Path(dataset_directory, 'processed_data', 'delivery_note.txt')
-#     processed_data_directory = pathlib.Path(dataset_directory, 'processed_data')
-#     data_file_path = pathlib.Path(processed_data_directory, data_file_name)
-#
-#     if not data_file_path.exists():
-#         logger.info(f'No data file found: {processed_data_directory}. Looking for file with keyword "data"...')
-#         for path in processed_data_directory.iterdir():
-#             if 'data' in path.stem:
-#                 data_file_path = path
-#                 logger.info(f'Will use data file: {path}')
-#                 break
-#     if not data_file_path:
-#         logger.error(f'Could not find any data file in delivery: {dataset_directory}')
-#         return
-#
-#     d_note = delivery_note.DeliveryNote(delivery_note_path)
-#
-#     column_info = config.get_column_info_config()
-#     id_handler = config.get_sharkadm_id_handler()
-#     print(f'{d_note.data_type=}')
-#     import_matrix = config.get_import_matrix_config(data_type=d_note.data_type)
-#
-#     print(f'{d_note.import_matrix_key=}')
-#     # raise
-#     import_header_mapper = import_matrix.get_mapper(d_note.import_matrix_key)
-#
-#     data_file = data_source_class(path=data_file_path, data_type=d_note.data_type)
-#     data_file.map_header(import_header_mapper)
-#
-#     d_holder = data_holder.SHARKadmController(data_type=d_note.data_type,
-#                                               # column_info=column_info,
-#                                               # id_handler=id_handler,
-#                                               dataset_name=dataset_directory.name)
-#
-#     # TODO: Add delivery note etc.
-#     d_holder.add_data_source(data_file)
-#     return d_holder
-#
-#
-# def load_xml_dataset(directory: str | pathlib.Path) -> data_holder.SHARKadmController | None:
-#     """Loads a xml based dataset"""
-#     return load_dataset(
-#         data_source_directory=directory,
-#         data_file_name='data.xml',
-#         data_source_class=data_source.XmlDataFile
-#     )
-#
-#
-# def load_txt_dataset(directory: str | pathlib.Path) -> data_holder.SHARKadmController | None:
-#     """Loads a txt based dataset"""
-#     return load_dataset(
-#         data_source_directory=directory,
-#         data_file_name='data.txt',
-#         data_source_class=data_source.TxtColumnDataFile
-#     )
+def get_data_holders() -> dict[str, Type[DataHolder]]:
+    """Returns a dictionary with data_holders"""
+    trans = {}
+    for cls in DataHolder.__subclasses__():
+        trans[cls.__name__] = cls
+    return trans
 
-# def load_xml_dataset(directory: str | pathlib.Path) -> data_holder.DataHolder | None:
-#     """Loads a xml based dataset"""
-#     dataset_directory = pathlib.Path(directory)
-#
-#     delivery_note_path = pathlib.Path(dataset_directory, 'processed_data', 'delivery_note.txt')
-#     data_file_path = pathlib.Path(dataset_directory, 'processed_data', 'data.xml')
-#
-#     if not data_file_path.exists():
-#         return
-#
-#     d_note = delivery_note.DeliveryNote(delivery_note_path)
-#
-#     column_info = config.get_column_info_config()
-#     id_handler = config.get_sharkadm_id_handler()
-#     import_matrix = config.get_import_matrix_config(data_type=d_note.data_type)
-#
-#     import_header_mapper = import_matrix.get_mapper(d_note.import_matrix_key)
-#
-#     data_file = data_source.XmlDataFile(path=data_file_path, data_type=d_note.data_type)
-#     data_file.map_header(import_header_mapper)
-#
-#     d_holder = data_holder.DataHolder(data_type=d_note.data_type,
-#                              column_info=column_info,
-#                              id_handler=id_handler,
-#                              dataset_name=dataset_directory.name)
-#
-#     d_holder.add_data_source(data_file)
-#     return d_holder
-#
-#
-# def load_txt_dataset(directory: str | pathlib.Path) -> data_holder.DataHolder | None:
-#     """Loads a txt based dataset"""
-#     dataset_directory = pathlib.Path(directory)
-#
-#     delivery_note_path = pathlib.Path(dataset_directory, 'processed_data', 'delivery_note.txt')
-#     data_file_path = pathlib.Path(dataset_directory, 'processed_data', 'data.txt')
-#
-#     if not data_file_path.exists():
-#         return
-#
-#     d_note = delivery_note.DeliveryNote(delivery_note_path)
-#
-#     column_info = config.get_column_info_config()
-#     id_handler = config.get_sharkadm_id_handler()
-#     import_matrix = config.get_import_matrix_config(data_type=d_note.data_type)
-#
-#     import_header_mapper = import_matrix.get_mapper(d_note.import_matrix_key)
-#
-#     data_file = data_source.TxtColumnDataFile(path=data_file_path, data_type=d_note.data_type)
-#     data_file.map_header(import_header_mapper)
-#
-#     d_holder = data_holder.DataHolder(data_type=d_note.data_type,
-#                              column_info=column_info,
-#                              id_handler=id_handler,
-#                              dataset_name=dataset_directory.name)
-#
-#     d_holder.add_data_source(data_file)
-#     return d_holder
+
+def get_data_holder_object(trans_name: str, **kwargs) -> DataHolder:
+    """Returns DataHolder object that matches teh given data_holder names"""
+    all_trans = get_data_holders()
+    tran = all_trans[trans_name]
+    return tran(**kwargs)
+
+
+def get_data_holders_description() -> dict[str, str]:
+    """Returns a dictionary with data_holder name as key and the description as value"""
+    result = dict()
+    for name, tran in get_data_holders().items():
+        result[name] = tran.get_data_holder_description()
+    return result
+
+
+def get_data_holders_info() -> dict:
+    result = dict()
+    for name, tran in get_data_holders().items():
+        result[name] = dict()
+        result[name]['name'] = name
+        result[name]['description'] = tran.get_data_holder_description()
+        result[name]['kwargs'] = dict()
+        for key, value in inspect.signature(tran.__init__).parameters.items():
+            if key in ['self', 'kwargs']:
+                continue
+            result[name]['kwargs'][key] = value.default
+    return result
+
+
+def get_data_holders_description_text() -> str:
+    info = get_data_holders_description()
+    line_length = 100
+    lines = list()
+    lines.append('=' * line_length)
+    lines.append('Available data_holders are:')
+    lines.append('-' * line_length)
+    for key in sorted(info):
+        lines.append(f'{key.ljust(30)}{info[key]}')
+    lines.append('=' * line_length)
+    return '\n'.join(lines)
+
+
+def print_data_holders_description() -> None:
+    """Prints all data_holders on screen"""
+    print(get_data_holders_description_text())
+
+
+def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
+    """Prints all data_holders on screen"""
+    with open(path, 'w') as fid:
+        fid.write(get_data_holders_description_text())
+
+
+def get_data_holder(path: str | pathlib.Path) -> DataHolder:
+    path = pathlib.Path(path)
+    if path.suffix == '.xlsx':
+        return get_dv_template_data_holder(path)
+    if path.is_dir():
+        archive_directory = directory_is_archive(path)
+        if archive_directory:
+            return get_archive_data_holder(archive_directory)
+        lims_directory = directory_is_lims(path)
+        if lims_directory:
+            return get_lims_data_holder(lims_directory)
+
 
 
 

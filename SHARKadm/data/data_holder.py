@@ -15,6 +15,21 @@ class DataHolder(ABC):
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
 
     @property
+    def workflow_message(self) -> str:
+        return f'Using DataHolder: {self.__class__.__name__}'
+
+    @property
+    def data_holder_name(self) -> str:
+        """Short name of the data_holder"""
+        return self.__class__.__name__
+
+    @staticmethod
+    @abstractmethod
+    def get_data_holder_description() -> str:
+        """Verbal description describing what the data_holder is doing"""
+        ...
+
+    @property
     @abstractmethod
     def data(self) -> pd.DataFrame:
         ...

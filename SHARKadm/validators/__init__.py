@@ -6,6 +6,7 @@ from .base import Validator
 from .year import ValidateYearNrDigits
 from .unique import ValidateUniqueSampleId
 from .columns import ValidateColumnViewColumnsNotInDataset
+from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
 def get_validator_list() -> list[Type[Validator]]:
@@ -41,11 +42,12 @@ def get_validators_info() -> dict:
         result[name] = dict()
         result[name]['name'] = name
         result[name]['description'] = val.get_validator_description()
-        result[name]['kwargs'] = dict()
-        for key, value in inspect.signature(val.__init__).parameters.items():
-            if key in ['self', 'kwargs']:
-                continue
-            result[name]['kwargs'][key] = value.default
+        result[name]['kwargs'] = get_kwargs_for_class(val)
+        # result[name]['kwargs'] = dict()
+        # for key, value in inspect.signature(val.__init__).parameters.items():
+        #     if key in ['self', 'kwargs']:
+        #         continue
+        #     result[name]['kwargs'][key] = value.default
     return result
 
 

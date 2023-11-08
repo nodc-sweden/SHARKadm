@@ -9,6 +9,7 @@ from .shark_metadata_auto import SHARKMetadataAuto
 from .txt_file import TxtAsIs
 from .zip_archive import ZipArchive
 from .html_station_map import HtmlStationMap
+from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
 def get_exporter_list() -> list[str]:
@@ -46,11 +47,15 @@ def get_exporters_info() -> dict:
         result[name] = dict()
         result[name]['name'] = name
         result[name]['description'] = exp.get_exporter_description()
-        result[name]['kwargs'] = dict()
-        for key, value in inspect.signature(exp.__init__).parameters.items():
-            if key in ['self', 'kwargs']:
-                continue
-            result[name]['kwargs'][key] = value.default
+        result[name]['kwargs'] = get_kwargs_for_class(exp)
+        # result[name]['kwargs'] = dict()
+        # for key, value in inspect.signature(exp.__init__).parameters.items():
+        #     if key in ['self', 'kwargs']:
+        #         continue
+        #     val = value.default
+        #     if type(val) == type:
+        #         val = None
+        #     result[name]['kwargs'][key] = val
     return result
 
 
