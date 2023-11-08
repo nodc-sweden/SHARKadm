@@ -13,19 +13,21 @@ from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
-from .laboratory import AddEnglishSampleOrderer
-from .laboratory import AddEnglishSamplingLaboratory
-from .laboratory import AddSwedishSampleOrderer
-from .laboratory import AddSwedishSamplingLaboratory
+# from .laboratory import AddEnglishSampleOrderer
+# from .laboratory import AddEnglishSamplingLaboratory
+# from .laboratory import AddSwedishSampleOrderer
+# from .laboratory import AddSwedishSamplingLaboratory
 from .map_header import ArchiveMapper
 from .map_header import PhysicalChemicalMapper
 from .position import AddPositionDD
 from .position import AddPositionDM
 from .position import AddPositionToAllLevels
-from .project_code import AddEnglishProjectName
-from .project_code import AddSwedishProjectName
+# from .project_code import AddEnglishProjectName
+# from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .station import AddStationInfo
+import inspect
+
 
 
 def get_transformer_list() -> list[str]:
@@ -53,6 +55,20 @@ def get_transformers_description() -> dict[str, str]:
     result = dict()
     for name, tran in get_transformers().items():
         result[name] = tran.get_transformer_description()
+    return result
+
+
+def get_transformers_info() -> dict:
+    result = dict()
+    for name, tran in get_transformers().items():
+        result[name] = dict()
+        result[name]['name'] = name
+        result[name]['description'] = tran.get_transformer_description()
+        result[name]['kwargs'] = dict()
+        for key, value in inspect.signature(tran.__init__).parameters.items():
+            if key in ['self', 'kwargs']:
+                continue
+            result[name]['kwargs'][key] = value.default
     return result
 
 

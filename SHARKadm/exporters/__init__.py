@@ -1,3 +1,4 @@
+import inspect
 import pathlib
 from typing import Type
 
@@ -36,6 +37,20 @@ def get_exporters_description() -> dict[str, str]:
     result = dict()
     for name, tran in get_exporters().items():
         result[name] = tran.get_exporter_description()
+    return result
+
+
+def get_exporters_info() -> dict:
+    result = dict()
+    for name, exp in get_exporters().items():
+        result[name] = dict()
+        result[name]['name'] = name
+        result[name]['description'] = exp.get_exporter_description()
+        result[name]['kwargs'] = dict()
+        for key, value in inspect.signature(exp.__init__).parameters.items():
+            if key in ['self', 'kwargs']:
+                continue
+            result[name]['kwargs'][key] = value.default
     return result
 
 

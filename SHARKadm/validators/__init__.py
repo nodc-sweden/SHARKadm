@@ -1,3 +1,4 @@
+import inspect
 from typing import Type
 import pathlib
 
@@ -31,6 +32,20 @@ def get_validators_description() -> dict[str, str]:
     result = dict()
     for name, val in get_validators().items():
         result[name] = val.get_validator_description()
+    return result
+
+
+def get_validators_info() -> dict:
+    result = dict()
+    for name, val in get_validators().items():
+        result[name] = dict()
+        result[name]['name'] = name
+        result[name]['description'] = val.get_validator_description()
+        result[name]['kwargs'] = dict()
+        for key, value in inspect.signature(val.__init__).parameters.items():
+            if key in ['self', 'kwargs']:
+                continue
+            result[name]['kwargs'][key] = value.default
     return result
 
 
