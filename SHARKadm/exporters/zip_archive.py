@@ -13,10 +13,13 @@ from .base import Exporter, DataHolderProtocol
 class ZipArchive(Exporter):
     """Class to export zip package that are sent to SHARKdata"""
 
-    def __init__(self, directory: str | pathlib.Path, **kwargs):
+    def __init__(self, directory: str | pathlib.Path | None = None, **kwargs):
         super().__init__(**kwargs)
+        if not directory:
+            directory = utils.get_export_directory(datetime.datetime.now().strftime('%Y%m%d'))
         self._save_to_directory = pathlib.Path(directory)
-        if not self._save_to_directory.iterdir():
+        print(f'{self._save_to_directory=}')
+        if not self._save_to_directory.is_dir():
             raise NotADirectoryError(self._save_to_directory)
         self._encoding = kwargs.get('encoding', 'cp1252')
         self._data_holder: ArchiveDataHolder | None = None
@@ -60,14 +63,14 @@ class ZipArchive(Exporter):
         self._create_data_file()
 
     def _copy_received_files(self) -> None:
-        target_dir = self._temp_zip_directory / self._data_holder.received_data_directory.name
+        target_dir = self._save_zip_directory / self._data_holder.received_data_directory.name
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.received_data_directory.iterdir():
             target_path = target_dir / path.name
             shutil.copy2(path, target_path)
 
     def _copy_processed_files(self) -> None:
-        target_dir = self._temp_zip_directory / self._data_holder.processed_data_directory.name
+        target_dir = self._save_zip_directory / self._data_holder.processed_data_directory.name
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.processed_data_directory.iterdir():
             target_path = target_dir / path.name
@@ -87,10 +90,10 @@ class ZipArchive(Exporter):
         pass
 
     def _create_shark_metadata_auto(self) -> None:
-        self._metadata_auto.create_file(path=self._temp_zip_directory / 'shark_metadata_auto.txt')
+        self._metadata_auto.create_file(path=self._save_zip_directory / 'shark_metadata_auto.txt')
 
     def _create_data_file(self) -> None:
-        exporter = exporters.SHARKdataTxt(path=self._temp_zip_directory / 'shark_data.txt')
+        exporter = exporters.SHARKdataTxt(path=self._save_zip_directory / 'shark_data.txt')
         exporter.export(self._data_holder)
 
 

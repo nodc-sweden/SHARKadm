@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 
 from SHARKadm import utils
@@ -11,18 +12,17 @@ from .base import Exporter, DataHolderProtocol
 class HtmlStationMap(Exporter):
     """Creates a html station map"""
 
-    def __init__(self,
-                 file_name: str | None = None,
+    def __init__(self, file_name: str | None = None,
                  directory: str | pathlib.Path | None = None,
-                 open_map: bool = False,
-                 **kwargs):
+                 open_map: bool = False, **kwargs):
+        super().__init__(**kwargs)
         self._file_name = file_name
         self._directory = directory
         self._open_map = open_map
 
     def _get_path(self, data_holder: DataHolderProtocol) -> pathlib.Path:
         if not self._directory:
-            self._directory = utils.get_temp_directory('html_maps')
+            self._directory = utils.get_export_directory(datetime.datetime.now().strftime('%Y%m%d'))
         if not self._file_name:
             self._file_name = f'station_map_{data_holder.dataset_name}.html'
         path = pathlib.Path(self._directory, self._file_name)
