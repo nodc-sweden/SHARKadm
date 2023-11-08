@@ -1,5 +1,8 @@
 _gui_subscribers = dict(
-
+    change_order={},
+    change_operator_state={},
+    load_config={},
+    save_config={},
 )
 
 
