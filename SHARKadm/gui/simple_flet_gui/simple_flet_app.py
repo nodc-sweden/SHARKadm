@@ -142,9 +142,10 @@ class SimpleFletApp:
         self._update_lists_from_config()
 
     def _on_save_config(self, data):
-        self._create_config_file(data['file_path'])
+        self._create_config_file(data['file_path'], data.get('overwrite', False))
 
-    def _create_config_file(self, path):
+    def _create_config_file(self, path: str | pathlib.Path, overwrite=False):
+        path = pathlib.Path(path)
         data = dict(archive_paths=[])
         if self._current_data_path.value:
             data['archive_paths'] = [self._current_data_path.value]
@@ -153,8 +154,13 @@ class SimpleFletApp:
         data['transformers'] = self._get_config_list(self._list_transform.get_active_data())
         data['exporters'] = self._get_config_list(self._list_export.get_active_data())
 
+        if path.exists() and not overwrite:
+            logger.warning(f'Overwrite not allowed. Will not create file: {path}')
+            return
         with open(path, 'w') as fid:
             yaml.safe_dump(data, fid)
+        self._current_config_file.value = str(path)
+        self._current_config_file.update()
 
     @staticmethod
     def _get_config_list(active_data):
