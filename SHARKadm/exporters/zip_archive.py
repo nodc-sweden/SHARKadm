@@ -90,7 +90,8 @@ class ZipArchive(Exporter):
         pass
 
     def _create_shark_metadata_auto(self) -> None:
-        self._metadata_auto.create_file(path=self._save_zip_directory / 'shark_metadata_auto.txt')
+        self._metadata_auto.create_file(export_directory=self._save_zip_directory,
+                                        export_file_name='shark_metadata_auto.txt')
 
     def _create_data_file(self) -> None:
         exporter = exporters.SHARKdataTxt(path=self._save_zip_directory / 'shark_data.txt')

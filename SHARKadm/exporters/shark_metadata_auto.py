@@ -11,8 +11,8 @@ class SHARKMetadataAuto(Exporter):
     date_str_format = '%Y-%m-%d'
 
     def __init__(self,
-                 export_directory: str | pathlib.Path | None,
-                 export_file_name: str | pathlib.Path | None,
+                 export_directory: str | pathlib.Path | None = None,
+                 export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
         super().__init__()
         if not export_directory:

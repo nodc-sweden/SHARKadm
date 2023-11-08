@@ -8,8 +8,8 @@ class TxtAsIs(Exporter):
     """Test class to export data 'as is' to a text file"""
 
     def __init__(self,
-                 export_directory: str | pathlib.Path | None,
-                 export_file_name: str | pathlib.Path | None,
+                 export_directory: str | pathlib.Path | None = None,
+                 export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
         super().__init__()
         if not export_directory:
