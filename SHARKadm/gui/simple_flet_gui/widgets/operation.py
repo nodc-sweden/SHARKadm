@@ -4,6 +4,7 @@ import flet as ft
 import textwrap
 
 from .. import gui_event
+from SHARKadm import utils
 
 
 class Operation(ft.UserControl):
@@ -147,15 +148,7 @@ class Operation(ft.UserControl):
         self.page.dialog = self._settings_dialog
         self._settings_dialog.open = True
         self.page.update()
-        print()
-        print()
-        print()
-        print(f'{self.settings=}')
-        print()
-        print()
-        print()
         self._update_settings_content(**self.settings)
-        # self._settings_content.update()
 
     def _close_settings(self, *args):
         self._settings_dialog.open = False
@@ -170,6 +163,9 @@ class Operation(ft.UserControl):
     def _update_settings_content(self, **kwargs):
         self._settings_content.controls = []
         self._settings_controls = {}
+        # column = ft.Column(width=430)
+        column = ft.Column(expand=True)
+        self._settings_content.controls.append(column)
         for key, value in kwargs.items():
             if key == 'export_directory':
                 self._settings_controls[key] = ft.Text()
@@ -187,21 +183,23 @@ class Operation(ft.UserControl):
                     button,
                     self._settings_controls[key]
                 ])
-                self._settings_content.controls.append(row)
-            elif key == 'file_name':
+                column.controls.append(row)
+                if not value:
+                    value = utils.get_export_directory()
+            elif key == 'export_file_name':
                 self._settings_controls[key] = ft.TextField()
                 row = ft.Row([
                     ft.Text('Ange ett filnamn'),
                     self._settings_controls[key]
                 ])
-                self._settings_content.controls.append(row)
+                column.controls.append(row)
 
             elif type(value) == bool:
                 self._settings_controls[key] = ft.Switch(label=key)
                 row = ft.Row([
                     self._settings_controls[key]
                 ])
-                self._settings_content.controls.append(row)
+                column.controls.append(row)
             if key in self._settings_controls:
                 self._settings_controls[key].value = value
             # self._settings_controls[key].update()
