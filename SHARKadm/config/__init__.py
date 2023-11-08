@@ -1,5 +1,6 @@
 import pathlib
 import functools
+import sys
 
 from .import_config import ImportMatrixConfig
 from .column_info import ColumnInfoConfig
@@ -9,7 +10,11 @@ from .data_type_mapper import DataTypeMapper
 from .physical_chemical_mapper import PhysicalChemicalMapper
 
 
-THIS_DIR = pathlib.Path(__file__).parent
+if getattr(sys, 'frozen', False):
+    THIS_DIR = pathlib.Path(sys.executable).parent
+else:
+    THIS_DIR = pathlib.Path(__file__).parent
+
 
 ID_CONFIG_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'ids')
 DEFAULT_IMPORT_MATRIX_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'import_matrix')
@@ -60,6 +65,7 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
 
 @functools.cache
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
+    print(f'{ID_CONFIG_DIRECTORY=}')
     config_directory = config_directory or ID_CONFIG_DIRECTORY
     return SharkadmIdsHandler(config_directory)
 

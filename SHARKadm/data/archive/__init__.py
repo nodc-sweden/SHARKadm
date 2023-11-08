@@ -1,5 +1,4 @@
 import pathlib
-from typing import Type
 
 from .archive_data_holder import ArchiveDataHolder
 from .epibenthos import EpibenthosMartransArchiveDataHolder

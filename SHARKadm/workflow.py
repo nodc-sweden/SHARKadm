@@ -21,7 +21,7 @@ class SHARKadmArchiveWorkflow:
             setattr(self, key, value)
 
     def _initiate_workflow(self) -> None:
-        adm_logger.log_workflow('Initiating up workflow')
+        adm_logger.log_workflow('Initiating workflow')
         self._set_validators_before()
         self._set_transformers()
         self._set_validators_after()

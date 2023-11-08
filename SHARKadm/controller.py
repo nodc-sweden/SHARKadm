@@ -2,6 +2,10 @@ import logging
 
 import pandas as pd
 
+from SHARKadm import exporters
+from SHARKadm import transformers
+from SHARKadm import validators
+
 from SHARKadm.data.data_holder import DataHolder
 from SHARKadm.exporters import Exporter
 from SHARKadm.transformers import Transformer
@@ -23,7 +27,76 @@ class SHARKadmController:
         self._exporters: list[Exporter] = []
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} with data type "{self.data_type}": {self.dataset_name}'
+        return f'{self.__class__.__name__}'
+
+    @classmethod
+    def ____old_get_validators_list(cls) -> list[dict]:
+        return [dict((name, desc) for name, desc in validators.get_validators_description().items())]
+
+    @classmethod
+    def ____old_get_transformers_list(cls) -> list[dict]:
+        return [dict((name, desc) for name, desc in transformers.get_transformers_description().items())]
+
+    @classmethod
+    def ____old_get_exporters_list(cls) -> list[dict]:
+        return [dict((name, desc) for name, desc in exporters.get_exporters_description().items())]
+
+    @classmethod
+    def get_validators(cls) -> dict[str, dict]:
+        return validators.get_validators_info()
+        # return_dict = dict()
+        # for name, desc in validators.get_validators_description().items():
+        #     return_dict[name] = dict(name=name, description=desc)
+        # return return_dict
+
+    @classmethod
+    def get_transformers(cls) -> dict[str, dict]:
+        return transformers.get_transformers_info()
+        # return_dict = dict()
+        # for name, desc in transformers.get_transformers_description().items():
+        #     return_dict[name] = dict(name=name, description=desc)
+        # return return_dict
+
+    @classmethod
+    def get_exporters(cls) -> dict[str, dict]:
+        return exporters.get_exporters_info()
+        # return_dict = dict()
+        # for name, desc in exporters.get_exporters_description().items():
+        #     return_dict[name] = dict(name=name, description=desc)
+        # return return_dict
+
+    @classmethod
+    def get_transformer_list(cls,
+                             start_with: list[str] | None = None,
+                             sort_the_rest: bool = True,
+                             ) -> dict[str, dict]:
+        return _get_fixed_list(
+            start_with=_get_name_mapper(start_with or []),
+            all_items=SHARKadmController.get_transformers(),
+            sort_the_rest=sort_the_rest
+        )
+
+    @classmethod
+    def get_validator_list(cls,
+                           start_with: list[str] | None = None,
+                           sort_the_rest: bool = True,
+                           ) -> dict[str, dict]:
+        return _get_fixed_list(
+            start_with=_get_name_mapper(start_with or []),
+            all_items=SHARKadmController.get_validators(),
+            sort_the_rest=sort_the_rest
+        )
+
+    @classmethod
+    def get_exporter_list(cls,
+                          start_with: list[str] | None = None,
+                          sort_the_rest: bool = True,
+                          ) -> dict[str, dict]:
+        return _get_fixed_list(
+            start_with=_get_name_mapper(start_with or []),
+            all_items=SHARKadmController.get_exporters(),
+            sort_the_rest=sort_the_rest
+        )
 
     @property
     def data_type(self) -> str:
@@ -110,3 +183,26 @@ class SHARKadmController:
         self.validate_after_all()
         self.export_all()
 
+
+def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:
+    return_dict = dict()
+    for item in list_to_map:
+        return_dict[item['name']] = item
+    return return_dict
+
+
+def _get_fixed_list(start_with: dict[str, dict] | None = None,
+                    all_items: dict[str, dict] | None = None,
+                    sort_the_rest: bool = True) -> dict[str, dict]:
+
+    return_dict = dict()
+    if start_with:
+        for name, data in start_with.items():
+            return_dict[name] = data
+            all_items.pop(name)
+    rest_names = list(all_items)
+    if sort_the_rest:
+        rest_names = sorted(rest_names)
+    for rest_name in rest_names:
+        return_dict[rest_name] = all_items[rest_name]
+    return return_dict

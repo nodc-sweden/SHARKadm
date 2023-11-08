@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import pathlib
+import sys
 
 from .base import Transformer, DataHolderProtocol
 from SHARKadm.data.archive import ArchiveDataHolder
 from SHARKadm.utils import yaml_data
 
-DELIVERY_NOTE_CONFIG_PATH = pathlib.Path(__file__).parent / 'etc' / 'delivery_note.yaml'
+if getattr(sys, 'frozen', False):
+    THIS_DIR = pathlib.Path(sys.executable).parent
+else:
+    THIS_DIR = pathlib.Path(__file__).parent
+
+
+DELIVERY_NOTE_CONFIG_PATH = THIS_DIR / 'etc' / 'delivery_note.yaml'
 
 
 class AddStatus(Transformer):
