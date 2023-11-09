@@ -6,6 +6,10 @@ from .base import Validator
 from .year import ValidateYearNrDigits
 from .unique import ValidateUniqueSampleId
 from .columns import ValidateColumnViewColumnsNotInDataset
+from .mandatory import ValidateMandatoryNatColumns
+from .mandatory import ValidateMandatoryRegColumns
+
+
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 

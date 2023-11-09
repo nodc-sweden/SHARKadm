@@ -9,7 +9,7 @@ class ValidateYearNrDigits(Validator):
         return 'Checks that year is a valid four digit number'
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['visit_year'] = data_holder.data['visit_year'].apply(self.check)
+        data_holder.data['visit_year'].apply(self.check)
 
     @staticmethod
     def check(x):
