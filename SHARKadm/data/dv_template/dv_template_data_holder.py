@@ -31,6 +31,9 @@ class DvTemplateDataHolder(DataHolder, ABC):
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
 
+        self._mandatory_reg_columns: list = []
+        self._mandatory_nat_columns: list = []
+
         self._delivery_note: delivery_note.DeliveryNote | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
@@ -40,6 +43,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
 
         self._initiate()
         self._load_delivery_note()
+        self._load_mandatory_columns()
         self._load_import_matrix()
         self._load_data()
 
@@ -92,6 +96,14 @@ class DvTemplateDataHolder(DataHolder, ABC):
         return self._import_matrix_mapper
 
     @property
+    def mandatory_nat_and_reg_columns(self):
+        return self._mandatory_reg_columns
+
+    @property
+    def mandatory_nat_only_columns(self):
+        return self._mandatory_nat_columns
+
+    @property
     def min_year(self) -> str:
         return str(min(self.data['datetime']).year)
 
@@ -125,6 +137,16 @@ class DvTemplateDataHolder(DataHolder, ABC):
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_dv_template(self._template_path)
+
+    def _load_mandatory_columns(self):
+        dn = pd.read_excel(self._template_path, sheet_name='Kolumnförklaring')
+        key_col_name = dn.columns[3]
+        dn['key_row'] = dn[key_col_name].apply(lambda x: True if type(x) == str and x.isupper() else False)
+
+        fdn = dn[dn['key_row']]
+
+        self._mandatory_reg_columns = list(fdn[fdn[dn.columns[0]] == '*'][key_col_name])
+        self._mandatory_nat_columns = list(fdn[fdn[dn.columns[0]].str.contains('*')][key_col_name])
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
