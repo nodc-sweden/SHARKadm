@@ -50,6 +50,10 @@ class HtmlStationMap(Exporter):
         app.add_list_data(df, list_name=list_name)
 
         export_path = self._get_path(data_holder)
+
+        print(f'{DEFAULT_STATION_FILE_PATH=}')
+        print(f'{export_path=}')
+
         app.write_list(
             writer='map',
             # list_names=['master'],
@@ -58,7 +62,6 @@ class HtmlStationMap(Exporter):
             new_stations_as_cluster=False,
             file_path=str(export_path)
         )
-
         if self._open_map:
             utils.open_file_with_default_program(export_path)
 

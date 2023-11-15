@@ -15,8 +15,8 @@ class TxtAsIs(Exporter):
         if not export_directory:
             export_directory = utils.get_export_directory()
         self._export_directory = pathlib.Path(export_directory)
-        if not export_file_name:
-            export_file_name = 'simple_export.txt'
+        # if not export_file_name:
+        #     export_file_name = 'simple_export.txt'
         self._export_file_name = export_file_name
         self._encoding = kwargs.get('encoding', 'cp1252')
 
@@ -29,4 +29,6 @@ class TxtAsIs(Exporter):
         return 'Writes data "as is" to the specified file.'
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
+        if not self._export_file_name:
+            self._export_file_name = f'data_as_is_{data_holder.dataset_name}.txt'
         data_holder.data.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
