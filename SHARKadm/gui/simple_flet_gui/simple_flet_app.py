@@ -17,11 +17,13 @@ import yaml
 from .widgets import operation
 from .widgets import config
 from . import gui_event
+from SHARKadm import event
 
 from SHARKadm import transformers
 from SHARKadm import validators
 from SHARKadm import exporters
 from SHARKadm.controller import SHARKadmController
+from SHARKadm.workflow import SHARKadmWorkflow
 from SHARKadm.workflow import SHARKadmArchiveWorkflow
 
 
@@ -52,8 +54,10 @@ class SimpleFletApp:
         self.logging_format = '%(asctime)s [%(levelname)10s]    %(pathname)s [%(lineno)d] => %(funcName)s():    %(message)s'
         self.logging_format_stdout = '[%(levelname)10s] %(filename)s: %(funcName)s() [%(lineno)d] %(message)s'
         # self._setup_logger()
+        event.subscribe('workflow', self._display_workflow)
 
         self.app = ft.app(target=self.main)
+
 
     @property
     def _log_directory(self):
@@ -65,7 +69,7 @@ class SimpleFletApp:
         self.page = page
         self.page.title = 'SHARKadm light'
         self.page.window_height = 700
-        self.page.window_width = 1100
+        self.page.window_width = 1200
         # self.page.padding = 0
         # self.page.spacing = 0
         self._build()
@@ -91,6 +95,22 @@ class SimpleFletApp:
         self._create_tab_controls()
         self._create_options_controls()
         self._create_config_controls()
+        self._create_snack_bar()
+
+    def _create_snack_bar(self):
+        self._snack_bar_text = ft.Text('')
+        self.page.snack_bar = ft.SnackBar(
+            content=self._snack_bar_text,
+            # action="Tack för info!",
+            show_close_icon=False,
+            duration=20000
+        )
+
+    def _display_workflow(self, msg):
+        self._snack_bar_text.value = msg
+        self._snack_bar_text.update()
+        self.page.snack_bar.open = True
+        self.page.update()
 
     def _create_options_controls(self) -> None:
 
@@ -104,28 +124,35 @@ class SimpleFletApp:
 
         self._button_pick_config_file = self._get_pick_config_file_button()
         # self._button_save_as_config_file = self._get_save_as_config_file_button()
-        self._button_load_data_directory = self._get_load_directory_file_button()
+        self._button_load_data_directory = self._get_load_directory_data_button()
+        self._button_load_data_file = self._get_load_file_data_button()
 
-        self._button_run_workflow = ft.ElevatedButton('Starta workflow', on_click=self._on_start_workflow)
+        self._button_run_workflow = ft.ElevatedButton('Starta workflow',
+                                                      on_click=self._start_workflow,
+                                                      bgcolor=ft.colors.GREEN_100
+                                                      )
         
     def _create_config_controls(self) -> None:
         self._container_config = ft.Container()
         self._config_list = config.Configs()
 
-    def _on_start_workflow(self, e):
+    def _start_workflow(self, e):
         if not self._current_data_path.value:
             print('Ingen data vald')
             return
         self._start_workflow_based_on_current_view()
 
     def _start_workflow_based_on_current_view(self) -> None:
-        workflow = SHARKadmArchiveWorkflow(
-            archive_paths=[self._current_data_path.value],
+        # workflow = SHARKadmArchiveWorkflow(
+        workflow = SHARKadmWorkflow(
+            data_source_paths=[self._current_data_path.value],
             validators_before=self._list_validate_before.get_active_data(),
             validators_after=self._list_validate_after.get_active_data(),
             transformers=self._list_transform.get_active_data(),
             exporters=self._list_export.get_active_data())
         workflow.start_workflow()
+        self.page.snack_bar.open = False
+        self.page.update()
 
     def _on_pick_config_file(self, e: ft.FilePickerResultEvent) -> None:
         if not e.files:
@@ -158,6 +185,7 @@ class SimpleFletApp:
             logger.warning(f'Overwrite not allowed. Will not create file: {path}')
             return
         with open(path, 'w') as fid:
+            print(f'{data=}')
             yaml.safe_dump(data, fid)
         self._current_config_file.value = str(path)
         self._current_config_file.update()
@@ -180,6 +208,13 @@ class SimpleFletApp:
         if not e.path:
             return
         self._current_data_path.value = e.path
+        self._current_data_path.update()
+
+    def _on_pick_data_file(self, e: ft.FilePickerResultEvent) -> None:
+        if not e.files:
+            return
+        path = e.files[0].path
+        self._current_data_path.value = path
         self._current_data_path.update()
 
     def _load_config_file(self, path: str) -> None:
@@ -256,7 +291,7 @@ class SimpleFletApp:
     #     )
     #     return row
 
-    def _get_load_directory_file_button(self) -> ft.Row:
+    def _get_load_directory_data_button(self) -> ft.Row:
         load_data_directory_file_dialog = ft.FilePicker(on_result=self._on_load_data_directory)
 
         self.page.overlay.append(load_data_directory_file_dialog)
@@ -268,6 +303,25 @@ class SimpleFletApp:
                     icon=ft.icons.STORAGE,
                     on_click=lambda _: load_data_directory_file_dialog.get_directory_path(
                         'Välj en mapp med data',
+                    ),
+                ),
+            ]
+        )
+        return row
+
+    def _get_load_file_data_button(self) -> ft.Row:
+        pick_data_file_dialog = ft.FilePicker(on_result=self._on_pick_data_file)
+
+        self.page.overlay.append(pick_data_file_dialog)
+
+        row = ft.Row(
+            [
+                ft.ElevatedButton(
+                    "Välj en fil med data",
+                    icon=ft.icons.STORAGE,
+                    on_click=lambda _: pick_data_file_dialog.pick_files(
+                        allow_multiple=False,
+                        allowed_extensions=['xlsx']
                     ),
                 ),
             ]
@@ -354,6 +408,7 @@ class SimpleFletApp:
         inner.controls.append(self._button_pick_config_file)
         # inner.controls.append(self._button_save_as_config_file)
         inner.controls.append(self._button_load_data_directory)
+        inner.controls.append(self._button_load_data_file)
         inner.controls.append(current_data_row)
         inner.controls.append(self._button_run_workflow)
         self._container_options.content = inner

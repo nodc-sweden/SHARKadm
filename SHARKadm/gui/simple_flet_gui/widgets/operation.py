@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pathlib
 
 import flet as ft
 import textwrap
@@ -41,7 +42,10 @@ class Operation(ft.UserControl):
     def settings(self) -> dict:
         data = self._data.get('kwargs', {})
         for key, control in self._settings_controls.items():
-            data[key] = control.value
+            value = control.value
+            if type(value) == pathlib.Path:
+                value = str(value)
+            data[key] = value
         return data
 
     @property
@@ -402,7 +406,6 @@ class OperationList(ft.UserControl):
     def _save_current_data(self) -> None:
         for control in self._list_column.controls:
             oper = control.content.content
-            print(f'{oper.get_data()=}')
             self._data[oper.name].update(**oper.get_data())
 
     def get_active_data(self) -> list[dict[str, dict]]:
