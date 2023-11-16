@@ -17,7 +17,7 @@ class HeaderMapper(Protocol):
 
 
 class LimsDataHolder(DataHolder):
-    _data_type = 'LIMS'
+    _data_type = 'physicalchemical'
 
     def __init__(self,
                  lims_root_directory: str | pathlib.Path = None,
@@ -43,6 +43,7 @@ class LimsDataHolder(DataHolder):
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
         self._data = self._get_data_from_data_source(d_source)
+        self._dataset_name = self._lims_root_directory.stem
 
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:

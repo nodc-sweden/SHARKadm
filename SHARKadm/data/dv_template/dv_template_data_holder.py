@@ -46,6 +46,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
         self._load_mandatory_columns()
         self._load_import_matrix()
         self._load_data()
+        self._map_mandatory_lists()
 
     @staticmethod
     def get_data_holder_description() -> str:
@@ -96,11 +97,11 @@ class DvTemplateDataHolder(DataHolder, ABC):
         return self._import_matrix_mapper
 
     @property
-    def mandatory_nat_and_reg_columns(self):
+    def mandatory_reg_columns(self):
         return self._mandatory_reg_columns
 
     @property
-    def mandatory_nat_only_columns(self):
+    def mandatory_nat_columns(self):
         return self._mandatory_nat_columns
 
     @property
@@ -144,9 +145,20 @@ class DvTemplateDataHolder(DataHolder, ABC):
         dn['key_row'] = dn[key_col_name].apply(lambda x: True if type(x) == str and x.isupper() else False)
 
         fdn = dn[dn['key_row']]
+        fdn = fdn.reset_index(drop=True)
+        fdn['man_str'] = fdn[dn.columns[0]].apply(str)
 
         self._mandatory_reg_columns = list(fdn[fdn[dn.columns[0]] == '*'][key_col_name])
-        self._mandatory_nat_columns = list(fdn[fdn[dn.columns[0]].str.contains('*')][key_col_name])
+        self._mandatory_nat_columns = list(fdn[fdn['man_str'].str.contains('\*')][key_col_name])
+
+    def _map_mandatory_lists(self):
+        if not self.import_matrix_mapper:
+            adm_logger.log_workflow(f'Could not map mandatory lists in {self.__class__.__name__}')
+            return
+        self._mandatory_reg_columns = [self._import_matrix_mapper.get_internal_name(col) for col in
+                                       self._mandatory_reg_columns]
+        self._mandatory_nat_columns = [self._import_matrix_mapper.get_internal_name(col) for col in
+                                       self._mandatory_nat_columns]
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
@@ -196,6 +208,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
 
     def _set_data_source(self, data_source: data_source.DataFile) -> None:
         """Sets a single data source to self._data"""
+        self._data_type = data_source.data_type
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
@@ -208,16 +221,16 @@ class DvTemplateDataHolder(DataHolder, ABC):
         wb = openpyxl.load_workbook(self._template_path)
 
         sheet_name = None
-        for name in ['data', 'Klistra in i denna']:
+        for name in ['data', 'Klistra in i denna', 'Klistra in  i denna']:
             if name in wb.sheetnames:
                 sheet_name = name
                 break
         if not sheet_name:
-            raise f'Could not find data sheet in file: {self._template_path}'
+            raise Exception(f'Could not find data sheet in file: {self._template_path}')
 
         d_source = data_source.XlsxFormatDataFile(path=self._template_path, data_type=self.delivery_note.data_type,
                                                   sheet_name=sheet_name)
-        if self._import_matrix_mapper:
+        if self.import_matrix_mapper:
             d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)

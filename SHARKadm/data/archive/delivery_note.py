@@ -76,7 +76,8 @@ class DeliveryNote:
         data['import_matrix_key'] = data['format']
         if data['format'] == 'PP':
             data['data_format'] = 'Phytoplankton'
-            data['import_matrix_key'] = data['PP_REG']
+            data['datatyp'] = 'Phytoplankton'
+            data['import_matrix_key'] = 'PP_REG'
 
         return DeliveryNote(data)
     # def _load_file(self) -> None:
