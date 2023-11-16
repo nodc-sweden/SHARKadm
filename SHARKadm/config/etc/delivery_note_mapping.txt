@@ -1,13 +1,13 @@
-txt_keys    xlsx_keys
-provtagningsår  MYEAR
-datatyp DTYPE
-rapporterande institut  RLABO
-rapporteringsdatum
-kontaktperson   REPBY
-format  FORMAT
-data kontrollerad
-övervakningsprogram MPROG
-beställare  ORDERER
-projekt PROJ
-kommentarer COMNT_DN
-status
+txt_keys	xlsx_keys
+provtagningsår	MYEAR
+datatyp	DTYPE
+rapporterande institut	RLABO
+rapporteringsdatum	
+kontaktperson	REPBY
+format	FORMAT
+data kontrollerad	
+övervakningsprogram	MPROG
+beställare	ORDERER
+projekt	PROJ
+kommentarer	COMNT_DN
+status	

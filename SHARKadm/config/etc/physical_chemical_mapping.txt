@@ -2,28 +2,28 @@ SHARKadm	Display name (en)	Display name (swe)	Units	Detection_limit	Metadata par
 visit_year	Year	År			x			MYEAR	MYEAR	year	År		Year	Year	Year	MYEAR	År			MYEAR		Yr	År	visit_year
 sample_project_code	Project	Projekt			x			PROJ	PROJ	projid	Projekt/Undersökning (kod)						Projekt/Undersökning (kod)			PROJ			Projekt	sample_project_name_sv
 sample_orderer_code	Orderer				x			ORDERER	ORDERER		Beställare (kod)						Beställare (kod)			ORDERER			Beställare	sample_orderer_name_sv
-	Deliverer				x			DELIVERER		deliverer														
+DELIVERER	Deliverer				x			DELIVERER		deliverer														
 visit_date	Start date	Datum			x			SDATE	SDATE	¤year¤||'-'||¤month¤||'-'||¤day¤	Start provtagningsdatum (YYYY-MM-DD)						Provtagningsdatum (YYYY-MM-DD)			SDATE	Date		Provtagningsdatum	visit_date
 sample_time	Start time	Tid			x			STIME	STIME	¤hour¤||':'||¤minute¤	Start tid (UTC)						Tid (UTC)			STIME	time		Provtagningstid (start)	sample_time
 sample_enddate					x			EDATE	EDATE		Slut provtagningsdatum (YYYY-MM-DD)									EDATE			Provtagningsdatum (slut)	sample_enddate
 sample_endtime					x			ETIME	ETIME		Slut tid (UTC)									ETIME			Provtagningstid (slut)	sample_endtime
-	Country	Land			x			CTRYID		ctryid	Landskod (kod)		%CtryID	%CtryID	%CtryID	CTRYID	Landskod (kod)			CTRYID		Lk	Land (kod)	country_code
-	Ship code	Fartygskod			x			SHIPC	SHIPC	shipid	Fartyg/Mätplattform (kod)		ShipID	ShipID	ShipID	SHIPC	Fartyg/Mätplattform (kod)			SHIPC	Ship	Fk	Provtagningsplattform (kod)	platform_code
-					x			CRUISE_NO	CRUISE_NO		Expeditionsnummer						Expeditionsnummer			CRUISE_NO			Expeditions-ID	expedition_id
-	Series	Serienummer			x			SERNO	SERNO	serie	Serienummer		Serie	Serie	Serie	SERIE	Serienummer			STNNO	St no	Sn	Besöks-ID	visit_id
-					x			SEQNO	SEQNO															
-					x			STATN_REPORTED	STATN	visit.stnname	Stationsnamn		Station	Station	Station	STATN	Stationsnamn	Station		STATN	Station name	statn	Rapporterat stationsnamn	reported_station_name
+CTRYID	Country	Land			x			CTRYID		ctryid	Landskod (kod)		%CtryID	%CtryID	%CtryID	CTRYID	Landskod (kod)			CTRYID		Lk	Land (kod)	country_code
+SHIPC	Ship code	Fartygskod			x			SHIPC	SHIPC	shipid	Fartyg/Mätplattform (kod)		ShipID	ShipID	ShipID	SHIPC	Fartyg/Mätplattform (kod)			SHIPC	Ship	Fk	Provtagningsplattform (kod)	platform_code
+CRUISE_NO					x			CRUISE_NO	CRUISE_NO		Expeditionsnummer						Expeditionsnummer			CRUISE_NO			Expeditions-ID	expedition_id
+SERNO	Series	Serienummer			x			SERNO	SERNO	serie	Serienummer		Serie	Serie	Serie	SERIE	Serienummer			STNNO	St no	Sn	Besöks-ID	visit_id
+SEQNO					x			SEQNO	SEQNO															
+STATN_REPORTED					x			STATN_REPORTED	STATN	visit.stnname	Stationsnamn		Station	Station	Station	STATN	Stationsnamn	Station		STATN	Station name	statn	Rapporterat stationsnamn	reported_station_name
 reported_station_name	Station	Station			x			STATN		stnreg.stnname														
-	Latitude (nom)	Latitud (nom)			x			LATIT_NOM			Latitud, nominell (DDMM.mm)		Lat	Lat	Lat	LATIT	Latitud, nominell (DDMM.mm)			LATIT_NOM	latitude			
-	Longitude (nom)	Longitud (nom)			x			LONGI_NOM			Longitud, nominell (DDMM.MM)		Lon	Lon	Lon	LONGI	Longitud, nominell (DDMM.MM)			LONGI_NOM	longitude			
+LATIT_NOM	Latitude (nom)	Latitud (nom)			x			LATIT_NOM			Latitud, nominell (DDMM.mm)		Lat	Lat	Lat	LATIT	Latitud, nominell (DDMM.mm)			LATIT_NOM	latitude			
+LONGI_NOM	Longitude (nom)	Longitud (nom)			x			LONGI_NOM			Longitud, nominell (DDMM.MM)		Lon	Lon	Lon	LONGI	Longitud, nominell (DDMM.MM)			LONGI_NOM	longitude			
 visit_reported_latitude	Latitude	Latitud			x			LATIT	LATIT	CAST(visit.latitud AS FLOAT)	Latitud, verklig (DDMM.mm)						Latitud, verklig (DDMM.mm)			LATIT		LaDmm	Provets latitud (DM)	sample_latitude_dm
 visit_reported_longitude	Longitude	Longitud			x			LONGI	LONGI	CAST(visit.longitud AS FLOAT)	Longitud, verklig (DDMM.MM)						Longitud, verklig (DDMM.MM)			LONGI		LoDmm	Provets longitud (DM)	sample_longitude_dm
 positioning_system_code					x			POSYS	POSYS		Positioneringssystem, verklig (kod)						Positioneringssystem, verklig (kod)			POSYS			Positioneringssystem (kod)	positioning_system_code
-	Statin depth	Stationsdjup	m		x			WADEP	WADEP	bottomd	Vattendjup vid stationen (m)	VATTENDJUP					Vattendjup vid stationen (m)			WADEP	sounding		Vattendjup vid stationen	water_depth_m
-	Number of depths	Antal djup			x			NODEPTH	NODEPTH		Antal djup						Antal djup			NODEPTH				
-					x			ADD_SMP	ADD_SMP															
-		Besökskommentar			x			COMNT_VISIT	COMNT_VISIT		Besökskommentar (fritext)						Besökskommentar (fritext)			COMNT_VISIT			Besökskommentar	visit_comment
-		SMHI_intern_kommentar						COMNT_INTERN																
+WADEP	Statin depth	Stationsdjup	m		x			WADEP	WADEP	bottomd	Vattendjup vid stationen (m)	VATTENDJUP					Vattendjup vid stationen (m)			WADEP	sounding		Vattendjup vid stationen	water_depth_m
+NODEPTH	Number of depths	Antal djup			x			NODEPTH	NODEPTH		Antal djup						Antal djup			NODEPTH				
+ADD_SMP					x			ADD_SMP	ADD_SMP															
+COMNT_VISIT		Besökskommentar			x			COMNT_VISIT	COMNT_VISIT		Besökskommentar (fritext)						Besökskommentar (fritext)			COMNT_VISIT			Besökskommentar	visit_comment
+COMNT_INTERN		SMHI_intern_kommentar						COMNT_INTERN																
 wind_direction_code	Wind direction	Vindriktning			x			WINDIR	WINDIR		Vindriktning (deka°)						Vindriktning (deka°)			WINDIR			Vindriktning (dekagrad)	wind_direction_code
 wind_speed_ms	Wind speed	Vindstyrka	m/s		x			WINSP	WINSP		Vindhastighet (m/s)						Vindhastighet (m/s)			WINSP			Vindhastighet (m/s)	wind_speed_ms
 air_temperature_degc	Air temperature	Lufttemperatur			x			AIRTEMP	AIRTEMP		Lufttemperatur (°C)						Lufttemperatur (°C)			AIRTEMP			Lufttemperatur (C)	air_temperature_degc
@@ -42,10 +42,14 @@ TEMP_BTL	Temperature (bottle)	Temperatur (flaska)	C					TEMP_BTL	TEMP_BTL	temp	T
 Q_TEMP_BTL								Q_TEMP_BTL	Q_TEMP_BTL	qtemp	Q-flag Temperatur-vattenhämtare 						Q-flag Temperatur-vattenhämtare 			Q_TEMP_BTL			Q-flagga Temperatur vattenhämtare	QFLAG Temperature bottle
 TEMP_CTD	Temperature (CTD)	Temperatur (CTD)	C					TEMP_CTD	TEMP_CTD	ctdtemp	Temperatur-CTD (°C)	TEMPERATUR-(CTD)	Temp CTD	Temp CTD	Temp (C)	TEMP_CTD	Temperatur-CTD (°C)		Temp	TEMP_CTD	water temperature		Temperatur CTD (C)	Temperature CTD (C)
 Q_TEMP_CTD								Q_TEMP_CTD	Q_TEMP_CTD	qctdtemp	Q-flag Temperatur-CTD						Q-flag Temperatur-CTD			Q_TEMP_CTD			Q-flagga Temperatur CTD	QFLAG Temperature CTD
+TEMP_CTD_2								TEMP_CTD_2																
+Q_TEMP_CTD_2								Q_TEMP_CTD_2																
 SALT_BTL	Salinity (bottle)	Salinitet (flaska)	psu					SALT_BTL	SALT_BTL	salt	Salinitet-vattenhämtare (psu)	SALINITET-(VATTENHÄMTARE)		Salt BTL		SALT_BTL	Salinitet-vattenhämtare (psu)	Salt		SALT_BTL			Salinitet vattenhämtare (o/oo psu)	Salinity bottle (o/oo psu)
 Q_SALT_BTL								Q_SALT_BTL	Q_SALT_BTL	qsalt	Q-flag Salinitet-vattenhämtare						Q-flag Salinitet-vattenhämtare			Q_SALT_BTL			Q-flagga Salinitet vattenhämtare	QFLAG Salinity bottle
 SALT_CTD	Salinity (CTD)	Salinitet (CTD)	psu					SALT_CTD	SALT_CTD	ctdsalt	Salinitet-CTD (psu)	SALINITET-(CTD)	Salt CTD	Salt CTD	Salt (psu o/oo)	SALT_CTD	Salinitet-CTD (psu)		Salin	SALT_CTD	salinity		Salinitet CTD (o/oo psu)	Salinity CTD (o/oo psu)
 Q_SALT_CTD								Q_SALT_CTD	Q_SALT_CTD	qctdsalt	Q-flag Salinitet-CTD						Q-flag Salinitet-CTD			Q_SALT_CTD			Q-flagga Salinitet CTD	QFLAG Salinity CTD
+SALT_CTD_2								SALT_CTD_2																
+Q_SALT_CTD_2								Q_SALT_CTD_2																
 CNDC_25								CNDC_25	CNDC_25		Konduktivitet_25-vattenhämtare (mS/m)						Konduktivitet_25-vattenhämtare (mS/m)						Konduktivitet_25 vattenhämtare (mS/m)	Conductivity_25 bottle (mS/m)
 Q_CNDC_25								Q_CNDC_25	Q_CNDC_25		Q-flag Konduktivitet_25-vattenhämtare						Q-flag Konduktivitet_25-vattenhämtare						Q-flagga Konduktivitet_25 vattenhämtare	QFLAG Conductivity_25 bottle
 CNDC_CTD								CNDC_CTD	CNDC_CTD														Konduktivitet CTD (mS/m)	Conductivity CTD (mS/m)
@@ -54,6 +58,8 @@ DOXY_BTL	Oxygen (bottle)	Syre (flaska)	ml/l					DOXY_BTL	DOXY_BTL	o2	Syrgashalt-
 Q_DOXY_BTL								Q_DOXY_BTL	Q_DOXY_BTL	qo2	Q-flag Syrgashalt-vattenhämtare						Q-flag Syrgashalt-vattenhämtare			Q_DOXY_BTL			Q-flagga Syrgashalt O2 vattenhämtare	QFLAG Dissolved oxygen O2 bottle
 DOXY_CTD	Oxygen (CTD)	Syre (CTD)	ml/l					DOXY_CTD	DOXY_CTD		Syrgashalt-CTD (ml/l)		O2_CTD				Syrgashalt-CTD (ml/l)			DOXY_CTD			Syrgashalt O2 CTD (ml/l)	Dissolved oxygen O2 CTD (ml/l)
 Q_DOXY_CTD								Q_DOXY_CTD	Q_DOXY_CTD		Q-flag Syrgashalt-CTD						Q-flag Syrgashalt-CTD			Q_DOXY_CTD			Q-flagga Syrgashalt O2 CTD	QFLAG Dissolved oxygen CTD
+DOXY_CTD_2								DOXY_CTD_2																
+Q_DOXY_CTD_2								Q_DOXY_CTD_2																
 FLUO_CTD								FLUO_CTD	FLUO_CTD							CHLFL								
 Q_FLUO_CTD								Q_FLUO_CTD	Q_FLUO_CTD							Q_CHLFL								
 H2S	Hydrogen sulfide	Svavelväte	umol/l			H2SXZZXX	UPOX	H2S	H2S	h2s	Svavelväte (µmol/l)	SVAVELVÄTE	H2S	H2S	H2S (æmol/l)	H2S	Svavelväte (µmol/l)		H2S	H2S	H2S		Svavelväte H2S (umol/l)	Hydrogen sulphide H2S (umol/l)
@@ -112,52 +118,52 @@ CDOM								CDOM	CDOM			CDOM_BTL				CDOM_BTL				CDOM_BTL			CDOM (1/m)	Colored di
 Q_CDOM								Q_CDOM	Q_CDOM			Q_CDOM_BTL				Q_CDOM_BTL				Q_CDOM_BTL			Q-flagga CDOM	QFLAG Colored dissolved organic matter CDOM
 TURB								TURB	TURB			TURB				TURB				TURB			TURB (FNU)	Turbidity TURB (FNU)
 Q_TURB								Q_TURB	Q_TURB			Q_TURB				Q_TURB				Q_TURB			Q-flagga TURB	QFLAG Turbidity TURB
-	Sample comment	Sample comment						COMNT_SAMP	COMNT_SAMP		Provkommentar per djup (fritext)						Provkommentar per djup (fritext)			COMNT_SAMP			Provkommentar	sample_comment
-					x			TRAWLNO	TRAWLNO															
-	Trawl type	Tråltyp			x			TRAWLTYP	TRAWLTYP															
-	Quadrant	Kvadrant			x			KVADRANT																
-	Station code	Stationskod			x			STNCODE		stnreg.sea1id||stnreg.sea2id||stnreg.sea3id||stnreg.stnid		STNCODE												
-					x			GROUP		grpid														
-	Month	Månad			x			MONTH		month			Month	Month	MONTH							Mo		
-	Visit day	Dag			x			VISIT_DAY					Day	Day	DAY									
-	Mixed layer depth	Mixed layer depth			x			MLD																
-	Mixed layer depth bottom	Mixed layer depth bottom			x			MLDX																
-					x			ATEMPW																
-								SIGMA_BTL				SIGMA_BTL				SIGMA_BTL				SIGMA_BTL				
-								Q_SIGMA_BTL				Q_SIGMA_BTL				Q_SIGMA_BTL				Q_SIGMA_BTL				
-								SIGMA_CTD				SIGMA_CTD	Sigma CTD	SigmaT	SIGMA_CTD	SIGMA_CTD				SIGMA_CTD				
-								Q_SIGMA_CTD				Q_SIGMA_CTD				Q_SIGMA_CTD				Q_SIGMA_CTD				
-								O2SAT_BTL				O2SAT_BTL		O2Sat (%)	O2SAT_BTL	O2SAT_BTL				O2SAT_BTL				
-								Q_O2SAT_BTL				Q_O2SAT_BTL				Q_O2SAT_BTL				Q_O2SAT_BTL				
-			%					O2SAT_CTD				O2SAT_CTD	O2Sat CTD			O2SAT_CTD				O2SAT_CTD				
-								Q_O2SAT_CTD				Q_O2SAT_CTD				Q_O2SAT_CTD				Q_O2SAT_CTD				
-	Project name	Projektnamn			x			PROJ_NAME										PROJ_NAME						
-					x			SLABO										SLABO					Provtagningslaboratorium (hyd)	sampling_laboratory_code_phyche
-					x			SMTYP										SMTYP						
-					x			ALABO										ALABO					Analyslaboratorium	analytical_laboratory_name_sv
-					x			METDC										METDC						
-								Own_comment																
-								SIGMA_CTD_KUST																
-								Q_SIGMA_CTD_KUST																
-								SALT_CTD_KUST																
-								Q_SALT_CTD_KUST																
-								TEMP_CTD_KUST																
-								Q_TEMP_CTD_KUST																
-								DOXY_CTD_KUST																
-								Q_DOXY_CTD_KUST																
-								DEPH2					Depth2	Depth2 (m)	DEPTH2									
-					x			DecDate					Dec Date	Dec Date	decdate							dYr		
-					x			zoo_vinkel																
-					x			zoo_mindepth																
-					x			zoo_maxdepth																
-								FLOWMETER_READING_START																
-								FLOWMETER_READING_STOP																
-								SAL_REF																
-								DEPTH_CTD																
-								Q_DEPTH_CTD																
-								DOXY_BTL_MAN																
-								Q_DOXY_BTL_MAN																
-								key_depth																
+COMNT_SAMP	Sample comment	Sample comment						COMNT_SAMP	COMNT_SAMP		Provkommentar per djup (fritext)						Provkommentar per djup (fritext)			COMNT_SAMP			Provkommentar	sample_comment
+TRAWLNO					x			TRAWLNO	TRAWLNO															
+TRAWLTYP	Trawl type	Tråltyp			x			TRAWLTYP	TRAWLTYP															
+KVADRANT	Quadrant	Kvadrant			x			KVADRANT																
+STNCODE	Station code	Stationskod			x			STNCODE		stnreg.sea1id||stnreg.sea2id||stnreg.sea3id||stnreg.stnid		STNCODE												
+GROUP					x			GROUP		grpid														
+MONTH	Month	Månad			x			MONTH		month			Month	Month	MONTH							Mo		
+VISIT_DAY	Visit day	Dag			x			VISIT_DAY					Day	Day	DAY									
+MLD	Mixed layer depth	Mixed layer depth			x			MLD																
+MLDX	Mixed layer depth bottom	Mixed layer depth bottom			x			MLDX																
+ATEMPW					x			ATEMPW																
+SIGMA_BTL								SIGMA_BTL				SIGMA_BTL				SIGMA_BTL				SIGMA_BTL				
+Q_SIGMA_BTL								Q_SIGMA_BTL				Q_SIGMA_BTL				Q_SIGMA_BTL				Q_SIGMA_BTL				
+SIGMA_CTD								SIGMA_CTD				SIGMA_CTD	Sigma CTD	SigmaT	SIGMA_CTD	SIGMA_CTD				SIGMA_CTD				
+Q_SIGMA_CTD								Q_SIGMA_CTD				Q_SIGMA_CTD				Q_SIGMA_CTD				Q_SIGMA_CTD				
+O2SAT_BTL								O2SAT_BTL				O2SAT_BTL		O2Sat (%)	O2SAT_BTL	O2SAT_BTL				O2SAT_BTL				
+Q_O2SAT_BTL								Q_O2SAT_BTL				Q_O2SAT_BTL				Q_O2SAT_BTL				Q_O2SAT_BTL				
+O2SAT_CTD			%					O2SAT_CTD				O2SAT_CTD	O2Sat CTD			O2SAT_CTD				O2SAT_CTD				
+Q_O2SAT_CTD								Q_O2SAT_CTD				Q_O2SAT_CTD				Q_O2SAT_CTD				Q_O2SAT_CTD				
+PROJ_NAME	Project name	Projektnamn			x			PROJ_NAME										PROJ_NAME						
+SLABO					x			SLABO										SLABO					Provtagningslaboratorium (hyd)	sampling_laboratory_code_phyche
+SMTYP					x			SMTYP										SMTYP						
+ALABO					x			ALABO										ALABO					Analyslaboratorium	analytical_laboratory_name_sv
+METDC					x			METDC										METDC						
+Own_comment								Own_comment																
+SIGMA_CTD_KUST								SIGMA_CTD_KUST																
+Q_SIGMA_CTD_KUST								Q_SIGMA_CTD_KUST																
+SALT_CTD_KUST								SALT_CTD_KUST																
+Q_SALT_CTD_KUST								Q_SALT_CTD_KUST																
+TEMP_CTD_KUST								TEMP_CTD_KUST																
+Q_TEMP_CTD_KUST								Q_TEMP_CTD_KUST																
+DOXY_CTD_KUST								DOXY_CTD_KUST																
+Q_DOXY_CTD_KUST								Q_DOXY_CTD_KUST																
+DEPH2								DEPH2					Depth2	Depth2 (m)	DEPTH2									
+DecDate					x			DecDate					Dec Date	Dec Date	decdate							dYr		
+zoo_vinkel					x			zoo_vinkel																
+zoo_mindepth					x			zoo_mindepth																
+zoo_maxdepth					x			zoo_maxdepth																
+FLOWMETER_READING_START								FLOWMETER_READING_START																
+FLOWMETER_READING_STOP								FLOWMETER_READING_STOP																
+SAL_REF								SAL_REF																
+DEPTH_CTD								DEPTH_CTD																
+Q_DEPTH_CTD								Q_DEPTH_CTD																
+DOXY_BTL_MAN								DOXY_BTL_MAN																
+Q_DOXY_BTL_MAN								Q_DOXY_BTL_MAN																
+key_depth								key_depth																
 																							Datatyp	delivery_datatype
 																							Stationsnamn	station_name
 																							Provets latitud (DD)	sample_latitude_dd
@@ -194,10 +200,10 @@ Q_TURB								Q_TURB	Q_TURB			Q_TURB				Q_TURB				Q_TURB			Q-flagga TURB	QFLAG T
 																							Internetåtkomst	internet_access
 																							Leveranspaket	dataset_name
 																							Filnamn	dataset_file_name
-								FLOWMETER_READING																
-								TRAWL_TYPE																
-								WATER_VOLUME																
-								DIN_LAB									DIN (µmol/l)							
-								Q_DIN_LAB									Q-flag DIN							
-								DIP_LAB									DIP (µmol/l)							
-								Q_DIP_LAB									Q-flag DIP							
+FLOWMETER_READING								FLOWMETER_READING																
+TRAWL_TYPE								TRAWL_TYPE																
+WATER_VOLUME								WATER_VOLUME																
+DIN_LAB								DIN_LAB									DIN (µmol/l)							
+Q_DIN_LAB								Q_DIN_LAB									Q-flag DIN							
+DIP_LAB								DIP_LAB									DIP (µmol/l)							
+Q_DIP_LAB								Q_DIP_LAB									Q-flag DIP							

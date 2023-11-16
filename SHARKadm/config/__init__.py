@@ -22,7 +22,7 @@ DEFAULT_IMPORT_MATRIX_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'import_matrix')
 
 DEFAULT_PHYSICAL_CHEMICAL_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'physical_chemical_mapping.txt')
 
-DEFAULT_DELIVERY_NOTE_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'delivery_note_mapper.txt')
+DEFAULT_DELIVERY_NOTE_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'delivery_note_mapping.txt')
 
 DEFAULT_COLUMN_INFO_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_info.yaml')
 DEFAULT_COLUMN_VIEWS_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_views.txt')
@@ -77,6 +77,23 @@ def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
 def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMapper:
     path = path or DEFAULT_DELIVERY_NOTE_MAPPER
     return DeliveryNoteMapper(path)
+
+
+@functools.cache
+def get_all_data_types() -> list[str]:
+    return [path.stem.split('_', 2)[-1].lower() for path in DEFAULT_IMPORT_MATRIX_DIRECTORY.iterdir()]
+
+
+# @functools.cache
+def get_valid_data_types(valid: list[str] | None = None,
+                         invalid: list[str] | None = None) -> list[str]:
+    if not any([valid, invalid]):
+        return get_all_data_types()
+    if valid:
+        return [item.lower() for item in valid if item.lower() in get_all_data_types()]
+    elif invalid:
+        invalid_lower = [item.lower() for item in invalid]
+        return [item for item in get_all_data_types() if item not in invalid_lower]
 
 
 if __name__ == '__main__':
