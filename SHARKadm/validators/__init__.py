@@ -1,20 +1,23 @@
+import functools
 import inspect
 from typing import Type
 import pathlib
 
+from SHARKadm import utils
 from .base import Validator
 from .year import ValidateYearNrDigits
 from .unique import ValidateUniqueSampleId
 from .columns import ValidateColumnViewColumnsNotInDataset
-from .mandatory import ValidateMandatoryNatColumns
-from .mandatory import ValidateMandatoryRegColumns
+from .mandatory import ValidateValuesInMandatoryNatColumns
+from .mandatory import ValidateValuesInMandatoryRegColumns
 
 
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
+@functools.cache
 def get_validator_list() -> list[Type[Validator]]:
-    return Validator.__subclasses__()
+    return sorted(utils.get_all_class_children_names(Validator))
 
 
 def get_validators() -> dict[str, Type[Validator]]:

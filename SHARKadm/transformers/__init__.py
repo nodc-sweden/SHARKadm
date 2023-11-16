@@ -1,8 +1,10 @@
+import functools
 import pathlib
 from typing import Type
 
-from .add_sampler_area import AddCalculatedSamplerArea
-from .add_sharkadm_id_columns import AddSharkadmId
+from SHARKadm import utils
+from .sampler_area import AddCalculatedSamplerArea
+from .sharkadm_id_columns import AddSharkadmId
 from .base import Transformer
 from .columns import AddColumnViewsColumns
 from .datatype import AddDatatype
@@ -26,14 +28,15 @@ from .position import AddPositionToAllLevels
 # from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .station import AddStationInfo
-import inspect
-
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
+from .qc import AddColumnsForAutomaticQC
 
+
+@functools.cache
 def get_transformer_list() -> list[str]:
     """Returns a sorted list of name of all available transformers"""
-    return sorted([cls.__name__ for cls in Transformer.__subclasses__()])
+    return sorted(utils.get_all_class_children_names(Transformer))
 
 
 def get_transformers() -> dict[str, Type[Transformer]]:

@@ -19,6 +19,9 @@ class ReplaceCommaWithDot(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self.apply_on_columns:
+            if col not in data_holder.data:
+                adm_logger.log_transformation(f'Missing column: {col}')
+                continue
             data_holder.data[col] = data_holder.data[col].apply(self.convert)
 
     @staticmethod

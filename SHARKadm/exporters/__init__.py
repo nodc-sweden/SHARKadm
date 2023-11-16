@@ -2,6 +2,8 @@ import inspect
 import pathlib
 from typing import Type
 
+from SHARKadm import utils
+import functools
 from .base import Exporter
 from .print_on_screen import PrintDataFrame
 from .shark_data_txt_file import SHARKdataTxt
@@ -12,10 +14,10 @@ from .html_station_map import HtmlStationMap
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
+@functools.cache
 def get_exporter_list() -> list[str]:
     """Returns a sorted list of name of all available exporters"""
-    print(f'{sorted([cls.__name__ for cls in Exporter.__subclasses__()])=}')
-    return sorted([cls.__name__ for cls in Exporter.__subclasses__()])
+    return sorted(utils.get_all_class_children_names(Exporter))
 
 
 def get_exporters() -> dict[str, Type[Exporter]]:
