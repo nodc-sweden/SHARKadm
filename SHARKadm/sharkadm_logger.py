@@ -1,5 +1,7 @@
 import logging
 
+from SHARKadm import event
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,6 +16,7 @@ class SHARKadmLogger:
 
         self._transformations: dict = dict()
         self._validations: dict = dict()
+        self._exports: dict = dict()
         self._workflow: list = list()
 
         self._initiate_log()
@@ -34,6 +37,7 @@ class SHARKadmLogger:
 
     def log_workflow(self, msg: str) -> None:
         self._workflow.append(msg)
+        event.post_event('workflow', msg)
 
     def log_transformation(self, msg: str, level: str = 'info') -> None:
         level = self._check_level(level)
@@ -45,10 +49,23 @@ class SHARKadmLogger:
         self._validations[level].setdefault(msg, 0)
         self._validations[level][msg] += 1
 
+    def log_exports(self, msg: str, level: str = 'info') -> None:
+        level = self._check_level(level)
+        self._exports[level].setdefault(msg, 0)
+        self._exports[level][msg] += 1
+
     def reset_log(self) -> None:
         """Resets all entries to the log"""
         logger.info(f'Resetting {self.__class__.__name__}')
         self._initiate_log()
+
+    def get_log_info(self) -> dict:
+        info = dict()
+        info['validations'] = self._validations
+        info['transformations'] = self._transformations
+        info['exports'] = self._exports
+        info['workflow'] = self._workflow
+        return info
 
 
 adm_logger = SHARKadmLogger()
