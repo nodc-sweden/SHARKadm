@@ -1,3 +1,4 @@
+import functools
 import pathlib
 import logging
 from typing import Type
@@ -16,13 +17,15 @@ from .dv_template import get_dv_template_data_holder
 from .archive import *
 from .lims import LimsDataHolder
 from .dv_template import DvTemplateDataHolder
+from SHARKadm import utils
 
 logger = logging.getLogger(__name__)
 
 
+@functools.cache
 def get_data_holder_list() -> list[str]:
     """Returns a sorted list of name of all available data_holders"""
-    return sorted([cls.__name__ for cls in DataHolder.__subclasses__()])
+    return sorted(utils.get_all_class_children_names(DataHolder))
 
 
 def get_data_holders() -> dict[str, Type[DataHolder]]:
@@ -34,7 +37,7 @@ def get_data_holders() -> dict[str, Type[DataHolder]]:
 
 
 def get_data_holder_object(trans_name: str, **kwargs) -> DataHolder:
-    """Returns DataHolder object that matches teh given data_holder names"""
+    """Returns DataHolder object that matches the given data_holder names"""
     all_trans = get_data_holders()
     tran = all_trans[trans_name]
     return tran(**kwargs)
@@ -97,6 +100,26 @@ def get_data_holder(path: str | pathlib.Path) -> DataHolder:
         lims_directory = directory_is_lims(path)
         if lims_directory:
             return get_lims_data_holder(lims_directory)
+
+
+def get_valid_data_holders(valid: list[str] | None = None,
+                           invalid: list[str] | None = None) -> list[str]:
+    if not any([valid, invalid]):
+        return get_data_holder_list()
+    data_holder_list_lower = [item.lower() for item in get_data_holder_list()]
+    data_holders = []
+    if valid:
+        valid_lower = [item.lower() for item in valid]
+        for item, item_lower in zip(get_data_holder_list(), data_holder_list_lower):
+            if item_lower in valid_lower:
+                data_holders.append(item)
+        return data_holders
+    elif invalid:
+        invalid_lower = [item.lower() for item in invalid]
+        for item, item_lower in zip(get_data_holder_list(), data_holder_list_lower):
+            if item_lower not in invalid_lower:
+                data_holders.append(item)
+        return data_holders
 
 
 
