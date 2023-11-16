@@ -1,3 +1,4 @@
+import datetime
 import os
 import pathlib
 import platform
@@ -39,7 +40,8 @@ def get_export_directory(*subfolders: str) -> pathlib.Path:
     if not export_directory.parent.exists():
         raise NotADirectoryError(f'Cant create export directory under {export_directory.parent}. Directory does not '
                                  f'exist!')
-    folder = pathlib.Path(export_directory, *subfolders)
+    # folder = pathlib.Path(export_directory, *subfolders)
+    folder = pathlib.Path(export_directory, datetime.datetime.now().strftime('%Y%m%d'), *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 
@@ -51,4 +53,14 @@ def open_file_with_default_program(path: str | pathlib.Path) -> None:
         os.startfile(str(path))
     else:                                   # linux variants
         subprocess.call(('xdg-open', str(path)))
+
+
+def get_all_class_children_names(cls):
+    if not cls.__subclasses__():
+        return []
+    names = []
+    for c in cls.__subclasses__():
+        names.append(c.__name__)
+        names.extend(get_all_class_children_names(c))
+    return names
 
