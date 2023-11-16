@@ -30,18 +30,6 @@ class SHARKadmController:
         return f'{self.__class__.__name__}'
 
     @classmethod
-    def ____old_get_validators_list(cls) -> list[dict]:
-        return [dict((name, desc) for name, desc in validators.get_validators_description().items())]
-
-    @classmethod
-    def ____old_get_transformers_list(cls) -> list[dict]:
-        return [dict((name, desc) for name, desc in transformers.get_transformers_description().items())]
-
-    @classmethod
-    def ____old_get_exporters_list(cls) -> list[dict]:
-        return [dict((name, desc) for name, desc in exporters.get_exporters_description().items())]
-
-    @classmethod
     def get_validators(cls) -> dict[str, dict]:
         return validators.get_validators_info()
         # return_dict = dict()
