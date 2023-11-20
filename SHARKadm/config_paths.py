@@ -9,7 +9,7 @@ if getattr(sys, 'frozen', False):
 else:
     THIS_DIR = pathlib.Path(__file__).parent
 
-LOCAL_CONFIG_ROOT_DIR = THIS_DIR / 'CONFIG_FILES'
+LOCAL_CONFIG_ROOT_DIR = THIS_DIR.parent / 'CONFIG_FILES'
 
 
 class ConfigPaths:
@@ -33,7 +33,7 @@ class ConfigPaths:
             self._paths[path.stem] = path
 
 
-def get_config_paths(root_path: str | pathlib.Path | None):
+def get_config_paths(root_path: str | pathlib.Path | None = None):
     if not root_path:
         if LOCAL_CONFIG_ROOT_DIR.exists():
             root_path = LOCAL_CONFIG_ROOT_DIR

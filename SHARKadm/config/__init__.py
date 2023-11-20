@@ -34,19 +34,21 @@ else:
 
 @functools.cache
 def get_physical_chemical_mapper(path: str | pathlib.Path = None) -> PhysicalChemicalMapper:
-    path = path or adm_config_paths.get('physical_chemical_mapping')
+    print(f'{adm_config_paths=}')
+    print(f'{adm_config_paths.get=}')
+    path = path or adm_config_paths('physical_chemical_mapping')
     return PhysicalChemicalMapper(path)
 
 
 @functools.cache
 def get_column_info_config(path: str | pathlib.Path = None) -> ColumnInfoConfig:
-    path = path or adm_config_paths.get('column_info')
+    path = path or adm_config_paths('column_info')
     return ColumnInfoConfig(path)
 
 
 @functools.cache
 def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
-    path = path or adm_config_paths.get('column_views')
+    path = path or adm_config_paths('column_views')
     return ColumnViews(path)
 
 
@@ -57,7 +59,7 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 @functools.cache
 def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = None,
                              data_type_mapping_path: str | pathlib.Path = None) -> ImportMatrixConfig:
-    directory = directory or adm_config_paths.get('import_matrix')
+    directory = directory or adm_config_paths('import_matrix')
     # d_type_mapper = get_data_type_mapper(data_type_mapping_path)
     for path in pathlib.Path(directory).iterdir():
         # if d_type_mapper.get(data_type) in path.name:
@@ -70,19 +72,19 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
 
 @functools.cache
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
-    config_directory = config_directory or adm_config_paths.get('ids')
+    config_directory = config_directory or adm_config_paths('ids')
     return SharkadmIdsHandler(config_directory)
 
 
 @functools.cache
 def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMapper:
-    path = path or adm_config_paths.get('delivery_note_mapping')
+    path = path or adm_config_paths('delivery_note_mapping')
     return DeliveryNoteMapper(path)
 
 
 @functools.cache
 def get_all_data_types() -> list[str]:
-    return [path.stem.split('_', 2)[-1].lower() for path in adm_config_paths.get('import_matrix').iterdir()]
+    return [path.stem.split('_', 2)[-1].lower() for path in adm_config_paths('import_matrix').iterdir()]
 
 
 # @functools.cache

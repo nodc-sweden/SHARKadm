@@ -22,7 +22,8 @@ class Settings:
     def _create_file(self):
         if self._path.exists():
             return
-        self._path.write_text('')
+        with open(self._path, 'w') as fid:
+            yaml.safe_dump(self._data, fid)
 
     def _load_settings(self):
         with open(self._path) as fid:
@@ -33,6 +34,8 @@ class Settings:
             yaml.safe_dump(self._data, fid)
 
     def get(self, key):
+        if not self._data:
+            return
         return self._data.get(key)
 
     def set(self, key, value):
