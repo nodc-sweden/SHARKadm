@@ -38,8 +38,8 @@ class SharkadmIdLevelHandler:
         """Returns the id based on the given data"""
         parts = [self.data_type]
         for col in self.id_columns:
-            parts.append(data[col])
-        return '+'.join(parts)
+            parts.append(data[col].replace('/', '_'))
+        return '_'.join(parts)
 
 
 class SharkadmIdConfig:

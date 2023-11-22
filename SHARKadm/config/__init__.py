@@ -34,8 +34,6 @@ else:
 
 @functools.cache
 def get_physical_chemical_mapper(path: str | pathlib.Path = None) -> PhysicalChemicalMapper:
-    print(f'{adm_config_paths=}')
-    print(f'{adm_config_paths.get=}')
     path = path or adm_config_paths('physical_chemical_mapping')
     return PhysicalChemicalMapper(path)
 

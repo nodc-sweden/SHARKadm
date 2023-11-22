@@ -55,9 +55,9 @@ class DvTemplateDataHolder(DataHolder, ABC):
     def _initiate(self) -> None:
         self._dataset_name = self.template_path.name
 
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
+    # @property
+    # def data(self) -> pd.DataFrame:
+    #     return self._data
 
     @property
     def data_type(self) -> str:

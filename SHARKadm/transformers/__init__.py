@@ -3,10 +3,10 @@ import pathlib
 from typing import Type
 
 from SHARKadm import utils
-from .sampler_area import AddCalculatedSamplerArea
-from .sharkadm_id_columns import AddSharkadmId
 from .base import Transformer
 from .columns import AddColumnViewsColumns
+from .columns import AddDEPHqcColumn
+from .cruise import AddCruiseId
 from .datatype import AddDatatype
 from .date_time import AddDateAndTimeToAllLevels
 from .date_time import AddDatetime
@@ -15,6 +15,7 @@ from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
+from .lims import MoveLessThanFlag
 # from .laboratory import AddEnglishSampleOrderer
 # from .laboratory import AddEnglishSamplingLaboratory
 # from .laboratory import AddSwedishSampleOrderer
@@ -24,13 +25,16 @@ from .map_header import PhysicalChemicalMapper
 from .position import AddPositionDD
 from .position import AddPositionDM
 from .position import AddPositionToAllLevels
+from .qc import AddColumnsForAutomaticQC
 # from .project_code import AddEnglishProjectName
 # from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
+from .sampler_area import AddCalculatedSamplerArea
+from .sharkadm_id_columns import AddSharkadmId
 from .station import AddStationInfo
+from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-
-from .qc import AddColumnsForAutomaticQC
+from .pressure import FakeAddPressure
 
 
 @functools.cache

@@ -16,6 +16,7 @@ class SHARKadmWorkflow:
                  transformers: list[dict[str, str | dict[str, str]]] = [],
                  validators_after: list[dict[str, str | dict[str, str]]] = [],
                  exporters: list[dict[str, str | dict[str, str]]] = [],
+                 save_config_path: str | pathlib.Path | None = None
                  ) -> None:
 
         self._controller = SHARKadmController()
@@ -24,6 +25,7 @@ class SHARKadmWorkflow:
         self.transformers = transformers
         self.validators_after = validators_after
         self.exporters = exporters
+        self.save_config_path = save_config_path
 
     def _initiate_workflow(self) -> None:
         adm_logger.log_workflow('Initiating workflow')
@@ -64,20 +66,39 @@ class SHARKadmWorkflow:
             d_holder = get_data_holder(path)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
+        self.save_config()
 
     def get_report(self):
         pass
+
+    def save_config(self):
+        if not self.save_config_path:
+            return
+        if self.save_config_path.suffix != '.yaml':
+            adm_logger.log_workflow(f'Could not save config file. The file is not a valid config file: {self.save_config_path}')
+            return
+        data = dict(
+            data_source_paths = self.data_source_paths,
+            validators_before = self.validators_before,
+            validators_after = self.validators_after,
+            transformers = self.transformers,
+            exporters = self.exporters,
+        )
+
+        with open(self.save_config_path, 'w') as fid:
+            yaml.safe_dump(data, self.save_config_path)
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path):
         with open(path) as fid:
             config = yaml.safe_load(fid)
         workflow = SHARKadmWorkflow(
-            data_source_paths=config.get('archive_paths', []),
+            data_source_paths=config.get('data_source_paths', []),
             validators_before=config.get('validators_before', []),
             validators_after=config.get('validators_after', []),
             transformers=config.get('transformers', []),
             exporters=config.get('exporters', []),
+            save_config_path=config.get('save_config_path', []),
         )
 
         return workflow

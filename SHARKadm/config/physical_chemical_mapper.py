@@ -36,7 +36,13 @@ class PhysicalChemicalMapper:
                     self._data[value] = internal_value
 
     def get_internal_name(self, external_par: str) -> str:
+        print('-'*100)
+        print(f'{external_par=}')
         if not self._data.get(external_par):
             logger.warning(f'Could not map parameter "{external_par}" using "{self.__class__.__name__}"')
             return external_par
+        print(f"{self._data[external_par].split('.', 1)[-1]=}")
         return self._data[external_par].split('.', 1)[-1]
+
+    def get_short_name(self, internal_par: str) -> str:
+        pass

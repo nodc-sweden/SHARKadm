@@ -25,3 +25,19 @@ class AddColumnViewsColumns(Transformer):
             data_holder.data[col] = ''
 
 
+class AddDEPHqcColumn(Transformer):
+    valid_data_holders = ['LimsDataHolder']
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._column_views = get_column_views_config()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Adds QC column for DEPH if missing'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if 'Q_DEPH' not in data_holder.data.columns:
+            data_holder.data['Q_DEPH'] = ''
+
+

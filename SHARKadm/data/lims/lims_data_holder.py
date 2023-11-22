@@ -52,9 +52,15 @@ class LimsDataHolder(DataHolder):
         data.reset_index(inplace=True, drop=True)
         return data
 
-    @property
-    def data(self) -> pd.DataFrame:
-        return self._data
+    # @property
+    # def data(self) -> pd.DataFrame:
+    #     return self._data
+    #
+    # @data.setter
+    # def data(self, df: pd.DataFrame) -> None:
+    #     if type(df) != pd.DataFrame:
+    #         raise 'Data must be of type pd.DataFrame'
+    #     self._data = df
 
     @property
     def data_type(self) -> str:

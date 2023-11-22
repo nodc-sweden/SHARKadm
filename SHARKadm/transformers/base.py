@@ -10,8 +10,11 @@ from SHARKadm.data import get_valid_data_holders
 class DataHolderProtocol(Protocol):
 
     @property
-    @abstractmethod
     def data(self) -> pd.DataFrame:
+        ...
+
+    @data.setter
+    def data(self, df: pd.DataFrame) -> None:
         ...
 
     @property

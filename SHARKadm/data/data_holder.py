@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the add_data_source method"""
+    _data = pd.DataFrame()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -30,9 +31,19 @@ class DataHolder(ABC):
         ...
 
     @property
-    @abstractmethod
     def data(self) -> pd.DataFrame:
-        ...
+        return self._data
+
+    @data.setter
+    def data(self, df: pd.DataFrame) -> None:
+        if type(df) != pd.DataFrame:
+            raise 'Data must be of type pd.DataFrame'
+        self._data = df
+
+    # @property
+    # @abstractmethod
+    # def data(self) -> pd.DataFrame:
+    #     ...
 
     @property
     @abstractmethod

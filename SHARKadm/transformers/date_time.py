@@ -7,6 +7,7 @@ from SHARKadm import adm_logger
 
 DATETIME_FORMATS = [
     '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M',
     '%Y-%m-%d'
 ]
 
@@ -36,14 +37,18 @@ class AddDateAndTimeToAllLevels(Transformer):
 
 
 class AddDatetime(Transformer):
-    datetime_source_column = 'sample_date'
+    date_source_column = 'sample_date'
+    time_source_column = 'sample_time'
 
     @staticmethod
     def get_transformer_description() -> str:
         return 'Adds column datetime. Time is taken from sample_date'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['datetime'] = data_holder.data[self.datetime_source_column].apply(self.to_datetime)
+        data_holder.data['date_and_time'] = data_holder.data[self.date_source_column] + ' ' + data_holder.data[
+            self.time_source_column]
+        data_holder.data['datetime'] = data_holder.data['date_and_time'].apply(self.to_datetime)
+        data_holder.data.drop('date_and_time', axis=1, inplace=True)
 
     @staticmethod
     def to_datetime(x: str) -> datetime.datetime:
@@ -77,4 +82,5 @@ class AddMonth(Transformer):
             adm_logger.log_transformation(f'Missing datetime in {data_holder}')
             return ''
         return str(x.month).zfill(2)
+
 

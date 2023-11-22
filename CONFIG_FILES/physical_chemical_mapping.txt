@@ -8,9 +8,9 @@ sample_time	Start time	Tid			x			STIME	STIME	¤hour¤||':'||¤minute¤	Start tid (UT
 sample_enddate					x			EDATE	EDATE		Slut provtagningsdatum (YYYY-MM-DD)									EDATE			Provtagningsdatum (slut)	sample_enddate
 sample_endtime					x			ETIME	ETIME		Slut tid (UTC)									ETIME			Provtagningstid (slut)	sample_endtime
 CTRYID	Country	Land			x			CTRYID		ctryid	Landskod (kod)		%CtryID	%CtryID	%CtryID	CTRYID	Landskod (kod)			CTRYID		Lk	Land (kod)	country_code
-SHIPC	Ship code	Fartygskod			x			SHIPC	SHIPC	shipid	Fartyg/Mätplattform (kod)		ShipID	ShipID	ShipID	SHIPC	Fartyg/Mätplattform (kod)			SHIPC	Ship	Fk	Provtagningsplattform (kod)	platform_code
-CRUISE_NO					x			CRUISE_NO	CRUISE_NO		Expeditionsnummer						Expeditionsnummer			CRUISE_NO			Expeditions-ID	expedition_id
-SERNO	Series	Serienummer			x			SERNO	SERNO	serie	Serienummer		Serie	Serie	Serie	SERIE	Serienummer			STNNO	St no	Sn	Besöks-ID	visit_id
+platform_code	Ship code	Fartygskod			x			SHIPC	SHIPC	shipid	Fartyg/Mätplattform (kod)		ShipID	ShipID	ShipID	SHIPC	Fartyg/Mätplattform (kod)			SHIPC	Ship	Fk	Provtagningsplattform (kod)	platform_code
+cruise_no					x			CRUISE_NO	CRUISE_NO		Expeditionsnummer	Expeditionsnummer			CRUISE_NO			Expeditions-ID	expedition_id
+visit_id	Series	Serienummer			x			SERNO	SERNO	serie	Serienummer		Serie	Serie	Serie	SERIE	Serienummer			STNNO	St no	Sn	Besöks-ID	visit_id
 SEQNO					x			SEQNO	SEQNO															
 STATN_REPORTED					x			STATN_REPORTED	STATN	visit.stnname	Stationsnamn		Station	Station	Station	STATN	Stationsnamn	Station		STATN	Station name	statn	Rapporterat stationsnamn	reported_station_name
 reported_station_name	Station	Station			x			STATN		stnreg.stnname														
