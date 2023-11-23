@@ -40,3 +40,21 @@ class MoveLessThanFlag(Transformer):
         adm_logger.log_transformation(f'Moving {col} flag < to flag column')
         return '<'
 
+
+class RemoveNonDataLines(Transformer):
+    valid_data_holders = ['LimsDataHolder']
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Removes SLA and ZOO lines in data'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        sla_bool = data_holder.data['sample_id'].str.contains('-SLA_')
+        zoo_bool = data_holder.data['sample_id'].str.contains('-ZOO_')
+        remove_bool = sla_bool | zoo_bool
+        data_holder.data = data_holder.data[~remove_bool]
+
+
