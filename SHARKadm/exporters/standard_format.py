@@ -6,6 +6,8 @@ from SHARKadm import utils
 
 
 class StandardFormat(Exporter):
+    valid_data_types = ['physicalchemical']
+
     def __init__(self,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
@@ -62,6 +64,7 @@ class StandardFormat(Exporter):
         df = d_data.copy()
         df.reset_index(drop=True, inplace=True)
         add_df = pd.DataFrame.from_dict(new_data)
+        add_df.reset_index(drop=True, inplace=True)
         d_data = pd.concat([add_df, df], axis=1)
         # d_data.insert(0, column='LONGITUDE_DD', value=data['sample_longitude_dd'])
         # d_data.insert(0, column='LATITUDE_DD', value=data['sample_latitude_dd'])
