@@ -16,6 +16,7 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .lims import MoveLessThanFlag
+from .lims import RemoveNonDataLines
 # from .laboratory import AddEnglishSampleOrderer
 # from .laboratory import AddEnglishSamplingLaboratory
 # from .laboratory import AddSwedishSampleOrderer
@@ -34,7 +35,8 @@ from .sharkadm_id_columns import AddSharkadmId
 from .station import AddStationInfo
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .pressure import FakeAddPressure
+from .fake import FakeAddPressureFromDepth
+from .fake import FakeAddCTDtagToColumns
 
 
 @functools.cache
