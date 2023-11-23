@@ -19,7 +19,6 @@ def subscribe(event: str, func, prio: int=50) -> None:
 
 
 def post_event(event: str, data=None) -> None:
-    print(f'{subscribers=}')
     if event not in subscribers:
         raise EventNotFound(event)
     for prio in sorted(subscribers[event]):
