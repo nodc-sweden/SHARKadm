@@ -76,24 +76,35 @@ class AddPositionDM(Transformer):
         if lon_column_to_set:
             self.lon_column_to_set = lon_column_to_set
 
-        self._cached_lat = dict()
-        self._cached_lon = dict()
+        # self._cached_lat = dict()
+        # self._cached_lon = dict()
+        self._cached_pos = dict()
 
     @staticmethod
     def get_transformer_description() -> str:
         return f'Adds sample position in decimal minute'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.lat_column_to_set] = data_holder.data.apply(lambda row: self._get_lat(row), axis=1)
-        data_holder.data[self.lon_column_to_set] = data_holder.data.apply(lambda row: self._get_lon(row), axis=1)
+        data_holder.data[self.lat_column_to_set] = data_holder.data[self.lat_source_col].apply(self._get_pos)
+        data_holder.data[self.lon_column_to_set] = data_holder.data[self.lon_source_col].apply(self._get_pos)
 
-    def _get_lat(self, row):
-        lat = row[self.lat_source_col]
-        return self._cached_lat.setdefault(lat, position.decdeg_to_decmin(lat, nr_decimals=2, with_space=True))
+        # data_holder.data[self.lat_column_to_set] = data_holder.data.apply(lambda row: self._get_lat(row), axis=1)
+        # data_holder.data[self.lon_column_to_set] = data_holder.data.apply(lambda row: self._get_lon(row), axis=1)
 
-    def _get_lon(self, row):
-        lon = row[self.lon_source_col]
-        return self._cached_lon.setdefault(lon, position.decdeg_to_decmin(lon, nr_decimals=2, with_space=True))
+    def _get_pos(self, pos: str) -> str:
+        pos = pos.replace(' ', '')
+        parts = pos.split('.')
+        if len(parts[0]) == 2:
+            pos = self._cached_pos.setdefault(pos, position.decdeg_to_decmin(pos, nr_decimals=None))
+        return pos[:8]
+
+    # def _get_lat(self, row):
+    #     lat = row[self.lat_source_col]
+    #     return self._cached_lat.setdefault(lat, position.decdeg_to_decmin(lat, nr_decimals=2, with_space=True))
+    #
+    # def _get_lon(self, row):
+    #     lon = row[self.lon_source_col]
+    #     return self._cached_lon.setdefault(lon, position.decdeg_to_decmin(lon, nr_decimals=2, with_space=True))
 
 
 class AddPositionDD(Transformer):
@@ -118,28 +129,44 @@ class AddPositionDD(Transformer):
         if lon_column_to_set:
             self.lon_column_to_set = lon_column_to_set
 
-        self._cached_lat = dict()
-        self._cached_lon = dict()
+        # self._cached_lat = dict()
+        # self._cached_lon = dict()
+        self._cached_pos = dict()
 
     @staticmethod
     def get_transformer_description() -> str:
         return f'Adds sample position in decimal degree'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.lat_column_to_set] = data_holder.data.apply(lambda row: self._get_lat(row), axis=1)
-        data_holder.data[self.lon_column_to_set] = data_holder.data.apply(lambda row: self._get_lon(row), axis=1)
+        data_holder.data[self.lat_column_to_set] = data_holder.data[self.lat_source_col].apply(self._get_pos)
+        data_holder.data[self.lon_column_to_set] = data_holder.data[self.lon_source_col].apply(self._get_pos)
 
-    def _get_lat(self, row):
-        lat = row[self.lat_source_col]
-        return self._cached_lat.setdefault(lat, position.decmin_to_decdeg(lat, nr_decimals=5))
+        # data_holder.data[self.lat_column_to_set] = data_holder.data.apply(lambda row, source_col self._get_lat(row),
+        #                                                                   axis=1)
+        # data_holder.data[self.lon_column_to_set] = data_holder.data.apply(lambda row: self._get_lon(row), axis=1)
 
-    def _get_lon(self, row):
-        lon = row[self.lon_source_col]
-        return self._cached_lon.setdefault(lon, position.decmin_to_decdeg(lon, nr_decimals=5))
+    def _get_pos(self, pos: str) -> str:
+        pos = pos.replace(' ', '')
+        parts = pos.split('.')
+        if len(parts[0]) == 4:
+            pos = self._cached_pos.setdefault(pos, position.decmin_to_decdeg(pos, nr_decimals=None))
+        return pos[:8]
 
-    @staticmethod
-    def _split_pos(x):
-        x = x.replace(' ', '')
-        x = ('%%2.%sf' % 5 % float(x))
-        return x
-        # return f'{x[:2]}{x[2:]}'
+
+    # def _get_lat(self, row):
+    #     lat = row[self.lat_source_col].replace(' ', '')
+    #     parts = lat.split('.')
+    #     if len(parts[0]) == 4:
+    #         lat = self._cached_lat.setdefault(lat, position.decmin_to_decdeg(lat, nr_decimals=None))
+    #     return lat[:8]
+    #
+    # def _get_lon(self, row):
+    #     lon = row[self.lon_source_col]
+    #     return self._cached_lon.setdefault(lon, position.decmin_to_decdeg(lon, nr_decimals=None))
+
+    # @staticmethod
+    # def _split_pos(x):
+    #     x = x.replace(' ', '')
+    #     x = ('%%2.%sf' % 5 % float(x))
+    #     return x
+    #     # return f'{x[:2]}{x[2:]}'
