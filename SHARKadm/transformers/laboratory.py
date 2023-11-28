@@ -1,5 +1,5 @@
 from SHARKadm import adm_logger
-from micro.translate_codes import get_default_translate_codes_object
+from micro.translate_codes import get_translate_codes_object
 from .base import Transformer, DataHolderProtocol
 
 
@@ -9,7 +9,7 @@ class AddSwedishSampleOrderer(Transformer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._loaded_code_info = {}
-        self._codes = get_default_translate_codes_object()
+        self._codes = get_translate_codes_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -33,7 +33,7 @@ class AddEnglishSampleOrderer(Transformer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._loaded_code_info = {}
-        self._codes = get_default_translate_codes_object()
+        self._codes = get_translate_codes_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -57,7 +57,7 @@ class AddSwedishSamplingLaboratory(Transformer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._loaded_code_info = {}
-        self._codes = get_default_translate_codes_object()
+        self._codes = get_translate_codes_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -81,7 +81,7 @@ class AddEnglishSamplingLaboratory(Transformer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._loaded_code_info = {}
-        self._codes = get_default_translate_codes_object()
+        self._codes = get_translate_codes_object()
 
     @staticmethod
     def get_transformer_description() -> str:

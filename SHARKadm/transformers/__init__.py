@@ -15,6 +15,9 @@ from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
+from .dyntaxa import AddDyntaxaId
+from .fake import FakeAddCTDtagToColumns
+from .fake import FakeAddPressureFromDepth
 from .lims import MoveLessThanFlag
 from .lims import RemoveNonDataLines
 # from .laboratory import AddEnglishSampleOrderer
@@ -31,12 +34,13 @@ from .qc import AddColumnsForAutomaticQC
 # from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .sampler_area import AddCalculatedSamplerArea
+from .scientific_name import AddReportedScientificName
+from .scientific_name import AddScientificName
 from .sharkadm_id_columns import AddSharkadmId
 from .station import AddStationInfo
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .fake import FakeAddPressureFromDepth
-from .fake import FakeAddCTDtagToColumns
+from .dyntaxa import AddDyntaxaId
 
 
 @functools.cache

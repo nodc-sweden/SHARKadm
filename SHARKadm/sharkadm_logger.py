@@ -9,6 +9,7 @@ class SHARKadmLogger:
     """Class to log events etc. in the SHARKadm dataflow"""
     def __init__(self):
         self._levels: list[str] = [
+            'debug',
             'info',
             'warning',
             'error'
