@@ -10,8 +10,8 @@ import pandas as pd
 from SHARKadm import config
 from SHARKadm import adm_logger
 # from SHARKadm.config import get_data_type_mapper
-from SHARKadm.config.import_config import ImportMatrixConfig
-from SHARKadm.config.import_config import ImportMatrixMapper
+from SHARKadm.config.import_matrix import ImportMatrixConfig
+from SHARKadm.config.import_matrix import ImportMatrixMapper
 from SHARKadm.data import data_source
 from SHARKadm.data.archive import delivery_note
 from SHARKadm.data.data_holder import DataHolder

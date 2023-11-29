@@ -3,7 +3,7 @@ import functools
 import sys
 
 from SHARKadm import adm_config_paths
-from .import_config import ImportMatrixConfig
+from .import_matrix import ImportMatrixConfig
 from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
 from .sharkadm_id import SharkadmIdsHandler
