@@ -1,7 +1,7 @@
 from SHARKadm import config
 from SHARKadm.config import column_info
 from SHARKadm.config import data_type_mapper
-from SHARKadm.config import sharkadm_id
+from SHARKadm.config import custom_id
 from .base import Transformer, DataHolderProtocol
 
 import hashlib

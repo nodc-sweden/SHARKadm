@@ -6,7 +6,7 @@ from SHARKadm import adm_config_paths
 from .import_matrix import ImportMatrixConfig
 from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
-from .sharkadm_id import SharkadmIdsHandler
+from .custom_id import CustomIdsHandler
 from .data_type_mapper import DataTypeMapper
 from .delivery_note_mapper import DeliveryNoteMapper
 from .physical_chemical_mapper import PhysicalChemicalMapper
@@ -71,7 +71,7 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
 @functools.cache
 def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
     config_directory = config_directory or adm_config_paths('ids')
-    return SharkadmIdsHandler(config_directory)
+    return CustomIdsHandler(config_directory)
 
 
 @functools.cache

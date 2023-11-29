@@ -7,7 +7,7 @@ from .data_type_mapper import DataTypeMapper
 logger = logging.getLogger(__name__)
 
 
-class SharkadmIdLevelHandler:
+class CustomIdLevelHandler:
     """Id handler for a single datatype and specific level"""
     def __init__(self, data_type: str, level: str, config: dict):
         self._data_type = data_type
@@ -42,8 +42,8 @@ class SharkadmIdLevelHandler:
         return '_'.join(parts)
 
 
-class SharkadmIdConfig:
-    """Config id handler fo a single datatype (single config file)"""
+class CustomIdConfig:
+    """Config id handler for a single datatype (single config file)"""
     def __init__(self, config_path: pathlib.Path):
         self._config_path = config_path
         self._config = {}
@@ -64,19 +64,19 @@ class SharkadmIdConfig:
     def levels(self) -> dict:
         return self._config['levels']
 
-    def get_id_objects(self) -> dict[str, SharkadmIdLevelHandler]:
+    def get_id_objects(self) -> dict[str, CustomIdLevelHandler]:
         objs = {}
         for level in self.levels:
-            obj = SharkadmIdLevelHandler(self.data_type, level, self._config)
+            obj = CustomIdLevelHandler(self.data_type, level, self._config)
             objs[level] = obj
         return objs
 
 
-class SharkadmIdsHandler:
+class CustomIdsHandler:
     """Handler for ids for all data types"""
     def __init__(self, directory: str | pathlib.Path):
         self._directory: pathlib.Path = pathlib.Path(directory)
-        self._id_objects: dict[str, dict[str, SharkadmIdLevelHandler]] = {}
+        self._id_objects: dict[str, dict[str, CustomIdLevelHandler]] = {}
         self._load_sharkadm_id_objects()
 
     def __repr__(self) -> str:
@@ -85,12 +85,12 @@ class SharkadmIdsHandler:
     def _load_sharkadm_id_objects(self) -> None:
         self._id_objects = {}
         for path in self._directory.iterdir():
-            config = SharkadmIdConfig(path)
+            config = CustomIdConfig(path)
             self._id_objects[config.data_type] = config.get_id_objects()
             
     def get_level_handler(self,
                           data_type: str = None,
-                          level: str = None) -> SharkadmIdLevelHandler | None:
+                          level: str = None) -> CustomIdLevelHandler | None:
                           # data_type_mapper: DataTypeMapper = None) -> SharkadmIdLevelHandler | None:
         # data_type = data_type_mapper.get(data_type)
         data_type = data_type.lower()
