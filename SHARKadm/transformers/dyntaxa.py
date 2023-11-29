@@ -65,17 +65,19 @@ class AddDyntaxaIdPolars(Transformer):
             new_dyntaxa = self.dyntaxa_id.get(source_name)
             d = df.filter(pl.col(self.source_col) == source_name)
             nr_rows = len(d)
-            nr_has_dyntaxa = len([item for item in d['dyntaxa_id'] if item])
+            nr_has_dyntaxa = len([item for item in d[self.col_to_set] if item])
             if nr_has_dyntaxa != nr_rows:
+                adm_logger.log_transformation(f'{source_name}: {nr_has_dyntaxa} out of {nr_rows} rows already have'
+                                              f' {self.col_to_set}')
                 
 
-            if not new_dyntaxa:
-                if current_dyntaxa:
-                    adm_logger.log_transformation(
-                        f'No dyntaxaId found for {source_name}. Keeping old id: {current_dyntaxa}',
-                        level='warning')
-                    return current_dyntaxa
-                adm_logger.log_transformation(f'No dyntaxaId found for {source_name}', level='warning')
+            # if not new_dyntaxa:
+            #     if current_dyntaxa:
+            #         adm_logger.log_transformation(
+            #             f'No dyntaxaId found for {source_name}. Keeping old id: {current_dyntaxa}',
+            #             level='warning')
+            #         return current_dyntaxa
+            #     adm_logger.log_transformation(f'No dyntaxaId found for {source_name}', level='warning')
 
 
         data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._add(row), axis=1)

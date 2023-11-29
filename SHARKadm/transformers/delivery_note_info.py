@@ -6,14 +6,12 @@ import sys
 from .base import Transformer, DataHolderProtocol
 from SHARKadm.data.archive import ArchiveDataHolder
 from SHARKadm.utils import yaml_data
+from SHARKadm import adm_config_paths
 
 if getattr(sys, 'frozen', False):
     THIS_DIR = pathlib.Path(sys.executable).parent
 else:
     THIS_DIR = pathlib.Path(__file__).parent
-
-
-DELIVERY_NOTE_CONFIG_PATH = THIS_DIR / 'etc' / 'delivery_note.yaml'
 
 
 class AddStatus(Transformer):
@@ -24,7 +22,7 @@ class AddStatus(Transformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._config = yaml_data.load_yaml(DELIVERY_NOTE_CONFIG_PATH)
+        self._config = yaml_data.load_yaml(adm_config_paths('delivery_note_status'))
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -45,5 +43,4 @@ class AddStatus(Transformer):
         data_holder.data['data_checked_by_sv'] = data['data_checked_by_sv']
         data_holder.data['data_checked_by_en'] = data['data_checked_by_en']
 
-        print(f'{data_holder.delivery_note.status=}')
 

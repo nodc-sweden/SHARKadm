@@ -36,7 +36,7 @@ from .replace_comma_with_dot import ReplaceCommaWithDot
 from .sampler_area import AddCalculatedSamplerArea
 from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificName
-from .sharkadm_id_columns import AddSharkadmId
+from .custom_id import AddCustomId
 from .station import AddStationInfo
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class

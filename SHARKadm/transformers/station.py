@@ -9,6 +9,7 @@ class AddStationInfo(Transformer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._stations = get_station_object()
+        self._station_synonyms = {}
         self._loaded_stations_info = {}
 
     @staticmethod
@@ -20,11 +21,26 @@ class AddStationInfo(Transformer):
 
         for i in data_holder.data.index:
             reported_station = data_holder.data.at[i, 'reported_station_name']
-            info = self._loaded_stations_info.setdefault(reported_station, self._stations.get_station_info(
-                reported_station))
-            data_holder.data.at[i, 'station_name'] = info['station_name']
-            data_holder.data.at[i, 'station_id'] = info['reg_id']
-            data_holder.data.at[i, 'sample_location_id'] = info['reg_id_group']
+            translated_station_name = self._station_synonyms.setdefault(reported_station,
+                                                                        self._stations.get_station_name(
+                                                                            reported_station))
+            lat = float(data_holder.data.at[i, 'sample_latitude_dd'])
+            lon = float(data_holder.data.at[i, 'sample_longitude_dd'])
+            info = self._loaded_stations_info.setdefault(reported_station,
+                                                         self._stations.get_closest_station_info(lat, lon))
+            if not info['accepted']:
+                adm_logger.log_transformation(f'Reported position is to far from position in station list: '
+                                              f'{reported_station} ({lat} / {lon}); {info["calc_dist"]} ({info["OUT_OF_BOUNDS_RADIUS"]})')
+                continue
+
+            if info['STATION_NAME'] != translated_station_name:
+                adm_logger.log_transformation(f'Reported station matches another station. Will replace: {translated_station_name} ->'
+                                              f' {info["STATION_NAME"]}', level='warning')
+            elif reported_station != translated_station_name:
+                adm_logger.log_transformation(f'Station name translated: {reported_station} -> {translated_station_name}', level='warning')
+            data_holder.data.at[i, 'station_name'] = info['STATION_NAME']
+            data_holder.data.at[i, 'station_id'] = info['REG_ID']
+            data_holder.data.at[i, 'sample_location_id'] = info['REG_ID_GROUP']
 
         # data_holder.data['station_name'], data_holder.data['station_name'], data_holder.data['station_name'] = \
         #     data_holder.data.map(self._translate)
