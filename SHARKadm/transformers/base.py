@@ -22,10 +22,6 @@ class DataHolderProtocol(Protocol):
     def data_type(self) -> str:
         ...
 
-    @property
-    def number_metadata_rows(self) -> int:
-        ...
-
 
 class Transformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""

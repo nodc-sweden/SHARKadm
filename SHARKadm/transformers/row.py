@@ -1,5 +1,30 @@
-from .base import Transformer, DataHolderProtocol
+from abc import abstractmethod
+from typing import Protocol
+
+import pandas as pd
+
 from SHARKadm import adm_logger
+from .base import Transformer
+
+
+class DataHolderProtocol(Protocol):
+
+    @property
+    def data(self) -> pd.DataFrame:
+        ...
+
+    @data.setter
+    def data(self, df: pd.DataFrame) -> None:
+        ...
+
+    @property
+    @abstractmethod
+    def data_type(self) -> str:
+        ...
+
+    @property
+    def number_metadata_rows(self) -> int:
+        ...
 
 
 class AddRowNumber(Transformer):
