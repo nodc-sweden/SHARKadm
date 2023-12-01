@@ -6,6 +6,7 @@ from SHARKadm import utils
 from .base import Transformer
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
+from .row import AddRowNumber
 from .cruise import AddCruiseId
 from .datatype import AddDatatype
 from .date_time import AddDateAndTimeToAllLevels
