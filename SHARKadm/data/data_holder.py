@@ -56,6 +56,10 @@ class DataHolder(ABC):
         ...
 
     @property
+    def number_metadata_rows(self) -> int:
+        return 0
+
+    @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
 

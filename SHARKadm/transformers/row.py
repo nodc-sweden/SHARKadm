@@ -15,5 +15,5 @@ class AddRowNumber(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set in data_holder.data:
             adm_logger.log_transformation(f'Column {self.col_to_set} already present. Will not overwrite')
-            return 
-        data_holder.data[self.col_to_set] = (data_holder.data.index + 1).astype(str)
+            return
+        data_holder.data[self.col_to_set] = (data_holder.data.index + 1 + data_holder.number_metadata_rows).astype(str)
