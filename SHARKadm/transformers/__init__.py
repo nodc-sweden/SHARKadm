@@ -37,6 +37,7 @@ from .sampler_area import AddCalculatedSamplerArea
 from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificName
 from .custom_id import AddCustomId
+from .shark_id import AddSharkId
 from .station import AddStationInfo
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class

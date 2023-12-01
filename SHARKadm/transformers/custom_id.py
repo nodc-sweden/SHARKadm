@@ -9,7 +9,7 @@ from SHARKadm import adm_logger
 
 
 class AddCustomId(Transformer):
-    _id_handler = config.get_sharkadm_id_handler()
+    _id_handler = config.get_custom_id_handler()
 
     def __init__(self, add_md5: bool = False):
         super().__init__()
@@ -20,7 +20,7 @@ class AddCustomId(Transformer):
         return 'Adds custom key and md5 id'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        """sharkadm_id in taken from self._id_handler"""
+        """custom_id in taken from self._id_handler"""
         for level in self._id_handler.get_levels_for_datatype(data_holder.data_type):
             id_handler = self._id_handler.get_level_handler(data_type=data_holder.data_type,
                                                             level=level,

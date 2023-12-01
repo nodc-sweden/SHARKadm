@@ -49,6 +49,7 @@ class ImportMatrixConfig:
         self._encoding = encoding
         self._data = {}
         self._mappers = {}
+        self._columns_by_level = {}
 
         self._validate()
 
@@ -63,11 +64,6 @@ class ImportMatrixConfig:
             logger.error(msg)
             raise ValueError(msg)
 
-    def _load_yaml_file(self) -> None:
-        # Not used
-        with open(self._path, encoding=self._encoding) as fid:
-            self._data = yaml.safe_load(fid)
-
     def _load_file(self) -> None:
         self._data = {}
         header = []
@@ -81,11 +77,20 @@ class ImportMatrixConfig:
                     self._data = {key: {} for key in header[1:]}
                     continue
 
+                self._add_variable_to_level(split_line[0])
+
                 for inst, par_str in zip(header[1:], split_line[1:]):
                     if not par_str:
                         continue
                     for par in par_str.split('<or>'):
                         self._data[inst][par.split('.', 1)[-1]] = split_line[0].split('.', 1)[-1]
+
+    def _add_variable_to_level(self, item) -> None:
+        level, column = item.split('.', 1)
+        if 'NOT_USED' in column:
+            return
+        self._columns_by_level.setdefault(level, [])
+        self._columns_by_level[level].append(column)
 
     @property
     def data_type(self) -> str:
@@ -96,31 +101,31 @@ class ImportMatrixConfig:
         """Returns a sorted list of all institutes"""
         return sorted(self._data)
 
-    @functools.cached_property
-    def all_external_parameters(self) -> list:
-        """Returns a sorted list of all external parameters found in the config file"""
-        all_pars = set()
-        for par_dict in self._data.values():
-            all_pars.update(par_dict.keys())
-        return sorted(all_pars)
-
-    @functools.cached_property
-    def all_internal_parameters_with_level(self) -> list:
-        """Returns a sorted list of all internal parameters found in the config file including the level"""
-        all_pars = set()
-        for par_dict in self._data.values():
-            all_pars.update(par_dict.values())
-        return sorted(all_pars)
-
-    @functools.cached_property
-    def all_internal_parameters(self) -> list:
-        """Returns a sorted list of all internal parameters found in the config file"""
-        return sorted([item.split('.', 1)[1] for item in self.all_internal_parameters_with_level])
-
-    @functools.cached_property
-    def levels(self) -> list:
-        """Returns a sorted list of all levels found in the config file"""
-        return sorted(set([item.split('.', 1)[0] for item in self.all_internal_parameters_with_level]))
+    # @functools.cached_property
+    # def all_external_parameters(self) -> list:
+    #     """Returns a sorted list of all external parameters found in the config file"""
+    #     all_pars = set()
+    #     for par_dict in self._data.values():
+    #         all_pars.update(par_dict.keys())
+    #     return sorted(all_pars)
+    #
+    # @functools.cached_property
+    # def all_internal_parameters_with_level(self) -> list:
+    #     """Returns a sorted list of all internal parameters found in the config file including the level"""
+    #     all_pars = set()
+    #     for par_dict in self._data.values():
+    #         all_pars.update(par_dict.values())
+    #     return sorted(all_pars)
+    #
+    # @functools.cached_property
+    # def all_internal_parameters(self) -> list:
+    #     """Returns a sorted list of all internal parameters found in the config file"""
+    #     return sorted([item.split('.', 1)[1] for item in self.all_internal_parameters_with_level])
+    #
+    # @functools.cached_property
+    # def levels(self) -> list:
+    #     """Returns a sorted list of all levels found in the config file"""
+    #     return sorted(set([item.split('.', 1)[0] for item in self.all_internal_parameters_with_level]))
 
     def get_mapper(self, import_column: str) -> ImportMatrixMapper:
         """Returns a mapper object for the given institute. Creates it if not found"""
@@ -129,5 +134,9 @@ class ImportMatrixConfig:
     def get(self, import_column: str, external_par: str) -> str:
         """Returns the internal parameter name for the given institute and external parameter name"""
         return self.get_mapper(import_column).get_internal_name(external_par)
+
+    def get_columns_by_level(self) -> dict[str, list[str]]:
+        """Returns a dict with levels as key and a list och corresponding variables as value"""
+        return self._columns_by_level
 
 

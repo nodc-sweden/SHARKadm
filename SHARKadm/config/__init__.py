@@ -69,7 +69,7 @@ def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = Non
 
 
 @functools.cache
-def get_sharkadm_id_handler(config_directory: str | pathlib.Path = None):
+def get_custom_id_handler(config_directory: str | pathlib.Path = None):
     config_directory = config_directory or adm_config_paths('ids')
     return CustomIdsHandler(config_directory)
 
@@ -100,5 +100,5 @@ def get_valid_data_types(valid: list[str] | None = None,
 if __name__ == '__main__':
     data = {}
     lev = 'visit'
-    h = get_sharkadm_id_handler()
+    h = get_custom_id_handler()
     lh = h.get_level_handler('phytoplankton', 'visit')

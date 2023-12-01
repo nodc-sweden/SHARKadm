@@ -50,9 +50,6 @@ class Exporter(ABC):
         return f'Applying exporter: {self.__class__.__name__}'
     
     def export(self, data_holder: DataHolderProtocol) -> None:
-        print('='*100)
-        print('='*100)
-        print('='*100)
         if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,
                                                                             invalid=self.invalid_data_types):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for exporter {self.__class__.__name__}')
