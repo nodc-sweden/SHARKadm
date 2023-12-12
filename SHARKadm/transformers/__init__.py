@@ -6,8 +6,9 @@ from SHARKadm import utils
 from .base import Transformer
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
-from .row import AddRowNumber
+from .copy_variable import CopyVariable
 from .cruise import AddCruiseId
+from .custom_id import AddCustomId
 from .datatype import AddDatatype
 from .date_time import AddDateAndTimeToAllLevels
 from .date_time import AddDatetime
@@ -17,32 +18,35 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
+from .dyntaxa import AddDyntaxaId
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
+from .laboratory import AddEnglishAnalyticalLaboratory
+from .laboratory import AddEnglishSampleOrderer
+from .laboratory import AddEnglishSamplingLaboratory
+from .laboratory import AddSwedishAnalyticalLaboratory
+from .laboratory import AddSwedishSampleOrderer
+from .laboratory import AddSwedishSamplingLaboratory
 from .lims import MoveLessThanFlag
 from .lims import RemoveNonDataLines
-# from .laboratory import AddEnglishSampleOrderer
-# from .laboratory import AddEnglishSamplingLaboratory
-# from .laboratory import AddSwedishSampleOrderer
-# from .laboratory import AddSwedishSamplingLaboratory
 from .map_header import ArchiveMapper
 from .map_header import PhysicalChemicalMapper
 from .position import AddPositionDD
 from .position import AddPositionDM
+from .position import AddPositionSweref99tm
 from .position import AddPositionToAllLevels
+from .project_code import AddEnglishProjectName
+from .project_code import AddSwedishProjectName
 from .qc import AddColumnsForAutomaticQC
-# from .project_code import AddEnglishProjectName
-# from .project_code import AddSwedishProjectName
 from .replace_comma_with_dot import ReplaceCommaWithDot
+from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificName
-from .custom_id import AddCustomId
 from .shark_id import AddSharkId
 from .station import AddStationInfo
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .dyntaxa import AddDyntaxaId
 
 
 @functools.cache

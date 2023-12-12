@@ -9,6 +9,8 @@ from SHARKadm import adm_logger
 
 
 class PhysicalChemicalMapper(Transformer):
+    valid_data_types = ['physicalchemical']
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._mapper = config.get_physical_chemical_mapper()
@@ -25,6 +27,8 @@ class PhysicalChemicalMapper(Transformer):
 
 
 class ArchiveMapper(Transformer):
+    valid_data_holders = archive.get_archive_data_holder_names()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

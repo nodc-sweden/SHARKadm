@@ -39,8 +39,8 @@ class AddStationInfo(Transformer):
             elif reported_station != translated_station_name:
                 adm_logger.log_transformation(f'Station name translated: {reported_station} -> {translated_station_name}', level='warning')
             data_holder.data.at[i, 'station_name'] = info['STATION_NAME']
-            data_holder.data.at[i, 'station_id'] = info['REG_ID']
-            data_holder.data.at[i, 'sample_location_id'] = info['REG_ID_GROUP']
+            data_holder.data.at[i, 'station_id'] = info['REG_ID_GROUP']
+            data_holder.data.at[i, 'sample_location_id'] = info['REG_ID']
 
         # data_holder.data['station_name'], data_holder.data['station_name'], data_holder.data['station_name'] = \
         #     data_holder.data.map(self._translate)
