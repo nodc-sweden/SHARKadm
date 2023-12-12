@@ -1,4 +1,5 @@
 import numpy as np
+import pyproj
 
 
 def decdeg_to_decmin(pos: float | str, nr_decimals: int | None = 2, with_space: bool = False):
@@ -26,3 +27,9 @@ def decmin_to_decdeg(pos: str, nr_decimals: int | None = 2):
         output = np.round(output, nr_decimals)
 
     return str(output)
+
+
+def decdeg_to_sweref99tm(lat: float, lon: float) -> (float, float):
+    pp = pyproj.Proj(proj='utm', zone=33, ellps='WGS84', preserve_units=False)
+    x, y = pp(lon, lat)
+    return x, y
