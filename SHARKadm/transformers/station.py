@@ -42,22 +42,29 @@ class AddStationInfo(Transformer):
             data_holder.data.at[i, 'station_id'] = info['REG_ID_GROUP']
             data_holder.data.at[i, 'sample_location_id'] = info['REG_ID']
 
-        # data_holder.data['station_name'], data_holder.data['station_name'], data_holder.data['station_name'] = \
-        #     data_holder.data.map(self._translate)
-
     def _create_columns_if_missing(self, data_holder: DataHolderProtocol) -> None:
         for col in self.columns_to_set:
             if col not in data_holder.data.columns:
                 adm_logger.log_transformation(f'Adding column {col}', level='info')
                 data_holder.data[col] = ''
 
-        # data_holder.data['station_name'] = data_holder.data.apply(lambda x: self._stations.get_station_name(
-        #     data_holder.data['reported_station_name']))
-        #
-        # data_holder.data['sample_location_id'] = data_holder.data.apply(lambda x: self._stations.get_translation(
-        #     data_holder.data['reported_station_name'], 'REG_ID'))
-        #
-        # data_holder.data['station_id'] = data_holder.data.apply(lambda x: self._stations.get_translation(
-        #     data_holder.data['reported_station_name'], 'REG_ID_GROUP'))
+
+class AddStationVissEuId(Transformer):
+    column_to_set = 'station_viss_eu_id'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._stations = get_station_object()
+        self._cached_ids = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds station EU_CD to data'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.column_to_set] = data_holder.data['station_name'].apply(self._get_eu_cd)
+
+    def _get_eu_cd(self, x: str) -> str:
+        return self._cached_ids.setdefault(x, self._stations.get_eu_cd_for_station_name(x))
 
 

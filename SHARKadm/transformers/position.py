@@ -4,7 +4,7 @@ import pandas as pd
 
 from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
-from SHARKadm.utils import position
+from SHARKadm.utils import geography
 
 
 class AddPositionToAllLevels(Transformer):
@@ -90,7 +90,7 @@ class AddPositionDM(Transformer):
         pos = pos.replace(' ', '')
         parts = pos.split('.')
         if len(parts[0]) == 2:
-            pos = self._cached_pos.setdefault(pos, position.decdeg_to_decmin(pos, nr_decimals=None))
+            pos = self._cached_pos.setdefault(pos, geography.decdeg_to_decmin(pos, nr_decimals=None))
         pos = f'{pos[:2]} {pos[2:]}'
         return pos[:8]
 
@@ -131,7 +131,7 @@ class AddPositionDD(Transformer):
         pos = pos.replace(' ', '')
         parts = pos.split('.')
         if len(parts[0]) == 4:
-            pos = self._cached_pos.setdefault(pos, position.decmin_to_decdeg(pos, nr_decimals=None))
+            pos = self._cached_pos.setdefault(pos, geography.decmin_to_decdeg(pos, nr_decimals=None))
         return pos[:8]
 
 
@@ -154,6 +154,6 @@ class AddPositionSweref99tm(Transformer):
     def _get_pos(self, row: dict) -> dict:
         lat, lon = row[self.lat_source_col], row[self.lon_source_col]
         row[self.x_column_to_set], row[self.y_column_to_set] = \
-            self._cached_pos.setdefault((lat, lon), position.decdeg_to_sweref99tm(lat=lat, lon=lon))
+            self._cached_pos.setdefault((lat, lon), geography.decdeg_to_sweref99tm(lat=lat, lon=lon))
         return row
 

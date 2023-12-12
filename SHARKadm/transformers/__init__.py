@@ -45,6 +45,7 @@ from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificName
 from .shark_id import AddSharkId
 from .station import AddStationInfo
+from .station import AddStationVissEuId
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
