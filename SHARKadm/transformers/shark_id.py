@@ -10,6 +10,7 @@ class AddSharkId(Transformer):
     def __init__(self, add_md5: bool = True):
         super().__init__()
         self._add_md5 = add_md5
+        self._cached_md5 = {}
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -41,8 +42,7 @@ class AddSharkId(Transformer):
             parts.append(row[col].replace('/', '_'))
         return '_'.join(parts)
 
-    @staticmethod
-    def get_md5(x) -> str:
-        return hashlib.md5(x.encode('utf-8')).hexdigest()
+    def get_md5(self, x) -> str:
+        return self._cached_md5.setdefault(x, hashlib.md5(x.encode('utf-8')).hexdigest())
 
 
