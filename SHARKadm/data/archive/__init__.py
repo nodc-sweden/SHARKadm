@@ -7,6 +7,7 @@ from .epibenthos import EpibenthosMartransArchiveDataHolder
 from .pythonplankton import PhytoplanktonArchiveDataHolder
 from .zoobenthos import ZoobenthosArchiveSkvDataHolder
 from .delivery_note import DeliveryNote
+from SHARKadm import utils
 
 object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
 
@@ -28,3 +29,8 @@ def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, F
             if name == 'delivery_note.txt':
                 return pathlib.Path(root, name).parent.parent
     return False
+
+
+def get_archive_data_holder_names() -> list[str]:
+    return utils.get_all_class_children_names(ArchiveDataHolder)
+
