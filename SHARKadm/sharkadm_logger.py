@@ -7,6 +7,11 @@ logger = logging.getLogger(__name__)
 
 class SHARKadmLogger:
     """Class to log events etc. in the SHARKadm dataflow"""
+    DEBUG = 'debug'
+    INFO = 'info'
+    WARNING = 'warning'
+    ERROR = 'error'
+
     def __init__(self):
         self._levels: list[str] = [
             'debug',
@@ -18,7 +23,7 @@ class SHARKadmLogger:
         self._transformations: dict = dict()
         self._validations: dict = dict()
         self._exports: dict = dict()
-        self._workflow: list = list()
+        self._workflow: dict = dict()
 
         self._initiate_log()
 
@@ -26,7 +31,7 @@ class SHARKadmLogger:
         """Initiate the log"""
         self._transformations: dict = dict((lev, {}) for lev in self._levels)
         self._validations: dict = dict((lev, {}) for lev in self._levels)
-        self._workflow: list = list()
+        self._workflow: dict = dict((lev, {}) for lev in self._levels)
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -36,8 +41,10 @@ class SHARKadmLogger:
             raise KeyError(msg)
         return level
 
-    def log_workflow(self, msg: str) -> None:
-        self._workflow.append(msg)
+    def log_workflow(self, msg: str, level: str = 'info') -> None:
+        level = self._check_level(level)
+        self._workflow[level].setdefault(msg, 0)
+        self._workflow[level][msg] += 1
         event.post_event('workflow', msg)
 
     def log_transformation(self, msg: str, level: str = 'info') -> None:
