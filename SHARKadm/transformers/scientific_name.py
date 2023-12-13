@@ -2,7 +2,7 @@ import pandas as pd
 from SHARKadm import adm_logger
 
 from .base import Transformer, DataHolderProtocol
-from micro.dyntaxa import get_translate_dyntaxa_object
+from dyntaxa import get_translate_dyntaxa_object
 
 
 class AddReportedScientificName(Transformer):

@@ -1,5 +1,5 @@
 from SHARKadm import adm_logger
-from micro.translate_codes import get_translate_codes_object
+from translate_codes import get_translate_codes_object
 from .base import Transformer, DataHolderProtocol
 
 

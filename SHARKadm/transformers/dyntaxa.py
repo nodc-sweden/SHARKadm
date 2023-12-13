@@ -1,6 +1,6 @@
 import pandas as pd
 from SHARKadm import adm_logger
-from micro import dyntaxa
+import dyntaxa
 import polars as pl
 
 from .base import Transformer, DataHolderProtocol
