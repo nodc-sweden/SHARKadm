@@ -29,6 +29,13 @@ from .laboratory import AddSwedishSampleOrderer
 from .laboratory import AddSwedishSamplingLaboratory
 from .lims import MoveLessThanFlag
 from .lims import RemoveNonDataLines
+from .location import AddLocationCounty
+from .location import AddLocationHelcomOsparArea
+from .location import AddLocationMunicipality
+from .location import AddLocationNation
+from .location import AddLocationSeaBasin
+from .location import AddLocationTypeArea
+from .location import AddLocationWaterDistrict
 from .map_header import ArchiveMapper
 from .map_header import PhysicalChemicalMapper
 from .position import AddPositionDD
