@@ -11,6 +11,9 @@ else:
 
 LOCAL_CONFIG_ROOT_DIR = THIS_DIR.parent / 'CONFIG_FILES'
 
+if not LOCAL_CONFIG_ROOT_DIR.exists():
+    LOCAL_CONFIG_ROOT_DIR = THIS_DIR / 'CONFIG_FILES'
+
 
 class ConfigPaths:
 
