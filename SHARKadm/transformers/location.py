@@ -14,6 +14,12 @@ class _AddLocationBase(Transformer):
         return ''
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.x_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Missing column {self.x_pos_col}. Cannot add column {self.col_to_set}')
+            return
+        if self.y_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Missing column {self.y_pos_col}. Cannot add column {self.col_to_set}')
+            return
         data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._get_code(row), axis=1)
 
     def _get_code(self, row):
