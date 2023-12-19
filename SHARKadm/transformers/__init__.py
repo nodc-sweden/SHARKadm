@@ -55,6 +55,7 @@ from .station import AddStationInfo
 from .station import AddStationVissEuId
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
+from .aphia import AddAphiaId
 
 
 @functools.cache
