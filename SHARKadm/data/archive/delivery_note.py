@@ -19,6 +19,12 @@ class DeliveryNote:
         self._data_format = data.pop('data_format', None)
         self._import_matrix_key = data.pop('import_matrix_key', None)
 
+    def __str__(self):
+        lst = []
+        for key, value in self._data.items():
+            lst.append(f'{key}: {value}')
+        return '\n'.join(lst)
+
     def __getitem__(self, item: str) -> str:
         return self._data[item]
 
@@ -125,3 +131,7 @@ class DeliveryNote:
     @property
     def date_reported(self):
         return datetime.datetime.strptime(self['rapporteringsdatum'], '%Y-%m-%d')
+
+    @property
+    def reporting_institute(self):
+        return self['rapporterande institut']

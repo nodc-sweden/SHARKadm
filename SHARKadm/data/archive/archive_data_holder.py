@@ -64,6 +64,10 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self._dataset_name
 
     @property
+    def reporting_institute(self) -> str:
+        return self._delivery_note.reporting_institute
+
+    @property
     def archive_root_directory(self) -> pathlib.Path:
         return self._archive_root_directory
 
