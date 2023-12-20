@@ -10,6 +10,7 @@ from .columns import AddDEPHqcColumn
 from .copy_variable import CopyVariable
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
+from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
 from .date_time import AddDateAndTimeToAllLevels
 from .date_time import AddDatetime
@@ -18,11 +19,11 @@ from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
-from .dyntaxa_id import AddDyntaxaId
-from .dyntaxa_id import AddDyntaxaId
+from .dyntaxa import AddDyntaxaId
+from .dyntaxa import AddDyntaxaId
+from .dyntaxa import AddDyntaxaScientificName
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
-from .static_internet_access import AddStaticInternetAccessInfo
 from .laboratory import AddEnglishAnalyticalLaboratory
 from .laboratory import AddEnglishSamplingLaboratory
 from .laboratory import AddSwedishAnalyticalLaboratory
@@ -53,15 +54,15 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .scientific_name import AddReportedScientificName
-from .scientific_name import AddScientificNameTranslatedWithDyntaxa
+from .scientific_name import AddScientificName
 from .shark_id import AddSharkId
+from .static_data_holding_center import AddStaticDataHoldingCenter
+from .static_internet_access import AddStaticInternetAccessInfo
+from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
 from .station import AddStationVissEuId
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .static_internet_access import AddStaticInternetAccessInfo
-from .static_data_holding_center import AddStaticDataHoldingCenter
-from .dataset_name import AddDatasetName
 
 
 @functools.cache

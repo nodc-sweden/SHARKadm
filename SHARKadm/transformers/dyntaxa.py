@@ -1,9 +1,46 @@
 import pandas as pd
 from SHARKadm import adm_logger
-import dyntaxa
 import polars as pl
 
 from .base import Transformer, DataHolderProtocol
+
+import dyntaxa
+
+
+class AddDyntaxaScientificName(Transformer):
+    col_to_set = 'dyntaxa_scientific_name'
+    source_col = 'reported_scientific_name'
+    translate_dyntaxa = dyntaxa.get_translate_dyntaxa_object()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds scientific_name translated from dyntaxa.'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Adding column {self.col_to_set} in {self.__class__.__name__}',
+                                          level='debug')
+            data_holder.data[self.col_to_set] = ''
+        elif all(data_holder.data[self.col_to_set]):
+            adm_logger.log_transformation(f'All {self.col_to_set} reported. Will skip {self.__class__.__name__}.')
+            return
+        data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._add(row), axis=1)
+
+    def _add(self, row: pd.Series) -> str:
+        current_name = row[self.col_to_set].strip()
+        source_name = row[self.source_col].strip()
+        new_name = self.translate_dyntaxa.get(source_name)
+        if new_name:
+            if not current_name:
+                adm_logger.log_transformation(f'Translated: {source_name} -> {new_name}')
+            elif current_name != new_name:
+                adm_logger.log_transformation(f'Translated: {source_name} -> {new_name}. Replacing: {current_name}')
+            return new_name
+        else:
+            if current_name and current_name != source_name:
+                adm_logger.log_transformation(f'No translation and {source_name} ({self.source_col}) is not the '
+                                              f'same as {current_name} ({self.col_to_set})')
+            return source_name
 
 
 class AddDyntaxaId(Transformer):
