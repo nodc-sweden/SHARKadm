@@ -3,6 +3,7 @@ import pathlib
 from typing import Type
 
 from SHARKadm import utils
+from .aphia import AddAphiaId
 from .base import Transformer
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
@@ -17,15 +18,14 @@ from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
-from .dyntaxa import AddDyntaxaId
-from .dyntaxa import AddDyntaxaId
+from .dyntaxa_id import AddDyntaxaId
+from .dyntaxa_id import AddDyntaxaId
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
+from .static_internet_access import AddStaticInternetAccessInfo
 from .laboratory import AddEnglishAnalyticalLaboratory
-from .laboratory import AddEnglishSampleOrderer
 from .laboratory import AddEnglishSamplingLaboratory
 from .laboratory import AddSwedishAnalyticalLaboratory
-from .laboratory import AddSwedishSampleOrderer
 from .laboratory import AddSwedishSamplingLaboratory
 from .lims import MoveLessThanFlag
 from .lims import RemoveNonDataLines
@@ -38,6 +38,8 @@ from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
 from .map_header import ArchiveMapper
 from .map_header import PhysicalChemicalMapper
+from .orderer import AddEnglishSampleOrderer
+from .orderer import AddSwedishSampleOrderer
 from .position import AddPositionDD
 from .position import AddPositionDM
 from .position import AddPositionSweref99tm
@@ -46,16 +48,20 @@ from .project_code import AddEnglishProjectName
 from .project_code import AddSwedishProjectName
 from .qc import AddColumnsForAutomaticQC
 from .replace_comma_with_dot import ReplaceCommaWithDot
+from .reporting_institute import AddEnglishReportingInstitute
+from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .scientific_name import AddReportedScientificName
-from .scientific_name import AddScientificName
+from .scientific_name import AddScientificNameTranslatedWithDyntaxa
 from .shark_id import AddSharkId
 from .station import AddStationInfo
 from .station import AddStationVissEuId
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .aphia import AddAphiaId
+from .static_internet_access import AddStaticInternetAccessInfo
+from .static_data_holding_center import AddStaticDataHoldingCenter
+from .dataset_name import AddDatasetName
 
 
 @functools.cache

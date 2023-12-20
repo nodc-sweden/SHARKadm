@@ -37,7 +37,7 @@ class AddReportedScientificName(Transformer):
         return row[self.col_to_set]
 
 
-class AddScientificName(Transformer):
+class AddScientificNameTranslatedWithDyntaxa(Transformer):
     col_to_set = 'scientific_name'
     source_col = 'reported_scientific_name'
     translate_dyntaxa = get_translate_dyntaxa_object()
