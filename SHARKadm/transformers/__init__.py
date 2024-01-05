@@ -63,6 +63,8 @@ from .station import AddStationInfo
 from .station import AddStationVissEuId
 from .visit import AddVisitKey
 from ..utils.inspect_kwargs import get_kwargs_for_class
+from .arithmetic import Multiply
+from .arithmetic import Divide
 
 
 @functools.cache

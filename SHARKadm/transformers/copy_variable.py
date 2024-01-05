@@ -34,8 +34,9 @@ class CopyVariable(Transformer):
         data_holder.data['unit'] = data_holder.data['parameter'].apply(self._fix_unit)
         data_holder.data['parameter'] = data_holder.data['parameter'].apply(self._fix_parameter)
 
-    def _fix_unit(self, x):
+    def _fix_unit(self, x) -> str:
         return x.split('.')[-1]
 
-    def _fix_parameter(self, x):
+    def _fix_parameter(self, x) -> str:
+        # return x.replace('COPY_VARIABLE', '')
         return x.split('.')[1]
