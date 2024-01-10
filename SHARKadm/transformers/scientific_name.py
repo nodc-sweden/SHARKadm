@@ -37,8 +37,8 @@ class AddReportedScientificName(Transformer):
 
 
 class AddScientificName(Transformer):
-    source_col = 'dyntaxa_scientific_name'
     col_to_set = 'scientific_name'
+    source_col = 'dyntaxa_scientific_name'
 
     @staticmethod
     def get_transformer_description() -> str:

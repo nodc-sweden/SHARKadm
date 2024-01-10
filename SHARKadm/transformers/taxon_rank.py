@@ -8,7 +8,8 @@ import dyntaxa
 
 
 class AddTaxonRanks(Transformer):
-    cols_to_set = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+    ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+    cols_to_set = [f'taxon_{rank}' for rank in ranks]
     source_col = 'dyntaxa_scientific_name'
     dyntaxa_taxon = dyntaxa.get_dyntaxa_taxon_object()
 
@@ -21,12 +22,15 @@ class AddTaxonRanks(Transformer):
             data_holder.data[col] = ''
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        self._add_columns()
+        self._add_columns(data_holder=data_holder)
         unique_scientific_names = data_holder.data[self.source_col].unique()
         for name in unique_scientific_names:
             info = self.dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus='accepted')
-            for col in self.cols_to_set:
-                value = info[col] or ''
+            if not info:
+                adm_logger.log_transformation(f'Could not add information about taxon rank: {name}')
+                continue
+            for rank, col in zip(self.ranks, self.cols_to_set):
+                value = info.get(rank, '')
                 data_holder.data.loc[data_holder.data[self.source_col] == name, col] = value
 
 
