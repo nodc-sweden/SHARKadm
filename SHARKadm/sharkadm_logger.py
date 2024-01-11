@@ -31,6 +31,173 @@ class SHARKadmLogger:
     WARNING = 'warning'
     ERROR = 'error'
 
+    VALIDATION = 'validation'
+    TRANSFORMATION = 'transformation'
+    EXPORT = 'export'
+
+    WORKFLOW = 'workflow'
+
+    _levels = [
+        DEBUG,
+        INFO,
+        WARNING,
+        ERROR
+    ]
+
+    _log_types = [
+        VALIDATION,
+        TRANSFORMATION,
+        EXPORT
+    ]
+
+    _data = dict()
+
+    def __init__(self):
+
+        self._transformations: dict = dict()
+        self._validations: dict = dict()
+        self._exports: dict = dict()
+        self._workflow: list = list()
+
+        self._initiate_log()
+
+    def _initiate_log(self) -> None:
+        """Initiate the log"""
+        self._data = dict((lev, {}) for lev in self._levels)
+
+    def _check_level(self, level: str) -> str:
+        level = level.lower()
+        if level not in self._levels:
+            msg = f'Invalid level: {level}'
+            logger.error(msg)
+            raise KeyError(msg)
+        return level
+
+    def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+        self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
+        # time_str = str(datetime.datetime.now())
+        # self._workflow.append((time_str, msg))
+        # event.post_event('workflow', msg)
+
+    def log_transformation(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, add=add)
+        # level = self._check_level(level)
+        # self._transformations[level].setdefault(msg, 0)
+        # self._transformations[level][msg] += 1
+
+    def log_validation(self, msg: str, level: str = 'info', add: str | None = None, data_row: str | int | None = None) -> None:
+        self.log(log_type=self.VALIDATION, msg=msg, level=level, add=add, data_row=data_row)
+        # level = self._check_level(level)
+        # self._validations[level].setdefault(msg, 0)
+        # self._validations[level][msg] += 1
+
+    def log_exports(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+        self.log(log_type=self.EXPORT, msg=msg, level=level, add=add)
+        # level = self._check_level(level)
+        # self._exports[level].setdefault(msg, 0)
+        # self._exports[level][msg] += 1
+
+    def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
+        level = self._check_level(level)
+        self._data[level].setdefault(log_type, dict())
+        self._data[level][log_type].setdefault(msg, dict(count=0, items=[]))
+        # self._data[level].setdefault(msg, 0)
+        self._data[level][log_type][msg]['count'] += 1
+        item = []
+        if add:
+            item.append(add)
+        if kwargs.get('data_row'):
+            item.append(f"at row {kwargs.get('data_row')}")
+        if item:
+            self._data[level][log_type][msg]['items'].append(' '.join(item))
+
+    def reset_log(self) -> None:
+        """Resets all entries to the log"""
+        logger.info(f'Resetting {self.__class__.__name__}')
+        self._initiate_log()
+
+    def get_filtered_data(self,
+                          log_types: str | list | None = None,
+                          levels: str | list | None = None,
+                          in_msg: str | None = None,
+                          ) -> dict:
+        if type(log_types) == str:
+            log_types = [log_types]
+        if type(levels) == str:
+            levels = [levels]
+        log_types = log_types or self._log_types
+        levels = levels or self._levels
+        filtered_data = dict()
+        for level_name, level_data in self._data.items():
+            if level_name not in levels:
+                continue
+            for log_type_name, log_type_data in level_data.items():
+                if log_type_name not in log_types:
+                    continue
+                if in_msg:
+                    for msg, msg_data in log_type_data.items():
+                        if in_msg and in_msg.lower() not in msg.lower():
+                            continue
+                        filtered_data.setdefault(level_name, dict())
+                        filtered_data[level_name].setdefault(log_type_name, dict())
+                        filtered_data[level_name][log_type_name][msg] = msg_data
+                else:
+                    filtered_data.setdefault(level_name, dict())
+                    filtered_data[level_name][log_type_name] = log_type_data
+        return filtered_data
+
+    def get_log_info(self,
+                     log_types: str | None = None,
+                     levels: str | list | None = None,
+                     ) -> dict:
+        if type(log_types) == str:
+            log_types = [log_types]
+        if type(levels) == str:
+            levels = [levels]
+        log_types = log_types or []
+        levels = levels or []
+        info = dict()
+        info['validations'] = self._validations
+        info['transformations'] = self._transformations
+        info['exports'] = self._exports
+        info['workflow'] = self._workflow
+
+        return info
+
+    def get_log_as_text(self):
+        length = 120
+        lines = []
+        lines.append('=' * length)
+        lines.append('SHARKadm log')
+        lines.append('-'*length)
+        info = self.get_log_info()
+        for operator_name, operator_data in info.items():
+            lines.append('')
+            lines.append(operator_name)
+            lines.append('-' * length)
+            if operator_name == 'workflow':
+                for item in operator_data:
+                    lines.append(f'{item[0]}: {item[1]}')
+            else:
+                for level, data in operator_data.items():
+                    lines.append(f'   {level}')
+                    for item in data:
+                        lines.append(f'      {item}')
+            lines.append('.' * length)
+            lines.append('')
+        return '\n'.join(lines)
+
+    def print_log(self):
+        print(self.get_log_as_text())
+
+
+class old_SHARKadmLogger:
+    """Class to log events etc. in the SHARKadm data model"""
+    DEBUG = 'debug'
+    INFO = 'info'
+    WARNING = 'warning'
+    ERROR = 'error'
+
     def __init__(self):
         self._levels: list[str] = [
             'debug',
@@ -441,6 +608,7 @@ class SHARKadmLoggerDict:
     def _add_to_log(self, **kwargs):
         kw = self._filter_kwargs(**kwargs)
         key = self._get_log_key(**kw)
+        print(f'{key=}')
         self._data.setdefault(key, self._log_template)
         self._data[key]['count'] += 1
         self._data[key]['timestamp'] = self._timestamp

@@ -42,7 +42,8 @@ class AddAphiaId(Transformer):
                 return current_aphia_id
 
         if not new_aphia_id:
-            adm_logger.log_transformation(f'No AphiaID found for {source_name}', level=adm_logger.WARNING)
+            # adm_logger.log_transformation(f'No AphiaID found for {source_name}', level=adm_logger.WARNING)
+            adm_logger.log_transformation(f'No AphiaID found', level=adm_logger.WARNING, add=source_name)
             return ''
 
         adm_logger.log_transformation(f'Addding AphiaID {new_aphia_id} translated from {source_name}')

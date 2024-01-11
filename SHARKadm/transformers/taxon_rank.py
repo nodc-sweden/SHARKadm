@@ -27,7 +27,7 @@ class AddTaxonRanks(Transformer):
         for name in unique_scientific_names:
             info = self.dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus='accepted')
             if not info:
-                adm_logger.log_transformation(f'Could not add information about taxon rank: {name}')
+                adm_logger.log_transformation(f'Could not add information about taxon rank', add=name)
                 continue
             for rank, col in zip(self.ranks, self.cols_to_set):
                 value = info.get(rank, '')
