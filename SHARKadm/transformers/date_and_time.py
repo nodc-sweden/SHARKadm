@@ -31,7 +31,7 @@ class AddDateAndTimeToAllLevels(Transformer):
             return row[par]
         for date_par in self.dates_to_sync:
             if row.get(date_par):
-                adm_logger.log_transformation(f'Added {par} from {date_par}')
+                adm_logger.log_transformation(f'Added {par} from {date_par}', level=adm_logger.INFO)
                 return row[date_par]
         return ''
 

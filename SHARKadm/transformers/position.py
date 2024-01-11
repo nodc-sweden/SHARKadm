@@ -30,17 +30,20 @@ class AddPositionToAllLevels(Transformer):
         return f'Adds position to all levels if not present'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        import time
+        t0 = time.time()
         for par in self.lat_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lat(p, row), axis=1)
         for par in self.lon_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lon(p, row), axis=1)
+        print(f'{time.time()-t0=}')
 
     def check_lat(self, par: str, row: pd.Series) -> str:
         if row.get(par):
             return row[par]
         for lat_par in self.lat_to_sync:
             if row.get(lat_par):
-                adm_logger.log_transformation(f'Added {par} from {lat_par}', level='info')
+                adm_logger.log_transformation(f'Added {par} from {lat_par}', level=adm_logger.INFO)
                 return row[lat_par]
         return ''
 
@@ -49,7 +52,7 @@ class AddPositionToAllLevels(Transformer):
             return row[par]
         for lon_par in self.lon_to_sync:
             if row.get(lon_par):
-                adm_logger.log_transformation(f'Added {par} from {lon_par}')
+                adm_logger.log_transformation(f'Added {par} from {lon_par}', level=adm_logger.INFO)
                 return row[lon_par]
         return ''
 
