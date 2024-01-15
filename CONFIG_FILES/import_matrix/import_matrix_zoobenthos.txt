@@ -20,7 +20,7 @@ sample.NOT_USED.taxon_datum	taxon.datum
 visit.wind_speed_ms	vindhastighet	WINSP
 visit.wave_height_m	vaghojd	WAVHT
 visit.wave_observation_code		WAVES
-visit.wave_observation_code		SEAST<or>WEATH
+visit.weather_observation_code		SEAST<or>WEATH
 visit.wind_direction_code	vindriktning	WINDR<or>WINDIR_CODE<or>WINDIR
 visit.air_temperature_degc		AIRTEMP
 visit.air_pressure_hpa		AIRPRES
