@@ -1,4 +1,5 @@
 import logging
+import pathlib
 
 from SHARKadm.data import data_source
 from .archive_data_holder import ArchiveDataHolder
@@ -28,9 +29,11 @@ class ZoobenthosArchiveSkvDataHolder(ArchiveDataHolder):
     def _load_file_paths(self) -> None:
         self._file_paths = dict()
         for path in self.processed_data_directory.iterdir():
+            if path.name == 'data.txt':
+                self._file_paths[path.stem] = path
+                return
             if path.suffix != '.skv':
-                continue
-            self._file_paths[path.stem] = path
+                self._file_paths[path.stem] = path
         # self._file_paths['station'] = self.processed_data_directory / 'station.skv'
         # self._file_paths['sample'] = self.processed_data_directory / 'sample.skv'
         # self._file_paths['abundance'] = self.processed_data_directory / 'abundance.skv'
@@ -44,13 +47,27 @@ class ZoobenthosArchiveSkvDataHolder(ArchiveDataHolder):
     def _load_single_data_file(self) -> None:
         path = self._file_paths['data']
         logger.info(f'Loading single data file: {path}')
-        d_source = data_source.SkvDataFile(path=path, data_type=self.delivery_note.data_type)
-        d_source.map_header(self.import_matrix_mapper)
+        # d_source = data_source.SkvDataFile(path=path, data_type=self.delivery_note.data_type)
+        # d_source.map_header(self.import_matrix_mapper)
+        if path.suffix == '.skv':
+            d_source = self._get_skv_data_source(path)
+        else:
+            d_source = self._get_txt_data_source(path)
         self._set_data_source(d_source)
 
     def _load_several_data_files(self) -> None:
         self._add_data_sources()
         self._merge_data()
+
+    def _get_skv_data_source(self, path: pathlib.Path):
+        d_source = data_source.SkvDataFile(path=path, data_type=self.delivery_note.data_type)
+        d_source.map_header(self.import_matrix_mapper)
+        return d_source
+
+    def _get_txt_data_source(self, path: pathlib.Path):
+        d_source = data_source.TxtRowFormatDataFile(path=path, data_type=self.delivery_note.data_type)
+        d_source.map_header(self.import_matrix_mapper)
+        return d_source
 
     def _add_data_sources(self) -> None:
         for name, path in self._file_paths.items():
