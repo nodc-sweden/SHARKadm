@@ -12,6 +12,8 @@ from SHARKadm.config import get_column_views_config
 
 
 class AddBvolScientificName(Transformer):
+    valid_data_types = ['Phytoplankton']
+
     col_to_set = 'bvol_scientific_name'
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
@@ -34,6 +36,8 @@ class AddBvolScientificName(Transformer):
 
 
 class AddBvolSizeClass(Transformer):
+    valid_data_types = ['Phytoplankton']
+
     col_to_set_name = 'bvol_scientific_name'
     col_to_set_size = 'bvol_size_class'
     # source_col = 'scientific_name'
@@ -63,6 +67,8 @@ class AddBvolSizeClass(Transformer):
 
 
 class AddBvolRefList(Transformer):
+    valid_data_types = ['Phytoplankton']
+
     col_to_set = 'bvol_ref_list'
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
@@ -87,6 +93,8 @@ class AddBvolRefList(Transformer):
 
 
 class AddBvolAphiaId(Transformer):
+    valid_data_types = ['Phytoplankton']
+
     col_to_set = 'bvol_aphia_id'
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
