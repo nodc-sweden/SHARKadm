@@ -35,8 +35,14 @@ class AddSharkId(Transformer):
 
     def _get_id(self, row: dict, dtype: str, cols: list[str]) -> str:
         """Returns the id based on the given data"""
+        # print()
+        # print(f'{row=}')
+        # print(f'{dtype=}')
+        # print(f'{cols=}')
         parts = [dtype]
         for col in cols:
+            # print(f'=== {col=}')
+            # print(f'- {row.get(col)=}')
             if not row.get(col):
                 continue
             parts.append(row[col].replace('/', '_'))

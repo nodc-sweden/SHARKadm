@@ -1,5 +1,6 @@
 from .base import Transformer, DataHolderProtocol
 import pandas as pd
+from SHARKadm import adm_logger
 
 
 class Divide(Transformer):
@@ -21,8 +22,17 @@ class Divide(Transformer):
 
     def _calculate(self, x: str, col: str) -> str:
         denominator = int(col.split('.')[-1])
-        fraction = float(x) / denominator
-        return str(fraction)
+        try:
+            if ',' in x:
+                x = x.replace(',', '.')
+                adm_logger.log_transformation('Can not divide. Probably a problem with comma in data. Consider adding '
+                                              'parameter to transformer.', level=adm_logger.INFO, add=col)
+            fraction = float(x) / denominator
+            return str(fraction)
+        except ValueError:
+            adm_logger.log_transformation('Can not divide. Probably a problem with comma in data. Consider adding '
+                                          'parameter to transformer.', level=adm_logger.WARNING, add=col)
+            return x
 
     def _fix_column_names(self, data_holder: DataHolderProtocol):
         new_column_names = [col.replace(self.key_word, '') for col in data_holder.data.columns]

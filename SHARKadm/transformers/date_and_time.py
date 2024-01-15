@@ -48,13 +48,13 @@ class AddDatetime(Transformer):
         data_holder.data['date_and_time'] = data_holder.data[self.date_source_column] + ' ' + data_holder.data[
             self.time_source_column]
         data_holder.data['datetime'] = data_holder.data['date_and_time'].apply(self.to_datetime)
-        data_holder.data.drop('date_and_time', axis=1, inplace=True)
+        # data_holder.data.drop('date_and_time', axis=1, inplace=True)
 
     @staticmethod
     def to_datetime(x: str) -> datetime.datetime:
         for form in DATETIME_FORMATS:
             try:
-                return datetime.datetime.strptime(x, form)
+                return datetime.datetime.strptime(x.strip(), form)
             except ValueError:
                 continue
 
