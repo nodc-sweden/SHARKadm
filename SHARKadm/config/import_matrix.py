@@ -85,7 +85,8 @@ class ImportMatrixConfig:
                     if not par_str:
                         continue
                     for par in par_str.split('<or>'):
-                        self._data[inst][par.split('.', 1)[-1]] = split_line[0].split('.', 1)[-1]
+                        # self._data[inst][par.split('.', 1)[-1]] = split_line[0].split('.', 1)[-1]
+                        self._data[inst][par] = split_line[0].split('.', 1)[-1]
 
     def _add_variable_to_level(self, item) -> None:
         level, column = item.split('.', 1)
