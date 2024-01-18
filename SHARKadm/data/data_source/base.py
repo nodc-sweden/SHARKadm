@@ -15,9 +15,6 @@ class ImportMapper(Protocol):
 
 
 class DataFile(ABC):
-    _data: pd.DataFrame = pd.DataFrame()
-    _original_header: list = []
-    _header_mapper: ImportMapper = None
 
     def __init__(self,
                  path: str | pathlib.Path = None,
@@ -27,10 +24,13 @@ class DataFile(ABC):
         self._path: pathlib.Path = pathlib.Path(path)
         self._data_type = data_type
         self._encoding: str = encoding
-        self._original_header: list = []
         self._data: pd.DataFrame = pd.DataFrame()
+        self._original_header: list = []
+        self._header_mapper: ImportMapper | None = None
+        self._mapped_columns = dict()
 
         self._load_file()
+        self._strip_column_names()
         self._add_source_to_data()
         self._save_original_header()
 
@@ -40,6 +40,9 @@ class DataFile(ABC):
     @abstractmethod
     def _load_file(self) -> None:
         ...
+
+    def _strip_column_names(self) -> None:
+        self._data.columns = [col.strip() for col in self._data.columns]
 
     def _add_source_to_data(self) -> None:
         self._data['source'] = self.source
@@ -62,9 +65,17 @@ class DataFile(ABC):
     def map_header(self, mapper: ImportMapper) -> None:
         mapped_header = []
         for item in self._original_header:
-            mapped_header.append(mapper.get_internal_name(item))
+            internal_name = mapper.get_internal_name(item)
+            self._mapped_columns[item] = internal_name
+            mapped_header.append(internal_name)
         self._data.columns = mapped_header
         self._header_mapper = mapper
+        print()
+        print()
+        print('-'*100)
+        for old, new in zip(self._original_header, self._data.columns):
+            print(f'{old} -> {new}')
+        print()
 
     def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
         """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
@@ -72,11 +83,15 @@ class DataFile(ABC):
             if new_column not in self._data.columns:
                 self._data[new_column] = self._data[col]
             else:
-                self._data[new_column] = self._data[new_column] + self._data[col]
+                self._data[new_column] = self._data[new_column] + ' <-> ' + self._data[col]
 
     @property
     def data(self) -> pd.DataFrame:
         return self.get_data()
+
+    @property
+    def mapped_columns(self) -> dict[str, str]:
+        return self._mapped_columns
 
     def get_data(self) -> pd.DataFrame:
         return self._data

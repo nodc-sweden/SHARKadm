@@ -98,6 +98,10 @@ class SHARKadmController:
     def data(self) -> pd.DataFrame:
         return self._data_holder.data
 
+    @property
+    def data_holder(self) -> DataHolder:
+        return self._data_holder
+
     def set_data_holder(self, data_holder: DataHolder) -> None:
         self._data_holder = data_holder
 

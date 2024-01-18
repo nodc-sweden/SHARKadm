@@ -6,6 +6,8 @@ import pandas as pd
 import logging
 
 from SHARKadm import config
+from SHARKadm import adm_logger
+from SHARKadm import sharkadm_exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +48,15 @@ class DeliveryNote:
                     data[key] = f'{data[key]} {line.strip()}'
                     continue
                 key, value = [item.strip() for item in line.split(':', 1)]
+                key = key.lstrip('- ')
                 data[key] = value
                 if key == 'format':
                     parts = [item.strip() for item in value.split(':')]
+                    print(f'{parts=}')
                     data['data_format'] = parts[0]
+                    if len(parts) == 1:
+                        msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
+                        raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
         return DeliveryNote(data)
 
@@ -101,6 +108,10 @@ class DeliveryNote:
     #                 parts = [item.strip() for item in value.split(':')]
     #                 self._data_format = parts[0]
     #                 self._import_matrix_key = parts[1]
+
+    @property
+    def data(self) -> dict[str, str]:
+        return self._data
 
     @property
     def data_type(self) -> str:

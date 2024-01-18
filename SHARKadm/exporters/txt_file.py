@@ -24,6 +24,10 @@ class TxtAsIs(Exporter):
     def export_file_path(self):
         return pathlib.Path(self._export_directory, self._export_file_name)
 
+    @property
+    def export_directory(self):
+        return self.export_file_path.parent
+
     @staticmethod
     def get_exporter_description() -> str:
         return 'Writes data "as is" to the specified file.'

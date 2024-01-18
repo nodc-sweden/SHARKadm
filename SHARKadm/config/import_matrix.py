@@ -1,6 +1,7 @@
 import functools
 import pathlib
 import logging
+from SHARKadm import adm_logger
 
 import yaml
 
@@ -28,12 +29,14 @@ class ImportMatrixMapper:
         return self._import_column
 
     def get_internal_name(self, external_par: str) -> str:
+        external_par = external_par.strip()
         if not self._data.get(external_par):
-            logger.warning(f'Could not map parameter "{external_par}" using mapping column "{self.import_column}" for data_type "{self.data_type}"')
+            adm_logger.log_workflow(f'Could not map parameter "{external_par}" using mapping column "{self.import_column}" for '
+                      f'data_type "{self.data_type}"')
             return external_par
         # return self._data[external_par].split('.', 1)[-1]
         # print(f' -  {external_par=} -> {self._data[external_par]=}')
-        return self._data[external_par]
+        return self._data[external_par].strip()
 
 
 class ImportMatrixConfig:

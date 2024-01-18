@@ -10,7 +10,10 @@ logger = logging.getLogger(__name__)
 
 class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the add_data_source method"""
-    _data = pd.DataFrame()
+
+    def __init__(self, *args, **kwargs):
+        self._data = pd.DataFrame()
+        self._data_sources: dict[str, DataFile] = dict()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -62,6 +65,13 @@ class DataHolder(ABC):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
+
+    @property
+    def mapped_columns(self) -> dict[str, str]:
+        mapped = dict()
+        for name, source in self._data_sources.items():
+            mapped.update(source.mapped_columns)
+        return mapped
 
 
 

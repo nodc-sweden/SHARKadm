@@ -5,7 +5,10 @@ from typing import Union
 from .archive_data_holder import ArchiveDataHolder
 from .epibenthos import EpibenthosMartransArchiveDataHolder
 from .pythonplankton import PhytoplanktonArchiveDataHolder
-from .zoobenthos import ZoobenthosArchiveSkvDataHolder
+from .zoobenthos import ZoobenthosArchiveDataHolder
+from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
+from .zoobenthos import ZoobenthosBedaArchiveDataHolder
+from .jellyfish import JellyfishArchiveDataHolder
 from .delivery_note import DeliveryNote
 from SHARKadm import utils
 

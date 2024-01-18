@@ -10,6 +10,9 @@ class ReplaceCommaWithDot(Transformer):
         'water_depth_m',
         '.*DIVIDE.*',
         '.*MULTIPLY.*',
+        '.*COPY_VARIABLE.*'
+        'sampled_volume.*',
+        'sampler_area.*'
     ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:

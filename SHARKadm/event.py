@@ -1,5 +1,6 @@
 subscribers = dict(
-    workflow={}
+    log=dict(),
+    workflow=dict()
 )
 
 
@@ -11,7 +12,7 @@ def get_events() -> list[str]:
     return sorted(subscribers)
 
 
-def subscribe(event: str, func, prio: int=50) -> None:
+def subscribe(event: str, func, prio: int = 50) -> None:
     if event not in subscribers:
         raise EventNotFound(event)
     subscribers[event].setdefault(prio, [])

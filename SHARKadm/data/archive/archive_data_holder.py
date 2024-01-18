@@ -21,7 +21,7 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     _date_str_format = '%Y-%m-%d'
 
-    def __init__(self, archive_root_directory: str | pathlib.Path = None):
+    def __init__(self, archive_root_directory: str | pathlib.Path = None, **kwargs):
         self._archive_root_directory = pathlib.Path(archive_root_directory)
 
         self._data: pd.DataFrame = pd.DataFrame()
@@ -55,9 +55,9 @@ class ArchiveDataHolder(DataHolder, ABC):
         # return self._data_type_mapper.get(self.data_format)
         return self._data_type
 
-    # @property
-    # def data_format(self) -> str:
-    #     return self._data_format
+    @property
+    def delivery_note(self) -> str:
+        return self._delivery_note
 
     @property
     def dataset_name(self) -> str:
@@ -84,7 +84,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self.processed_data_directory / 'delivery_note.txt'
 
     @property
-    def delivery_note(self) -> delivery_note.DeliveryNote:
+    def delivery_note(self):
         return self._delivery_note
 
     @property

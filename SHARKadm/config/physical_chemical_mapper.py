@@ -1,5 +1,6 @@
 import logging
 import pathlib
+from SHARKadm import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class PhysicalChemicalMapper:
         print('-'*100)
         print(f'{external_par=}')
         if not self._data.get(external_par):
-            logger.warning(f'Could not map parameter "{external_par}" using "{self.__class__.__name__}"')
+            adm_logger.log_workflow(f'Could not map parameter "{external_par}" using "{self.__class__.__name__}"')
             return external_par
         print(f"{self._data[external_par].split('.', 1)[-1]=}")
         return self._data[external_par].split('.', 1)[-1]

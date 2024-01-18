@@ -47,18 +47,13 @@ class SHARKadmLogger:
     _log_types = [
         VALIDATION,
         TRANSFORMATION,
-        EXPORT
+        EXPORT,
+        WORKFLOW
     ]
 
     _data = dict()
 
     def __init__(self):
-
-        self._transformations: dict = dict()
-        self._validations: dict = dict()
-        self._exports: dict = dict()
-        self._workflow: list = list()
-
         self._initiate_log()
 
     def _initiate_log(self) -> None:
@@ -77,7 +72,7 @@ class SHARKadmLogger:
         self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
         # time_str = str(datetime.datetime.now())
         # self._workflow.append((time_str, msg))
-        # event.post_event('workflow', msg)
+        event.post_event('workflow', msg)
 
     def log_transformation(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, add=add)
@@ -110,23 +105,54 @@ class SHARKadmLogger:
             item.append(f"at row {kwargs.get('data_row')}")
         if item:
             self._data[level][log_type][msg]['items'].append(' '.join(item))
+        event.post_event('log', msg)
 
     def reset_log(self) -> None:
         """Resets all entries to the log"""
         logger.info(f'Resetting {self.__class__.__name__}')
         self._initiate_log()
 
-    def get_filtered_data(self,
+    def _get_levels(self, *args: str, levels: str | list | None = None):
+        use_levels = []
+        for arg in args:
+            if arg.lower() in self._levels:
+                use_levels.append(arg.lower())
+        if type(levels) == str:
+            levels = [levels]
+        if levels:
+            use_levels = list(set(use_levels + levels))
+        use_levels = use_levels or self._levels
+        return use_levels
+
+    def _get_log_types(self, *args: str, log_types: str | list | None = None):
+        use_log_types = []
+        for arg in args:
+            if arg.lower() in self._log_types:
+                use_log_types.append(arg.lower())
+        if type(log_types) == str:
+            log_types = [log_types]
+        if log_types:
+            use_log_types = list(set(use_log_types + log_types))
+        use_log_types = use_log_types or self._log_types
+        return use_log_types
+
+    def _get_filtered_data(self,
+                          *args,
                           log_types: str | list | None = None,
                           levels: str | list | None = None,
                           in_msg: str | None = None,
+                          **kwargs
                           ) -> dict:
-        if type(log_types) == str:
-            log_types = [log_types]
-        if type(levels) == str:
-            levels = [levels]
-        log_types = log_types or self._log_types
-        levels = levels or self._levels
+        # if type(log_types) == str:
+        #     log_types = [log_types]
+        # if type(levels) == str:
+        #     levels = [levels]
+        # log_types = log_types or self._log_types
+        # levels = levels or self._levels
+
+        log_types = self._get_log_types(*args, log_types=log_types)
+        levels = self._get_levels(*args, levels=levels)
+
         filtered_data = dict()
         for level_name, level_data in self._data.items():
             if level_name not in levels:
@@ -134,6 +160,7 @@ class SHARKadmLogger:
             for log_type_name, log_type_data in level_data.items():
                 if log_type_name not in log_types:
                     continue
+
                 if in_msg:
                     for msg, msg_data in log_type_data.items():
                         if in_msg and in_msg.lower() not in msg.lower():
@@ -146,49 +173,61 @@ class SHARKadmLogger:
                     filtered_data[level_name][log_type_name] = log_type_data
         return filtered_data
 
-    def get_log_info(self,
-                     log_types: str | None = None,
-                     levels: str | list | None = None,
-                     ) -> dict:
-        if type(log_types) == str:
-            log_types = [log_types]
-        if type(levels) == str:
-            levels = [levels]
-        log_types = log_types or []
-        levels = levels or []
-        info = dict()
-        info['validations'] = self._validations
-        info['transformations'] = self._transformations
-        info['exports'] = self._exports
-        info['workflow'] = self._workflow
+    def get_log_lines(self, *args: str, include_items: bool = False, sort_log: bool = True, **kwargs) -> list[str]:
+        """
+        Option to filter data.
+        """
+        data = self._get_filtered_data(*args, **kwargs)
+        if sort_log:
+            lines = self._get_sorted_log_lines(data, include_items=include_items)
+        else:
+            lines = self._get_unsorted_log_lines(data, include_items=include_items)
+        return lines
 
-        return info
-
-    def get_log_as_text(self):
-        length = 120
+    def _get_sorted_log_lines(self, data: dict, **kwargs):
         lines = []
-        lines.append('=' * length)
-        lines.append('SHARKadm log')
-        lines.append('-'*length)
-        info = self.get_log_info()
-        for operator_name, operator_data in info.items():
-            lines.append('')
-            lines.append(operator_name)
-            lines.append('-' * length)
-            if operator_name == 'workflow':
-                for item in operator_data:
-                    lines.append(f'{item[0]}: {item[1]}')
-            else:
-                for level, data in operator_data.items():
-                    lines.append(f'   {level}')
-                    for item in data:
-                        lines.append(f'      {item}')
-            lines.append('.' * length)
-            lines.append('')
+        for level in sorted(data):
+            level_data = data[level]
+            for log_type in sorted(level_data):
+                log_type_data = level_data[log_type]
+                for msg in sorted(log_type_data):
+                    msg_data = log_type_data[msg]
+                    count = msg_data['count']
+                    items = msg_data['items']
+                    lines.append(self._get_log_line(level, log_type, msg, count))
+                    if kwargs.get('include_items'):
+                        for item in sorted(items):
+                            lines.append(self._get_log_item_line(item))
+        return lines
+
+    def _get_unsorted_log_lines(self, data: dict, **kwargs):
+        lines = []
+        for level, level_data in data.items():
+            for log_type, log_type_data in level_data.items():
+                for msg, msg_data in log_type_data.items():
+                    count = msg_data['count']
+                    items = msg_data['items']
+                    lines.append(self._get_log_line(level, log_type, msg, count))
+                    if kwargs.get('include_items'):
+                        for item in items:
+                            lines.append(self._get_log_item_line(item))
+        return lines
+
+    def _get_log_line(self, level, log_type, msg, count):
+        line = f'{level.upper()} - {log_type}: {msg}'
+        if count > 1:
+            line += f' ({count} times)'
+        return line
+
+    def _get_log_item_line(self, item):
+        return f'    {item}'
+
+    def get_log_text(self, *args: str, include_items: bool = False, **kwargs) -> str:
+        lines = self.get_log_lines(*args, include_items=include_items, **kwargs)
         return '\n'.join(lines)
 
-    def print_log(self):
-        print(self.get_log_as_text())
+    def print_log(self, *args: str, include_items: bool = False, **kwargs) -> None:
+        print(self.get_log_text(*args, include_items=include_items, **kwargs))
 
 
 class old_SHARKadmLogger:
