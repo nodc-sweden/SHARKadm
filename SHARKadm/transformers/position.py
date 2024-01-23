@@ -131,7 +131,7 @@ class AddPositionDD(Transformer):
         data_holder.data[self.lon_column_to_set] = data_holder.data[self.lon_source_col].apply(self._get_pos)
 
     def _get_pos(self, pos: str) -> str:
-        pos = pos.replace(' ', '')
+        pos = pos.replace(' ', '').lstrip('0')
         parts = pos.split('.')
         if len(parts[0]) == 4:
             pos = self._cached_pos.setdefault(pos, geography.decmin_to_decdeg(pos, nr_decimals=None))
