@@ -21,6 +21,9 @@ class Divide(Transformer):
         self._fix_column_names(data_holder=data_holder)
 
     def _calculate(self, x: str, col: str) -> str:
+        if not x:
+            adm_logger.log_transformation('Could not DIVIDE: missing value', add=col)
+            return ''
         denominator = int(col.split('.')[-1])
         try:
             if ',' in x:
@@ -57,6 +60,9 @@ class Multiply(Transformer):
         self._fix_column_names(data_holder=data_holder)
 
     def _calculate(self, x: str, col: str) -> str:
+        if not x:
+            adm_logger.log_transformation('Could not MULTIPLY: missing value', add=col)
+            return ''
         factor = int(col.split('.')[-1])
         product = float(x) * factor
         return str(product)
