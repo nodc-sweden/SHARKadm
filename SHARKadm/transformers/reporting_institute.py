@@ -61,6 +61,11 @@ class AddEnglishReportingInstitute(Transformer):
         return f'Adds reporting institute name in english'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if not data_holder.reporting_institute:
+            adm_logger.log_transformation(f'No "reporting institute" found. Setting empty string',
+                                          level=adm_logger.WARNING)
+            data_holder.data[self.col_to_set] = ''
+            return
         data_holder.data[self.col_to_set] = self._get_name(data_holder.reporting_institute)
 
     def _get_name(self, code):
