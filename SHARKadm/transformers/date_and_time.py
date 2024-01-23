@@ -45,7 +45,9 @@ class AddDatetime(Transformer):
         return 'Adds column datetime. Time is taken from sample_date'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['date_and_time'] = data_holder.data[self.date_source_column] + ' ' + data_holder.data[
+        data_holder.data['date_and_time'] = data_holder.data[self.date_source_column]
+        if self.time_source_column in data_holder.data.columns:
+            data_holder.data['date_and_time'] = data_holder.data['date_and_time'] + ' ' + data_holder.data[
             self.time_source_column]
         data_holder.data['datetime'] = data_holder.data['date_and_time'].apply(self.to_datetime)
         # data_holder.data.drop('date_and_time', axis=1, inplace=True)
