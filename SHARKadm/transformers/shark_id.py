@@ -1,3 +1,5 @@
+import pandas as pd
+
 from SHARKadm import config
 from .base import Transformer, DataHolderProtocol
 
@@ -33,7 +35,7 @@ class AddSharkId(Transformer):
                 col_name_md5 = f'{col_name}_md5'
                 data_holder.data[col_name_md5] = data_holder.data[col_name].apply(self.get_md5)
 
-    def _get_id(self, row: dict, dtype: str, cols: list[str]) -> str:
+    def _get_id(self, row: pd.Series, dtype: str, cols: list[str]) -> str:
         """Returns the id based on the given data"""
         # print()
         # print(f'{row=}')
@@ -41,6 +43,11 @@ class AddSharkId(Transformer):
         # print(f'{cols=}')
         parts = [dtype]
         for col in cols:
+            # print('='*100)
+            # print('='*100)
+            # print(f'=== {type(row)=}')
+            # cols = [col for col in row.keys() if 'water' in col]
+            # print(f'=== {cols=}')
             # print(f'=== {col=}')
             # print(f'- {row.get(col)=}')
             if not row.get(col):

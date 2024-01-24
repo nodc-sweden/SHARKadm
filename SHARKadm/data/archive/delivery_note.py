@@ -18,8 +18,8 @@ class DeliveryNote:
     def __init__(self, data: dict) -> None:
         self._data = data
         self._path = data.pop('path', None)
-        self._data_format = data.pop('data_format', None)
-        self._import_matrix_key = data.pop('import_matrix_key', None)
+        self._data_format = data.get('data_format', None)
+        self._import_matrix_key = data.get('import_matrix_key', None)
 
     def __str__(self):
         lst = []
@@ -28,7 +28,7 @@ class DeliveryNote:
         return '\n'.join(lst)
 
     def __getitem__(self, item: str) -> str:
-        return self._data[item]
+        return self._data.get(item)
 
     @classmethod
     def from_txt_file(cls, path: str | pathlib.Path, encoding: str = 'cp1252') -> 'DeliveryNote':
@@ -52,12 +52,12 @@ class DeliveryNote:
                 data[key] = value
                 if key == 'format':
                     parts = [item.strip() for item in value.split(':')]
-                    print(f'{parts=}')
                     data['data_format'] = parts[0]
                     if len(parts) == 1:
                         msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
+                    print(data['import_matrix_key'])
         return DeliveryNote(data)
 
     @classmethod
@@ -130,10 +130,6 @@ class DeliveryNote:
     def fields(self) -> list[str]:
         """Returns a list of all the fields in teh file. The list is unsorted."""
         return list(self._data)
-
-    def __getitem__(self, item: str) -> str:
-        """Returns the corresponding value for the given field"""
-        return self._data[item]
 
     @property
     def status(self) -> str:

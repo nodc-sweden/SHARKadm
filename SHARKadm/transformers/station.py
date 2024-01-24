@@ -65,6 +65,10 @@ class AddStationVissEuId(Transformer):
         data_holder.data[self.column_to_set] = data_holder.data['station_name'].apply(self._get_eu_cd)
 
     def _get_eu_cd(self, x: str) -> str:
-        return self._cached_ids.setdefault(x, self._stations.get_eu_cd_for_station_name(x))
+        eu_cd = self._cached_ids.setdefault(x, self._stations.get_eu_cd_for_station_name(x))
+        if not eu_cd:
+            adm_logger.log_transformation(f'Could not find eu_cd', add=x, level=adm_logger.WARNING)
+            return ''
+        return eu_cd
 
 

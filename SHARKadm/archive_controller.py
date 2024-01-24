@@ -1,3 +1,5 @@
+import os
+
 from SHARKadm import controller
 from SHARKadm import transformers
 from SHARKadm.data import archive
@@ -16,15 +18,16 @@ from SHARKadm import sharkadm_exceptions
 import re
 from SHARKadm import utils
 from SHARKadm import event
+import numpy as np
 
 
 class ArchiveController:
     def __init__(self, archive_root_directory: str | pathlib.Path):
         self._archive_root_directory = pathlib.Path(archive_root_directory)
-        self._data_type = None
-        self._archive_list = []
+        self._data_type: str | None = None
+        self._archive_list: list[pathlib.Path] = []
         self._df = pd.DataFrame()
-        self._save_path = None
+        self._save_path: pathlib.Path | None = None
 
     @property
     def data(self) -> pd.DataFrame:
@@ -69,6 +72,36 @@ class ArchiveController:
             self._filter_archive_name_in_list(string)
         return self
 
+    def filter_columns(self, *cols, exclude: list[str] | None = None):
+        if self.data.empty:
+            raise Exception('No data loaded')
+        exclude = exclude or []
+        columns = []
+        for col in cols:
+            if type(col) == str:
+                col = [col]
+            else:
+                col = list(col)
+            for c in col:
+                if col in exclude:
+                    continue
+                if c not in self.data.columns:
+                    continue
+                columns.append(c)
+        self._df = self._df[columns]
+        return self
+
+    def filter_column_content(self, exclude: dict[str, str] | None = None, **kwargs):
+        """Filter column 'key' that include 'value' in kwargs"""
+        exclude = exclude or dict()
+        boolean = np.array([np.ones(len(self.data))], dtype='bool')
+        for key, value in kwargs.items():
+            boolean = boolean & self.data[key].str.contains(value)
+        for key, value in exclude.items():
+            boolean = boolean & ~self.data[key].str.contains(value)
+        self._df = self.data[boolean]
+        return self
+
     def _filter_archive_name_in_data(self, string: str):
         self._df = self._df[self._df['archive'].str.contains(string)]
 
@@ -95,13 +128,25 @@ class ArchiveController:
             else:
                 try:
                     delivery_note = DeliveryNote.from_txt_file(delivery_note_path)
+                    for key, value in delivery_note.data.items():
+                        if 'kommentar' == key:
+                            print(f'{path.name=}: {key=}: {value=}')
                     line_data.update(delivery_note.data)
+                    # print(f'{delivery_note.data.keys()=}')
                     info_set.update(list(line_data))
                 except sharkadm_exceptions.NoDataFormatFoundError:
                     line_data['data_format_missing'] = 'x'
+            # temp_list = [item for item in list(info_set) if item.startswith('i')]
+            # print(f'{temp_list=}')
             info.append(line_data)
 
-        cols_to_use = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing'] + sorted(info_set)
+        temp_list = [item for item in info_set if item.lower().startswith('kom')]
+        print(f'{temp_list=}')
+        cols_to_use = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing'] + sorted(info_set,
+                                                                                                          key=lambda
+                                                                                                              x:
+                                                                                                          x.lower())
+        # print(f'{cols_to_use=}')
         self._create_dataframe(info, cols_to_use)
         self._save_path = utils.get_export_directory() / f'delivery_note_summary_{self._data_type}.txt'
         return self
@@ -148,33 +193,23 @@ class ArchiveController:
             except (sharkadm_exceptions.ArchiveDataError, sharkadm_exceptions.DeliveryNoteError):
                 adm_logger.log_workflow(f'Could not create data_holder for {path}')
                 continue
-                # Check for zoobenthos beda format
-                processed_folder = pathlib.Path(path, 'processed_data')
-                for file in processed_folder.iterdir():
-                    if not file.suffix == '.txt':
-                        continue
-                    if not file.name.startswith('data'):
-                        continue
-                    with open(file) as fid:
-                        cols = [item.strip() for item in fid.readline().split('\t')]
-                        for col in cols:
-                            mapped_columns[col] = True
-                try:
-                    delivery_note = DeliveryNote.from_txt_file(processed_folder / 'delivery_note.txt')
-                    line['format'] = delivery_note.import_matrix_key
-                except sharkadm_exceptions.DeliveryNoteError:
-                    line['format'] = 'missing'
+                # # Check for zoobenthos beda format
+                # processed_folder = pathlib.Path(path, 'processed_data')
+                # for file in processed_folder.iterdir():
+                #     if not file.suffix == '.txt':
+                #         continue
+                #     if not file.name.startswith('data'):
+                #         continue
+                #     with open(file) as fid:
+                #         cols = [item.strip() for item in fid.readline().split('\t')]
+                #         for col in cols:
+                #             mapped_columns[col] = True
+                # try:
+                #     delivery_note = DeliveryNote.from_txt_file(processed_folder / 'delivery_note.txt')
+                #     line['format'] = delivery_note.import_matrix_key
+                # except sharkadm_exceptions.DeliveryNoteError:
+                #     line['format'] = 'missing'
 
-        # data = []
-        # cols = sorted(all_columns_set) or list(columns)
-        # cols_to_use = ['archive', 'format'] + cols
-        # for line in info:
-        #     new_line = []
-        #     for col in cols_to_use:
-        #         new_line.append(line.get(col, ''))
-        #     data.append(new_line)
-        # self._df = pd.DataFrame(data=info, columns=cols_to_use)
-        # return self
         cols = sorted(all_columns_set) or list(columns)
         cols_to_use = ['archive', 'format'] + cols
         self._create_dataframe(info, cols_to_use)
@@ -183,17 +218,48 @@ class ArchiveController:
         if len(self.data.columns) > nr:
             string = string + '___'
         self._save_path = utils.get_export_directory() / f'column_summary_{self._data_type}_{string}.txt'
+        return self
+
+    def create_files_list(self):
+        """
+        Lists all files in the
+        """
+        columns = ['archive', 'path', 'parent_directory_name', 'name', 'suffix']
+
+        def get_data_from_path(archive: str, p: pathlib.Path) -> dict[str, str]:
+            return dict(
+                archive=archive,
+                path=str(p),
+                parent_directory_name=p.parent.name,
+                name=p.name,
+                suffix=p.suffix
+            )
+
+        info = []
+        for directory in self.archive_list:
+            for root, dirs, files in os.walk(directory):
+                for name in files:
+                    path = pathlib.Path(root, name)
+                    info.append(get_data_from_path(directory.name, path))
+                for name in dirs:
+                    path = pathlib.Path(root, name)
+                    info.append(get_data_from_path(directory.name, path))
+        self._create_dataframe(info, columns=columns)
+        self._save_path = utils.get_export_directory() / f'file_list_{self._data_type}.txt'
+        return self
 
     def _create_dataframe(self, info, columns):
+        temp_list_columns = [item for item in columns if item.lower().startswith('kom')]
+        print(f'{temp_list_columns=}')
         data = []
         for line in info:
-            print(f'{line=}')
             new_line = []
             for col in columns:
                 new_line.append(line.get(col, ''))
             data.append(new_line)
         self._df = pd.DataFrame(data=data, columns=columns)
-        return self
+        temp_list_columns_df = [item for item in self._df.columns if item.lower().startswith('kom')]
+        print(f'{temp_list_columns_df=}')
 
     def save_data(self, **kwargs):
         self._save_path = kwargs.get('path', self._save_path)
@@ -206,12 +272,15 @@ class ArchiveController:
             utils.open_file_with_default_program(self._save_path)
         return self
 
+    def open_file_with_excel(self):
+        if self._save_path:
+            utils.open_file_with_excel(self._save_path)
+        return self
+
     def open_directory(self):
         if self._save_path:
             utils.open_directory(self._save_path.parent)
         return self
-
-
 
 
 def print_workflow(msg):
@@ -225,25 +294,36 @@ if __name__ == '__main__':
     if 0:
         a = ArchiveController(r'C:\Arbetsmapp\datasets')
         # a.set_data_type('zoobenthos').filter_archive_name('.*UMSC.*').create_column_summary('WAVES', 'SEAST', 'WEATH').save_data(
-        a.set_data_type('zoobenthos').filter_archive_name('.*UMSC.*').create_column_summary(all_columns=True,
-                                                                                            ).save_data(
-            open_file=True)
+        a.set_data_type('zoobenthos').filter_archive_name('.*SLUA_FORS.*').create_column_summary(all_columns=True,
+                                                                                            ).save_data()
 
         adm_logger.print_log()
 
-    if 1:
+    if 0:
         d = DeliveryNote.from_txt_file(
             r"C:\Arbetsmapp\datasets\Zoobenthos\SHARK_Zoobenthos_2022_DEEP\processed_data\delivery_note.txt")
 
     if 0:
         event.subscribe('workflow', print_workflow)
         a = ArchiveController(r'C:\Arbetsmapp\datasets')
-        a.set_data_type('zoobenthos').create_delivery_note_summary().save_data().open_file()
-
+        a.set_data_type('zoobenthos').create_delivery_note_summary() # .save_data().open_file_with_excel()
+        # a.set_data_type('zoobenthos').create_delivery_note_summary().filter_columns('archive_directory_name',
+        #                                                                             'import_matrix_key', 'format',
+        #                                                                             'data_format'
+        #                                                                             ).save_data().open_file_with_excel()
 
     if 0:
+        event.subscribe('workflow', print_workflow)
+        a = ArchiveController(r'C:\Arbetsmapp\datasets')
+        a.set_data_type('zoobenthos').create_files_list().filter_column_content(
+            exclude=dict(path='correspondence')).save_data(encoding='utf8').open_file_with_excel()
+
+
+    if 1:
         # z = ZoobenthosArchiveDataHolder(folder, merge_data=True)
-        z = ZoobenthosArchiveDataHolder(r'C:\Arbetsmapp\datasets\Zoobenthos\SHARK_Zoobenthos_1983_UMSC', merge_data=True)
+        # z = ZoobenthosArchiveDataHolder(r'C:\Arbetsmapp\datasets\Zoobenthos\SHARK_Zoobenthos_1983_UMSC', merge_data=True)
+        # z = ZoobenthosArchiveDataHolder(r'C:\Arbetsmapp\datasets\Zoobenthos\SHARK_Zoobenthos_1983_UMSC', merge_data=True)
+        z = get_data_holder(r'C:\Arbetsmapp\datasets\Zoobenthos\SHARK_Zoobenthos_1983_1994_UMSC')
 
         # botten_data = z._get_data_from_data_source(z._file_data['dataBottenvatten'])
         # hugg_data = z._get_data_from_data_source(z._file_data['dataHugg'])

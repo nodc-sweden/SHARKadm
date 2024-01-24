@@ -44,6 +44,9 @@ class DataFile(ABC):
     def _strip_column_names(self) -> None:
         self._data.columns = [col.strip() for col in self._data.columns]
 
+    def _remove_temp_tag(self):
+        self._data.columns = [col[5:] if col.startswith('TEMP.') else col for col in self._data.columns]
+
     def _add_source_to_data(self) -> None:
         self._data['source'] = self.source
 
@@ -70,20 +73,36 @@ class DataFile(ABC):
             mapped_header.append(internal_name)
         self._data.columns = mapped_header
         self._header_mapper = mapper
-        print()
-        print()
-        print('-'*100)
-        for old, new in zip(self._original_header, self._data.columns):
-            print(f'{old} -> {new}')
-        print()
+        self._remove_temp_tag()
+        # print()
+        # print()
+        # print('-'*100)
+        # for old, new in zip(self._original_header, self._data.columns):
+        #     print(f'{old} -> {new}')
+        # print()
 
-    def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
+    def old_add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
         """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
         for col in columns_to_use:
             if new_column not in self._data.columns:
                 self._data[new_column] = self._data[col]
             else:
                 self._data[new_column] = self._data[new_column] + ' <-> ' + self._data[col]
+
+    def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
+        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
+        if not all([True if col in self.data.columns else False for col in columns_to_use]):
+            print(f'{self.data.columns=}')
+            print(f'{columns_to_use=}')
+            print(f'Not adding column: {new_column}')
+            return
+        if new_column in self.data.columns:
+            self.data.drop(new_column, axis=1, inplace=True)
+        for col in columns_to_use:
+            if new_column not in self.data.columns:
+                self.data[new_column] = self.data[col]
+            else:
+                self.data[new_column] = self.data[new_column] + ' <-> ' + self.data[col]
 
     @property
     def data(self) -> pd.DataFrame:

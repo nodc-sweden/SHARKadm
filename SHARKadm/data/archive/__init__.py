@@ -12,14 +12,21 @@ from .jellyfish import JellyfishArchiveDataHolder
 from .delivery_note import DeliveryNote
 from SHARKadm import utils
 
-object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
+
+def all_subclasses(cls):
+    return set(cls.__subclasses__()).union(
+        [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+
+
+object_mapping = dict((cls._data_format.lower(), cls) for cls in all_subclasses(ArchiveDataHolder))
+# object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
 
 
 def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / 'processed_data/delivery_note.txt')
-    # print(f'{object_mapping=}')
-    # print(f'{d_note.data_format=}')
+    print(f'{object_mapping=}')
+    print(f'{d_note.data_format=}')
     return object_mapping.get(d_note.data_format)(path)
 
 

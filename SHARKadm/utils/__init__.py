@@ -55,6 +55,10 @@ def open_file_with_default_program(path: str | pathlib.Path) -> None:
         subprocess.call(('xdg-open', str(path)))
 
 
+def open_file_with_excel(path: str | pathlib.Path) -> None:
+    os.system(f"start EXCEL.EXE {path}")
+
+
 def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
     try:
         string = '"C:\Program Files (x86)\WinMerge\WinMergeU.exe"'
