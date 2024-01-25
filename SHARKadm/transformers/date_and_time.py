@@ -25,7 +25,7 @@ class AddDateAndTimeToAllLevels(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in self.dates_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self._check_and_add(p, row), axis=1)
-        self._split_date_and_time(data_holder=data_holder)
+        # self._split_date_and_time(data_holder=data_holder)
 
     def _check_and_add(self, par: str, row: pd.Series) -> str:
         if row.get(par):
@@ -38,12 +38,17 @@ class AddDateAndTimeToAllLevels(Transformer):
 
     def _split_date_and_time(self, data_holder: DataHolderProtocol):
         for date_par in self.dates_to_sync:
-            time_par = date_par.replace('date', 'time')
-            data_holder.data[time_par] = data_holder.data[date_par].apply(self._get_time_from_date)
+            time_par = self._get_time_par(date_par)
+            # data_holder.data[time_par] = data_holder.data[date_par].apply(self._get_time_from_date)
+            data_holder.data[time_par] = data_holder.data[date_par].apply(lambda row, p=date_par: self._get_time_from_date(p, row), axis=1)
             data_holder.data[date_par] = data_holder.data[date_par].apply(self._get_date_from_date)
 
-    def _get_time_from_date(self, x: str) -> str:
-        parts = x.strip().split()
+    # def _get_time_from_date(self, x: str) -> str:
+    def _get_time_from_date(self, date_par: str, row: pd.Series) -> str:
+        time_par = self._get_time_par(date_par)
+        if row.get(time_par):
+            return row[time_par]
+        parts = row[date_par].strip().split()
         if len(parts) == 2:
             adm_logger.log_transformation('Setting time string from date string', level=adm_logger.DEBUG)
             return parts[1]
@@ -53,6 +58,9 @@ class AddDateAndTimeToAllLevels(Transformer):
         if ' ' not in x:
             return x
         return x.strip().split()[0]
+
+    def _get_time_par(self, date_par: str) -> str:
+        return date_par.replace('date', 'time')
 
 
 

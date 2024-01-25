@@ -1,5 +1,6 @@
 from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
+from SHARKadm.utils import matching_strings
 import re
 
 
@@ -10,7 +11,7 @@ class ReplaceCommaWithDot(Transformer):
         'water_depth_m',
         '.*DIVIDE.*',
         '.*MULTIPLY.*',
-        '.*COPY_VARIABLE.*'
+        '.*COPY_VARIABLE.*',
         'sampled_volume.*',
         'sampler_area.*'
     ]
@@ -32,15 +33,16 @@ class ReplaceCommaWithDot(Transformer):
             data_holder.data[col] = data_holder.data[col].apply(self.convert)
 
     def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
-        cols = dict()
-        for item in self.apply_on_columns:
-            if item in data_holder.data.columns:
-                cols[item] = True
-                continue
-            for col in data_holder.data.columns:
-                if re.match(item, col):
-                    cols[col] = True
-        return list(cols)
+        return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
+        # cols = dict()
+        # for item in self.apply_on_columns:
+        #     if item in data_holder.data.columns:
+        #         cols[item] = True
+        #         continue
+        #     for col in data_holder.data.columns:
+        #         if re.match(item, col):
+        #             cols[col] = True
+        # return list(cols)
 
     @staticmethod
     def convert(x) -> str:

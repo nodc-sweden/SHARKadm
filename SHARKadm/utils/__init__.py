@@ -61,7 +61,8 @@ def open_file_with_excel(path: str | pathlib.Path) -> None:
 
 def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
     try:
-        string = '"C:\Program Files (x86)\WinMerge\WinMergeU.exe"'
+        string = '"C:\Program Files\WinMerge\WinMergeU.exe"'
+        print(f'{string=}')
         for arg in args:
             string = string + f' {arg}'
         subprocess.call(string)
@@ -93,4 +94,6 @@ def get_all_class_children_names(cls):
         names.append(c.__name__)
         names.extend(get_all_class_children_names(c))
     return names
+
+
 

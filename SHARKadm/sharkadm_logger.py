@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 
 from typing import Optional
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+# from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 
 from SHARKadm import event
@@ -12,16 +12,16 @@ from SHARKadm import event
 logger = logging.getLogger(__name__)
 
 
-class LogEntry(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    timestamp: datetime.datetime
-    log_type: str
-    msg: str
-    count: int = Field(default=1)
-    level: str = Field(default='info')
-    line: Optional[str]
-    data_source: Optional[str]
-    cls: Optional[str]
+# class LogEntry(SQLModel, table=True):
+#     id: Optional[int] = Field(default=None, primary_key=True)
+#     timestamp: datetime.datetime
+#     log_type: str
+#     msg: str
+#     count: int = Field(default=1)
+#     level: str = Field(default='info')
+#     line: Optional[str]
+#     data_source: Optional[str]
+#     cls: Optional[str]
 
 
 class SHARKadmLogger:

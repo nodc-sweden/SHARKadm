@@ -149,7 +149,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
         fdn['man_str'] = fdn[dn.columns[0]].apply(str)
 
         self._mandatory_reg_columns = list(fdn[fdn[dn.columns[0]] == '*'][key_col_name])
-        self._mandatory_nat_columns = list(fdn[fdn['man_str'].str.contains('\*')][key_col_name])
+        self._mandatory_nat_columns = list(fdn[fdn['man_str'].str.contains('*')][key_col_name])
 
     def _map_mandatory_lists(self):
         if not self.import_matrix_mapper:
