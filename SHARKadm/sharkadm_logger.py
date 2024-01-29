@@ -1,6 +1,8 @@
 import datetime
 import inspect
 import logging
+import pathlib
+
 import pandas as pd
 
 from typing import Optional
@@ -8,6 +10,7 @@ from typing import Optional
 
 
 from SHARKadm import event
+from SHARKadm import utils
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +62,7 @@ class SHARKadmLogger:
     def _initiate_log(self) -> None:
         """Initiate the log"""
         self._data = dict((lev, {}) for lev in self._levels)
+        self._filtered_data = dict()
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -67,6 +71,12 @@ class SHARKadmLogger:
             logger.error(msg)
             raise KeyError(msg)
         return level
+
+    @property
+    def data(self) -> dict:
+        if self._filtered_data:
+            return self._filtered_data
+        return self._data
 
     def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
@@ -107,10 +117,27 @@ class SHARKadmLogger:
             self._data[level][log_type][msg]['items'].append(' '.join(item))
         event.post_event('log', msg)
 
-    def reset_log(self) -> None:
+    def reset_log(self) -> 'SHARKadmLogger':
         """Resets all entries to the log"""
         logger.info(f'Resetting {self.__class__.__name__}')
         self._initiate_log()
+        return self
+
+    def reset_filter(self) -> 'SHARKadmLogger':
+        self._filtered_data = dict()
+        return self
+
+    def filter_data(self, *args,
+                          log_types: str | list | None = None,
+                          levels: str | list | None = None,
+                          in_msg: str | None = None,
+                          **kwargs) -> 'SHARKadmLogger':
+        self._filtered_data = self._get_filtered_data(*args,
+                                                      log_types=log_types,
+                                                      levels=levels,
+                                                      in_msg=in_msg,
+                                                      **kwargs)
+        return self
 
     def _get_levels(self, *args: str, levels: str | list | None = None):
         use_levels = []
@@ -154,7 +181,7 @@ class SHARKadmLogger:
         levels = self._get_levels(*args, levels=levels)
 
         filtered_data = dict()
-        for level_name, level_data in self._data.items():
+        for level_name, level_data in self.data.items():
             if level_name not in levels:
                 continue
             for log_type_name, log_type_data in level_data.items():
@@ -173,15 +200,37 @@ class SHARKadmLogger:
                     filtered_data[level_name][log_type_name] = log_type_data
         return filtered_data
 
-    def get_log_lines(self, *args: str, include_items: bool = False, sort_log: bool = True, **kwargs) -> list[str]:
+    def save_as_xlsx(self, path: str | pathlib.Path | None = None, include_items: bool = False) -> 'SHARKadmLogger':
+        if not path:
+            path = utils.get_export_directory() / 'sharkadm_log.xlsx'
+        data = []
+        header = ['Level', 'Log type', 'Message', 'Nr', 'Item']
+        for level, level_data in self.data.items():
+            for log_type, log_type_data in level_data.items():
+                for msg, msg_data in log_type_data.items():
+                    count = msg_data['count']
+                    line = [level, log_type, msg, count]
+                    if not include_items or not msg_data['items']:
+                        line.append('')
+                        data.append(line)
+                        continue
+                    for item in msg_data['items']:
+                        data.append(line + [item])
+
+        df = pd.DataFrame(data=data, columns=header)
+        df.fillna('', inplace=True)
+        df.to_excel(str(path), index=False)
+        logger.info(f'Saving sharkadm log file to {path}')
+        return self
+
+    def get_log_lines(self, *args: str, include_items: bool = False, sort_log: bool = True) -> list[str]:
         """
         Option to filter data.
         """
-        data = self._get_filtered_data(*args, **kwargs)
         if sort_log:
-            lines = self._get_sorted_log_lines(data, include_items=include_items)
+            lines = self._get_sorted_log_lines(self.data, include_items=include_items)
         else:
-            lines = self._get_unsorted_log_lines(data, include_items=include_items)
+            lines = self._get_unsorted_log_lines(self.data, include_items=include_items)
         return lines
 
     def _get_sorted_log_lines(self, data: dict, **kwargs):
