@@ -1,3 +1,5 @@
+import datetime
+
 import yaml
 import pathlib
 from SHARKadm.controller import SHARKadmController
@@ -7,6 +9,7 @@ from SHARKadm import exporters
 from SHARKadm import adm_logger
 from SHARKadm.data.archive import get_archive_data_holder
 from SHARKadm.data import get_data_holder
+from SHARKadm import utils
 
 
 class SHARKadmWorkflow:
@@ -16,7 +19,7 @@ class SHARKadmWorkflow:
                  transformers: list[dict[str, str | dict[str, str]]] = [],
                  validators_after: list[dict[str, str | dict[str, str]]] = [],
                  exporters: list[dict[str, str | dict[str, str]]] = [],
-                 save_config_path: str | pathlib.Path | None = None
+                 save_directory: str | pathlib.Path | None = None
                  ) -> None:
 
         self._controller = SHARKadmController()
@@ -25,7 +28,14 @@ class SHARKadmWorkflow:
         self.transformers = transformers
         self.validators_after = validators_after
         self.exporters = exporters
-        self.save_config_path = save_config_path
+        self._save_directory = save_directory
+
+    @property
+    def save_directory(self) -> pathlib.Path:
+        if self._save_directory:
+            return pathlib.Path(self._save_directory)
+        return utils.get_export_directory()
+
 
     def _initiate_workflow(self) -> None:
         adm_logger.log_workflow('Initiating workflow')
@@ -66,23 +76,27 @@ class SHARKadmWorkflow:
             d_holder = get_data_holder(path)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
+            self._save_report(path.stem)
         self.save_config()
 
-    def get_report(self):
+    def _save_report(self, name):
+        date_str = datetime.datetime.now().strftime('%Y%m%d')
+        path = self.save_directory / f'sharkadm_log_{name}_{date_str}.xlsx'
+        adm_logger.save_as_xlsx(path=path)
         pass
 
     def save_config(self):
-        if not self.save_config_path:
+        if not self.save_directory:
             return
         if self.save_config_path.suffix != '.yaml':
             adm_logger.log_workflow(f'Could not save config file. The file is not a valid config file: {self.save_config_path}')
             return
         data = dict(
-            data_source_paths = self.data_source_paths,
-            validators_before = self.validators_before,
-            validators_after = self.validators_after,
-            transformers = self.transformers,
-            exporters = self.exporters,
+            data_source_paths=self.data_source_paths,
+            validators_before=self.validators_before,
+            validators_after=self.validators_after,
+            transformers=self.transformers,
+            exporters=self.exporters,
         )
 
         with open(self.save_config_path, 'w') as fid:
@@ -100,7 +114,6 @@ class SHARKadmWorkflow:
             exporters=config.get('exporters', []),
             save_config_path=config.get('save_config_path', []),
         )
-
         return workflow
 
 
@@ -156,8 +169,9 @@ class SHARKadmArchiveWorkflow:
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
 
-    def get_report(self):
-        pass
+    def save_report_as_xlsx(self, path: str | pathlib.Path | None = None):
+        adm_logger.get_log_lines()
+
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path):
