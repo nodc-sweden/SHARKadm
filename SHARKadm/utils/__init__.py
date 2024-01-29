@@ -9,7 +9,7 @@ SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
 
 def get_root_directory(*subfolders: str) -> pathlib.Path:
     if not SHARKADM_DIRECTORY.parent.exists():
-        raise NotADirectoryError(f'Cant create temp directory under {SHARKADM_DIRECTORY.parent}. Directory does not '
+        raise NotADirectoryError(f'Cant create root directory under {SHARKADM_DIRECTORY.parent}. Directory does not '
                                  f'exist!')
     folder = pathlib.Path(SHARKADM_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
