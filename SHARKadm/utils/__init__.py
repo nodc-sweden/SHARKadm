@@ -61,12 +61,11 @@ def open_file_with_excel(path: str | pathlib.Path) -> None:
 
 def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
     try:
-        string = '"C:\Program Files\WinMerge\WinMergeU.exe"'
-        print(f'{string=}')
+        string = '"C:/Program Files/WinMerge/WinMergeU.exe"'
         for arg in args:
             string = string + f' {arg}'
         subprocess.call(string)
-        # subprocess.call((f'"C:\Program Files (x86)\WinMerge\WinMergeU.exe" {file1} {file2}'))
+        # subprocess.call((f'"C:/Program Files (x86)/WinMerge/WinMergeU.exe" {file1} {file2}'))
     except:
         pass
 
@@ -86,14 +85,33 @@ def open_export_directory(*subdirectories: str) -> None:
     open_directory(get_export_directory(*subdirectories))
 
 
-def get_all_class_children_names(cls):
+def get_all_class_children_list(cls):
     if not cls.__subclasses__():
         return []
-    names = []
+    children = []
     for c in cls.__subclasses__():
-        names.append(c.__name__)
-        names.extend(get_all_class_children_names(c))
-    return names
+        children.append(c)
+        children.extend(get_all_class_children_list(c))
+    return children
+
+
+def get_all_class_children_names(cls):
+    return [c.__name__ for c in get_all_class_children_list(cls)]
+    # if not cls.__subclasses__():
+    #     return []
+    # names = []
+    # for c in cls.__subclasses__():
+    #     names.append(c.__name__)
+    #     names.extend(get_all_class_children_names(c))
+    # return names
+
+
+def get_all_class_children(cls):
+    mapping = dict()
+    for c in get_all_class_children_list(cls):
+        mapping[c.__name__] = c
+    return mapping
+
 
 
 

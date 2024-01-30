@@ -19,23 +19,57 @@ class SHARKadmWorkflow:
                  transformers: list[dict[str, str | dict[str, str]]] = [],
                  validators_after: list[dict[str, str | dict[str, str]]] = [],
                  exporters: list[dict[str, str | dict[str, str]]] = [],
-                 save_directory: str | pathlib.Path | None = None
+                 workflow_config: dict[str, str] = None,
+                 adm_logger_config: dict[str, str] = None,
+                 **kwargs
                  ) -> None:
 
         self._controller = SHARKadmController()
-        self.data_source_paths = data_source_paths
+        self.data_source_paths = self.string_list_path_list(data_source_paths)
         self.validators_before = validators_before
         self.transformers = transformers
         self.validators_after = validators_after
         self.exporters = exporters
-        self._save_directory = save_directory
 
-    @property
-    def save_directory(self) -> pathlib.Path:
-        if self._save_directory:
-            return pathlib.Path(self._save_directory)
-        return utils.get_export_directory()
+        self._open_report_paths = set()
+        self._open_directory_paths = set()
 
+        self._workflow_config = dict(
+            export_directory=utils.get_export_directory(),
+            file_name=False,
+            open_export_directory=False
+        )
+        self._workflow_config.update(workflow_config or {})
+
+        self._adm_logger_config = []
+
+
+
+    def _get_default_adm_logger_config(self) -> dict:
+        return dict(
+            save_xlsx=True,
+            export_directory=utils.get_export_directory(),
+            open_report=True,
+            open_export_directory=False,
+            filter={}
+        )
+
+    def _arrange_adm_logger_config(self, input_adm_logger_config: dict | list[dict]) -> None:
+        if isinstance(input_adm_logger_config, dict):
+            input_adm_logger_config = [input_adm_logger_config]
+        self._adm_logger_config = []
+        for input_config in input_adm_logger_config:
+            config = self._get_default_adm_logger_config()
+            config.update(input_config)
+            self._adm_logger_config.append(config)
+
+    def _get_directory(self, path: str | pathlib.Path) -> pathlib.Path:
+        path = pathlib.Path(path)
+        if not path.exists():
+            raise NotADirectoryError(f'Invalid export directory: {path}')
+        if not path.is_dir():
+            raise NotADirectoryError(f'Path is not a directory: {path}')
+        return path
 
     def _initiate_workflow(self) -> None:
         adm_logger.log_workflow('Initiating workflow')
@@ -47,6 +81,7 @@ class SHARKadmWorkflow:
     def _set_validators_before(self) -> None:
         vals_list = []
         for val in self.validators_before or []:
+            print(f'{type(val)=}: {val=}')
             vals_list.append(validators.get_validator_object(val['name'], **val.get('kwargs', {})))
         self._controller.set_validators_before(*vals_list)
 
@@ -64,7 +99,6 @@ class SHARKadmWorkflow:
 
     def _set_exporters(self) -> None:
         exporter_list = []
-        print(f'{self.exporters=}')
         for exp in self.exporters or []:
             exporter_list.append(exporters.get_exporter_object(exp['name'], **exp.get('kwargs', {})))
         self._controller.set_exporters(*exporter_list)
@@ -76,43 +110,84 @@ class SHARKadmWorkflow:
             d_holder = get_data_holder(path)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
-            self._save_report(path.stem)
-        self.save_config()
+            self._do_adm_logger_stuff(path)
+            adm_logger.reset_log()
 
-    def _save_report(self, name):
+        self.save_config()
+        self._open_log_reports()
+        self._open_export_directory()
+
+    def _do_adm_logger_stuff(self, source_path: pathlib.Path) -> None:
+        for adm_logger_config in self._adm_logger_config:
+            self._filter_log(adm_logger_config)
+            self._save_log_report_xlsx(source_path.stem, adm_logger_config)
+            adm_logger.reset_filter()
+
+    def _filter_log(self, adm_logger_config: dict) -> None:
+        if not adm_logger_config['filter']:
+            return
+        adm_logger.filter_data(**adm_logger_config['filter'])
+
+    def _save_log_report_xlsx(self, name: str, adm_logger_config: dict) -> None:
+        if not adm_logger_config['save_xlsx']:
+            return
         date_str = datetime.datetime.now().strftime('%Y%m%d')
-        path = self.save_directory / f'sharkadm_log_{name}_{date_str}.xlsx'
-        adm_logger.save_as_xlsx(path=path)
-        pass
+        path = adm_logger_config['export_directory'] / f'sharkadm_log_{name}_{date_str}.xlsx'
+        adm_logger.save_as_xlsx(path=path, **adm_logger_config)
+        if adm_logger_config.get('open_report'):
+            self._open_report_paths.add(path)
+        if adm_logger_config.get('open_export_directory'):
+            self._open_directory_paths.add(path.parent)
+
+    def _open_log_reports(self) -> None:
+        for path in self._open_report_paths:
+            utils.open_file_with_excel(path)
+
+    def _open_export_directory(self) -> None:
+        for directory in self._open_directory_paths:
+            utils.open_directory(directory)
+        if self._workflow_config.get('open_export_directory'):
+            utils.open_directory(self._get_directory(self._workflow_config['export_directory']))
+
+    @staticmethod
+    def path_list_as_string_list(paths: list[str | pathlib.Path]) -> list[str]:
+        return [str(path) for path in paths]
+
+    @staticmethod
+    def string_list_path_list(paths: list[str | pathlib.Path]) -> list[pathlib.Path]:
+        return [pathlib.Path(path) for path in paths]
 
     def save_config(self):
-        if not self.save_directory:
-            return
-        if self.save_config_path.suffix != '.yaml':
-            adm_logger.log_workflow(f'Could not save config file. The file is not a valid config file: {self.save_config_path}')
-            return
+        file_name = self._workflow_config['file_name']
+        if not file_name:
+            name_str = '-'.join([pathlib.Path(path).stem for path in self.data_source_paths])
+            file_name = f'config_{name_str}.yaml'
+        config_save_path = self._workflow_config['export_directory'] / file_name
+        if not config_save_path.suffix == '.yaml':
+            raise UserWarning(f'Export file name is not a yaml-file: {file_name}')
         data = dict(
-            data_source_paths=self.data_source_paths,
+            data_source_paths=self.path_list_as_string_list(self.data_source_paths),
             validators_before=self.validators_before,
             validators_after=self.validators_after,
             transformers=self.transformers,
             exporters=self.exporters,
         )
 
-        with open(self.save_config_path, 'w') as fid:
-            yaml.safe_dump(data, self.save_config_path)
+        with open(config_save_path, 'w') as fid:
+            yaml.safe_dump(data, fid)
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path):
         with open(path) as fid:
             config = yaml.safe_load(fid)
         workflow = SHARKadmWorkflow(
-            data_source_paths=config.get('data_source_paths', []),
-            validators_before=config.get('validators_before', []),
-            validators_after=config.get('validators_after', []),
-            transformers=config.get('transformers', []),
-            exporters=config.get('exporters', []),
-            save_config_path=config.get('save_config_path', []),
+            data_source_paths=config.pop('data_source_paths', []),
+            validators_before=config.pop('validators_before', []),
+            validators_after=config.pop('validators_after', []),
+            transformers=config.pop('transformers', []),
+            exporters=config.pop('exporters', []),
+            save_config_path=config.pop('save_config_path', []),
+            **config
         )
         return workflow
 

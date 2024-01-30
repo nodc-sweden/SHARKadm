@@ -22,14 +22,15 @@ def get_validator_list() -> list[Type[Validator]]:
 
 def get_validators() -> dict[str, Type[Validator]]:
     """Returns a dictionary with validators"""
-    validators = {}
-    for cls in Validator.__subclasses__():
-        validators[cls.__name__] = cls
-    return validators
+    return utils.get_all_class_children(Validator)
+    # validators = {}
+    # for cls in Validator.__subclasses__():
+    #     validators[cls.__name__] = cls
+    # return validators
 
 
 def get_validator_object(validator_name: str, **kwargs) -> Validator:
-    """Returns Validator object that matches teh given validator name"""
+    """Returns Validator object that matches the given validator name"""
     all_validators = get_validators()
     val = all_validators[validator_name]
     return val(**kwargs)

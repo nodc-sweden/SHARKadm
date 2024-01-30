@@ -84,14 +84,11 @@ def get_transformer_list() -> list[str]:
 
 def get_transformers() -> dict[str, Type[Transformer]]:
     """Returns a dictionary with transformers"""
-    trans = {}
-    for cls in Transformer.__subclasses__():
-        trans[cls.__name__] = cls
-    return trans
+    return utils.get_all_class_children(Transformer)
 
 
 def get_transformer_object(trans_name: str, **kwargs) -> Transformer:
-    """Returns Transformer object that matches teh given transformer names"""
+    """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans[trans_name]
     return tran(**kwargs)
