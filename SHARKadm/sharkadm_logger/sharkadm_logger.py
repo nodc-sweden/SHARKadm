@@ -11,6 +11,7 @@ from typing import Optional
 
 from SHARKadm import event
 from SHARKadm import utils
+from .exporter import SharkadmExporter
 
 logger = logging.getLogger(__name__)
 
@@ -57,12 +58,14 @@ class SHARKadmLogger:
     _data = dict()
 
     def __init__(self):
+        self._name = ''
         self._initiate_log()
 
     def _initiate_log(self) -> None:
         """Initiate the log"""
         self._data = dict((lev, {}) for lev in self._levels)
         self._filtered_data = dict()
+        self.name = ''
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -77,6 +80,14 @@ class SHARKadmLogger:
         if self._filtered_data:
             return self._filtered_data
         return self._data
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        self._name = str(name)
 
     def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
@@ -125,6 +136,10 @@ class SHARKadmLogger:
 
     def reset_filter(self) -> 'SHARKadmLogger':
         self._filtered_data = dict()
+        return self
+
+    def export(self, exporter: SharkadmExporter):
+        exporter(self)
         return self
 
     def filter_data(self, *args,
@@ -200,126 +215,126 @@ class SHARKadmLogger:
                     filtered_data[level_name][log_type_name] = log_type_data
         return filtered_data
 
-    def save_as_xlsx(self, path: str | pathlib.Path | None = None, include_items: bool = False, **kwargs) -> 'SHARKadmLogger':
-        if not path:
-            path = utils.get_export_directory() / 'sharkadm_log.xlsx'
-        data = []
-        header = ['Level', 'Log type', 'Message', 'Nr', 'Item']
-        for level, level_data in self.data.items():
-            for log_type, log_type_data in level_data.items():
-                for msg, msg_data in log_type_data.items():
-                    count = msg_data['count']
-                    line = [level, log_type, msg, count]
-                    if not include_items or not msg_data['items']:
-                        line.append('')
-                        data.append(line)
-                        continue
-                    for item in msg_data['items']:
-                        data.append(line + [item])
-
-        df = pd.DataFrame(data=data, columns=header)
-        df.fillna('', inplace=True)
-        self._save_as_xlsx_with_table(path, df)
-        # df.to_excel(str(path), index=False)
-        logger.info(f'Saving sharkadm log file to {path}')
-
-        return self
-
-    def _save_as_xlsx_with_table(self, path: pathlib.Path, df: pd.DataFrame):
-        """
-        https://stackoverflow.com/questions/58326392/how-to-create-excel-table-with-pandas-to-excel
-        """
-
-        # Create a Pandas Excel writer using XlsxWriter as the engine.
-        writer = pd.ExcelWriter(str(path), engine='xlsxwriter')
-
-        # Convert the dataframe to an XlsxWriter Excel object. Turn off the default
-        # header and index and skip one row to allow us to insert a user defined
-        # header.
-        sheet_name = path.stem.split('SHARK_')[-1][:30]
-        df.to_excel(writer, sheet_name=sheet_name, startrow=1, header=False, index=False)
-
-        # Get the xlsxwriter workbook and worksheet objects.
-        workbook = writer.book
-        worksheet = writer.sheets[sheet_name]
-
-        # Get the dimensions of the dataframe.
-        (max_row, max_col) = df.shape
-
-        # Create a list of column headers, to use in add_table().
-        column_settings = []
-        for header in df.columns:
-            column_settings.append({'header': header})
-
-        # Add the table.
-        worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
-
-        # Make the columns wider for clarity.
-        worksheet.set_column(0, 0, 10)
-        worksheet.set_column(1, 1, 20)
-        worksheet.set_column(2, 2, 90)
-        worksheet.set_column(3, 3, 8)
-        worksheet.set_column(4, 4, 70)
-        # worksheet.set_column(0, max_col - 1, 20)
-        # worksheet.set_column(0, max_col - 1, 20)
-
-        # Close the Pandas Excel writer and output the Excel file.
-        writer.close()
-
-    def get_log_lines(self, *args: str, include_items: bool = False, sort_log: bool = True) -> list[str]:
-        """
-        Option to filter data.
-        """
-        if sort_log:
-            lines = self._get_sorted_log_lines(self.data, include_items=include_items)
-        else:
-            lines = self._get_unsorted_log_lines(self.data, include_items=include_items)
-        return lines
-
-    def _get_sorted_log_lines(self, data: dict, **kwargs):
-        lines = []
-        for level in sorted(data):
-            level_data = data[level]
-            for log_type in sorted(level_data):
-                log_type_data = level_data[log_type]
-                for msg in sorted(log_type_data):
-                    msg_data = log_type_data[msg]
-                    count = msg_data['count']
-                    items = msg_data['items']
-                    lines.append(self._get_log_line(level, log_type, msg, count))
-                    if kwargs.get('include_items'):
-                        for item in sorted(items):
-                            lines.append(self._get_log_item_line(item))
-        return lines
-
-    def _get_unsorted_log_lines(self, data: dict, **kwargs):
-        lines = []
-        for level, level_data in data.items():
-            for log_type, log_type_data in level_data.items():
-                for msg, msg_data in log_type_data.items():
-                    count = msg_data['count']
-                    items = msg_data['items']
-                    lines.append(self._get_log_line(level, log_type, msg, count))
-                    if kwargs.get('include_items'):
-                        for item in items:
-                            lines.append(self._get_log_item_line(item))
-        return lines
-
-    def _get_log_line(self, level, log_type, msg, count):
-        line = f'{level.upper()} - {log_type}: {msg}'
-        if count > 1:
-            line += f' ({count} times)'
-        return line
-
-    def _get_log_item_line(self, item):
-        return f'    {item}'
-
-    def get_log_text(self, *args: str, include_items: bool = False, **kwargs) -> str:
-        lines = self.get_log_lines(*args, include_items=include_items, **kwargs)
-        return '\n'.join(lines)
-
-    def print_log(self, *args: str, include_items: bool = False, **kwargs) -> None:
-        print(self.get_log_text(*args, include_items=include_items, **kwargs))
+    # def save_as_xlsx(self, path: str | pathlib.Path | None = None, include_items: bool = False, **kwargs) -> 'SHARKadmLogger':
+    #     if not path:
+    #         path = utils.get_export_directory() / 'sharkadm_log.xlsx'
+    #     data = []
+    #     header = ['Level', 'Log type', 'Message', 'Nr', 'Item']
+    #     for level, level_data in self.data.items():
+    #         for log_type, log_type_data in level_data.items():
+    #             for msg, msg_data in log_type_data.items():
+    #                 count = msg_data['count']
+    #                 line = [level, log_type, msg, count]
+    #                 if not include_items or not msg_data['items']:
+    #                     line.append('')
+    #                     data.append(line)
+    #                     continue
+    #                 for item in msg_data['items']:
+    #                     data.append(line + [item])
+    #
+    #     df = pd.DataFrame(data=data, columns=header)
+    #     df.fillna('', inplace=True)
+    #     self._save_as_xlsx_with_table(path, df)
+    #     # df.to_excel(str(path), index=False)
+    #     logger.info(f'Saving sharkadm log file to {path}')
+    #
+    #     return self
+    #
+    # def _save_as_xlsx_with_table(self, path: pathlib.Path, df: pd.DataFrame):
+    #     """
+    #     https://stackoverflow.com/questions/58326392/how-to-create-excel-table-with-pandas-to-excel
+    #     """
+    #
+    #     # Create a Pandas Excel writer using XlsxWriter as the engine.
+    #     writer = pd.ExcelWriter(str(path), engine='xlsxwriter')
+    #
+    #     # Convert the dataframe to an XlsxWriter Excel object. Turn off the default
+    #     # header and index and skip one row to allow us to insert a user defined
+    #     # header.
+    #     sheet_name = path.stem.split('SHARK_')[-1][:30]
+    #     df.to_excel(writer, sheet_name=sheet_name, startrow=1, header=False, index=False)
+    #
+    #     # Get the xlsxwriter workbook and worksheet objects.
+    #     workbook = writer.book
+    #     worksheet = writer.sheets[sheet_name]
+    #
+    #     # Get the dimensions of the dataframe.
+    #     (max_row, max_col) = df.shape
+    #
+    #     # Create a list of column headers, to use in add_table().
+    #     column_settings = []
+    #     for header in df.columns:
+    #         column_settings.append({'header': header})
+    #
+    #     # Add the table.
+    #     worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
+    #
+    #     # Make the columns wider for clarity.
+    #     worksheet.set_column(0, 0, 10)
+    #     worksheet.set_column(1, 1, 20)
+    #     worksheet.set_column(2, 2, 90)
+    #     worksheet.set_column(3, 3, 8)
+    #     worksheet.set_column(4, 4, 70)
+    #     # worksheet.set_column(0, max_col - 1, 20)
+    #     # worksheet.set_column(0, max_col - 1, 20)
+    #
+    #     # Close the Pandas Excel writer and output the Excel file.
+    #     writer.close()
+    #
+    # def get_log_lines(self, *args: str, include_items: bool = False, sort_log: bool = True) -> list[str]:
+    #     """
+    #     Option to filter data.
+    #     """
+    #     if sort_log:
+    #         lines = self._get_sorted_log_lines(self.data, include_items=include_items)
+    #     else:
+    #         lines = self._get_unsorted_log_lines(self.data, include_items=include_items)
+    #     return lines
+    #
+    # def _get_sorted_log_lines(self, data: dict, **kwargs):
+    #     lines = []
+    #     for level in sorted(data):
+    #         level_data = data[level]
+    #         for log_type in sorted(level_data):
+    #             log_type_data = level_data[log_type]
+    #             for msg in sorted(log_type_data):
+    #                 msg_data = log_type_data[msg]
+    #                 count = msg_data['count']
+    #                 items = msg_data['items']
+    #                 lines.append(self._get_log_line(level, log_type, msg, count))
+    #                 if kwargs.get('include_items'):
+    #                     for item in sorted(items):
+    #                         lines.append(self._get_log_item_line(item))
+    #     return lines
+    #
+    # def _get_unsorted_log_lines(self, data: dict, **kwargs):
+    #     lines = []
+    #     for level, level_data in data.items():
+    #         for log_type, log_type_data in level_data.items():
+    #             for msg, msg_data in log_type_data.items():
+    #                 count = msg_data['count']
+    #                 items = msg_data['items']
+    #                 lines.append(self._get_log_line(level, log_type, msg, count))
+    #                 if kwargs.get('include_items'):
+    #                     for item in items:
+    #                         lines.append(self._get_log_item_line(item))
+    #     return lines
+    #
+    # def _get_log_line(self, level, log_type, msg, count):
+    #     line = f'{level.upper()} - {log_type}: {msg}'
+    #     if count > 1:
+    #         line += f' ({count} times)'
+    #     return line
+    #
+    # def _get_log_item_line(self, item):
+    #     return f'    {item}'
+    #
+    # def get_log_text(self, *args: str, include_items: bool = False, **kwargs) -> str:
+    #     lines = self.get_log_lines(*args, include_items=include_items, **kwargs)
+    #     return '\n'.join(lines)
+    #
+    # def print_log(self, *args: str, include_items: bool = False, **kwargs) -> None:
+    #     print(self.get_log_text(*args, include_items=include_items, **kwargs))
 
 
 class old_SHARKadmLogger:
@@ -802,6 +817,4 @@ class SHARKadmLoggerDict:
 # the_method = stack[1][0].f_code.co_name
 # print("I was called by {}.{}()".format(the_class, the_method))
 
-
-adm_logger = SHARKadmLogger()
 # adm_logger = SHARKadmLoggerDict()
