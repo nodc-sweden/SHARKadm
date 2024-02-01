@@ -21,6 +21,7 @@ def get_exporter_list() -> list[str]:
     return sorted(utils.get_all_class_children_names(Exporter))
 
 
+@functools.cache
 def get_exporters() -> dict[str, Type[Exporter]]:
     """Returns a dictionary with exporters"""
     return utils.get_all_class_children(Exporter)

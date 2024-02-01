@@ -11,6 +11,8 @@ from SHARKadm.exporters import Exporter
 from SHARKadm.transformers import Transformer
 from SHARKadm.validators import Validator
 
+from SHARKadm import adm_logger
+
 logger = logging.getLogger(__name__)
 
 
@@ -104,6 +106,7 @@ class SHARKadmController:
 
     def set_data_holder(self, data_holder: DataHolder) -> None:
         self._data_holder = data_holder
+        adm_logger.name = data_holder.dataset_name
 
     def set_transformers(self, *args: Transformer) -> None:
         """Add one or more Transformers to the data holder"""
