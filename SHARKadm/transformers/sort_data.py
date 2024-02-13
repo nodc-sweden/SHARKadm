@@ -1,4 +1,5 @@
 from .base import Transformer, DataHolderProtocol
+from SHARKadm import adm_logger
 
 
 class SortData(Transformer):
@@ -21,4 +22,6 @@ class SortData(Transformer):
         return f'Sorts data by: sample_date -> sample_time -> sample_min_depth_m -> sample_max_depth_m'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data.sort_values(self.sort_by_columns, inplace=True)
+        sort_by_columns = [col for col in self.sort_by_columns if col in data_holder.data.columns]
+        adm_logger.log_transformation(f'Sorting data based on columns: {', '.join(sort_by_columns)}')
+        data_holder.data.sort_values(sort_by_columns, inplace=True)

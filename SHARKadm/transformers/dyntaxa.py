@@ -8,7 +8,7 @@ import dyntaxa
 
 
 class AddDyntaxaScientificName(Transformer):
-    invalid_data_types = ['physicalchemical']
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'dyntaxa_scientific_name'
     source_col = 'reported_scientific_name'
     translate_dyntaxa = dyntaxa.get_translate_dyntaxa_object()
@@ -45,6 +45,7 @@ class AddDyntaxaScientificName(Transformer):
 
 
 class AddDyntaxaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'dyntaxa_id'
     source_col = 'scientific_name'
     dyntaxa_id = dyntaxa.get_dyntaxa_taxon_object()

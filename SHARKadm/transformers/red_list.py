@@ -6,7 +6,7 @@ from .base import Transformer, DataHolderProtocol
 
 
 class AddRedList(Transformer):
-    invalid_data_types = ['PhysicalChemical']
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
 
     col_to_set = 'red_listed'
     source_cols = ['dyntaxa_id', 'scientific_name', 'reported_scientific_name']

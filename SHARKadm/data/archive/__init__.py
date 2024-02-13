@@ -4,6 +4,7 @@ from typing import Union
 
 from SHARKadm import utils
 from .archive_data_holder import ArchiveDataHolder
+from .chlorophyll import ChlorophyllArchiveDataHolder
 from .delivery_note import DeliveryNote
 from .epibenthos import EpibenthosMartransArchiveDataHolder
 from .jellyfish import JellyfishArchiveDataHolder

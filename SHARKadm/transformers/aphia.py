@@ -6,6 +6,7 @@ from .base import Transformer, DataHolderProtocol
 
 
 class AddAphiaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'aphia_id'
     source_col = 'scientific_name'
     taxa_worms = worms.get_taxa_worms_object()
