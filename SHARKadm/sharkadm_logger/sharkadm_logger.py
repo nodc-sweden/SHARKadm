@@ -142,11 +142,11 @@ class SHARKadmLogger:
         exporter(self)
         return self
 
-    def filter_data(self, *args,
-                          log_types: str | list | None = None,
-                          levels: str | list | None = None,
-                          in_msg: str | None = None,
-                          **kwargs) -> 'SHARKadmLogger':
+    def filter(self, *args,
+                     log_types: str | list | None = None,
+                     levels: str | list | None = None,
+                     in_msg: str | None = None,
+                     **kwargs) -> 'SHARKadmLogger':
         self._filtered_data = self._get_filtered_data(*args,
                                                       log_types=log_types,
                                                       levels=levels,

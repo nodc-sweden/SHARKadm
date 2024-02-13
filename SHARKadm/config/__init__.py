@@ -56,7 +56,7 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 
 @functools.cache
 def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = None,
-                             data_type_mapping_path: str | pathlib.Path = None) -> ImportMatrixConfig:
+                             data_type_mapping_path: str | pathlib.Path = None) -> ImportMatrixConfig | None:
     directory = directory or adm_config_paths('import_matrix')
     # d_type_mapper = get_data_type_mapper(data_type_mapping_path)
     for path in pathlib.Path(directory).iterdir():

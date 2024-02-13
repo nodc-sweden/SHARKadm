@@ -21,6 +21,10 @@ class DeliveryNote:
         self._data_format = data.get('data_format', None)
         self._import_matrix_key = data.get('import_matrix_key', None)
 
+        #TODO: Fullhack
+        if self._data['datatyp'] == 'Physical and Chemical':
+            self._data['datatyp'] = 'PhysicalChemical'
+
     def __str__(self):
         lst = []
         for key, value in self._data.items():
@@ -34,7 +38,7 @@ class DeliveryNote:
     def from_txt_file(cls, path: str | pathlib.Path, encoding: str = 'cp1252') -> 'DeliveryNote':
         path = pathlib.Path(path)
         if path.suffix != '.txt':
-            msg = f'Fil is not a valid xlsx dv template: {path}'
+            msg = f'File is not a valid delivery_note text file: {path}'
             logger.error(msg)
             raise FileNotFoundError(msg)
         data = dict()
@@ -93,21 +97,6 @@ class DeliveryNote:
             data['import_matrix_key'] = 'PP_REG'
 
         return DeliveryNote(data)
-    # def _load_file(self) -> None:
-    #     with open(self._path, encoding=self._encoding) as fid:
-    #         for line in fid:
-    #             if not line.strip():
-    #                 continue
-    #             if ':' not in line:
-    #                 # Belongs to previous row
-    #                 self._data[key] = f'{self._data[key]} {line.strip()}'
-    #                 continue
-    #             key, value = [item.strip() for item in line.split(':', 1)]
-    #             self._data[key] = value
-    #             if key == 'format':
-    #                 parts = [item.strip() for item in value.split(':')]
-    #                 self._data_format = parts[0]
-    #                 self._import_matrix_key = parts[1]
 
     @property
     def data(self) -> dict[str, str]:

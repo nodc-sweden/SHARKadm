@@ -10,7 +10,9 @@ from SHARKadm.config.import_matrix import ImportMatrixConfig
 from SHARKadm.config.import_matrix import ImportMatrixMapper
 from SHARKadm.data import data_source
 from SHARKadm.data.archive import delivery_note
+from SHARKadm.data.archive import sampling_info
 from SHARKadm.data.data_holder import DataHolder
+from SHARKadm import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         self._dataset_name: str | None = None
 
         self._delivery_note: delivery_note.DeliveryNote | None = None
+        self._sampling_info: sampling_info.SamplingInfo | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -36,6 +39,7 @@ class ArchiveDataHolder(DataHolder, ABC):
 
         self._initiate()
         self._load_delivery_note()
+        self._load_sampling_info()
         self._load_import_matrix()
         self._load_data()
 
@@ -56,8 +60,12 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self._data_type
 
     @property
-    def delivery_note(self) -> str:
+    def delivery_note(self) -> delivery_note.DeliveryNote:
         return self._delivery_note
+
+    @property
+    def sampling_info(self) -> sampling_info.SamplingInfo:
+        return self._sampling_info
 
     @property
     def dataset_name(self) -> str:
@@ -84,8 +92,8 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self.processed_data_directory / 'delivery_note.txt'
 
     @property
-    def delivery_note(self):
-        return self._delivery_note
+    def sampling_info_path(self) -> pathlib.Path:
+        return self.processed_data_directory / 'sampling_info.txt'
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:
@@ -126,9 +134,18 @@ class ArchiveDataHolder(DataHolder, ABC):
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(self.delivery_note_path)
 
+    def _load_sampling_info(self) -> None:
+        if not self.sampling_info_path.exists():
+            adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
+            return
+        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path)
+
+
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
         self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
+        if not self._import_matrix:
+            self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_format)
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
 
     def _add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
