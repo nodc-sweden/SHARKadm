@@ -20,7 +20,7 @@ class AddAphiaId(Transformer):
             adm_logger.log_transformation(f'Adding column {self.col_to_set} in {self.__class__.__name__}',
                                           level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ''
-        if all(data_holder.data[self.col_to_set]):
+        elif all(data_holder.data[self.col_to_set]):
             adm_logger.log_transformation(f'All {self.col_to_set} reported. Will skip {self.__class__.__name__}.')
             return
         data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._add(row), axis=1)

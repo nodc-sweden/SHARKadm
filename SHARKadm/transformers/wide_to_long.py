@@ -45,6 +45,9 @@ class WideToLong(Transformer):
         return f'Transposes data from column data to row data'
 
     def _transform(self, data_holder: archive.ArchiveDataHolder) -> None:
+        if self._column_name_parameter in data_holder.columns:
+            adm_logger.log_transformation(f'Could not transform to row format. {self._column_name_parameter} already in data')
+            return
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
@@ -92,7 +95,6 @@ class WideToLong(Transformer):
     def _associated_qf_col(self, col: str, df: pd.DataFrame) -> str:
         for prefix in self._qf_prefix:
             qcol = f'{prefix}{col}'
-            print(f'{col=}: {qcol=}')
             if qcol in df.columns:
                 return qcol
         return ''

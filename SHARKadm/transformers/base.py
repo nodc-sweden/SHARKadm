@@ -68,7 +68,8 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
             return
-        adm_logger.log_workflow(self.workflow_message)
+        adm_logger.log_workflow(self.workflow_message, add=self.get_transformer_description())
+        print(self._transform)
         self._transform(data_holder=data_holder)
 
     @abstractmethod

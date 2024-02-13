@@ -28,6 +28,7 @@ class AddDateAndTimeToAllLevels(Transformer):
         # self._split_date_and_time(data_holder=data_holder)
 
     def _check_and_add(self, par: str, row: pd.Series) -> str:
+        print(f'{par=}: {row.get(par)=}')
         if row.get(par):
             return row[par]
         for date_par in self.dates_to_sync:
@@ -63,11 +64,15 @@ class AddDateAndTimeToAllLevels(Transformer):
         return date_par.replace('date', 'time')
 
 
-
-
 class AddDatetime(Transformer):
-    date_source_column = 'sample_date'
-    time_source_column = 'sample_time'
+
+    def __init__(self,
+                 date_source_column: str = 'sample_date',
+                 time_source_column: str = 'sample_time',
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.date_source_column = date_source_column
+        self.time_source_column = time_source_column
 
     @staticmethod
     def get_transformer_description() -> str:

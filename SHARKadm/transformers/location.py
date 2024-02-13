@@ -25,7 +25,7 @@ class _AddLocationBase(Transformer):
     def _get_code(self, row):
         x_pos = row[self.x_pos_col]
         y_pos = row[self.y_pos_col]
-        return self._cashed_data.setdefault((x_pos, y_pos),
+        return self._cashed_data.setdefault((x_pos, y_pos, self.col_to_set),
                                             geography.get_shape_file_info_at_position(x_pos=x_pos,
                                                                                       y_pos=y_pos,
                                                                                       variable=self.col_to_set))

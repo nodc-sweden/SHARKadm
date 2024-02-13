@@ -57,11 +57,13 @@ from .position import AddPositionToAllLevels
 from .project_code import AddEnglishProjectName
 from .project_code import AddSwedishProjectName
 from .qc import AddColumnsForAutomaticQC
+from .red_list import AddRedList
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
+from .sampling_info import AddSamplingInfo
 from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificName
 from .shark_id import AddSharkId
