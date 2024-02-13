@@ -105,11 +105,11 @@ class SHARKadmWorkflow:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
         for path in self.data_source_paths:
+            adm_logger.reset_log()
             d_holder = get_data_holder(path)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
             self._do_adm_logger_stuff()
-            adm_logger.reset_log()
 
         self.save_config()
         self._open_log_reports()
