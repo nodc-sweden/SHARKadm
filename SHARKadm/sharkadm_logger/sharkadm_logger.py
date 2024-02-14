@@ -93,25 +93,28 @@ class SHARKadmLogger:
         self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
         # time_str = str(datetime.datetime.now())
         # self._workflow.append((time_str, msg))
-        event.post_event('workflow', msg)
+        event.post_event('log_workflow', msg)
 
     def log_transformation(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, add=add)
         # level = self._check_level(level)
         # self._transformations[level].setdefault(msg, 0)
         # self._transformations[level][msg] += 1
+        event.post_event('log_transformation', msg)
 
     def log_validation(self, msg: str, level: str = 'info', add: str | None = None, data_row: str | int | None = None) -> None:
         self.log(log_type=self.VALIDATION, msg=msg, level=level, add=add, data_row=data_row)
         # level = self._check_level(level)
         # self._validations[level].setdefault(msg, 0)
         # self._validations[level][msg] += 1
+        event.post_event('log_validation', msg)
 
     def log_exports(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.EXPORT, msg=msg, level=level, add=add)
         # level = self._check_level(level)
         # self._exports[level].setdefault(msg, 0)
         # self._exports[level][msg] += 1
+        event.post_event('log_exports', msg)
 
     def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
         level = self._check_level(level)
