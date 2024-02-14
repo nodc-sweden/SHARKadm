@@ -24,7 +24,7 @@ class ChlorophyllArchiveDataHolder(ArchiveDataHolder):
             logger.error(f'Could not find any data file in delivery: {self.archive_root_directory}')
             return
 
-        d_source = data_source.TxtRowFormatDataFile(path=data_file_path, data_type=self.delivery_note.data_type)
+        d_source = data_source.TxtColumnFormatDataFile(path=data_file_path, data_type=self.delivery_note.data_type)
         d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)
