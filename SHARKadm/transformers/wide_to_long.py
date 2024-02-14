@@ -16,10 +16,11 @@ class WideToLong(Transformer):
                  ignore_containing: str | list[str] | None = None,
                  column_name_parameter: str = 'parameter',
                  column_name_value: str = 'value',
-                 column_name_qf: str = 'qflag',
+                 column_name_qf: str = 'quality_flag',
                  column_name_unit: str = 'unit',
                  **kwargs
                  ):
+
         # ignore_containing can be regex
         super().__init__(**kwargs)
 
@@ -75,15 +76,12 @@ class WideToLong(Transformer):
             if self._ignore(col):
                 continue
             self._data_columns.append(original_col)
+            self._qf_col_mapping[original_col] = qcol
             self._qf_col_mapping[col] = qcol
-            self._qf_col_mapping[qcol] = col
 
     def _ignore(self, col: str) -> bool:
         if matching_strings.get_matching_strings([col], self._ignore_containing):
             return True
-        # for string in self._ignore_containing:
-        #     if string in col:
-        #         return True
         return False
 
     def _is_qf_col(self, col: str) -> bool:
@@ -109,7 +107,7 @@ class WideToLong(Transformer):
                     continue
                 par = self._get_parameter_name_from_parameter(col)
                 value = row[col]
-                qf = row.get(q_col, '')
+                qf = row[q_col]
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
                 data.append(new_row)
@@ -135,22 +133,12 @@ class WideToLong(Transformer):
             return par.split('[')[0].strip()
         return par
 
-
-
-
-
-
-
-
-
-
     def _remove_columns(self, data_holder: archive.ArchiveDataHolder) -> None:
         for col in ['parameter', 'value', 'unit']:
             if col in data_holder.data.columns:
                 data_holder.data.drop(col, axis=1, inplace=True)
 
     def _wide_to_long(self, data_holder: archive.ArchiveDataHolder) -> None:
-        # copy_columns = [col for col in data_holder.data.columns if col.startswith('COPY_VARIABLE')]
         data_holder.data = data_holder.data.melt(id_vars=[col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')],
                                                  var_name='parameter')
 
@@ -162,5 +150,4 @@ class WideToLong(Transformer):
         return x.split('.')[-1]
 
     def _fix_parameter(self, x) -> str:
-        # return x.replace('COPY_VARIABLE', '')
         return x.split('.')[1]
