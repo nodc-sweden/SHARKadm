@@ -32,9 +32,6 @@ class SHARKadmWorkflow:
         self.validators_after = validators_after or []
         self.exporters = exporters or []
 
-        self._open_report_paths = set()
-        self._open_directory_paths = set()
-
         self._workflow_config = dict(
             export_directory=utils.get_export_directory(),
             file_name=False,
@@ -112,8 +109,6 @@ class SHARKadmWorkflow:
             self._do_adm_logger_stuff()
 
         self.save_config()
-        self._open_log_reports()
-        self._open_export_directory()
 
     def _do_adm_logger_stuff(self) -> None:
         # Other options for log here later?
@@ -127,7 +122,7 @@ class SHARKadmWorkflow:
     def _filter_log(self, log_filter: dict | None) -> None:
         if not log_filter:
             return
-        adm_logger.filter_data(**log_filter)
+        adm_logger.filter(**log_filter)
 
     # def _save_log_report_xlsx(self, name: str, adm_logger_config: dict) -> None:
     #     if not adm_logger_config['save_xlsx']:
@@ -142,7 +137,7 @@ class SHARKadmWorkflow:
 
     def _open_log_reports(self) -> None:
         for path in self._open_report_paths:
-            utils.open_file_with_excel(path)
+            utils.open_file_with_default_program(path)
 
     def _open_export_directory(self) -> None:
         for directory in self._open_directory_paths:
