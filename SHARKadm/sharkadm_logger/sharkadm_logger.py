@@ -2,6 +2,7 @@ import datetime
 import inspect
 import logging
 import pathlib
+import time
 
 import pandas as pd
 
@@ -34,6 +35,7 @@ class SHARKadmLogger:
     INFO = 'info'
     WARNING = 'warning'
     ERROR = 'error'
+    CRITICAL = 'critical'
 
     VALIDATION = 'validation'
     TRANSFORMATION = 'transformation'
@@ -45,7 +47,8 @@ class SHARKadmLogger:
         DEBUG,
         INFO,
         WARNING,
-        ERROR
+        ERROR,
+        CRITICAL
     ]
 
     _log_types = [
@@ -58,7 +61,6 @@ class SHARKadmLogger:
     _data = dict()
 
     def __init__(self):
-        self._name = ''
         self._initiate_log()
 
     def _initiate_log(self) -> None:
@@ -66,6 +68,7 @@ class SHARKadmLogger:
         self._data = dict((lev, {}) for lev in self._levels)
         self._filtered_data = dict()
         self.name = ''
+        self._nr_log_entries = 0
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -117,14 +120,17 @@ class SHARKadmLogger:
         event.post_event('log_export', msg)
 
     def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
+        self._nr_log_entries += 1
         level = self._check_level(level)
         self._data[level].setdefault(log_type, dict())
+        # self._data[level][log_type].setdefault(msg, dict(count=0, items=[], time=datetime.datetime.now()))
         self._data[level][log_type].setdefault(msg, dict(count=0, items=[]))
         # self._data[level].setdefault(msg, 0)
         self._data[level][log_type][msg]['count'] += 1
+        self._data[level][log_type][msg]['log_nr'] = self._nr_log_entries
         item = []
         if add:
-            item.append(add)
+            item.append(f'({self._nr_log_entries}) {add}')
         if kwargs.get('data_row'):
             item.append(f"at row {kwargs.get('data_row')}")
         if item:
@@ -142,7 +148,7 @@ class SHARKadmLogger:
         return self
 
     def export(self, exporter: SharkadmExporter):
-        exporter(self)
+        exporter.export(self)
         return self
 
     def filter(self, *args,
@@ -160,14 +166,20 @@ class SHARKadmLogger:
     def _get_levels(self, *args: str, levels: str | list | None = None):
         use_levels = []
         for arg in args:
-            if arg.lower() in self._levels:
+            if arg.lower().strip('<>') in self._levels:
                 use_levels.append(arg.lower())
         if type(levels) == str:
             levels = [levels]
         if levels:
             use_levels = list(set(use_levels + levels))
         use_levels = use_levels or self._levels
-        return use_levels
+        levels_to_use = set()
+        for level in use_levels:
+            if '<' in level:
+                levels_to_use.update(self._levels[:self._levels.index(level.strip('<>'))+1])
+            if '>' in level:
+                levels_to_use.update(self._levels[self._levels.index(level.strip('<>')):])
+        return [level for level in self._levels if level in levels_to_use]
 
     def _get_log_types(self, *args: str, log_types: str | list | None = None):
         use_log_types = []

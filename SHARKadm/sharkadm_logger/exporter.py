@@ -2,6 +2,7 @@ import datetime
 from abc import abstractmethod, ABC
 import pathlib
 from SHARKadm import utils
+from SHARKadm.utils import matching_strings
 import logging
 import pandas as pd
 
@@ -30,13 +31,33 @@ class SharkadmExporter(ABC):
     def _export(self):
         ...
 
+    def _set_save_path(self):
+        file_path = self.kwargs.get('file_path')
+        file_name = self.kwargs.get('file_name')
+        export_directory = self.kwargs.get('export_directory')
+        if file_path:
+            self.file_path = self.kwargs.get('path')
+            return
+        if not file_name:
+            date_str = datetime.datetime.now().strftime('%Y%m%d')
+            file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{'-'.join(list(self.adm_logger.data.keys()))}.xlsx'
+        if not export_directory:
+            export_directory = utils.get_export_directory()
+        self.file_path = pathlib.Path(export_directory, file_name)
+        if not self.file_path.parent.exists():
+            raise NotADirectoryError(self.file_path.parent)
+
     def _open_directory(self):
+        if not self.kwargs.get('open_directory'):
+            return
         if not self.file_path:
             logger.info(f'open_directory is not implemented for exporter {self.__class__.__name__}')
             return
         utils.open_directory(self.file_path.parent)
 
     def _open_file(self):
+        if not self.kwargs.get('open_report'):
+            return
         if not self.file_path:
             logger.info(f'open_file is not implemented for exporter {self.__class__.__name__}')
             return
@@ -54,39 +75,45 @@ class XlsxExporter(SharkadmExporter):
         self._save_as_xlsx_with_table(df)
         logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
 
-    def _set_save_path(self):
-        file_path = self.kwargs.get('file_path')
-        file_name = self.kwargs.get('file_name')
-        export_directory = self.kwargs.get('export_directory')
-        if file_path:
-            self.file_path = self.kwargs.get('path')
-            return
-        if not file_name:
-            date_str = datetime.datetime.now().strftime('%Y%m%d')
-            file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}.xlsx'
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self.file_path = pathlib.Path(export_directory, file_name)
-        if not self.file_path.parent.exists():
-            raise NotADirectoryError(self.file_path.parent)
-
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
-        header = ['Level', 'Log type', 'Message', 'Nr', 'Item']
+        header = ['Level', 'Log type', 'Message', 'Nr of logs', 'Log number', 'Item']
+
         for level, level_data in data.items():
             for log_type, log_type_data in level_data.items():
                 for msg, msg_data in log_type_data.items():
                     count = msg_data['count']
-                    line = [level, log_type, msg, count]
+                    log_nr = msg_data['log_nr']
+                    line = [level, log_type, msg, count, log_nr]
                     if not self.kwargs.get('include_items') or not msg_data['items']:
                         line.append('')
                         info.append(line)
                         continue
                     for item in msg_data['items']:
+                        line[3] = 1
                         info.append(line + [item])
         df = pd.DataFrame(data=info, columns=header)
         df.fillna('', inplace=True)
+        if self.kwargs.get('sort_by'):
+            sort_by_columns = [col for col in df.columns if self._compress_item(col) in self._compress_list_items(self.kwargs.get('sort_by'))]
+            df.sort_values(sort_by_columns, inplace=True)
+        include_columns = header
+        if self.kwargs.get('include_columns'):
+            include_columns = [col for col in header if
+                               self._compress_item(col) in self._compress_list_items(self.kwargs.get('include_columns'))]
+        if self.kwargs.get('exclude_columns'):
+            include_columns = [col for col in include_columns if
+                               self._compress_item(col) not in self._compress_list_items(self.kwargs.get('exclude_columns'))]
+        df = df[include_columns]
         return df
+
+    def _compress_item(self, item: str) -> str:
+        return item.lower().replace(' ', '')
+
+    def _compress_list_items(self, lst: list[str] | str) -> list[str]:
+        if type(lst) == str:
+            lst = [lst]
+        return [self._compress_item(item) for item in lst]
 
     def _save_as_xlsx_with_table(self, df: pd.DataFrame):
         """
@@ -134,7 +161,8 @@ exporter_mapping = {
 
 
 def get_exporter(**kwargs):
-    obj = exporter_mapping.get(kwargs.pop('name'))
+    name = kwargs.pop('name')
+    obj = exporter_mapping.get(name)
     if not obj:
         raise KeyError(f'Invalid sharkadm exporter name: {name}')
     return obj(**kwargs)
