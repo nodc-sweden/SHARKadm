@@ -109,12 +109,12 @@ class SHARKadmLogger:
         # self._validations[level][msg] += 1
         event.post_event('log_validation', msg)
 
-    def log_exports(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+    def log_export(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         self.log(log_type=self.EXPORT, msg=msg, level=level, add=add)
         # level = self._check_level(level)
         # self._exports[level].setdefault(msg, 0)
         # self._exports[level][msg] += 1
-        event.post_event('log_exports', msg)
+        event.post_event('log_export', msg)
 
     def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
         level = self._check_level(level)
@@ -395,7 +395,7 @@ class old_SHARKadmLogger:
         self._validations[level].setdefault(msg, 0)
         self._validations[level][msg] += 1
 
-    def log_exports(self, msg: str, level: str = 'info') -> None:
+    def log_export(self, msg: str, level: str = 'info') -> None:
         level = self._check_level(level)
         self._exports[level].setdefault(msg, 0)
         self._exports[level][msg] += 1
@@ -524,7 +524,7 @@ class SHARKadmLoggerSql:
         cls = stack[1][0].f_locals['self'].__class__.__name__
         self.log(msg, 'validate', level, cls=cls, as_duplicate=as_duplicate, **kwargs)
 
-    def log_exports(self, msg: str, level: str = 'info', **kwargs) -> None:
+    def log_export(self, msg: str, level: str = 'info', **kwargs) -> None:
         stack = inspect.stack()
         cls = stack[1][0].f_locals['self'].__class__.__name__
         self.log(msg, 'export', level, cls=cls, **kwargs)
@@ -717,7 +717,7 @@ class SHARKadmLoggerDict:
             source_class = stack[1][0].f_locals['self'].__class__.__name__
         self.log(msg, 'validate', level, source_class=source_class, **kwargs)
 
-    def log_exports(self, msg: str, level: str = 'info', **kwargs) -> None:
+    def log_export(self, msg: str, level: str = 'info', **kwargs) -> None:
         stack = inspect.stack()
         source_class = ''
         if 'self' in stack[1][0].f_locals:

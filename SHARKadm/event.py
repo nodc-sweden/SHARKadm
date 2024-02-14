@@ -1,6 +1,9 @@
 subscribers = dict(
     log=dict(),
-    workflow=dict()
+    log_workflow=dict(),
+    log_transformation=dict(),
+    log_validation=dict(),
+    log_export=dict(),
 )
 
 
