@@ -31,19 +31,21 @@ class SharkadmExporter(ABC):
     def _export(self):
         ...
 
-    def _set_save_path(self):
+    def _set_save_path(self, suffix):
         file_path = self.kwargs.get('file_path')
         file_name = self.kwargs.get('file_name')
         export_directory = self.kwargs.get('export_directory')
         if file_path:
             self.file_path = self.kwargs.get('path')
-            return
-        if not file_name:
-            date_str = datetime.datetime.now().strftime('%Y%m%d')
-            file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{'-'.join(list(self.adm_logger.data.keys()))}.xlsx'
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self.file_path = pathlib.Path(export_directory, file_name)
+        else:
+            if not file_name:
+                date_str = datetime.datetime.now().strftime('%Y%m%d')
+                file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{'-'.join(list(self.adm_logger.data.keys()))}.xlsx'
+            if not export_directory:
+                export_directory = utils.get_export_directory()
+            self.file_path = pathlib.Path(export_directory, file_name)
+        if self.file_path.suffix != suffix:
+            self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
         if not self.file_path.parent.exists():
             raise NotADirectoryError(self.file_path.parent)
 
@@ -70,7 +72,7 @@ class XlsxExporter(SharkadmExporter):
         super().__init__(**kwargs)
 
     def _export(self) -> None:
-        self._set_save_path()
+        self._set_save_path(suffix='xlsx')
         df = self._extract_info(self.adm_logger.data)
         self._save_as_xlsx_with_table(df)
         logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
