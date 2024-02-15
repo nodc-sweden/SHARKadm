@@ -18,7 +18,7 @@ class FixYesNo(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds cruise id column'
+        return f'Fix boolean values to YES or No (Y or N?)'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         use_columns = matching_strings.get_matching_strings(strings=data_holder.data.columns,
