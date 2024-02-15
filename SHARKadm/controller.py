@@ -115,12 +115,12 @@ class SHARKadmController:
     def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
-            logger.debug(f'Running transformer: {trans}')
+            # logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
 
     def transform(self, *transformers: Transformer) -> 'SHARKadmController':
         for trans in transformers:
-            logger.debug(f'Running transformer: {trans}')
+#             logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
         return self
 
@@ -131,12 +131,12 @@ class SHARKadmController:
     def validate_before_all(self) -> None:
         """Runs all set validator objects in self._validators_before"""
         for val in self._validators_before:
-            logger.debug(f'Running validator: {val}')
+#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
 
     def validate_before(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
-            logger.debug(f'Running validator: {val}')
+#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
         return self
 
@@ -147,12 +147,12 @@ class SHARKadmController:
     def validate_after_all(self) -> None:
         """Runs all set validator objects in self._validators_after"""
         for val in self._validators_after:
-            logger.debug(f'Running validator: {val}')
+#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
 
     def validate_after(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
-            logger.debug(f'Running validator: {val}')
+#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
         return self
 
@@ -163,12 +163,12 @@ class SHARKadmController:
     def export_all(self) -> None:
         """Runs all export objects in self._exporters"""
         for exp in self._exporters:
-            logger.debug(f'Running exporter: {exp}')
+#             logger.debug(f'Running exporter: {exp}')
             exp.export(self._data_holder)
 
     def export(self, *exporters: Exporter) -> 'SHARKadmController':
         for exp in exporters:
-            logger.debug(f'Running exporter: {exp}')
+#             logger.debug(f'Running exporter: {exp}')
             exp.export(self._data_holder)
         return self
 

@@ -2,14 +2,16 @@ import os
 import pathlib
 from typing import Union
 
+from SHARKadm import sharkadm_exceptions
 from SHARKadm import utils
 from .archive_data_holder import ArchiveDataHolder
+from .bacterioplankton import BacterioplanktonArchiveDataHolder
 from .chlorophyll import ChlorophyllArchiveDataHolder
 from .delivery_note import DeliveryNote
 from .epibenthos import EpibenthosMartransArchiveDataHolder
 from .jellyfish import JellyfishArchiveDataHolder
 from .physicalchemical import PhysicalChemicalArchiveDataHolder
-from .pythonplankton import PhytoplanktonArchiveDataHolder
+from .phytoplankton import PhytoplanktonArchiveDataHolder
 from .zoobenthos import ZoobenthosArchiveDataHolder
 from .zoobenthos import ZoobenthosBedaArchiveDataHolder
 from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
@@ -29,7 +31,10 @@ def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     d_note = DeliveryNote.from_txt_file(path / 'processed_data/delivery_note.txt')
     print(f'{object_mapping=}')
     print(f'{d_note.data_format=}')
-    return object_mapping.get(d_note.data_format)(path)
+    d_holder = object_mapping.get(d_note.data_format)
+    if not d_holder:
+        raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
+    return d_holder(path)
 
 
 def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:

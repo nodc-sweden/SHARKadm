@@ -61,7 +61,7 @@ class DeliveryNote:
                         msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
-                    print(data['import_matrix_key'])
+                    # print(data['import_matrix_key'])
         return DeliveryNote(data)
 
     @classmethod

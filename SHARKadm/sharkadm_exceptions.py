@@ -19,3 +19,7 @@ class NoDataFormatFoundError(SHARKadmException):
 class ArchiveDataError(SHARKadmException):
     pass
 
+
+class ArchiveDataHolderError(SHARKadmException):
+    pass
+

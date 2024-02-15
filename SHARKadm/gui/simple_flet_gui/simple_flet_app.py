@@ -448,7 +448,6 @@ class SimpleFletApp:
                     self._current_config_file.update()
 
     def _get_order_from_config(self, list_name: str):
-        print(f'{list_name=}')
         return [item['name'] for item in self._loaded_config.get(list_name, []) or []]
 
 

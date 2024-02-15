@@ -28,7 +28,6 @@ class AddDateAndTimeToAllLevels(Transformer):
         # self._split_date_and_time(data_holder=data_holder)
 
     def _check_and_add(self, par: str, row: pd.Series) -> str:
-        print(f'{par=}: {row.get(par)=}')
         if row.get(par):
             return row[par]
         for date_par in self.dates_to_sync:
@@ -62,6 +61,32 @@ class AddDateAndTimeToAllLevels(Transformer):
 
     def _get_time_par(self, date_par: str) -> str:
         return date_par.replace('date', 'time')
+
+
+class ChangeDateFormat(Transformer):
+    dates_to_check = [
+        'sample_date',
+        'visit_date'
+    ]
+    from_format = '%Y%m%d'
+    to_format = '%Y-%m-%d'
+
+    mapping = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Changes date format from {ChangeDateFormat.from_format} to {ChangeDateFormat.to_format}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for par in self.dates_to_check:
+            data_holder.data[par] = data_holder.data[par].apply(self._set_new_format)
+
+    def _set_new_format(self, x: str):
+        try:
+            return self.mapping.setdefault(x, datetime.datetime.strptime(x, self.from_format).strftime(self.to_format))
+        except ValueError:
+            return x
+
 
 
 class AddDatetime(Transformer):

@@ -12,11 +12,13 @@ import pathlib
 import pandas as pd
 from SHARKadm import adm_logger
 from SHARKadm.data.archive.delivery_note import DeliveryNote
+from SHARKadm.data.archive.shark_metadata import SharkMetadata
 
 from SHARKadm.data.archive import ZoobenthosArchiveDataHolder
 from SHARKadm import sharkadm_exceptions
 import re
 from SHARKadm import utils
+from SHARKadm.utils import matching_strings
 from SHARKadm import event
 import numpy as np
 
@@ -72,22 +74,22 @@ class ArchiveController:
             self._filter_archive_name_in_list(string)
         return self
 
-    def filter_columns(self, *cols, exclude: list[str] | None = None):
+    def filter_columns(self, include: list[str] | None = None, exclude: list[str] | None = None):
         if self.data.empty:
             raise Exception('No data loaded')
-        exclude = exclude or []
+        include_columns = list(self.data.columns)
+        exclude_columns = []
+        if include:
+            include_columns = matching_strings.get_matching_strings(self.data.columns, include)
+        if exclude_columns:
+            exclude_columns = matching_strings.get_matching_strings(self.data.columns, exclude)
         columns = []
-        for col in cols:
-            if type(col) == str:
-                col = [col]
-            else:
-                col = list(col)
-            for c in col:
-                if col in exclude:
-                    continue
-                if c not in self.data.columns:
-                    continue
-                columns.append(c)
+        for col in self.data.columns:
+            if col in exclude_columns:
+                continue
+            if col not in include_columns:
+                continue
+            columns.append(col)
         self._df = self._df[columns]
         return self
 
@@ -135,20 +137,69 @@ class ArchiveController:
                     # print(f'{delivery_note.data.keys()=}')
                     info_set.update(list(line_data))
                 except sharkadm_exceptions.NoDataFormatFoundError:
+                    print('====¤¤¤¤¤====')
                     line_data['data_format_missing'] = 'x'
             # temp_list = [item for item in list(info_set) if item.startswith('i')]
             # print(f'{temp_list=}')
             info.append(line_data)
 
-        temp_list = [item for item in info_set if item.lower().startswith('kom')]
-        print(f'{temp_list=}')
-        cols_to_use = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing'] + sorted(info_set,
-                                                                                                          key=lambda
-                                                                                                              x:
-                                                                                                          x.lower())
+        # temp_list = [item for item in info_set if item.lower().startswith('kom')]
+        # print(f'{temp_list=}')
+        column_mapping = {}
+        first_cols = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing']
+        collection = {}
+        cols_to_use = dict((item, item) for item in first_cols)
+        for col in info_set:
+            col_lower = col.lower().strip()
+            collection.setdefault(col_lower, [])
+            col_name = f'{col} {'.' * len(collection[col_lower])}'.strip()
+            collection[col_lower].append(col)
+            cols_to_use[col] = col_name
+
+        cols_to_use = dict((key, cols_to_use[key]) for key in sorted(cols_to_use, key=lambda x: x.lower()))
+
+        # other_columns = sorted([col for col in info_set if col.lower() not in first_cols])
+        # cols_to_use = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing'] + other_columns
+        self.info = info
+        self.cols_to_use = cols_to_use
         # print(f'{cols_to_use=}')
         self._create_dataframe(info, cols_to_use)
         self._save_path = utils.get_export_directory() / f'delivery_note_summary_{self._data_type}.txt'
+        return self
+
+    def create_shark_metadata_summary(self):
+        if not self.data_type:
+            raise Exception('data_type is not set!')
+        info = []
+        info_set = set()
+        for path in self.archive_list:
+            adm_logger.log_workflow(f'Looking at: {path}')
+            line_data = dict()
+            shark_metadata_path = path / 'shark_metadata.txt'
+            line_data['archive_directory_name'] = path.name
+            if not shark_metadata_path.exists():
+                line_data['shark_metadata_missing'] = 'x'
+            else:
+                delivery_note = SharkMetadata.from_txt_file(shark_metadata_path)
+                line_data.update(delivery_note.data)
+                info_set.update(list(line_data))
+            info.append(line_data)
+
+        first_cols = ['archive_directory_name', 'shark_metadata_missing']
+        collection = {}
+        cols_to_use = dict((item, item) for item in first_cols)
+        for col in info_set:
+            col_lower = col.lower().strip()
+            collection.setdefault(col_lower, [])
+            col_name = f'{col} {'.'*len(collection[col_lower])}'.strip()
+            collection[col_lower].append(col)
+            cols_to_use[col] = col_name
+
+        cols_to_use = dict((key, cols_to_use[key]) for key in sorted(cols_to_use, key=lambda x: x.lower()))
+        self.info = info
+        self.cols_to_use = cols_to_use
+        self._create_dataframe(info, cols_to_use)
+        self._save_path = utils.get_export_directory() / f'shark_metadata_summary_{self._data_type}.txt'
         return self
 
     def create_column_summary(self, *columns: str, all_columns=False):
@@ -248,23 +299,64 @@ class ArchiveController:
         self._save_path = utils.get_export_directory() / f'file_list_{self._data_type}.txt'
         return self
 
-    def _create_dataframe(self, info, columns):
+    def _create_dataframe(self, info: list[dict], columns: list | dict):
         temp_list_columns = [item for item in columns if item.lower().startswith('kom')]
         print(f'{temp_list_columns=}')
         data = []
+        if type(columns) is list:
+            columns = dict((col, col) for col in columns)
         for line in info:
             new_line = []
             for col in columns:
                 new_line.append(line.get(col, ''))
             data.append(new_line)
-        self._df = pd.DataFrame(data=data, columns=columns)
+        self._df = pd.DataFrame(data=data, columns=list(columns.values()))
         temp_list_columns_df = [item for item in self._df.columns if item.lower().startswith('kom')]
         print(f'{temp_list_columns_df=}')
 
-    def save_data(self, **kwargs):
+    def save_data_as_txt(self, **kwargs):
         self._save_path = kwargs.get('path', self._save_path)
+        self._save_path = self._save_path.with_suffix('.txt')
         self.data.to_csv(self._save_path, sep=kwargs.get('sep', '\t'), index=False, encoding=kwargs.get('encoding',
                                                                                                         'cp1252'))
+        return self
+
+    def save_data_as_xlsx(self, **kwargs):
+        """
+        https://stackoverflow.com/questions/58326392/how-to-create-excel-table-with-pandas-to-excel
+        """
+        self._save_path = kwargs.get('path', self._save_path)
+        self._save_path = self._save_path.with_suffix('.xlsx')
+        # Create a Pandas Excel writer using XlsxWriter as the engine.
+        writer = pd.ExcelWriter(str(self._save_path), engine='xlsxwriter')
+
+        # Convert the dataframe to an XlsxWriter Excel object. Turn off the default
+        # header and index and skip one row to allow us to insert a user defined
+        # header.
+        sheet_name = self._save_path.stem.split('SHARK_')[-1][:30]
+        self.data.to_excel(writer, sheet_name=sheet_name, startrow=1, header=False, index=False)
+
+        # Get the xlsxwriter workbook and worksheet objects.
+        # workbook = writer.book
+        worksheet = writer.sheets[sheet_name]
+
+        # Get the dimensions of the dataframe.
+        (max_row, max_col) = self.data.shape
+
+        # Create a list of column headers, to use in add_table().
+        column_settings = []
+        for header in self.data.columns:
+            column_settings.append({'header': header})
+
+        # Add the table.
+        worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
+
+        # Make the columns wider for clarity.
+        worksheet.set_column(0, max_col - 1, 30)
+
+        # Close the Pandas Excel writer and output the Excel file.
+        writer.close()
+
         return self
 
     def open_file(self):

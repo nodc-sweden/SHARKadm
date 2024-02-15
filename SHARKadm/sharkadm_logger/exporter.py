@@ -45,7 +45,8 @@ class SharkadmExporter(ABC):
                 export_directory = utils.get_export_directory()
             self.file_path = pathlib.Path(export_directory, file_name)
         if self.file_path.suffix != suffix:
-            self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
+            self.file_path = self.file_path.with_suffix(suffix)
+            # self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
         if not self.file_path.parent.exists():
             raise NotADirectoryError(self.file_path.parent)
 
@@ -79,21 +80,23 @@ class XlsxExporter(SharkadmExporter):
 
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
-        header = ['Level', 'Log type', 'Message', 'Nr of logs', 'Log number', 'Item']
+        header = ['Level', 'Log type', 'Message', 'Nr of logs', 'Log number']
+        if self.kwargs.get('include_items'):
+            header = header + ['Item']
 
         for level, level_data in data.items():
             for log_type, log_type_data in level_data.items():
                 for msg, msg_data in log_type_data.items():
                     count = msg_data['count']
                     log_nr = msg_data['log_nr']
-                    line = [level, log_type, msg, count, log_nr]
                     if not self.kwargs.get('include_items') or not msg_data['items']:
-                        line.append('')
+                        line = [level, log_type, msg, count, log_nr]
                         info.append(line)
                         continue
                     for item in msg_data['items']:
-                        line[3] = 1
-                        info.append(line + [item])
+                        # line[3] = 1
+                        line = [level, log_type, msg, count, log_nr, item]
+                        info.append(line)
         df = pd.DataFrame(data=info, columns=header)
         df.fillna('', inplace=True)
         if self.kwargs.get('sort_by'):

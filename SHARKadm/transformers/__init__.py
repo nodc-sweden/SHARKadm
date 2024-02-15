@@ -6,6 +6,7 @@ from SHARKadm import utils
 from .aphia import AddAphiaId
 from .arithmetic import Divide
 from .arithmetic import Multiply
+from .bacteria import AddBacteriaAsReportedScientificName
 from .base import Transformer
 from .boolean import FixYesNo
 from .bvol import AddBvolAphiaId
@@ -22,6 +23,7 @@ from .datatype import AddDatatype
 from .date_and_time import AddDateAndTimeToAllLevels
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
+from .date_and_time import ChangeDateFormat
 from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
