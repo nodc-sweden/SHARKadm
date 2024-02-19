@@ -74,7 +74,6 @@ from .static_data_holding_center import AddStaticDataHoldingCenter
 from .static_internet_access import AddStaticInternetAccessInfo
 from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
-from .station import AddStationVissEuId
 from .taxon_rank import AddTaxonRanks
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong

@@ -8,7 +8,7 @@ import dyntaxa
 
 
 class AddTaxonRanks(Transformer):
-    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    invalid_data_types = ['physicalchemical', 'chlorophyll', 'bacterioplankton']
     ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
     cols_to_set = [f'taxon_{rank}' for rank in ranks]
     source_col = 'dyntaxa_scientific_name'
