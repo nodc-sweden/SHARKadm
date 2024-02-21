@@ -30,6 +30,9 @@ class AddTaxonRanks(Transformer):
             if not info:
                 adm_logger.log_transformation(f'Could not add information about taxon rank', add=name)
                 continue
+            if type(info) == list:
+                adm_logger.log_transformation(f'Several matches in dyntaxa', add=name, level=adm_logger.WARNING)
+                continue
             for rank, col in zip(self.ranks, self.cols_to_set):
                 value = info.get(rank, '')
                 data_holder.data.loc[data_holder.data[self.source_col] == name, col] = value

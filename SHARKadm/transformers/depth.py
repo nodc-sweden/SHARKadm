@@ -61,6 +61,7 @@ class AddSectionStartAndEndDepth(Transformer):
 
 
 class ReorderSampleMinAndMaxDepth(Transformer):
+    invalid_data_holders = ['EpibenthosMartransArchiveDataHolder']
     min_depth_par = 'sample_min_depth_m'
     max_depth_par = 'sample_max_depth_m'
 
@@ -69,6 +70,7 @@ class ReorderSampleMinAndMaxDepth(Transformer):
         return f'Reorders sample min and max depth if they are in wrong order.'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        print(data_holder.data[[self.min_depth_par, self.max_depth_par]])
         data_holder.data[[self.min_depth_par, self.max_depth_par]] = \
             data_holder.data.apply(lambda row: self.reorder(row), axis=1, result_type='expand')
         # data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.reorder(p, row), axis=1)

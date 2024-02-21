@@ -769,7 +769,6 @@ class SHARKadmLoggerDict:
     def _add_to_log(self, **kwargs):
         kw = self._filter_kwargs(**kwargs)
         key = self._get_log_key(**kw)
-        print(f'{key=}')
         self._data.setdefault(key, self._log_template)
         self._data[key]['count'] += 1
         self._data[key]['timestamp'] = self._timestamp

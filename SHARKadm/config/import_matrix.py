@@ -44,7 +44,7 @@ class ImportMatrixConfig:
     def __init__(self,
                  path: str | pathlib.Path,
                  data_type: str = None,
-                 encoding: str = 'cp1252') -> None:
+                 encoding: str = 'ansi') -> None:
                  # data_type_mapper: DataTypeMapper = None) -> None:
         self._path = pathlib.Path(path)
         # self._data_type = data_type_mapper.get(data_type)

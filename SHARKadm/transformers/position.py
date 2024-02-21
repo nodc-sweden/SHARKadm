@@ -151,12 +151,42 @@ class AddPositionSweref99tm(Transformer):
         return f'Adds crs position in sweref99tm'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.x_column_to_set] = ''
+        data_holder.data[self.y_column_to_set] = ''
         # data_holder.data[self.x_column_to_set], data_holder.data[self.y_column_to_set] = \
-        data_holder.data = data_holder.data.apply(self._get_pos, axis=1)
+        for (lat, lon), df in data_holder.data.groupby([self.lat_source_col, self.lon_source_col]):
+            x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
+            boolean = (data_holder.data[self.lat_source_col] == lat) & (data_holder.data[self.lon_source_col] == lon)
+            data_holder.data.loc[boolean, self.x_column_to_set] = x
+            data_holder.data.loc[boolean, self.y_column_to_set] = y
 
-    def _get_pos(self, row: dict) -> dict:
-        lat, lon = row[self.lat_source_col], row[self.lon_source_col]
-        row[self.x_column_to_set], row[self.y_column_to_set] = \
-            self._cached_pos.setdefault((lat, lon), geography.decdeg_to_sweref99tm(lat=lat, lon=lon))
-        return row
+
+    #     data_holder.data = data_holder.data.apply(self._get_pos, axis=1)
+    #
+    # def _get_pos(self, row: dict) -> dict:
+    #     lat, lon = row[self.lat_source_col], row[self.lon_source_col]
+    #     if not (lat and lon):
+    #         adm_logger.log_transformation(
+    #             f'Missing {self.lat_source_col} and/or {self.lon_source_col} in {self.__class__.__name__}',
+    #             add=row.get('row_number', None),
+    #             level=adm_logger.WARNING)
+    #         return row
+    #     row[self.x_column_to_set], row[self.y_column_to_set] = \
+    #         self._cached_pos.setdefault((lat, lon), geography.decdeg_to_sweref99tm(lat=lat, lon=lon))
+    #     return row
+
+    # def _transform(self, data_holder: DataHolderProtocol) -> None:
+    #     # data_holder.data[self.x_column_to_set], data_holder.data[self.y_column_to_set] = \
+    #     data_holder.data = data_holder.data.apply(self._get_pos, axis=1)
+    #
+    # def _get_pos(self, row: dict) -> dict:
+    #     lat, lon = row[self.lat_source_col], row[self.lon_source_col]
+    #     if not (lat and lon):
+    #         adm_logger.log_transformation(f'Missing {self.lat_source_col} and/or {self.lon_source_col} in {self.__class__.__name__}',
+    #                                       add=row.get('row_number', None),
+    #                                       level=adm_logger.WARNING)
+    #         return row
+    #     row[self.x_column_to_set], row[self.y_column_to_set] = \
+    #         self._cached_pos.setdefault((lat, lon), geography.decdeg_to_sweref99tm(lat=lat, lon=lon))
+    #     return row
 

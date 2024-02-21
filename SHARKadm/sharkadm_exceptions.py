@@ -23,3 +23,7 @@ class ArchiveDataError(SHARKadmException):
 class ArchiveDataHolderError(SHARKadmException):
     pass
 
+
+class DataHolderError(SHARKadmException):
+    pass
+

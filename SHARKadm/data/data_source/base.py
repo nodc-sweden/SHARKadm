@@ -104,6 +104,11 @@ class DataFile(ABC):
             else:
                 self.data[new_column] = self.data[new_column] + ' <-> ' + self.data[col]
 
+    def remove_columns(self, *cols):
+        columns = [col for col in self._data.columns if col not in cols]
+        self._original_header = columns
+        self._data = self._data[columns]
+
     @property
     def data(self) -> pd.DataFrame:
         return self.get_data()

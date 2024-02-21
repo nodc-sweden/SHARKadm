@@ -16,7 +16,9 @@ class AddReportedScientificName(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         self.check_columns = [col for col in self.check_columns if col in data_holder.data.columns]
-        if all(data_holder.data[self.col_to_set]):
+        if self.col_to_set not in data_holder.data.columns:
+            data_holder.data[self.col_to_set] = ''
+        elif all(data_holder.data[self.col_to_set]):
             adm_logger.log_transformation(f'All {self.col_to_set} reported. Will skip {self.__class__.__name__}.')
             return
         if not self.check_columns:

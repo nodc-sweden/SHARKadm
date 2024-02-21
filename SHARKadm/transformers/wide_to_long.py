@@ -103,14 +103,11 @@ class WideToLong(Transformer):
             meta = list(row[self._metadata_columns].values)
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
+                print(row[col])
                 if not row[col]:
                     continue
                 par = self._get_parameter_name_from_parameter(col)
                 value = row[col]
-                print()
-                print()
-                for key, v in self._qf_col_mapping.items():
-                    print(f'{key=}: {v=}')
                 qf = row.get(q_col)
                 if qf is None:
                     adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)

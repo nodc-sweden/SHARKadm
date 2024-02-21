@@ -7,6 +7,8 @@ from .base import Transformer, DataHolderProtocol
 from SHARKadm.data.archive import ArchiveDataHolder
 from SHARKadm.utils import yaml_data
 from SHARKadm import adm_config_paths
+from SHARKadm import adm_logger
+
 
 if getattr(sys, 'frozen', False):
     THIS_DIR = pathlib.Path(sys.executable).parent
@@ -30,6 +32,10 @@ class AddStatus(Transformer):
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
         checked_by = data_holder.delivery_note['data kontrollerad av']
+        if not checked_by:
+            adm_logger.log_transformation(f'Could not set "status" and "checked". Missing information in delivery_note: data kontrollerad av',
+                                          level=adm_logger.WARNING)
+            return
         data = dict()
         if data_holder.data_type.lower() in self.physical_chemical_keys:
             data = self._config['default_physical_chemical']

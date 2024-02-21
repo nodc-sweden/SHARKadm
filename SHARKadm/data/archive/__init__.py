@@ -8,6 +8,7 @@ from .archive_data_holder import ArchiveDataHolder
 from .bacterioplankton import BacterioplanktonArchiveDataHolder
 from .chlorophyll import ChlorophyllArchiveDataHolder
 from .delivery_note import DeliveryNote
+# from .epibenthos import EpibenthosArchiveDataHolder
 from .epibenthos import EpibenthosMartransArchiveDataHolder
 from .jellyfish import JellyfishArchiveDataHolder
 from .physicalchemical import PhysicalChemicalArchiveDataHolder

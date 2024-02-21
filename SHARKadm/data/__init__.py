@@ -100,6 +100,7 @@ def get_data_holder(path: str | pathlib.Path) -> DataHolder:
         lims_directory = directory_is_lims(path)
         if lims_directory:
             return get_lims_data_holder(lims_directory)
+    raise sharkadm_exceptions.DataHolderError(f'Could not find dataholder for: {path}')
 
 
 def get_valid_data_holders(valid: list[str] | None = None,
