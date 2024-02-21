@@ -14,13 +14,13 @@ visit.water_land_station_type_code		WLTYP
 visit.monitoring_station_type_code		MSTAT
 visit.monitoring_purpose_code		PURPM
 visit.water_depth_m	station.djup	WADEP
-sample.visit_water_depth_m	besok.djup
+sample.water_depth_m	besok.djup	
 visit.NOT_USED.besok_h2s	besok.h2s	
 sample.NOT_USED.taxon_datum	taxon.datum	
 visit.wind_speed_ms	vindhastighet	WINSP
 visit.wave_height_m	vaghojd	WAVHT
-visit.wave_observation_code		WAVES
-visit.weather_observation_code		SEAST<or>WEATH
+visit.wave_observation_code		WAVES<or>SEAST
+visit.weather_observation_code		WEATH
 visit.wind_direction_code	vindriktning	WINDR<or>WINDIR_CODE<or>WINDIR
 visit.air_temperature_degc		AIRTEMP
 visit.air_pressure_hpa		AIRPRES

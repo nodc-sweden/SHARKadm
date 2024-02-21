@@ -69,7 +69,3 @@ variable.COPY_VARIABLE.Displacement volume.ml	DISPLA
 variable.COPY_VARIABLE.Length mean.mm	LENGTH_MEAN	
 variable.COPY_VARIABLE.Length median.mm	LENGTH_MEDIAN	
 variable.COPY_VARIABLE.Length.mm	LENGTH	LENGTH
-		
-		
-		
-		

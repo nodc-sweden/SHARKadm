@@ -47,10 +47,10 @@ sample.sample_substrate_cover_rock							Täckningsgrad häll (prov)	Hård
 sample.sample_substrate_comnt_rock							Kommentar häll (prov)		
 sample.sample_substrate_comnt_gravel							Kommentar grus (prov)		
 sample.sample_substrate_comnt_softbottom							Kommentar mjukbotten (prov)		
-TEMP.substrate					provsubstrat.substrat_substrat<or>substrat.substrat				
-TEMP.substrate_code	SUBST				provsubstrat.substratkod	SUBST			
-TEMP.substrate_cover	SUBST_COVER				provsubstrat.tackningsgrad	SUBST_COVER			
-TEMP.substrate_comment					provsubstrat.kommentar		<or>Kommentar grus (prov)<or>Kommentar häll (prov)		
+variable.substrate					provsubstrat.substrat_substrat<or>substrat.substrat				
+variable.COPY_VARIABLE.Substrate.code	SUBST				provsubstrat.substratkod	SUBST			
+variable.COPY_VARIABLE.Substrate cover.%	SUBST_COVER				provsubstrat.tackningsgrad	SUBST_COVER			
+variable.substrate_comment					provsubstrat.kommentar		<or>Kommentar grus (prov)<or>Kommentar häll (prov)		
 visit.transect_id					transekt.transektnamn	Transekt	Transekt-ID		
 sample.transect_id	TRANS_ID<or>TRANS	TRANS	TRANS<or>Transect			TRANS_ID			TRANS_ID
 sample.transect_start_latitude_dm		TRANS_LAT_START							
@@ -95,10 +95,10 @@ sample.section_fauna_flora_found					avsnitt.nospecies
 sample.section_debris_cover					avsnitt.debris				
 sample.section_bare_substrate					avsnitt.kalbotten				
 sample.section_transect									
-TEMP.sect_substrate					avsnittsubstrat.substrat_substrat				
-TEMP.sect_substrate_code					avsnittsubstrat.substratkod				
-TEMP.sect_substrate_cover					avsnittsubstrat.tackningsgrad				
-TEMP.sect_substrate_comment					avsnittsubstrat.kommentar				
+variable.sect_substrate					avsnittsubstrat.substrat_substrat				
+variable.COPY_VARIABLE.Section substrate.code					avsnittsubstrat.substratkod				
+variable.COPY_VARIABLE.Section substrate cover.%					avsnittsubstrat.tackningsgrad				
+variable.sect_substrate_comment					avsnittsubstrat.kommentar				
 sample.section_comment	COMNT_SECTION	COMNT_SECTION			avsnitt.avsnitt_kommentar<or>avsnitt.kommentar	Kommentar<or>COMNT_SECTION			
 sample.sampler_type_code	SMTYP	SMTYP	SMTYP	SMTYP	prov.redskapstyp_redskapstyp	SMTYP			SMTYP
 sample.sampler_area_m2	SAREA	SAREA		SAREA	prov.prov_yta<or>prov.yta	SAREA	Provtagar-area (m2)	Provyta	SAREA
