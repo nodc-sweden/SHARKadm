@@ -103,8 +103,8 @@ class WideToLong(Transformer):
             meta = list(row[self._metadata_columns].values)
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
-                print(row[col])
                 if not row[col]:
+                    # print(f'{col=}')
                     continue
                 par = self._get_parameter_name_from_parameter(col)
                 value = row[col]
@@ -115,6 +115,19 @@ class WideToLong(Transformer):
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
                 data.append(new_row)
+
+        self.meta = meta
+        self.par = par
+        self.value = value
+        self.qf = qf
+        self.unit = unit
+        self.new_row = new_row
+        self.row = row
+        self.data = data
+        self.columns = self._metadata_columns + [self._column_name_parameter,
+                                                                           self._column_name_value,
+                                                                           self._column_name_qf,
+                                                                           self._column_name_unit]
         new_df = pd.DataFrame(data=data, columns=self._metadata_columns + [self._column_name_parameter,
                                                                            self._column_name_value,
                                                                            self._column_name_qf,

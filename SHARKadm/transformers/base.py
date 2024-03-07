@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Protocol
+import time
 
 import pandas as pd
 
@@ -43,10 +44,6 @@ class Transformer(ABC):
         return f'Transformer: {self.__class__.__name__}'
 
     @property
-    def workflow_message(self) -> str:
-        return f'Applying transformer: {self.__class__.__name__}'
-
-    @property
     def transformer_name(self) -> str:
         """Short name of the transformer"""
         return self.__class__.__name__
@@ -68,9 +65,11 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
             return
-        adm_logger.log_workflow(self.workflow_message, add=self.get_transformer_description())
-        print(self._transform)
+
+        adm_logger.log_workflow(f'Applying transformer: {self.__class__.__name__}', add=self.get_transformer_description())
+        t0 = time.time()
         self._transform(data_holder=data_holder)
+        adm_logger.log_workflow(f'Transformer {self.__class__.__name__} executed in {time.time()-t0} seconds')
 
     @abstractmethod
     def _transform(self, data_holder: DataHolderProtocol) -> None:

@@ -16,15 +16,29 @@ class AddSwedishSamplingLaboratory(Transformer):
         return f'Adds sampling laboratory name in swedish'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._get_code(row), axis=1)
+        col = 'sampling_laboratory_code'
+        if col not in data_holder.data.columns:
+            col = 'sampling_laboratory_name_en'
+        data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row, col=col: self._get(row, col), axis=1)
 
-    def _get_code(self, row):
-        code = row['sampling_laboratory_code']
+    def _get(self, row, col):
+        code = row[col]
         info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
         if not info:
-            adm_logger.log_transformation(f'Could not find information for sampling_laboratory_code: {code}')
+            adm_logger.log_transformation(f'Could not find information for {col}: {code}')
             return ''
         return info['swedish']
+
+    # def _transform(self, data_holder: DataHolderProtocol) -> None:
+    #     data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._get_code(row), axis=1)
+    #
+    # def _get_code(self, row):
+    #     code = row['sampling_laboratory_code']
+    #     info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+    #     if not info:
+    #         adm_logger.log_transformation(f'Could not find information for sampling_laboratory_code: {code}')
+    #         return ''
+    #     return info['swedish']
 
 
 class AddEnglishSamplingLaboratory(Transformer):
@@ -53,7 +67,6 @@ class AddEnglishSamplingLaboratory(Transformer):
 
 class AddSwedishAnalyticalLaboratory(Transformer):
     col_to_set = 'analytical_laboratory_name_sv'
-    source_column = 'analytical_laboratory_code'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -65,18 +78,32 @@ class AddSwedishAnalyticalLaboratory(Transformer):
         return f'Adds analytical laboratory name in swedish'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.source_column not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Missing column {self.source_column} when trying to set {self.col_to_set}')
-            return
-        data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._get_code(row), axis=1)
+        col = 'analytical_laboratory_code'
+        if col not in data_holder.data.columns:
+            col = 'analytical_laboratory_name_en'
+        data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row, col=col: self._get(row, col), axis=1)
 
-    def _get_code(self, row):
-        code = row[self.source_column]
+    def _get(self, row, col):
+        code = row[col]
         info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
         if not info:
-            adm_logger.log_transformation(f'Could not find information for analytical_laboratory_code: {code}')
+            adm_logger.log_transformation(f'Could not find information for {col}: {code}')
             return ''
         return info['swedish']
+
+    # def _transform(self, data_holder: DataHolderProtocol) -> None:
+    #     if self.source_column not in data_holder.data.columns:
+    #         adm_logger.log_transformation(f'Missing column {self.source_column} when trying to set {self.col_to_set}')
+    #         return
+    #     data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row: self._get_code(row), axis=1)
+    #
+    # def _get_code(self, row):
+    #     code = row[self.source_column]
+    #     info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+    #     if not info:
+    #         adm_logger.log_transformation(f'Could not find information for analytical_laboratory_code: {code}')
+    #         return ''
+    #     return info['swedish']
 
 
 class AddEnglishAnalyticalLaboratory(Transformer):
