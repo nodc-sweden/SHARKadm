@@ -1,4 +1,4 @@
-subscribers = dict(
+_subscribers = dict(
     log=dict(),
     log_workflow=dict(),
     log_transformation=dict(),
@@ -12,20 +12,20 @@ class EventNotFound(Exception):
 
 
 def get_events() -> list[str]:
-    return sorted(subscribers)
+    return sorted(_subscribers)
 
 
 def subscribe(event: str, func, prio: int = 50) -> None:
-    if event not in subscribers:
+    if event not in _subscribers:
         raise EventNotFound(event)
-    subscribers[event].setdefault(prio, [])
-    subscribers[event][prio].append(func)
+    _subscribers[event].setdefault(prio, [])
+    _subscribers[event][prio].append(func)
 
 
 def post_event(event: str, data=None) -> None:
-    if event not in subscribers:
+    if event not in _subscribers:
         raise EventNotFound(event)
-    for prio in sorted(subscribers[event]):
-        for func in subscribers[event][prio]:
+    for prio in sorted(_subscribers[event]):
+        for func in _subscribers[event][prio]:
             func(data)
 
