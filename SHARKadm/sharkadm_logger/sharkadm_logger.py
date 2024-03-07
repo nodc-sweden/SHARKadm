@@ -3,6 +3,7 @@ import inspect
 import logging
 import pathlib
 import time
+from functools import wraps
 
 import pandas as pd
 
@@ -105,7 +106,7 @@ class SHARKadmLogger:
         # self._transformations[level][msg] += 1
         event.post_event('log_transformation', msg)
 
-    def log_validation(self, msg: str, level: str = 'info', add: str | None = None, data_row: str | int | None = None) -> None:
+    def log_validation(self, msg: str, level: str = 'warning', add: str | None = None, data_row: str | int | None = None) -> None:
         self.log(log_type=self.VALIDATION, msg=msg, level=level, add=add, data_row=data_row)
         # level = self._check_level(level)
         # self._validations[level].setdefault(msg, 0)
@@ -118,6 +119,21 @@ class SHARKadmLogger:
         # self._exports[level].setdefault(msg, 0)
         # self._exports[level][msg] += 1
         event.post_event('log_export', msg)
+
+    def log_time(self, func):
+        """https://dev.to/kcdchennai/python-decorator-to-measure-execution-time-54hk"""
+        @wraps(func)
+        def timeit_wrapper(*args, **kwargs):
+            start_time = time.perf_counter()
+            result = func(*args, **kwargs)
+            end_time = time.perf_counter()
+            total_time = end_time - start_time
+            msg = f'{func.__name__}{args} {kwargs} took {total_time:.4f} seconds'
+            self.log(log_type=self.WORKFLOW, msg=msg, level=self.DEBUG)
+            event.post_event('log_workflow', msg)
+            return result
+
+        return timeit_wrapper
 
     def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
         self._nr_log_entries += 1
@@ -177,8 +193,10 @@ class SHARKadmLogger:
         for level in use_levels:
             if '<' in level:
                 levels_to_use.update(self._levels[:self._levels.index(level.strip('<>'))+1])
-            if '>' in level:
+            elif '>' in level:
                 levels_to_use.update(self._levels[self._levels.index(level.strip('<>')):])
+            else:
+                levels_to_use.add(level)
         return [level for level in self._levels if level in levels_to_use]
 
     def _get_log_types(self, *args: str, log_types: str | list | None = None):

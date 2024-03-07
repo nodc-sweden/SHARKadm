@@ -73,7 +73,7 @@ class XlsxExporter(SharkadmExporter):
         super().__init__(**kwargs)
 
     def _export(self) -> None:
-        self._set_save_path(suffix='xlsx')
+        self._set_save_path(suffix='.xlsx')
         df = self._extract_info(self.adm_logger.data)
         self._save_as_xlsx_with_table(df)
         logger.info(f'Saving sharkadm xlsx log to {self.file_path}')

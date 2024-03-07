@@ -3,6 +3,7 @@ import os
 import pathlib
 import platform
 import subprocess
+import zipfile
 
 SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
 
@@ -113,5 +114,10 @@ def get_all_class_children(cls):
     return mapping
 
 
-
-
+def unzip_file(path: pathlib.Path, export_directory: pathlib.Path, delete_old=False):
+    sub_export_dir = export_directory / path.stem
+    if sub_export_dir.exists() and not delete_old:
+        raise IsADirectoryError(f'Already exist: {sub_export_dir}')
+    with zipfile.ZipFile(path, 'r') as zip_ref:
+        zip_ref.extractall(sub_export_dir)
+    return sub_export_dir

@@ -10,6 +10,7 @@ from .unique import ValidateUniqueSampleId
 from .columns import ValidateColumnViewColumnsNotInDataset
 from .mandatory import ValidateValuesInMandatoryNatColumns
 from .mandatory import ValidateValuesInMandatoryRegColumns
+from .aphia_id import ValidateAphiaId
 
 
 from ..utils.inspect_kwargs import get_kwargs_for_class

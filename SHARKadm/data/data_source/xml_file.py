@@ -178,6 +178,8 @@ class XmlMartransDataFile(DataFile):
                                 lines.append(data)
 
         self._data = pd.DataFrame.from_records(lines)
+        self._data.fillna('', inplace=True)
+
         # self._fix_reported_scientific_name()
         # self._fix_dyntaxa()
         # self._fix_variable_comment()
@@ -185,12 +187,17 @@ class XmlMartransDataFile(DataFile):
 
         self._concatenate('reported_scientific_name', ['avsnittart.taxon_namn', 'provart.taxon_namn', 'taxon.taxon_namn', 'transekttaxaminmax.taxon_namn'])
         self._concatenate('dyntaxa_id', ['transekttaxaminmax.transekttaxaminmax_taxonID', 'avsnittart.taxonID', 'provart.provart_taxonID', 'provart.taxonID'])
-        self._concatenate('variable_comment', ['provart.provart_kommentar', 'transekttaxaminmax.transekttaxaminmax_kommentar', 'avsnitt.avsnittart_kommentar', 'bitmarken.bitmarken_beskrivning', 'nyrekrytering.nyrekrytering_beskrivning', 'avsnittart.kommentar', 'provart.kommentar', 'avsnittart.nyrekrytering_nyrekrytering', 'avsnittart.bitmarken_bitmarken', 'transekttaxaminmax.kommentar	segmenttaxonkommentar', 'kommentar', 'COMNT_VAR'])
+        self._concatenate('variable_comment', ['provart.provart_kommentar', 'transekttaxaminmax.transekttaxaminmax_kommentar', 'avsnitt.avsnittart_kommentar', 'bitmarken.bitmarken_beskrivning', 'nyrekrytering.nyrekrytering_beskrivning', 'avsnittart.kommentar', 'provart.kommentar', 'avsnittart.nyrekrytering_nyrekrytering', 'avsnittart.bitmarken_bitmarken', 'transekttaxaminmax.kommentar'])
         self._concatenate('variable.COPY_VARIABLE.Cover.%', ['provartstorlek.provartstorlek_abundans', 'provart.provart_abundans', 'avsnittart.avsnittart_antal', 'avsnittart.antal', 'provart.abundans'])
         self._concatenate('taxon_photo', ['avsnittart.foto', 'provart.provart_foto', 'provart.foto', 'avsnitt.foto'])
         self._concatenate('epibiont', ['transekttaxaminmax.transekttaxaminmax_epibiotisk', 'provart.provart_epibiotisk', 'avsnittart.epibiotisk', 'provart.epibiotisk', 'transekttaxaminmax.epibiotisk'])
         self._concatenate('species_flag_code', ['transekttaxaminmax.transekttaxaminmax_sflag', 'provart.provart_sflag', 'avsnittart.avsnittart_sflag', 'avsnittart.sflag', 'provart.sflag', 'transekttaxaminmax.sflag'])
         self._concatenate('sample_depth_m', ['prov.prov_djup', 'hydrografi.djup', 'prov.djup'])
+        self._concatenate('COPY_VARIABLE.Cover.%', ['avsnittart.tackningsgrad', 'provart.provart_tackningsgrad', 'provart.tackningsgrad'])
+        self._concatenate('CREATE_VARIABLE.Total cover of all species.%', ['avsnitt.totalcover', 'prov.totalcover'])
+        self._concatenate('section_distance_start_m', ['avsnitt.startavstand', 'prov.avstand'])
+        self._concatenate('section_distance_end_m', ['avsnitt.slutavstand', 'prov.avsnitt_slutavstand'])
+        self._concatenate('taxanomist', ['transekt.inventerare', 'prov.sorterare'])
 
     def _concatenate(self, result_col: str, columns: list[str]) -> None:
         cols = [col for col in columns if col in self._data.columns]

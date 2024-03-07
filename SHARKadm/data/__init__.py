@@ -12,6 +12,7 @@ import inspect
 from .data_holder import DataHolder
 from .archive import get_archive_data_holder, directory_is_archive
 from .lims import get_lims_data_holder, directory_is_lims
+from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
 from .dv_template import get_dv_template_data_holder
 
 from .archive import *
@@ -93,6 +94,8 @@ def get_data_holder(path: str | pathlib.Path) -> DataHolder:
     path = pathlib.Path(path)
     if path.suffix == '.xlsx':
         return get_dv_template_data_holder(path)
+    if path_is_zip_archive(path):
+        return get_zip_archive_data_holder(path)
     if path.is_dir():
         archive_directory = directory_is_archive(path)
         if archive_directory:
