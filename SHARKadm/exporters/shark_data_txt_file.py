@@ -35,3 +35,34 @@ class SHARKdataTxt(Exporter):
         column_list = self._column_views.get_columns_for_view(view=data_holder.data_type)
         data = data_holder.data[column_list]
         data.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
+
+
+class SHARKdataTxtAsGiven(Exporter):
+    exclude_columns = ['source']
+
+    def __init__(self,
+                 export_directory: str | pathlib.Path | None = None,
+                 export_file_name: str | pathlib.Path | None = None,
+                 **kwargs):
+        super().__init__()
+        if not export_directory:
+            export_directory = utils.get_export_directory()
+        self._export_directory = pathlib.Path(export_directory)
+        if not export_file_name:
+            export_file_name = 'shark_data.txt'
+        self._export_file_name = export_file_name
+        self._encoding = kwargs.get('encoding', 'cp1252')
+        self._column_views = get_column_views_config()
+
+    @property
+    def export_file_path(self):
+        return pathlib.Path(self._export_directory, self._export_file_name)
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return f'Writes data to file with all given columns except the flowing: {', '.join(SHARKdataTxtAsGiven.exclude_columns)}.'
+
+    def _export(self, data_holder: DataHolderProtocol) -> None:
+        columns = [col for col in data_holder.data.columns if col not in self.exclude_columns]
+        df = data_holder.data[columns]
+        df.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)

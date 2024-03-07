@@ -36,3 +36,4 @@ class TxtAsIs(Exporter):
         if not self._export_file_name:
             self._export_file_name = f'data_as_is_{data_holder.dataset_name}.txt'
         data_holder.data.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
+
