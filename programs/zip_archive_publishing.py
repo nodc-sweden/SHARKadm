@@ -36,6 +36,7 @@ CONFIG_PATH = pathlib.Path(ROOT_DIR, 'config.yaml').resolve()
 class ImportNotAvailable(Exception):
     pass
 
+
 class ZipArchivePublishing:
 
     def __init__(self):
@@ -79,8 +80,20 @@ class ZipArchivePublishing:
             shutil.copy2(source_path, target_path)
 
     @property
+    def sharkdata_dataset_directory(self) -> str:
+        return self._config['sharkdata_dataset_directory']
+
+    @property
+    def url_import_status(self) -> str:
+        return self._config['url_import_status']
+
+    @property
+    def url_trigger_import(self) -> str:
+        return self._config['url_trigger_import']
+
+    @property
     def _import_status_is_available(self):
-        if requests.get(self._config['url_import_status']).content.decode() == 'AVAILABLE':
+        if requests.get(self.url_import_status).content.decode() == 'AVAILABLE':
             return True
         return False
 
@@ -125,7 +138,7 @@ class ZipPath(ft.UserControl):
         return ft.Row([
             ft.IconButton(
                 ft.icons.DELETE_OUTLINE,
-                tooltip="Delete To-Do",
+                tooltip="Ta bort",
                 on_click=self._delete,
             ),
             ft.Text(self.path),
@@ -175,8 +188,8 @@ class ZipArchivePublisherGUI:
 
         self._zip_paths_column = ft.Column(tight=True)
         self._option_update_zip_archives = ft.Checkbox(label='Uppdatera zip-paket', tooltip='Uppdaterar zip-peketen med _sv-columner. Uppdaterade paket skriver INTE över befintliga.')
-        self._option_copy_zip_archives_to_sharkdata = ft.Checkbox(label='Kopiera zip-paket till "datasets"', tooltip='Kopierar zip-paketen till sharkdata/datasets-mappen för import i sharkdata')
-        self._option_trigger_import = ft.Checkbox(label='Importera zip-paketen', tooltip='Triggar APIet så att data arkiv som ligger i dataset-mappen importeras till sharkdata')
+        self._option_copy_zip_archives_to_sharkdata = ft.Checkbox(label='Kopiera zip-paket till "datasets"', tooltip=f'Kopierar zip-paketen till {self._publisher.sharkdata_dataset_directory}')
+        self._option_trigger_import = ft.Checkbox(label='Importera zip-paketen', tooltip=f'Triggar APIet ({self._publisher.url_trigger_import}) \nså att arkiven som ligger i dataset-mappen importeras till sharkdata')
         options_column = ft.Column([
             self._option_update_zip_archives,
             self._option_copy_zip_archives_to_sharkdata,
@@ -203,7 +216,11 @@ class ZipArchivePublisherGUI:
         self.update_page()
 
     def _run(self, *args):
-        if not self._zip_paths:
+        if not any([self._option_trigger_import.value, self._option_update_zip_archives.value, self._option_copy_zip_archives_to_sharkdata.value]):
+            self._dialog_text.value = 'Du har inte valt något att göra!'
+            self._open_dlg()
+            return
+        if not self._zip_paths and any([self._option_update_zip_archives.value, self._option_copy_zip_archives_to_sharkdata.value]):
             self._dialog_text.value = 'Inga zip-arkiv valda!'
             self._open_dlg()
             return
