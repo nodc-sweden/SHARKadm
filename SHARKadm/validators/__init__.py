@@ -30,10 +30,10 @@ def get_validators() -> dict[str, Type[Validator]]:
     # return validators
 
 
-def get_validator_object(validator_name: str, **kwargs) -> Validator:
+def get_validator_object(name: str, **kwargs) -> Validator:
     """Returns Validator object that matches the given validator name"""
     all_validators = get_validators()
-    val = all_validators[validator_name]
+    val = all_validators[name]
     return val(**kwargs)
 
 
@@ -65,10 +65,10 @@ def get_validators_description_text() -> str:
     line_length = 100
     lines = list()
     lines.append('=' * line_length)
-    lines.append('Available validators are:')
+    lines.append('Available validators:')
     lines.append('-' * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(30)}{info[key]}')
+        lines.append(f'{key.ljust(60)}{info[key]}')
     lines.append('=' * line_length)
     return '\n'.join(lines)
 

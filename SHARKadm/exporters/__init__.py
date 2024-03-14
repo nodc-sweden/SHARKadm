@@ -32,10 +32,10 @@ def get_exporters() -> dict[str, Type[Exporter]]:
     # return exporters
 
 
-def get_exporter_object(exporter_name: str, **kwargs) -> Exporter:
+def get_exporter_object(name: str, **kwargs) -> Exporter:
     """Returns Exporter object that matches the given exporter name"""
     all_exporters = get_exporters()
-    exporter = all_exporters[exporter_name]
+    exporter = all_exporters[name]
     return exporter(**kwargs)
 
 
@@ -70,7 +70,7 @@ def get_exporters_description_text() -> str:
     line_length = 100
     lines = list()
     lines.append('=' * line_length)
-    lines.append('Available exporters are:')
+    lines.append('Available exporters:')
     lines.append('-' * line_length)
     for key in sorted(info):
         lines.append(f'{key.ljust(30)}{info[key]}')

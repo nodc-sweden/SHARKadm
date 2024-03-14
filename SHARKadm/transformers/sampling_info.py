@@ -16,10 +16,11 @@ else:
 
 
 class AddSamplingInfo(Transformer):
+    valid_data_holders = ['ArchiveDataHolder']
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f''
+        return f'Adds sampling information to data'
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
         if 'parameter' not in data_holder.columns:

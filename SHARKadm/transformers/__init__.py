@@ -90,10 +90,10 @@ def get_transformers() -> dict[str, Type[Transformer]]:
     return utils.get_all_class_children(Transformer)
 
 
-def get_transformer_object(trans_name: str, **kwargs) -> Transformer:
+def get_transformer_object(name: str, **kwargs) -> Transformer:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
-    tran = all_trans[trans_name]
+    tran = all_trans[name]
     return tran(**kwargs)
 
 
@@ -101,6 +101,8 @@ def get_transformers_description() -> dict[str, str]:
     """Returns a dictionary with transformer name as key and the description as value"""
     result = dict()
     for name, tran in get_transformers().items():
+        if name.startswith('_'):
+            continue
         result[name] = tran.get_transformer_description()
     return result
 
@@ -112,11 +114,6 @@ def get_transformers_info() -> dict:
         result[name]['name'] = name
         result[name]['description'] = tran.get_transformer_description()
         result[name]['kwargs'] = get_kwargs_for_class(tran)
-        # result[name]['kwargs'] = dict()
-        # for key, value in inspect.signature(tran.__init__).parameters.items():
-        #     if key in ['self', 'kwargs']:
-        #         continue
-        #     result[name]['kwargs'][key] = value.default
     return result
 
 
@@ -125,10 +122,10 @@ def get_transformers_description_text() -> str:
     line_length = 100
     lines = list()
     lines.append('=' * line_length)
-    lines.append('Available transformers are:')
+    lines.append('Available transformers:')
     lines.append('-' * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(30)}{info[key]}')
+        lines.append(f'{key.ljust(40)}{info[key]}')
     lines.append('=' * line_length)
     return '\n'.join(lines)
 

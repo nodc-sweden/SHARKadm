@@ -36,13 +36,15 @@ def get_config_directory(*subfolders: str) -> pathlib.Path:
     return folder
 
 
-def get_export_directory(*subdirectories: str) -> pathlib.Path:
+def get_export_directory(*subdirectories: str, date_directory=True) -> pathlib.Path:
     export_directory = get_root_directory() / 'exports'
     if not export_directory.parent.exists():
         raise NotADirectoryError(f'Cant create export directory under {export_directory.parent}. Directory does not '
                                  f'exist!')
-    # folder = pathlib.Path(export_directory, *subdirectories)
-    folder = pathlib.Path(export_directory, datetime.datetime.now().strftime('%Y%m%d'), *subdirectories)
+    if date_directory:
+        folder = pathlib.Path(export_directory, datetime.datetime.now().strftime('%Y%m%d'), *subdirectories)
+    else:
+        folder = pathlib.Path(export_directory, *subdirectories)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 

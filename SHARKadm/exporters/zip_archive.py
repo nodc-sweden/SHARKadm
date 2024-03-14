@@ -16,7 +16,7 @@ class ZipArchive(Exporter):
     def __init__(self, directory: str | pathlib.Path | None = None, **kwargs):
         super().__init__(**kwargs)
         if not directory:
-            directory = utils.get_export_directory(datetime.datetime.now().strftime('%Y%m%d'))
+            directory = utils.get_export_directory()
         self._save_to_directory = pathlib.Path(directory)
         print(f'{self._save_to_directory=}')
         if not self._save_to_directory.is_dir():

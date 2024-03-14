@@ -32,11 +32,11 @@ class SharkadmExporter(ABC):
         ...
 
     def _set_save_path(self, suffix):
-        file_path = self.kwargs.get('file_path')
-        file_name = self.kwargs.get('file_name')
+        file_path = self.kwargs.get('export_file_path')
+        file_name = self.kwargs.get('export_file_name')
         export_directory = self.kwargs.get('export_directory')
         if file_path:
-            self.file_path = self.kwargs.get('path')
+            self.file_path = file_path
         else:
             if not file_name:
                 date_str = datetime.datetime.now().strftime('%Y%m%d')
@@ -51,7 +51,7 @@ class SharkadmExporter(ABC):
             raise NotADirectoryError(self.file_path.parent)
 
     def _open_directory(self):
-        if not self.kwargs.get('open_directory'):
+        if not self.kwargs.get('open_directory', self.kwargs.get('open_export_directory')):
             return
         if not self.file_path:
             logger.info(f'open_directory is not implemented for exporter {self.__class__.__name__}')
@@ -59,7 +59,7 @@ class SharkadmExporter(ABC):
         utils.open_directory(self.file_path.parent)
 
     def _open_file(self):
-        if not self.kwargs.get('open_report', self.kwargs.get('open_file')):
+        if not self.kwargs.get('open_report', self.kwargs.get('open_file', self.kwargs.get('open_export_file'))):
             return
         if not self.file_path:
             logger.info(f'open_file is not implemented for exporter {self.__class__.__name__}')
@@ -89,8 +89,12 @@ class XlsxExporter(SharkadmExporter):
                 for msg, msg_data in log_type_data.items():
                     count = msg_data['count']
                     log_nr = msg_data['log_nr']
-                    if not self.kwargs.get('include_items') or not msg_data['items']:
+                    if not self.kwargs.get('include_items'):
                         line = [level, log_type, msg, count, log_nr]
+                        info.append(line)
+                        continue
+                    if not msg_data['items']:
+                        line = [level, log_type, msg, count, log_nr, '']
                         info.append(line)
                         continue
                     for item in msg_data['items']:

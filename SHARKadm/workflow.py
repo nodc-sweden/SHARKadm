@@ -15,7 +15,7 @@ from SHARKadm.sharkadm_logger.exporter import get_exporter
 
 class SHARKadmWorkflow:
     def __init__(self,
-                 data_source_paths: list[str | pathlib.Path] | None = None,
+                 data_sources: list[str | pathlib.Path] | None = None,
                  validators_before: list[dict[str, str | dict[str, str]]] | None = None,
                  transformers: list[dict[str, str | dict[str, str]]] | None = None,
                  validators_after: list[dict[str, str | dict[str, str]]] | None = None,
@@ -26,16 +26,18 @@ class SHARKadmWorkflow:
                  ) -> None:
 
         self._controller = SHARKadmController()
-        self.data_source_paths = self.string_list_path_list(data_source_paths) or []
-        self.validators_before = validators_before or []
-        self.transformers = transformers or []
-        self.validators_after = validators_after or []
-        self.exporters = exporters or []
+        self._data_sources = data_sources or []
+        # self.data_source_paths = self.string_list_as_path_list(data_source_paths) or []
+        self._validators_before = validators_before or []
+        self._transformers = transformers or []
+        self._validators_after = validators_after or []
+        self._exporters = exporters or []
 
         self._workflow_config = dict(
             export_directory=utils.get_export_directory(),
             file_name=False,
-            open_export_directory=False
+            open_export_directory=False,
+            save_config=True
         )
         self._workflow_config.update(workflow_config or {})
 
@@ -75,44 +77,44 @@ class SHARKadmWorkflow:
 
     def _set_validators_before(self) -> None:
         vals_list = []
-        for val in self.validators_before or []:
-            print(f'{type(val)=}: {val=}')
-            vals_list.append(validators.get_validator_object(val['name'], **val.get('kwargs', {})))
+        for val in self._validators_before or []:
+            vals_list.append(validators.get_validator_object(**val))
         self._controller.set_validators_before(*vals_list)
 
     def _set_validators_after(self) -> None:
         vals_list = []
-        for val in self.validators_after or []:
-            vals_list.append(validators.get_validator_object(val['name'], **val.get('kwargs', {})))
+        for val in self._validators_after or []:
+            vals_list.append(validators.get_validator_object(**val))
         self._controller.set_validators_after(*vals_list)
 
     def _set_transformers(self) -> None:
         trans_list = []
-        for tran in self.transformers or []:
-            trans_list.append(transformers.get_transformer_object(tran['name'], **tran.get('kwargs', {})))
+        for tran in self._transformers or []:
+            trans_list.append(transformers.get_transformer_object(**tran))
         self._controller.set_transformers(*trans_list)
 
     def _set_exporters(self) -> None:
         exporter_list = []
-        for exp in self.exporters or []:
-            exporter_list.append(exporters.get_exporter_object(exp['name'], **exp.get('kwargs', {})))
+        for exp in self._exporters or []:
+            exporter_list.append(exporters.get_exporter_object(**exp))
         self._controller.set_exporters(*exporter_list)
 
     def start_workflow(self) -> None:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
-        for path in self.data_source_paths:
+        for data_source in self._data_sources:
+        # for path in self.data_source_paths:
             adm_logger.reset_log()
-            d_holder = get_data_holder(path)
+            d_holder = get_data_holder(**data_source)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
             self._do_adm_logger_stuff()
-
         self.save_config()
 
     def _do_adm_logger_stuff(self) -> None:
         # Other options for log here later?
         for adm_logger_config in self._adm_logger_config.get('exporters', []):
+            print(f'{adm_logger_config=}')
             self._filter_log(adm_logger_config.get('filter'))
             exporter = get_exporter(**adm_logger_config)
             exporter.export(adm_logger)
@@ -142,33 +144,54 @@ class SHARKadmWorkflow:
     def _open_export_directory(self) -> None:
         for directory in self._open_directory_paths:
             utils.open_directory(directory)
-        if self._workflow_config.get('open_export_directory'):
+        if self._workflow_config.get('open_export_directory', self._workflow_config.get('open_directory')):
             utils.open_directory(self._get_directory(self._workflow_config['export_directory']))
 
-    @staticmethod
-    def path_list_as_string_list(paths: list[str | pathlib.Path]) -> list[str]:
-        return [str(path) for path in paths]
+    # @staticmethod
+    # def path_list_as_string_list(paths: list[str | pathlib.Path]) -> list[str]:
+    #     return [str(path) for path in paths]
+    #
+    # @staticmethod
+    # def string_list_as_path_list(paths: list[str | pathlib.Path] | None) -> list[pathlib.Path]:
+    #     if not paths:
+    #         return []
+    #     return [pathlib.Path(path) for path in paths]
 
-    @staticmethod
-    def string_list_path_list(paths: list[str | pathlib.Path] | None) -> list[pathlib.Path]:
-        if not paths:
-            return []
-        return [pathlib.Path(path) for path in paths]
+    def _paths_to_string(self, info: dict | list):
+        if isinstance(info, list):
+            new_info = []
+            for item in info:
+                if isinstance(item, (dict, list)):
+                    item = self._paths_to_string(item)
+                new_info.append(item)
+        else:
+            new_info = {}
+            for key, value in info.items():
+                if isinstance(value, pathlib.Path):
+                    value = str(value)
+                if isinstance(value, dict):
+                    value = self._paths_to_string(value)
+                new_info[key] = value
+        return new_info
 
     def save_config(self):
+        if not self._workflow_config['save_config']:
+            return
         file_name = self._workflow_config['file_name']
         if not file_name:
-            name_str = '-'.join([pathlib.Path(path).stem for path in self.data_source_paths])
+            name_str = '-'.join([pathlib.Path(source['path']).stem for source in self._data_sources])
             file_name = f'config_{name_str}.yaml'
         config_save_path = self._workflow_config['export_directory'] / file_name
         if not config_save_path.suffix == '.yaml':
             raise UserWarning(f'Export file name is not a yaml-file: {file_name}')
         data = dict(
-            data_source_paths=self.path_list_as_string_list(self.data_source_paths),
-            validators_before=self.validators_before,
-            validators_after=self.validators_after,
-            transformers=self.transformers,
-            exporters=self.exporters,
+            workflow_config=self._paths_to_string(self._workflow_config),
+            adm_logger_config=self._paths_to_string(self._adm_logger_config),
+            data_source_paths=self._paths_to_string(self._data_sources),
+            validators_before=self._paths_to_string(self._validators_before),
+            validators_after=self._paths_to_string(self._validators_after),
+            transformers=self._paths_to_string(self._transformers),
+            exporters=self._paths_to_string(self._exporters),
         )
 
         with open(config_save_path, 'w') as fid:
@@ -179,15 +202,6 @@ class SHARKadmWorkflow:
         with open(path) as fid:
             config = yaml.safe_load(fid)
         workflow = SHARKadmWorkflow(**config)
-        # workflow = SHARKadmWorkflow(
-        #     data_source_paths=config.pop('data_source_paths', []),
-        #     validators_before=config.pop('validators_before', []),
-        #     validators_after=config.pop('validators_after', []),
-        #     transformers=config.pop('transformers', []),
-        #     exporters=config.pop('exporters', []),
-        #     save_config_path=config.pop('save_config_path', []),
-        #     **config
-        # )
         return workflow
 
 
@@ -212,7 +226,7 @@ class SHARKadmWorkflow:
 #
 #     def _set_validators_before(self) -> None:
 #         vals_list = []
-#         for val in self.validators_before or []:
+#         for val in self._validators_before or []:
 #             vals_list.append(validators.get_validator_object(val['name'], **val.get('kwargs', {})))
 #         self._controller.set_validators_before(*vals_list)
 #
@@ -230,8 +244,8 @@ class SHARKadmWorkflow:
 #
 #     def _set_exporters(self) -> None:
 #         exporter_list = []
-#         print(f'{self.exporters=}')
-#         for exp in self.exporters or []:
+#         print(f'{self._exporters=}')
+#         for exp in self._exporters or []:
 #             exporter_list.append(exporters.get_exporter_object(exp['name'], **exp.get('kwargs', {})))
 #         self._controller.set_exporters(*exporter_list)
 #

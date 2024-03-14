@@ -72,7 +72,7 @@ def get_data_holders_description_text() -> str:
     line_length = 100
     lines = list()
     lines.append('=' * line_length)
-    lines.append('Available data_holders are:')
+    lines.append('Available data_holders:')
     lines.append('-' * line_length)
     for key in sorted(info):
         lines.append(f'{key.ljust(30)}{info[key]}')
@@ -92,7 +92,6 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
 
 
 def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs) -> DataHolder:
-    print(f'{path=}')
     if path:
         path = pathlib.Path(path)
         if path.suffix == '.xlsx':
