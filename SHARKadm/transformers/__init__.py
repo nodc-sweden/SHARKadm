@@ -47,7 +47,6 @@ from .location import AddLocationSeaBasin
 from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
 from .map_header import ArchiveMapper
-from .map_header import PhysicalChemicalMapper
 from .orderer import AddEnglishSampleOrderer
 from .orderer import AddSwedishSampleOrderer
 from .parameter_unit_value import AddParameterUnitValueFromReported

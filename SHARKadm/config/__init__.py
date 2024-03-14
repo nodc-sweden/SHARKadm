@@ -3,39 +3,18 @@ import functools
 import sys
 
 from SHARKadm import adm_config_paths
-from .import_matrix import ImportMatrixConfig
+from .import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
 from .custom_id import CustomIdsHandler
 from .data_type_mapper import DataTypeMapper
 from .delivery_note_mapper import DeliveryNoteMapper
-from .physical_chemical_mapper import PhysicalChemicalMapper
 
 
 if getattr(sys, 'frozen', False):
     THIS_DIR = pathlib.Path(sys.executable).parent
 else:
     THIS_DIR = pathlib.Path(__file__).parent
-
-
-
-# ID_CONFIG_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'ids')
-# DEFAULT_IMPORT_MATRIX_DIRECTORY = pathlib.Path(THIS_DIR, 'etc', 'import_matrix')
-#
-# DEFAULT_PHYSICAL_CHEMICAL_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'physical_chemical_mapping.txt')
-#
-# DEFAULT_DELIVERY_NOTE_MAPPER = pathlib.Path(THIS_DIR, 'etc', 'delivery_note_mapping.txt')
-#
-# DEFAULT_COLUMN_INFO_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_info.yaml')
-# DEFAULT_COLUMN_VIEWS_PATH = pathlib.Path(THIS_DIR, 'etc', 'column_views.txt')
-
-# DEFAULT_DATA_TYPE_MAPPING_PATH = pathlib.Path(THIS_DIR, 'etc', 'data_type_mapping.yaml')
-
-
-@functools.cache
-def get_physical_chemical_mapper(path: str | pathlib.Path = None) -> PhysicalChemicalMapper:
-    path = path or adm_config_paths('physical_chemical_mapping')
-    return PhysicalChemicalMapper(path)
 
 
 @functools.cache
@@ -55,17 +34,25 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 #     return [path.stem.split('_', 2)[-1] for path in pathlib.Path(directory).iterdir()]
 
 @functools.cache
-def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = None,
-                             data_type_mapping_path: str | pathlib.Path = None) -> ImportMatrixConfig | None:
+def get_import_matrix_config(data_type: str, directory: str | pathlib.Path = None) -> ImportMatrixConfig | None:
     directory = directory or adm_config_paths('import_matrix')
-    # d_type_mapper = get_data_type_mapper(data_type_mapping_path)
     for path in pathlib.Path(directory).iterdir():
         # if d_type_mapper.get(data_type) in path.name:
         if data_type.lower() in path.name.lower():
             return ImportMatrixConfig(path,
                                       data_type=data_type.lower(),
-                                      #data_type_mapper=d_type_mapper
                                       )
+
+
+@functools.cache
+def get_import_matrix_mapper(data_type: str, import_column: str, directory: str | pathlib.Path = None, **kwargs) -> ImportMatrixMapper | None:
+    directory = directory or adm_config_paths('import_matrix')
+    for path in pathlib.Path(directory).iterdir():
+        if data_type.lower() in path.name.lower():
+            config = ImportMatrixConfig(path,
+                                      data_type=data_type.lower(),
+                                      )
+            return config.get_mapper(import_column)
 
 
 @functools.cache

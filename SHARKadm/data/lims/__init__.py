@@ -7,7 +7,8 @@ import pathlib
 
 
 def get_lims_data_holder(path: str | pathlib.Path) -> LimsDataHolder:
-    mapper = config.get_physical_chemical_mapper()
+    # mapper = config.get_physical_chemical_mapper()
+    mapper = config.get_import_matrix_mapper(data_type='PhysicalChemical', import_column='SHARKarchive')
     return LimsDataHolder(lims_root_directory=path, header_mapper=mapper)
 
 

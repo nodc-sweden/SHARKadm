@@ -16,6 +16,7 @@ class ImportMatrixMapper:
         self._data_type = data_type
         self._import_column = import_column
         self._data = data
+        self._reverse_mapper = dict((value, key) for key, value in self._data.items())
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self._data_type}" and column "{self._import_column}"'
@@ -34,9 +35,15 @@ class ImportMatrixMapper:
             adm_logger.log_workflow(f'Could not map parameter "{external_par}" using mapping column "{self.import_column}" for '
                       f'data_type "{self.data_type}"')
             return external_par
-        # return self._data[external_par].split('.', 1)[-1]
-        # print(f' -  {external_par=} -> {self._data[external_par]=}')
         return self._data[external_par].strip()
+
+    def get_external_name(self, internal_name: str) -> str:
+        internal_name = internal_name.strip()
+        if not self._reverse_mapper.get(internal_name):
+            adm_logger.log_workflow(f'Could not map parameter "{internal_name}" to external name using mapping column '
+                                    f'"{self.import_column}" for data_type "{self.data_type}"')
+            return internal_name
+        return self._reverse_mapper[internal_name].strip()
 
 
 class ImportMatrixConfig:

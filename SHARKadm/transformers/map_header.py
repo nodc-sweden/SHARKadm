@@ -1,29 +1,6 @@
-import datetime
-
-import pandas as pd
-
-from .base import Transformer, DataHolderProtocol
-from SHARKadm.data import archive
 from SHARKadm import config
-from SHARKadm import adm_logger
-
-
-class PhysicalChemicalMapper(Transformer):
-    valid_data_types = ['physicalchemical']
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._mapper = config.get_physical_chemical_mapper()
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f'Maps the data header using lims mapper'
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        mapped_header = []
-        for item in data_holder.data.columns:
-            mapped_header.append(self._mapper.get_internal_name(item))
-        data_holder.data.columns = mapped_header
+from SHARKadm.data import archive
+from .base import Transformer
 
 
 class ArchiveMapper(Transformer):

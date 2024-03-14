@@ -140,7 +140,6 @@ class ArchiveDataHolder(DataHolder, ABC):
             return
         self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path)
 
-
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
         self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)

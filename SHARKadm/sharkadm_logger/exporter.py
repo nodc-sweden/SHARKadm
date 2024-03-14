@@ -59,7 +59,7 @@ class SharkadmExporter(ABC):
         utils.open_directory(self.file_path.parent)
 
     def _open_file(self):
-        if not self.kwargs.get('open_report'):
+        if not self.kwargs.get('open_report', self.kwargs.get('open_file')):
             return
         if not self.file_path:
             logger.info(f'open_file is not implemented for exporter {self.__class__.__name__}')

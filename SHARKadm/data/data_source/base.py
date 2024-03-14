@@ -74,12 +74,6 @@ class DataFile(ABC):
         self._data.columns = mapped_header
         self._header_mapper = mapper
         self._remove_temp_tag()
-        # print()
-        # print()
-        # print('-'*100)
-        # for old, new in zip(self._original_header, self._data.columns):
-        #     print(f'{old} -> {new}')
-        # print()
 
     def old_add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
         """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""

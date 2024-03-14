@@ -1,3 +1,4 @@
+import pathlib
 import time
 from abc import ABC, abstractmethod
 from typing import Protocol
@@ -6,6 +7,7 @@ import pandas as pd
 
 from SHARKadm import adm_logger, config
 from SHARKadm.data import get_valid_data_holders
+from SHARKadm import utils
 
 
 class DataHolderProtocol(Protocol):
@@ -65,3 +67,53 @@ class Exporter(ABC):
     @abstractmethod
     def _export(self, data_holder: DataHolderProtocol) -> None:
         ...
+
+
+class FileExporter(Exporter, ABC):
+    def __init__(self,
+                 export_directory: str | pathlib.Path | None = None,
+                 export_file_name: str | pathlib.Path | None = None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        if not export_directory:
+            export_directory = utils.get_export_directory()
+        self._export_directory = pathlib.Path(export_directory)
+        self._export_file_name = export_file_name
+        self._encoding = kwargs.get('encoding', 'cp1252')
+
+    @property
+    def export_file_path(self):
+        return pathlib.Path(self._export_directory, self._export_file_name)
+
+    @property
+    def export_directory(self):
+        return self.export_file_path.parent
+
+    def export(self, data_holder: DataHolderProtocol):
+        super().export(data_holder=data_holder)
+
+    def open_file(self):
+        if self._kwargs.get('open_file', self._kwargs.get('open_export_file')) and self.export_file_path:
+            utils.open_file_with_default_program(self.export_file_path)
+        return self
+
+    def open_file_with_excel(self):
+        if self.export_file_path:
+            utils.open_file_with_excel(self.export_file_path)
+        return self
+
+    def open_directory(self):
+        if self._kwargs.get('open_directory') and self.export_file_path:
+            utils.open_directory(self.export_file_path.parent)
+        return self
+
+    @staticmethod
+    @abstractmethod
+    def get_exporter_description() -> str:
+        """Verbal description describing what the exporter is doing"""
+        ...
+
+    @abstractmethod
+    def _export(self, data_holder: DataHolderProtocol) -> None:
+        ...
+

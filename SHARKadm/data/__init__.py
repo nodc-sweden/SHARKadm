@@ -14,6 +14,7 @@ from .archive import get_archive_data_holder, directory_is_archive
 from .lims import get_lims_data_holder, directory_is_lims
 from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
 from .dv_template import get_dv_template_data_holder
+from .sharkweb import get_sharkweb_data_holder
 
 from .archive import *
 from .lims import LimsDataHolder
@@ -90,19 +91,23 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
         fid.write(get_data_holders_description_text())
 
 
-def get_data_holder(path: str | pathlib.Path) -> DataHolder:
-    path = pathlib.Path(path)
-    if path.suffix == '.xlsx':
-        return get_dv_template_data_holder(path)
-    if path_is_zip_archive(path):
-        return get_zip_archive_data_holder(path)
-    if path.is_dir():
-        archive_directory = directory_is_archive(path)
-        if archive_directory:
-            return get_archive_data_holder(archive_directory)
-        lims_directory = directory_is_lims(path)
-        if lims_directory:
-            return get_lims_data_holder(lims_directory)
+def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs) -> DataHolder:
+    print(f'{path=}')
+    if path:
+        path = pathlib.Path(path)
+        if path.suffix == '.xlsx':
+            return get_dv_template_data_holder(path)
+        if path_is_zip_archive(path):
+            return get_zip_archive_data_holder(path)
+        if path.is_dir():
+            archive_directory = directory_is_archive(path)
+            if archive_directory:
+                return get_archive_data_holder(archive_directory)
+            lims_directory = directory_is_lims(path)
+            if lims_directory:
+                return get_lims_data_holder(lims_directory)
+    if sharkweb:
+        return get_sharkweb_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f'Could not find dataholder for: {path}')
 
 
