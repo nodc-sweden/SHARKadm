@@ -16,10 +16,18 @@ class ImportMatrixMapper:
         self._data_type = data_type
         self._import_column = import_column
         self._data = data
-        self._reverse_mapper = dict((value, key) for key, value in self._data.items())
+        self._reverse_mapper = dict()
+        self._create_reverse_mapper()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self._data_type}" and column "{self._import_column}"'
+
+    def _create_reverse_mapper(self):
+        self._reverse_mapper = dict()
+        for key, value in self._data.items():
+            self._reverse_mapper[value] = key
+            if 'COPY_VARIABLE' in value:
+                self._reverse_mapper[value.split('.')[1]] = key
 
     @property
     def data_type(self) -> str:

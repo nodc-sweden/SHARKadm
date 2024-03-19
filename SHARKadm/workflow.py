@@ -27,7 +27,6 @@ class SHARKadmWorkflow:
 
         self._controller = SHARKadmController()
         self._data_sources = data_sources or []
-        # self.data_source_paths = self.string_list_as_path_list(data_source_paths) or []
         self._validators_before = validators_before or []
         self._transformers = transformers or []
         self._validators_after = validators_after or []

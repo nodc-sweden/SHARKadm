@@ -1,6 +1,7 @@
 import datetime
 
 import pandas as pd
+import re
 
 from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
@@ -39,5 +40,27 @@ class AddDEPHqcColumn(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'Q_DEPH' not in data_holder.data.columns:
             data_holder.data['Q_DEPH'] = ''
+
+
+class RemoveColumns(Transformer):
+    def __init__(self, *args, **kwargs):
+        self._args = args
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Removes columns matching given strings in args'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        exclude_columns = []
+        for col in data_holder.data.columns:
+            for arg in self._args:
+                if re.match(arg, col):
+                    exclude_columns.append(col)
+                    break
+        keep_columns = [col for col in data_holder.data.columns if col not in exclude_columns]
+        data_holder.data = data_holder.data[keep_columns]
+
+
 
 

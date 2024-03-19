@@ -91,6 +91,9 @@ class FileExporter(Exporter, ABC):
 
     def export(self, data_holder: DataHolderProtocol):
         super().export(data_holder=data_holder)
+        self.open_file()
+        self.open_file_with_excel()
+        self.open_directory()
 
     def open_file(self):
         if self._kwargs.get('open_file', self._kwargs.get('open_export_file')) and self.export_file_path:
@@ -98,7 +101,7 @@ class FileExporter(Exporter, ABC):
         return self
 
     def open_file_with_excel(self):
-        if self.export_file_path:
+        if self._kwargs.get('open_file_with_excel', self._kwargs.get('open_export_file_with_excel', self._kwargs.get('open_with_excel'))) and self.export_file_path:
             utils.open_file_with_excel(self.export_file_path)
         return self
 

@@ -3,7 +3,25 @@ from .base import Transformer, DataHolderProtocol
 from SHARKadm import adm_logger
 
 
-class MoveLessThanFlag(Transformer):
+class MoveLessThanFlagRowFormat(Transformer):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Moves flag < in value column to quality_flag column'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        boolean = data_holder.data['value'].str.startswith('<')
+        qf_boolean = data_holder.data['value'] != ''
+
+        move_boolean = boolean & qf_boolean
+        data_holder.data.loc[move_boolean, 'quality_flag'] = '<'
+
+        data_holder.data['value'] = data_holder.data['value'].str.lstrip('<')
+
+class MoveLessThanFlagColumnFormat(Transformer):
     valid_data_holders = ['LimsDataHolder']
 
     def __init__(self, **kwargs):
