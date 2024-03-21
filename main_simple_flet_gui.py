@@ -1,4 +1,4 @@
-from SHARKadm.gui.simple_flet_gui import simple_flet_app
+from sharkadm.gui.simple_flet_gui import simple_flet_app
 
 
 if __name__ == '__main__':

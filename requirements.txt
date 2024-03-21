@@ -1,6 +1,0 @@
-pyyaml==6.0.1
-pyproj==3.6.1
-folium==0.14.0
-geopandas==0.14.0
-polars==0.20.5
-openpyxl==3.1.2
