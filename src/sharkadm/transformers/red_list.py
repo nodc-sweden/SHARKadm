@@ -1,8 +1,14 @@
 import pandas as pd
 from sharkadm import adm_logger
-import nodc_dyntaxa
 
 from .base import Transformer, DataHolderProtocol
+
+
+try:
+    import nodc_dyntaxa
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
 class AddRedList(Transformer):
@@ -10,8 +16,11 @@ class AddRedList(Transformer):
 
     col_to_set = 'red_listed'
     source_cols = ['dyntaxa_id', 'scientific_name', 'reported_scientific_name']
-    red_list_obj = nodc_dyntaxa.get_red_list_object()
     mapped = dict()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.red_list_obj = nodc_dyntaxa.get_red_list_object()
 
     @staticmethod
     def get_transformer_description() -> str:

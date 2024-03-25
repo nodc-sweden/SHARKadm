@@ -6,6 +6,8 @@ from sharkadm.transformers import get_transformers_description_text
 from sharkadm.validators import get_validators_description_text
 from sharkadm.exporters import get_exporters_description_text
 
+from sharkadm.lims_data import get_row_data_from_lims_export
+
 
 def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None:
     """Writes a summary of validators, transformers and exporters to file"""
@@ -17,4 +19,8 @@ def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None
             get_validators_description_text(),
             get_transformers_description_text(),
             get_exporters_description_text()
-        ])) 
+        ]))
+
+
+
+

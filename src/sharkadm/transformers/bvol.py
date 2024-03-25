@@ -4,8 +4,14 @@ import pandas as pd
 
 from .base import Transformer, DataHolderProtocol
 from sharkadm import adm_logger
-import nodc_bvol
 import functools
+
+try:
+    import nodc_bvol
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
+
 
 
 from sharkadm.config import get_column_views_config
@@ -13,11 +19,13 @@ from sharkadm.config import get_column_views_config
 
 class AddBvolScientificName(Transformer):
     valid_data_types = ['Phytoplankton']
-
     col_to_set = 'bvol_scientific_name'
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
-    translate_bvol_name = nodc_bvol.get_translate_bvol_name_object()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.translate_bvol_name = nodc_bvol.get_translate_bvol_name_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -46,7 +54,9 @@ class AddBvolSizeClass(Transformer):
 
     cash = dict()
 
-    translate_bvol_name = nodc_bvol.get_translate_bvol_name_size_object()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.translate_bvol_name = nodc_bvol.get_translate_bvol_name_size_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -73,7 +83,9 @@ class AddBvolRefList(Transformer):
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
 
-    translate_bvol_nomp = nodc_bvol.get_translate_bvol_nomp_object()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.translate_bvol_nomp = nodc_bvol.get_translate_bvol_nomp_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -99,7 +111,9 @@ class AddBvolAphiaId(Transformer):
     # source_col = 'scientific_name'
     source_col = 'reported_scientific_name'
 
-    translate_bvol_nomp = nodc_bvol.get_translate_bvol_nomp_object()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.translate_bvol_nomp = nodc_bvol.get_translate_bvol_nomp_object()
 
     @staticmethod
     def get_transformer_description() -> str:

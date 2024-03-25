@@ -11,7 +11,7 @@ from .shark_data_txt_file import SHARKdataTxtAsGiven
 from .shark_metadata_auto import SHARKMetadataAuto
 from .txt_file import TxtAsIs
 from .zip_archive import ZipArchive
-from .html_station_map import HtmlStationMap
+# from .html_station_map import HtmlStationMap
 from ..utils.inspect_kwargs import get_kwargs_for_class
 from .standard_format import StandardFormat
 

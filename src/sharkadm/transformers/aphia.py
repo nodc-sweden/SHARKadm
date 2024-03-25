@@ -1,8 +1,13 @@
 import pandas as pd
 from sharkadm import adm_logger
-import nodc_worms
 
 from .base import Transformer, DataHolderProtocol
+
+try:
+    import nodc_worms
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
 class AddAphiaId(Transformer):
@@ -10,8 +15,10 @@ class AddAphiaId(Transformer):
     col_to_set = 'aphia_id'
     reported_aphia_id_col = 'reported_aphia_id'
     source_col = 'scientific_name'
-    taxa_worms = nodc_worms.get_taxa_worms_object()
-    # mapped_aphia_id = dict()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.taxa_worms = nodc_worms.get_taxa_worms_object()
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -66,8 +73,11 @@ class old_AddAphiaId(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'aphia_id'
     source_col = 'scientific_name'
-    taxa_worms = nodc_worms.get_taxa_worms_object()
     mapped_aphia_id = dict()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.taxa_worms = nodc_worms.get_taxa_worms_object()
 
     @staticmethod
     def get_transformer_description() -> str:

@@ -1,10 +1,12 @@
-import pandas as pd
 from sharkadm import adm_logger
-import polars as pl
 
 from .base import Transformer, DataHolderProtocol
 
-import nodc_dyntaxa
+try:
+    import nodc_dyntaxa
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
 class AddTaxonRanks(Transformer):
@@ -12,7 +14,10 @@ class AddTaxonRanks(Transformer):
     ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
     cols_to_set = [f'taxon_{rank}' for rank in ranks]
     source_col = 'dyntaxa_scientific_name'
-    dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
 
     @staticmethod
     def get_transformer_description() -> str:

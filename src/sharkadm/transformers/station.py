@@ -1,6 +1,11 @@
-from nodc_station.station_file import get_station_object
 from sharkadm import adm_logger
 from .base import Transformer, DataHolderProtocol
+
+try:
+    from nodc_station.station_file import get_station_object
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
 class AddStationInfo(Transformer):
@@ -41,7 +46,8 @@ class AddStationInfo(Transformer):
                 continue
 
             if reported_station != info['STATION_NAME']:
-                adm_logger.log_transformation(f'Station name translated: {reported_station} -> {info['STATION_NAME']}', level='warning')
+                name = info['STATION_NAME']
+                adm_logger.log_transformation(f'Station name translated: {reported_station} -> {name}', level='warning')
             data_holder.data.loc[boolean, 'station_name'] = info['STATION_NAME']
             data_holder.data.loc[boolean, 'station_id'] = info['REG_ID_GROUP']
             data_holder.data.loc[boolean, 'sample_location_id'] = info['REG_ID']

@@ -40,7 +40,8 @@ class SharkadmExporter(ABC):
         else:
             if not file_name:
                 date_str = datetime.datetime.now().strftime('%Y%m%d')
-                file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{'-'.join(list(self.adm_logger.data.keys()))}.xlsx'
+                data_string = '-'.join(list(self.adm_logger.data.keys()))
+                file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}.xlsx'
             if not export_directory:
                 export_directory = utils.get_export_directory()
             self.file_path = pathlib.Path(export_directory, file_name)

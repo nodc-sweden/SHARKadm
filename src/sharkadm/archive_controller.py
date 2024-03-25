@@ -152,7 +152,8 @@ class ArchiveController:
         for col in info_set:
             col_lower = col.lower().strip()
             collection.setdefault(col_lower, [])
-            col_name = f'{col} {'.' * len(collection[col_lower])}'.strip()
+            len_col_string = '.' * len(collection[col_lower])
+            col_name = f'{col} {len_col_string}'.strip()
             collection[col_lower].append(col)
             cols_to_use[col] = col_name
 
@@ -191,7 +192,8 @@ class ArchiveController:
         for col in info_set:
             col_lower = col.lower().strip()
             collection.setdefault(col_lower, [])
-            col_name = f'{col} {'.'*len(collection[col_lower])}'.strip()
+            len_col_string = '.' * len(collection[col_lower])
+            col_name = f'{col} {len_col_string}'.strip()
             collection[col_lower].append(col)
             cols_to_use[col] = col_name
 

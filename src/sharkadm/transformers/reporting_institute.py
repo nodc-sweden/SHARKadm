@@ -1,10 +1,15 @@
 from sharkadm import adm_logger
-from nodc_codes import get_translate_codes_object
 from .base import Transformer
 from sharkadm.data import get_archive_data_holder_names
 
 from typing import Protocol
 import pandas as pd
+
+try:
+    from nodc_codes import get_translate_codes_object
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
 class DataHolderProtocol(Protocol):

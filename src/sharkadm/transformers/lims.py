@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from .base import Transformer, DataHolderProtocol
 from sharkadm import adm_logger
 
@@ -14,12 +15,17 @@ class MoveLessThanFlagRowFormat(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         boolean = data_holder.data['value'].str.startswith('<')
+
         qf_boolean = data_holder.data['value'] != ''
 
         move_boolean = boolean & qf_boolean
         data_holder.data.loc[move_boolean, 'quality_flag'] = '<'
 
         data_holder.data['value'] = data_holder.data['value'].str.lstrip('<')
+
+        nr_flags = boolean.value_counts().get(True)
+        if nr_flags:
+            adm_logger.log_transformation(f'Moving {nr_flags} "<"-flags to quality_flag column')
 
 class MoveLessThanFlagColumnFormat(Transformer):
     valid_data_holders = ['LimsDataHolder']

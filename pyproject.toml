@@ -8,17 +8,20 @@ authors = [
 dependencies = [
     "pyyaml==6.0.1",
     "pyproj==3.6.1",
-    "folium==0.14.0",
-    "geopandas>=0.14.0",
-    "polars>=0.20.15",
+    #    "folium==0.14.0",
+    #    "geopandas>=0.14.0",
+    #    "polars>=0.20.15",
     "openpyxl==3.1.2",
-    "flet>=0.21.2",
-    "nodc-dyntaxa @ file:///C:/mw/git/nodc-dyntaxa",
-    "nodc-station @ file:///C:/mw/git/nodc-station",
-    "nodc-worms @ file:///C:/mw/git/nodc-worms",
-    "nodc-bvol @ file:///C:/mw/git/nodc-bvol",
-    "nodc-geography @ file:///C:/mw/git/nodc-geography",
-    "nodc-codes @ file:///C:/mw/git/nodc-codes",
+    #    "flet>=0.21.2",
+    #    "nodc-dyntaxa @ file:///C:/mw/git/nodc-dyntaxa",
+    #    "nodc-station @ file:///C:/mw/git/nodc-station",
+    #    "nodc-worms @ file:///C:/mw/git/nodc-worms",
+    #    "nodc-bvol @ file:///C:/mw/git/nodc-bvol",
+    #    "nodc-geography @ file:///C:/mw/git/nodc-geography",
+    #    "nodc-codes @ file:///C:/mw/git/nodc-codes",
+    "pandas>=2.2.1",
+    "requests>=2.31.0",
+    "xlsxwriter>=3.2.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -34,13 +37,13 @@ distribution = true
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "-e file:///C:/mw/git/nodc-worms#egg=nodc-worms",
-    "-e file:///C:/mw/git/nodc-bvol#egg=nodc-bvol",
-    "-e file:///C:/mw/git/nodc-dyntaxa#egg=nodc-dyntaxa",
-    "-e file:///C:/mw/git/nodc-codes#egg=nodc-codes",
-    "-e file:///C:/mw/git/nodc-geography#egg=nodc-geography",
-    "-e file:///C:/mw/git/nodc-station#egg=nodc-station",
-    "pyinstaller>=4.5.1",
+#    "-e file:///C:/mw/git/nodc-worms#egg=nodc-worms",
+#    "-e file:///C:/mw/git/nodc-bvol#egg=nodc-bvol",
+#    "-e file:///C:/mw/git/nodc-dyntaxa#egg=nodc-dyntaxa",
+#    "-e file:///C:/mw/git/nodc-codes#egg=nodc-codes",
+#    "-e file:///C:/mw/git/nodc-geography#egg=nodc-geography",
+#    "-e file:///C:/mw/git/nodc-station#egg=nodc-station",
+#    "pyinstaller>=4.5.1",
 ]
 
 [tool.setuptools.packages.find]

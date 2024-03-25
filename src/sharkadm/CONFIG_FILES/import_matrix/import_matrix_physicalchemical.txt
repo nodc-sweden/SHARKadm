@@ -76,7 +76,7 @@ TEMP.QFLAG.Nitrite+Nitrate NO2+NO3-N	Q_NTRZ
 variable.COPY_VARIABLE.Ammonium NH4-N.umol/l	AMON
 TEMP.QFLAG.Ammonium NH4-N	Q_AMON
 variable.COPY_VARIABLE.Total Nitrogen Tot-N.umol/l	NTOT
-TEMP.QFLAG.Total Nitrogen Tot-N.umol/l	Q_NTOT
+TEMP.QFLAG.Total Nitrogen Tot-N	Q_NTOT
 variable.COPY_VARIABLE.Silicate SiO3-Si.umol/l	SIO3-SI
 TEMP.QFLAG.Silicate SiO3-Si	Q_SIO3-SI
 variable.COPY_VARIABLE.Humus.ug/l	HUMUS
