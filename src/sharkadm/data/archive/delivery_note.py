@@ -89,7 +89,6 @@ class DeliveryNote:
         data = dict()
         data['path'] = path
         for key, value in zip(fdn[col_mapping[0]], fdn[col_mapping[2]]):
-            print(f'{key=}  :  {value=}')
             if str(value) == 'nan':
                 value = ''
             elif type(value) == datetime.datetime:

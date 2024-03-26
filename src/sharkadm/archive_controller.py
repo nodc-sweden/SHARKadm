@@ -130,9 +130,6 @@ class ArchiveController:
             else:
                 try:
                     delivery_note = DeliveryNote.from_txt_file(delivery_note_path)
-                    for key, value in delivery_note.data.items():
-                        if 'kommentar' == key:
-                            print(f'{path.name=}: {key=}: {value=}')
                     line_data.update(delivery_note.data)
                     # print(f'{delivery_note.data.keys()=}')
                     info_set.update(list(line_data))

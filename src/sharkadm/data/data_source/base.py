@@ -72,7 +72,6 @@ class DataFile(ABC):
             internal_name = mapper.get_internal_name(item)
             self._mapped_columns[item] = internal_name
             mapped_header.append(internal_name)
-            print(f'{item=} ==> {internal_name=}')
         self._data.columns = mapped_header
         self._header_mapper = mapper
         self._remove_temp_tag()

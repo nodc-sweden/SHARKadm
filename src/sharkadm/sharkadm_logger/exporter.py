@@ -50,8 +50,6 @@ class SharkadmExporter(ABC):
             # self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
         if not self.file_path.parent.exists():
             raise NotADirectoryError(self.file_path.parent)
-        if self.file_path.exists():
-            self._set_incremented_file_path()
 
     def _set_incremented_file_path(self):
         i = 1
@@ -90,8 +88,13 @@ class XlsxExporter(SharkadmExporter):
     def _export(self) -> None:
         self._set_save_path(suffix='.xlsx')
         df = self._extract_info(self.adm_logger.data)
-        self._save_as_xlsx_with_table(df)
-        logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
+        try:
+            self._save_as_xlsx_with_table(df)
+            logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
+        except PermissionError:
+            self._set_incremented_file_path()
+            self._save_as_xlsx_with_table(df)
+            logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
 
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
@@ -172,10 +175,10 @@ class XlsxExporter(SharkadmExporter):
         # Make the columns wider for clarity.
         worksheet.set_column(0, 0, 10)
         worksheet.set_column(1, 1, 20)
-        worksheet.set_column(1, 1, 40)
-        worksheet.set_column(2, 2, 90)
-        worksheet.set_column(3, 3, 8)
-        worksheet.set_column(4, 4, 70)
+        worksheet.set_column(1, 2, 40)
+        worksheet.set_column(2, 3, 90)
+        worksheet.set_column(3, 4, 8)
+        worksheet.set_column(4, 5, 70)
 
         # Close the Pandas Excel writer and output the Excel file.
         writer.close()
