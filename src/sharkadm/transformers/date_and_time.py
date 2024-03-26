@@ -25,7 +25,7 @@ class AddDateAndTimeToAllLevels(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in self.dates_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self._check_and_add(p, row), axis=1)
-        # self._split_date_and_time(data_holder=data_holder)
+        self._split_date_and_time(data_holder=data_holder)
 
     def _check_and_add(self, par: str, row: pd.Series) -> str:
         if row.get(par):
@@ -40,7 +40,7 @@ class AddDateAndTimeToAllLevels(Transformer):
         for date_par in self.dates_to_sync:
             time_par = self._get_time_par(date_par)
             # data_holder.data[time_par] = data_holder.data[date_par].apply(self._get_time_from_date)
-            data_holder.data[time_par] = data_holder.data[date_par].apply(lambda row, p=date_par: self._get_time_from_date(p, row), axis=1)
+            data_holder.data[time_par] = data_holder.data.apply(lambda row, p=date_par: self._get_time_from_date(p, row), axis=1)
             data_holder.data[date_par] = data_holder.data[date_par].apply(self._get_date_from_date)
 
     # def _get_time_from_date(self, x: str) -> str:

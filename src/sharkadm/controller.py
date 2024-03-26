@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class SHARKadmController:
-    """Class to hold data from a specific data type. Add data using the add_data_source method"""
+    """Class to hold data from a specific data type"""
 
     def __init__(self) -> None:
 
