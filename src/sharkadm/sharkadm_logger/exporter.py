@@ -50,6 +50,20 @@ class SharkadmExporter(ABC):
             # self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
         if not self.file_path.parent.exists():
             raise NotADirectoryError(self.file_path.parent)
+        if self.file_path.exists():
+            self._set_incremented_file_path()
+
+    def _set_incremented_file_path(self):
+        i = 1
+        path = self._get_incremented_file_path(i)
+        while path.exists():
+            i += 1
+            path = self._get_incremented_file_path(i)
+        self.file_path = path
+
+    def _get_incremented_file_path(self, nr):
+        return self.file_path.parent / f'{self.file_path.stem}({nr}){self.file_path.suffix}'
+
 
     def _open_directory(self):
         if not self.kwargs.get('open_directory', self.kwargs.get('open_export_directory')):
@@ -81,7 +95,7 @@ class XlsxExporter(SharkadmExporter):
 
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
-        header = ['Level', 'Log type', 'Message', 'Nr of logs', 'Log number']
+        header = ['Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
         if self.kwargs.get('include_items'):
             header = header + ['Item']
 
@@ -90,17 +104,18 @@ class XlsxExporter(SharkadmExporter):
                 for msg, msg_data in log_type_data.items():
                     count = msg_data['count']
                     log_nr = msg_data['log_nr']
+                    cls = msg_data['cls']
                     if not self.kwargs.get('include_items'):
-                        line = [level, log_type, msg, count, log_nr]
+                        line = [level, log_type, cls, msg, count, log_nr]
                         info.append(line)
                         continue
                     if not msg_data['items']:
-                        line = [level, log_type, msg, count, log_nr, '']
+                        line = [level, log_type, cls, msg, count, log_nr, '']
                         info.append(line)
                         continue
                     for item in msg_data['items']:
                         # line[3] = 1
-                        line = [level, log_type, msg, count, log_nr, item]
+                        line = [level, log_type, cls, msg, count, log_nr, item]
                         info.append(line)
         df = pd.DataFrame(data=info, columns=header)
         df.fillna('', inplace=True)
@@ -157,6 +172,7 @@ class XlsxExporter(SharkadmExporter):
         # Make the columns wider for clarity.
         worksheet.set_column(0, 0, 10)
         worksheet.set_column(1, 1, 20)
+        worksheet.set_column(1, 1, 40)
         worksheet.set_column(2, 2, 90)
         worksheet.set_column(3, 3, 8)
         worksheet.set_column(4, 4, 70)

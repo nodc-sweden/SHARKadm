@@ -94,27 +94,47 @@ class SHARKadmLogger:
         self._name = str(name)
 
     def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
-        self.log(log_type=self.WORKFLOW, msg=msg, level=level, add=add)
+        cls = ''
+        stack = inspect.stack()
+        if stack[1][0].f_locals.get('self'):
+            cls = stack[1][0].f_locals["self"].__class__.__name__
+            # the_method = stack[1][0].f_code.co_name
+            # msg = f'{the_class}: {msg}'
+            # print(f'{the_class=}')
+            # print(f'{the_method=}')
+        self.log(log_type=self.WORKFLOW, msg=msg, level=level, cls=cls, add=add)
         # time_str = str(datetime.datetime.now())
         # self._workflow.append((time_str, msg))
         event.post_event('log_workflow', msg)
 
     def log_transformation(self, msg: str, level: str = 'info', add: str | None = None) -> None:
-        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, add=add)
+        cls = ''
+        stack = inspect.stack()
+        if stack[1][0].f_locals.get('self'):
+            cls = stack[1][0].f_locals["self"].__class__.__name__
+        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add)
         # level = self._check_level(level)
         # self._transformations[level].setdefault(msg, 0)
         # self._transformations[level][msg] += 1
         event.post_event('log_transformation', msg)
 
     def log_validation(self, msg: str, level: str = 'warning', add: str | None = None, data_row: str | int | None = None) -> None:
-        self.log(log_type=self.VALIDATION, msg=msg, level=level, add=add, data_row=data_row)
+        cls = ''
+        stack = inspect.stack()
+        if stack[1][0].f_locals.get('self'):
+            cls = stack[1][0].f_locals["self"].__class__.__name__
+        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, data_row=data_row)
         # level = self._check_level(level)
         # self._validations[level].setdefault(msg, 0)
         # self._validations[level][msg] += 1
         event.post_event('log_validation', msg)
 
     def log_export(self, msg: str, level: str = 'info', add: str | None = None) -> None:
-        self.log(log_type=self.EXPORT, msg=msg, level=level, add=add)
+        cls = ''
+        stack = inspect.stack()
+        if stack[1][0].f_locals.get('self'):
+            cls = stack[1][0].f_locals["self"].__class__.__name__
+        self.log(log_type=self.EXPORT, msg=msg, level=level, cls=cls, add=add)
         # level = self._check_level(level)
         # self._exports[level].setdefault(msg, 0)
         # self._exports[level][msg] += 1
@@ -135,7 +155,7 @@ class SHARKadmLogger:
 
         return timeit_wrapper
 
-    def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, **kwargs) -> None:
+    def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, cls: str = '', **kwargs) -> None:
         self._nr_log_entries += 1
         level = self._check_level(level)
         self._data[level].setdefault(log_type, dict())
@@ -144,6 +164,7 @@ class SHARKadmLogger:
         # self._data[level].setdefault(msg, 0)
         self._data[level][log_type][msg]['count'] += 1
         self._data[level][log_type][msg]['log_nr'] = self._nr_log_entries
+        self._data[level][log_type][msg]['cls'] = cls
         item = []
         if add:
             item.append(f'({self._nr_log_entries}) {add}')
