@@ -67,10 +67,12 @@ class DataFile(ABC):
 
     def map_header(self, mapper: ImportMapper) -> None:
         mapped_header = []
+        print(f'{self._original_header=}')
         for item in self._original_header:
             internal_name = mapper.get_internal_name(item)
             self._mapped_columns[item] = internal_name
             mapped_header.append(internal_name)
+            print(f'{item=} ==> {internal_name=}')
         self._data.columns = mapped_header
         self._header_mapper = mapper
         self._remove_temp_tag()

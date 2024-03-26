@@ -115,6 +115,7 @@ class SHARKadmController:
     def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
         for trans in self._transformers:
+            print(f'{trans=}')
             # logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
 

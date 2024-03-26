@@ -174,6 +174,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
             adm_logger.log_workflow(msg)
             return
         try:
+            print(f'{self.delivery_note.import_matrix_key=}')
             self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
         except KeyError as e:
             msg = f'Could not get import matrix mapper for import_matrix_key: {self.delivery_note.import_matrix_key}'
@@ -225,7 +226,6 @@ class DvTemplateDataHolder(DataHolder, ABC):
 
     def _load_data(self):
         wb = openpyxl.load_workbook(self._template_path)
-
         sheet_name = None
         for name in ['data', 'Klistra in i denna', 'Klistra in  i denna', 'Kolumner']:
             if name in wb.sheetnames:
@@ -234,8 +234,14 @@ class DvTemplateDataHolder(DataHolder, ABC):
         if not sheet_name:
             raise Exception(f'Could not find data sheet in file: {self._template_path}')
 
+        ws = wb.get_sheet_by_name(sheet_name)
+        for r in range(1, 5):
+            print(f'{ws.cell(r, 1).value=}')
+            if ws.cell(r, 1).value in ['Tabellhuvud:']:
+                self._number_metadata_rows = r - 1
+                break
         d_source = data_source.XlsxFormatDataFile(path=self._template_path, data_type=self.delivery_note.data_type,
-                                                  sheet_name=sheet_name)
+                                                  sheet_name=sheet_name, skip_rows=self.number_metadata_rows)
         if self.import_matrix_mapper:
             d_source.map_header(self.import_matrix_mapper)
 

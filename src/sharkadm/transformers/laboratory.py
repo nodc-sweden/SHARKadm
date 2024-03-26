@@ -25,7 +25,7 @@ class AddSwedishSamplingLaboratory(Transformer):
         if col not in data_holder.data.columns:
             col = 'sampling_laboratory_name_en'
         if col not in data_holder.data.columns:
-            adm_logger.log_workflow(f'Could not add {self.col_to_set}. No source column (sampling_laboratory_code, {col}) in data!', level=adm_logger.WARNING,
+            adm_logger.log_transformation(f'Could not add {self.col_to_set}. No source column (sampling_laboratory_code, {col}) in data!', level=adm_logger.WARNING,
                                     add=data_holder.dataset_name)
             return
         data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row, col=col: self._get(row, col), axis=1)
@@ -84,7 +84,7 @@ class AddSwedishAnalyticalLaboratory(Transformer):
         if col not in data_holder.data.columns:
             col = 'analytical_laboratory_name_en'
         if col not in data_holder.data.columns:
-            adm_logger.log_workflow(f'Could not add {self.col_to_set}. No source column (analytical_laboratory_code, {col}) in data!', level=adm_logger.WARNING,
+            adm_logger.log_transformation(f'Could not add {self.col_to_set}. No source column (analytical_laboratory_code, {col}) in data!', level=adm_logger.WARNING,
                                     add=data_holder.dataset_name)
             return
         data_holder.data[self.col_to_set] = data_holder.data.apply(lambda row, col=col: self._get(row, col), axis=1)

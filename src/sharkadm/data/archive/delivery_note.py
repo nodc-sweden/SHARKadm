@@ -9,10 +9,13 @@ from sharkadm import config
 from sharkadm import adm_logger
 from sharkadm import sharkadm_exceptions
 
+import nodc_codes
+
 logger = logging.getLogger(__name__)
 
 
 class DeliveryNote:
+    translate_codes = nodc_codes.get_translate_codes_object()
 
     # def __init__(self, path: str | pathlib.Path, encoding: str = 'cp1252') -> None:
     def __init__(self, data: dict) -> None:
@@ -20,6 +23,8 @@ class DeliveryNote:
         self._path = data.pop('path', None)
         self._data_format = data.get('data_format', None)
         self._import_matrix_key = data.get('import_matrix_key', None)
+
+        self._data['datatyp'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['datatyp'], translate_to='public_value')
 
         #TODO: Fullhack
         if self._data['datatyp'] == 'Physical and Chemical':
@@ -84,6 +89,7 @@ class DeliveryNote:
         data = dict()
         data['path'] = path
         for key, value in zip(fdn[col_mapping[0]], fdn[col_mapping[2]]):
+            print(f'{key=}  :  {value=}')
             if str(value) == 'nan':
                 value = ''
             elif type(value) == datetime.datetime:
@@ -95,7 +101,6 @@ class DeliveryNote:
             data['data_format'] = 'Phytoplankton'
             data['datatyp'] = 'Phytoplankton'
             data['import_matrix_key'] = 'PP_REG'
-
         return DeliveryNote(data)
 
     @property

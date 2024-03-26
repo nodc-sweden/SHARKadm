@@ -1,129 +1,129 @@
-node.internal_key	SHARKarchive
-	
-	
-visit.visit_year	MYEAR
-sample.sample_project_code	PROJ_CODE<or>PROJ
-sample.sample_orderer_code	ORDERER
-visit.visit_date	SDATE
-sample.sample_time	STIME
-sample.sample_enddate	EDATE
-sample.sample_endtime	ETIME
-visit.platform_code	SHIPC
-visit.expedition_id	CRUISE_NO
-visit.visit_id	SERNO<or>STNNO
-visit.reported_station_name	STATN
-visit.visit_reported_latitude	LATIT
-visit.visit_reported_longitude	LONGI
-visit.positioning_system_code	POSYS
-visit.water_depth_m	WADEP
-visit.additional_sampling	ADD_SMP
-visit.visit_comment	COMNT_VISIT
-	
-visit.wind_direction_code	WINDIR<or>WINDR
-visit.wind_speed_ms	WINSP
-visit.air_temperature_degc	AIRTEMP
-visit.air_pressure_hpa	AIRPRES
-visit.weather_observation_code	WEATH
-visit.cloud_observation_code	CLOUD
-visit.wave_observation_code	WAVES<or>SEAST
-visit.ice_observation_code	ICEOB
-variable.COPY_VARIABLE.Secchi depth.m	SECCHI
-TEMP.QFLAG.Secchi depth	Q_SECCHI
-sample.sample_id	SMPNO
-sample.sample_depth_m	DEPH
-variable.COPY_VARIABLE.Pressure CTD.dbar	PRES_CTD
-TEMP.QFLAG.Pressure CTD	Q_PRES_CTD
-sample.sample_min_depth_m	MINDEPH
-sample.sample_max_depth_m	MAXDEPH
-variable.COPY_VARIABLE.Temperature bottle.C	TEMP_BTL
-TEMP.QFLAG.Temperature bottle	Q_TEMP_BTL
-variable.COPY_VARIABLE.Temperature CTD.C	TEMP_CTD
-TEMP.QFLAG.Temperature CTD	Q_TEMP_CTD
-variable.COPY_VARIABLE.Salinity bottle.o/oo psu	SALT_BTL
-TEMP.QFLAG.Salinity bottle	Q_SALT_BTL
-variable.COPY_VARIABLE.Salinity CTD.o/oo psu	SALT_CTD
-TEMP.QFLAG.Salinity CTD	Q_SALT_CTD
-variable.COPY_VARIABLE.Conductivity_25 bottle.mS/m	CNDC_25
-TEMP.QFLAG.Conductivity_25 bottle	Q_CNDC_25
-variable.COPY_VARIABLE.Conductivity CTD.mS/m	CNDC_CTD
-TEMP.QFLAG.Conductivity CTD	Q_CNDC_CTD
-variable.COPY_VARIABLE.Dissolved oxygen O2 bottle.ml/l	DOXY_BTL
-TEMP.QFLAG.Dissolved oxygen O2 bottle	Q_DOXY_BTL
-variable.COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l	DOXY_CTD
-TEMP.QFLAG.Dissolved oxygen O2 CTD	Q_DOXY_CTD
-variable.COPY_VARIABLE.Hydrogen sulphide H2S.umol/l	H2S
-TEMP.QFLAG.Hydrogen sulphide H2S	Q_H2S
-variable.COPY_VARIABLE.pH.	PH
-TEMP.QFLAG.pH	Q_PH
-variable.COPY_VARIABLE.pH Laboratory.	PH_LAB
-TEMP.QFLAG.pH Laboratory	Q_PH_LAB
-variable.COPY_VARIABLE.Temperature pH Laboratory.C	PH_LAB_TEMP
-TEMP.QFLAG.Temperature pH Laboratory	Q_PH_LAB_TEMP
-variable.COPY_VARIABLE.Alkalinity.mmol/kg	ALKY
-TEMP.QFLAG.Alkalinity	Q_ALKY
-variable.COPY_VARIABLE.Alkalinity_2.mmol/l	ALKY_2
-TEMP.QFLAG.Alkalinity_2	Q_ALKY_2
-variable.COPY_VARIABLE.Phosphate PO4-P.umol/l	PHOS
-TEMP.QFLAG.Phosphate PO4-P	Q_PHOS
-variable.COPY_VARIABLE.Total phosphorus Tot-P.umol/l	PTOT
-TEMP.QFLAG.Total phosphorus Tot-P	Q_PTOT
-variable.COPY_VARIABLE.Nitrite NO2-N.umol/l	NTRI
-TEMP.QFLAG.Nitrite NO2-N	Q_NTRI
-variable.COPY_VARIABLE.Nitrate NO3-N.umol/l	NTRA
-TEMP.QFLAG.Nitrate NO3-N	Q_NTRA
-variable.COPY_VARIABLE.Nitrite+Nitrate NO2+NO3-N.umol/l	NTRZ
-TEMP.QFLAG.Nitrite+Nitrate NO2+NO3-N	Q_NTRZ
-variable.COPY_VARIABLE.Ammonium NH4-N.umol/l	AMON
-TEMP.QFLAG.Ammonium NH4-N	Q_AMON
-variable.COPY_VARIABLE.Total Nitrogen Tot-N.umol/l	NTOT
-TEMP.QFLAG.Total Nitrogen Tot-N	Q_NTOT
-variable.COPY_VARIABLE.Silicate SiO3-Si.umol/l	SIO3-SI
-TEMP.QFLAG.Silicate SiO3-Si	Q_SIO3-SI
-variable.COPY_VARIABLE.Humus.ug/l	HUMUS
-TEMP.QFLAG.Humus	Q_HUMUS
-variable.COPY_VARIABLE.Chlorophyll-a bottle.ug/l	CPHL
-TEMP.QFLAG.Chlorophyll-a bottle	Q_CPHL
-variable.COPY_VARIABLE.Dissolved organic carbon DOC.umol/l	DOC
-TEMP.QFLAG.Dissolved organic carbon DOC	Q_DOC
-variable.COPY_VARIABLE.Particulate organic carbon POC.umol/l	POC
-TEMP.QFLAG.Particulate organic carbon POC	Q_POC
-variable.COPY_VARIABLE.Total organic carbon TOC.mg/l	TOC
-TEMP.QFLAG.Total organic carbon TOC	Q_TOC
-variable.COPY_VARIABLE.Particulate organic nitrogen PON.umol/l	PON
-TEMP.QFLAG.Particulate organic nitrogen PON	Q_PON
-variable.COPY_VARIABLE.Current direction.deca degrees	CURDIR
-TEMP.QFLAG.Current direction	Q_CURDIR
-variable.COPY_VARIABLE.Current velocity.cm/s	CURVEL
-TEMP.QFLAG.Current velocity	Q_CURVEL
-variable.COPY_VARIABLE.Lignin.mg/l	LIGNIN
-TEMP.QFLAG.Lignin	Q_LIGNIN
-variable.COPY_VARIABLE.Yellow substance.1/l	YELLOW
-TEMP.QFLAG.Yellow substance	Q_YELLOW
-variable.COPY_VARIABLE.Aluminium.ug/l	AL
-TEMP.QFLAG.Aluminium	Q_AL
-variable.COPY_VARIABLE.Urea.umol/l	UREA
-TEMP.QFLAG.Urea	Q_UREA
-variable.COPY_VARIABLE.Coloured dissolved organic matter CDOM.1/m	CDOM
-TEMP.QFLAG.Coloured dissolved organic matter CDOM	Q_CDOM
-variable.COPY_VARIABLE.Turbidity TURB.FNU	TURB
-TEMP.QFLAG.Turbidity TURB	Q_TURB
-sample.sample_comment	COMNT_SAMP<or>COMNT_SP
-variable.analysis_method_code	METOA
-	
-variable.analysis_method_reference_code	REFSK_ANA
-variable.variable_comment	MET_COMNT
-variable.estimation_uncertainty	UNCERT
-variable.method_calculation_uncertainty	METCU
-variable.quantification_limit	LMQNT
-variable.detection_limit	DETLI
-variable.analysis_range	RANA
-variable.analytical_laboratory_code	ALABO
-variable.analytical_laboratory_accreditated	ACKR_ANA
-	
-variable.sampler_type_code_phyche	SMTYP
-variable.sampling_method_reference_code_phyche	REFSK_SMP
-variable.sampling_method_comment_phyche	COMNT_SMPM<or>COMT_SMPM
-variable.sampling_laboratory_code_phyche	SLABO
-variable.sampling_laboratory_accreditated_phyche	ACKR_SMP
-	
-sample.monitoring_program_code	MPROG
+node.internal_key	SHARKarchive	LIMS	PhysicalChemical
+			
+			
+visit.visit_year	MYEAR	MYEAR	MYEAR
+sample.sample_project_code	PROJ_CODE<or>PROJ	PROJ	PROJ
+sample.sample_orderer_code	ORDERER	ORDERER	ORDERER
+visit.visit_date	SDATE	SDATE	SDATE
+sample.sample_time	STIME	STIME	STIME
+sample.sample_enddate	EDATE	EDATE	EDATE
+sample.sample_endtime	ETIME	ETIME	ETIME
+visit.platform_code	SHIPC	SHIPC	SHIPC
+visit.expedition_id	CRUISE_NO	CRUISE_NO	CRUISE_NO
+visit.visit_id	SERNO	STNNO	SERNO
+visit.reported_station_name	STATN	STATN	STATN
+visit.visit_reported_latitude	LATIT	LATIT	LATIT
+visit.visit_reported_longitude	LONGI	LONGI	LONGI
+visit.positioning_system_code	POSYS	POSYS	POSYS
+visit.water_depth_m	WADEP	WADEP	WADEP
+visit.additional_sampling	ADD_SMP	ADD_SMP	ADD_SMP
+visit.visit_comment	COMNT_VISIT	COMNT_VISIT	COMNT_VISIT
+			
+visit.wind_direction_code	WINDIR<or>WINDR	WINDIR	WINDIR
+visit.wind_speed_ms	WINSP	WINSP	WINSP
+visit.air_temperature_degc	AIRTEMP	AIRTEMP	AIRTEMP
+visit.air_pressure_hpa	AIRPRES	AIRPRES	AIRPRES
+visit.weather_observation_code	WEATH	WEATH	WEATH
+visit.cloud_observation_code	CLOUD	CLOUD	CLOUD
+visit.wave_observation_code	WAVES<or>SEAST	WAVES	WAVES
+visit.ice_observation_code	ICEOB	ICEOB	ICEOB
+variable.COPY_VARIABLE.Secchi depth.m	SECCHI	SECCHI	SECCHI
+TEMP.QFLAG.Secchi depth	Q_SECCHI	Q_SECCHI	Q_SECCHI
+sample.sample_id	SMPNO	SMPNO	SMPNO
+sample.sample_depth_m	DEPH	DEPH	DEPH
+variable.COPY_VARIABLE.Pressure CTD.dbar	PRES_CTD	PRES_CTD	PRES_CTD
+TEMP.QFLAG.Pressure CTD	Q_PRES_CTD	Q_PRES_CTD	Q_PRES_CTD
+sample.sample_min_depth_m	MINDEPH	MINDEPH	MINDEPH
+sample.sample_max_depth_m	MAXDEPH	MAXDEPH	MAXDEPH
+variable.COPY_VARIABLE.Temperature bottle.C	TEMP_BTL	TEMP_BTL	TEMP_BTL
+TEMP.QFLAG.Temperature bottle	Q_TEMP_BTL	Q_TEMP_BTL	Q_TEMP_BTL
+variable.COPY_VARIABLE.Temperature CTD.C	TEMP_CTD	TEMP_CTD	TEMP_CTD
+TEMP.QFLAG.Temperature CTD	Q_TEMP_CTD	Q_TEMP_CTD	Q_TEMP_CTD
+variable.COPY_VARIABLE.Salinity bottle.o/oo psu	SALT_BTL	SALT_BTL	SALT_BTL
+TEMP.QFLAG.Salinity bottle	Q_SALT_BTL	Q_SALT_BTL	Q_SALT_BTL
+variable.COPY_VARIABLE.Salinity CTD.o/oo psu	SALT_CTD	SALT_CTD	SALT_CTD
+TEMP.QFLAG.Salinity CTD	Q_SALT_CTD	Q_SALT_CTD	Q_SALT_CTD
+variable.COPY_VARIABLE.Conductivity_25 bottle.mS/m	CNDC_25	CNDC_25	CNDC_25
+TEMP.QFLAG.Conductivity_25 bottle	Q_CNDC_25	Q_CNDC_25	Q_CNDC_25
+variable.COPY_VARIABLE.Conductivity CTD.mS/m	CNDC_CTD	CNDC_CTD	CNDC_CTD
+TEMP.QFLAG.Conductivity CTD	Q_CNDC_CTD	Q_CNDC_CTD	Q_CNDC_CTD
+variable.COPY_VARIABLE.Dissolved oxygen O2 bottle.ml/l	DOXY_BTL	DOXY_BTL	DOXY_BTL
+TEMP.QFLAG.Dissolved oxygen O2 bottle	Q_DOXY_BTL	Q_DOXY_BTL	Q_DOXY_BTL
+variable.COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l	DOXY_CTD	DOXY_CTD	DOXY_CTD
+TEMP.QFLAG.Dissolved oxygen O2 CTD	Q_DOXY_CTD	Q_DOXY_CTD	Q_DOXY_CTD
+variable.COPY_VARIABLE.Hydrogen sulphide H2S.umol/l	H2S	H2S	H2S
+TEMP.QFLAG.Hydrogen sulphide H2S	Q_H2S	Q_H2S	Q_H2S
+variable.COPY_VARIABLE.pH.	PH	PH	PH
+TEMP.QFLAG.pH	Q_PH	Q_PH	Q_PH
+variable.COPY_VARIABLE.pH Laboratory.	PH_LAB	PH_LAB	PH_LAB
+TEMP.QFLAG.pH Laboratory	Q_PH_LAB	Q_PH_LAB	Q_PH_LAB
+variable.COPY_VARIABLE.Temperature pH Laboratory.C	PH_LAB_TEMP	PH_LAB_TEMP	PH_LAB_TEMP
+TEMP.QFLAG.Temperature pH Laboratory	Q_PH_LAB_TEMP	Q_PH_LAB_TEMP	Q_PH_LAB_TEMP
+variable.COPY_VARIABLE.Alkalinity.mmol/kg	ALKY	ALKY	ALKY
+TEMP.QFLAG.Alkalinity	Q_ALKY	Q_ALKY	Q_ALKY
+variable.COPY_VARIABLE.Alkalinity_2.mmol/l	ALKY_2	ALKY_2	ALKY_2
+TEMP.QFLAG.Alkalinity_2	Q_ALKY_2	Q_ALKY_2	Q_ALKY_2
+variable.COPY_VARIABLE.Phosphate PO4-P.umol/l	PHOS	PHOS	PHOS
+TEMP.QFLAG.Phosphate PO4-P	Q_PHOS	Q_PHOS	Q_PHOS
+variable.COPY_VARIABLE.Total phosphorus Tot-P.umol/l	PTOT	PTOT	PTOT
+TEMP.QFLAG.Total phosphorus Tot-P	Q_PTOT	Q_PTOT	Q_PTOT
+variable.COPY_VARIABLE.Nitrite NO2-N.umol/l	NTRI	NTRI	NTRI
+TEMP.QFLAG.Nitrite NO2-N	Q_NTRI	Q_NTRI	Q_NTRI
+variable.COPY_VARIABLE.Nitrate NO3-N.umol/l	NTRA	NTRA	NTRA
+TEMP.QFLAG.Nitrate NO3-N	Q_NTRA	Q_NTRA	Q_NTRA
+variable.COPY_VARIABLE.Nitrite+Nitrate NO2+NO3-N.umol/l	NTRZ	NTRZ	NTRZ
+TEMP.QFLAG.Nitrite+Nitrate NO2+NO3-N	Q_NTRZ	Q_NTRZ	Q_NTRZ
+variable.COPY_VARIABLE.Ammonium NH4-N.umol/l	AMON	AMON	AMON
+TEMP.QFLAG.Ammonium NH4-N	Q_AMON	Q_AMON	Q_AMON
+variable.COPY_VARIABLE.Total Nitrogen Tot-N.umol/l	NTOT	NTOT	NTOT
+TEMP.QFLAG.Total Nitrogen Tot-N	Q_NTOT	Q_NTOT	Q_NTOT
+variable.COPY_VARIABLE.Silicate SiO3-Si.umol/l	SIO3-SI	SIO3-SI	SIO3-SI
+TEMP.QFLAG.Silicate SiO3-Si	Q_SIO3-SI	Q_SIO3-SI	Q_SIO3-SI
+variable.COPY_VARIABLE.Humus.ug/l	HUMUS	HUMUS	HUMUS
+TEMP.QFLAG.Humus	Q_HUMUS	Q_HUMUS	Q_HUMUS
+variable.COPY_VARIABLE.Chlorophyll-a bottle.ug/l	CPHL	CPHL	CPHL
+TEMP.QFLAG.Chlorophyll-a bottle	Q_CPHL	Q_CPHL	Q_CPHL
+variable.COPY_VARIABLE.Dissolved organic carbon DOC.umol/l	DOC	DOC	DOC
+TEMP.QFLAG.Dissolved organic carbon DOC	Q_DOC	Q_DOC	Q_DOC
+variable.COPY_VARIABLE.Particulate organic carbon POC.umol/l	POC	POC	POC
+TEMP.QFLAG.Particulate organic carbon POC	Q_POC	Q_POC	Q_POC
+variable.COPY_VARIABLE.Total organic carbon TOC.mg/l	TOC	TOC	TOC
+TEMP.QFLAG.Total organic carbon TOC	Q_TOC	Q_TOC	Q_TOC
+variable.COPY_VARIABLE.Particulate organic nitrogen PON.umol/l	PON	PON	PON
+TEMP.QFLAG.Particulate organic nitrogen PON	Q_PON	Q_PON	Q_PON
+variable.COPY_VARIABLE.Current direction.deca degrees	CURDIR	CURDIR	CURDIR
+TEMP.QFLAG.Current direction	Q_CURDIR	Q_CURDIR	Q_CURDIR
+variable.COPY_VARIABLE.Current velocity.cm/s	CURVEL	CURVEL	CURVEL
+TEMP.QFLAG.Current velocity	Q_CURVEL	Q_CURVEL	Q_CURVEL
+variable.COPY_VARIABLE.Lignin.mg/l	LIGNIN	LIGNIN	LIGNIN
+TEMP.QFLAG.Lignin	Q_LIGNIN	Q_LIGNIN	Q_LIGNIN
+variable.COPY_VARIABLE.Yellow substance.1/l	YELLOW	YELLOW	YELLOW
+TEMP.QFLAG.Yellow substance	Q_YELLOW	Q_YELLOW	Q_YELLOW
+variable.COPY_VARIABLE.Aluminium.ug/l	AL	AL	AL
+TEMP.QFLAG.Aluminium	Q_AL	Q_AL	Q_AL
+variable.COPY_VARIABLE.Urea.umol/l	UREA	UREA	UREA
+TEMP.QFLAG.Urea	Q_UREA	Q_UREA	Q_UREA
+variable.COPY_VARIABLE.Coloured dissolved organic matter CDOM.1/m	CDOM	CDOM	CDOM
+TEMP.QFLAG.Coloured dissolved organic matter CDOM	Q_CDOM	Q_CDOM	Q_CDOM
+variable.COPY_VARIABLE.Turbidity TURB.FNU	TURB	TURB	TURB
+TEMP.QFLAG.Turbidity TURB	Q_TURB	Q_TURB	Q_TURB
+sample.sample_comment	COMNT_SAMP<or>COMNT_SP	COMNT_SAMP	COMNT_SAMP
+variable.analysis_method_code	METOA	METOA	METOA
+			
+variable.analysis_method_reference_code	REFSK_ANA	REFSK_ANA	REFSK_ANA
+variable.variable_comment	MET_COMNT	MET_COMNT	MET_COMNT
+variable.estimation_uncertainty	UNCERT	UNCERT	UNCERT
+variable.method_calculation_uncertainty	METCU	METCU	METCU
+variable.quantification_limit	LMQNT	LMQNT	LMQNT
+variable.detection_limit	DETLI	DETLI	DETLI
+variable.analysis_range	RANA	RANA	RANA
+variable.analytical_laboratory_code	ALABO	ALABO	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA	ACKR_ANA
+			
+variable.sampler_type_code_phyche	SMTYP	SMTYP	SMTYP
+variable.sampling_method_reference_code_phyche	REFSK_SMP	REFSK_SMP	REFSK_SMP
+variable.sampling_method_comment_phyche	COMNT_SMPM<or>COMT_SMPM	COMNT_SMPM<or>COMT_SMPM	COMNT_SMPM<or>COMT_SMPM
+variable.sampling_laboratory_code_phyche	SLABO	SLABO	SLABO
+variable.sampling_laboratory_accreditated_phyche	ACKR_SMP	ACKR_SMP	ACKR_SMP
+			
+sample.monitoring_program_code	MPROG	MPROG	MPROG

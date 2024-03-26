@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
+from sharkadm import adm_logger
 from sharkadm.data.data_source.base import DataFile
 
 logger = logging.getLogger(__name__)
@@ -14,9 +15,19 @@ class DataHolder(ABC):
     def __init__(self, *args, **kwargs):
         self._data = pd.DataFrame()
         self._data_sources: dict[str, DataFile] = dict()
+        self._number_metadata_rows = 0
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
+
+    def __add__(self, other):
+        if self.data_type != other.data_type:
+            adm_logger.log_workflow(f'Not allowed to merge data_sources of different data_types: {self.data_type} and {other.data_type}')
+            return
+        if self.dataset_name != other.dataset_name:
+            adm_logger.log_workflow(f'Not allowed to merge to instances of the same dataset: {self.dataset_name}')
+            return
+        concat_data = pd.concat([self.data, other.data])
 
     @property
     def workflow_message(self) -> str:
@@ -60,7 +71,7 @@ class DataHolder(ABC):
 
     @property
     def number_metadata_rows(self) -> int:
-        return 0
+        return self._number_metadata_rows
 
     @property
     def columns(self) -> list[str]:

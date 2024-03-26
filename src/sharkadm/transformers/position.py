@@ -36,7 +36,6 @@ class AddPositionToAllLevels(Transformer):
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lat(p, row), axis=1)
         for par in self.lon_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self.check_lon(p, row), axis=1)
-        print(f'{time.time()-t0=}')
 
     def check_lat(self, par: str, row: pd.Series) -> str:
         if row.get(par):
@@ -155,6 +154,7 @@ class AddPositionSweref99tm(Transformer):
         data_holder.data[self.y_column_to_set] = ''
         # data_holder.data[self.x_column_to_set], data_holder.data[self.y_column_to_set] = \
         for (lat, lon), df in data_holder.data.groupby([self.lat_source_col, self.lon_source_col]):
+            print(f'{lat=}  : {lon=}')
             x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
             boolean = (data_holder.data[self.lat_source_col] == lat) & (data_holder.data[self.lon_source_col] == lon)
             data_holder.data.loc[boolean, self.x_column_to_set] = x
