@@ -22,6 +22,7 @@ class LimsDataHolder(DataHolder):
     def __init__(self,
                  lims_root_directory: str | pathlib.Path = None,
                  header_mapper: HeaderMapper = None):
+        super().__init__()
         self._lims_root_directory = pathlib.Path(lims_root_directory)
         self._header_mapper = header_mapper
 
