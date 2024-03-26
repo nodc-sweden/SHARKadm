@@ -9,4 +9,4 @@ class AddCruiseId(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data['cruise_id'] = data_holder.data['visit_year'].str.cat(data_holder.data['platform_code'], '_'
-                                                                               ).str.cat(data_holder.data['cruise_no'], '_')
+                                                                               ).str.cat(data_holder.data['expedition_id'], '_')

@@ -31,6 +31,9 @@ class AddStatus(Transformer):
         return f'Adds status columns'
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
+        if not hasattr(data_holder, 'delivery_note'):
+            adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING, add=data_holder.dataset_name)
+            return
         checked_by = data_holder.delivery_note['data kontrollerad av']
         if not checked_by:
             adm_logger.log_transformation(f'Could not set "status" and "checked". Missing information in delivery_note: data kontrollerad av',

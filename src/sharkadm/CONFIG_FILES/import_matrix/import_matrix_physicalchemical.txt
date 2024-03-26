@@ -10,7 +10,7 @@ sample.sample_enddate	EDATE
 sample.sample_endtime	ETIME
 visit.platform_code	SHIPC
 visit.expedition_id	CRUISE_NO
-visit.visit_id	SERNO
+visit.visit_id	SERNO<or>STNNO
 visit.reported_station_name	STATN
 visit.visit_reported_latitude	LATIT
 visit.visit_reported_longitude	LONGI

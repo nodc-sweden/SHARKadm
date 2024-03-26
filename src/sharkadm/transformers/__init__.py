@@ -145,4 +145,67 @@ def write_transformers_description_to_file(path: str | pathlib.Path) -> None:
         fid.write(get_transformers_description_text())
 
 
+def get_physical_chemical_transformer_objects() -> list[Transformer]:
+    return [
+        AddRowNumber(),
+        AddDEPHqcColumn(),
+        AddPositionToAllLevels(),
+        ReplaceCommaWithDot(),
+        AddDateAndTimeToAllLevels(),
+        ChangeDateFormat(),
+        AddDatetime(),
+        AddPositionDD(),
+        AddPositionDM(),
+        AddPositionSweref99tm(),
+        MoveLessThanFlagColumnFormat(),
+        AddColumnsForAutomaticQC(),
+        AddCruiseId(),
+        AddVisitKey(),
+        # RemoveNonDataLines(), # LIMS
+        AddMonth(),
+        AddBacteriaAsReportedScientificName(),
+        AddReportedScientificName(),
+        AddDyntaxaScientificName(),
+        AddScientificName(),
+        AddSampleMinAndMaxDepth(),
+        ReorderSampleMinAndMaxDepth(),
+        # AddParameterUnitValueFromReported(),
+        AddDyntaxaId(),
+        AddDatatype(),
+        AddStatus(),
+        AddStationInfo(),
+        AddSharkId(),
+        AddEnglishProjectName(),
+        AddSwedishProjectName(),
+        AddEnglishSampleOrderer(),
+        AddEnglishSamplingLaboratory(),
+        AddSwedishSampleOrderer(),
+        AddSwedishSamplingLaboratory(),
+        AddSwedishAnalyticalLaboratory(),
+        AddEnglishAnalyticalLaboratory(),
+        AddLocationCounty(),
+        AddLocationHelcomOsparArea(),
+        AddLocationMunicipality(),
+        AddLocationNation(),
+        AddLocationSeaBasin(),
+        AddLocationTypeArea(),
+        AddLocationWaterDistrict(),
+        AddAphiaId(),
+        AddStaticInternetAccessInfo(),
+        AddDatasetName(),
+        AddSwedishReportingInstitute(),
+        AddEnglishReportingInstitute(),
+        AddStaticDataHoldingCenter(),
+        FixYesNo(),
+
+        Multiply(),
+        Divide(),
+
+        WideToLong(),
+
+        AddColumnViewsColumns(),
+        SortData(),
+    ]
+
+
 

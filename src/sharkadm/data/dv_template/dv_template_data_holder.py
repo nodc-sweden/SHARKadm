@@ -4,7 +4,7 @@ import openpyxl
 import logging
 import pathlib
 from abc import ABC, abstractmethod
-
+import re
 import pandas as pd
 
 from sharkadm import config
@@ -149,7 +149,13 @@ class DvTemplateDataHolder(DataHolder, ABC):
         fdn['man_str'] = fdn[dn.columns[0]].apply(str)
 
         self._mandatory_reg_columns = list(fdn[fdn[dn.columns[0]] == '*'][key_col_name])
-        self._mandatory_nat_columns = list(fdn[fdn['man_str'].str.contains('*')][key_col_name])
+        # print(f'{dn.columns[0]=}')
+        # print(f'{dn.columns=}')
+        # print(fdn['man_str'])
+        try:
+            self._mandatory_nat_columns = list(fdn[fdn['man_str'].str.contains('*')][key_col_name])
+        except re.error:
+            adm_logger.log_workflow(f'Could not find mandatory_nat_columns', level=adm_logger.WARNING)
 
     def _map_mandatory_lists(self):
         if not self.import_matrix_mapper:
@@ -221,7 +227,7 @@ class DvTemplateDataHolder(DataHolder, ABC):
         wb = openpyxl.load_workbook(self._template_path)
 
         sheet_name = None
-        for name in ['data', 'Klistra in i denna', 'Klistra in  i denna']:
+        for name in ['data', 'Klistra in i denna', 'Klistra in  i denna', 'Kolumner']:
             if name in wb.sheetnames:
                 sheet_name = name
                 break
