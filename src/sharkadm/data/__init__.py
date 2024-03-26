@@ -20,6 +20,7 @@ from .archive import *
 from .lims import LimsDataHolder
 from .dv_template import DvTemplateDataHolder
 from sharkadm import utils
+from sharkadm import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,7 @@ def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **k
                 return get_lims_data_holder(lims_directory)
     if sharkweb:
         return get_sharkweb_data_holder(**kwargs)
-    raise sharkadm_exceptions.DataHolderError(f'Could not find dataholder for: {path}')
+    raise sharkadm_exceptions.DataHolderError(f'Could not find dataholer for: {path}')
 
 
 def get_valid_data_holders(valid: list[str] | None = None,

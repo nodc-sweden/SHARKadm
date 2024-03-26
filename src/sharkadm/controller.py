@@ -106,7 +106,7 @@ class SHARKadmController:
 
     def set_data_holder(self, data_holder: DataHolder) -> None:
         self._data_holder = data_holder
-        adm_logger.name = data_holder.dataset_name
+        adm_logger.dataset_name = data_holder.dataset_name
 
     def set_transformers(self, *args: Transformer) -> None:
         """Add one or more Transformers to the data holder"""

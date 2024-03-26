@@ -98,7 +98,7 @@ class XlsxExporter(SharkadmExporter):
 
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
-        header = ['Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
+        header = ['Dataset name', 'Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
         if self.kwargs.get('include_items'):
             header = header + ['Item']
 
@@ -108,17 +108,18 @@ class XlsxExporter(SharkadmExporter):
                     count = msg_data['count']
                     log_nr = msg_data['log_nr']
                     cls = msg_data['cls']
+                    dataset_name = msg_data['dataset_name']
                     if not self.kwargs.get('include_items'):
-                        line = [level, log_type, cls, msg, count, log_nr]
+                        line = [dataset_name, level, log_type, cls, msg, count, log_nr]
                         info.append(line)
                         continue
                     if not msg_data['items']:
-                        line = [level, log_type, cls, msg, count, log_nr, '']
+                        line = [dataset_name, level, log_type, cls, msg, count, log_nr, '']
                         info.append(line)
                         continue
                     for item in msg_data['items']:
                         # line[3] = 1
-                        line = [level, log_type, cls, msg, count, log_nr, item]
+                        line = [dataset_name, level, log_type, cls, msg, count, log_nr, item]
                         info.append(line)
         df = pd.DataFrame(data=info, columns=header)
         df.fillna('', inplace=True)
@@ -173,12 +174,13 @@ class XlsxExporter(SharkadmExporter):
         worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
 
         # Make the columns wider for clarity.
-        worksheet.set_column(0, 0, 10)
-        worksheet.set_column(1, 1, 20)
-        worksheet.set_column(2, 2, 40)
-        worksheet.set_column(3, 3, 90)
-        worksheet.set_column(4, 4, 8)
-        worksheet.set_column(5, 5, 70)
+        worksheet.set_column(0, 0, 40)
+        worksheet.set_column(1, 1, 10)
+        worksheet.set_column(2, 2, 20)
+        worksheet.set_column(3, 3, 40)
+        worksheet.set_column(4, 4, 90)
+        worksheet.set_column(5, 5, 8)
+        worksheet.set_column(6, 6, 70)
 
         # Close the Pandas Excel writer and output the Excel file.
         writer.close()

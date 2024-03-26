@@ -113,7 +113,6 @@ class SHARKadmWorkflow:
     def _do_adm_logger_stuff(self) -> None:
         # Other options for log here later?
         for adm_logger_config in self._adm_logger_config.get('exporters', []):
-            print(f'{adm_logger_config=}')
             self._filter_log(adm_logger_config.get('filter'))
             exporter = get_exporter(**adm_logger_config)
             exporter.export(adm_logger)

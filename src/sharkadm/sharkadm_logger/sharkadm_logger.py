@@ -65,11 +65,11 @@ class SHARKadmLogger:
         self._initiate_log()
 
     def _initiate_log(self) -> None:
-        """Initiate the log"""
         self._data = dict((lev, {}) for lev in self._levels)
         self._filtered_data = dict()
         self.name = ''
         self._nr_log_entries = 0
+        self._dataset_name = ''
 
     def _check_level(self, level: str) -> str:
         level = level.lower()
@@ -86,12 +86,12 @@ class SHARKadmLogger:
         return self._data
 
     @property
-    def name(self) -> str:
-        return self._name
+    def dataset_name(self) -> str:
+        return self._dataset_name
 
-    @name.setter
-    def name(self, name: str):
-        self._name = str(name)
+    @dataset_name.setter
+    def dataset_name(self, dataset_name: str):
+        self._dataset_name = str(dataset_name)
 
     def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
         cls = ''
@@ -165,6 +165,7 @@ class SHARKadmLogger:
         self._data[level][log_type][msg]['count'] += 1
         self._data[level][log_type][msg]['log_nr'] = self._nr_log_entries
         self._data[level][log_type][msg]['cls'] = cls
+        self._data[level][log_type][msg]['dataset_name'] = self.dataset_name
         item = []
         if add:
             item.append(f'({self._nr_log_entries}) {add}')

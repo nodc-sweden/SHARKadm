@@ -26,7 +26,9 @@ class DvTemplateDataHolder(DataHolder, ABC):
     _date_str_format = '%Y-%m-%d'
 
     def __init__(self, template_path: str | pathlib.Path = None):
+        super().__init__()
         self._template_path = pathlib.Path(template_path)
+        adm_logger.dataset_name = self._template_path.name
 
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
