@@ -1,11 +1,5 @@
-from abc import abstractmethod
-
-import pandas as pd
-
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
-from sharkadm import config
 from sharkadm.data import archive
+from .base import Transformer
 
 
 class CopyVariable(Transformer):
@@ -39,5 +33,4 @@ class CopyVariable(Transformer):
         return x.split('.')[-1]
 
     def _fix_parameter(self, x) -> str:
-        # return x.replace('COPY_VARIABLE', '')
         return x.split('.')[1]
