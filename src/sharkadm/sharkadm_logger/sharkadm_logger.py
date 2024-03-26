@@ -189,10 +189,16 @@ class SHARKadmLogger:
         return self
 
     def filter(self, *args,
+                     log_type: str | None = None,
                      log_types: str | list | None = None,
+                     level: str | None = None,
                      levels: str | list | None = None,
                      in_msg: str | None = None,
                      **kwargs) -> 'SHARKadmLogger':
+        if level and type(level) == str:
+            levels = [level]
+        if log_type and type(log_type) == str:
+            log_types = [log_type]
         self._filtered_data = self._get_filtered_data(*args,
                                                       log_types=log_types,
                                                       levels=levels,
