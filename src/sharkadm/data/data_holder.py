@@ -24,10 +24,14 @@ class DataHolder(ABC):
         if self.data_type != other.data_type:
             adm_logger.log_workflow(f'Not allowed to merge data_sources of different data_types: {self.data_type} and {other.data_type}')
             return
-        if self.dataset_name != other.dataset_name:
+        if self.dataset_name == other.dataset_name:
             adm_logger.log_workflow(f'Not allowed to merge to instances of the same dataset: {self.dataset_name}')
             return
-        concat_data = pd.concat([self.data, other.data])
+        concat_data = pd.concat([self.data, other.data], axis=0)
+        cdh = ConcatDataHolder()
+        cdh.data = concat_data
+        cdh.data_type = self.data_type
+        return cdh
 
     @property
     def workflow_message(self) -> str:
@@ -83,6 +87,34 @@ class DataHolder(ABC):
         for name, source in self._data_sources.items():
             mapped.update(source.mapped_columns)
         return mapped
+
+
+class ConcatDataHolder(DataHolder):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._data_type = ''
+
+    @staticmethod
+    def get_data_holder_description() -> str:
+        return 'This is a concatenated data holder'
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type
+
+    @data_type.setter
+    def data_type(self, data_type: str) -> None:
+        self._data_type = data_type
+
+    @property
+    def dataset_name(self) -> str:
+        return '#'.join(self.data['dataset_name'].unique())
+
+    @property
+    def number_metadata_rows(self) -> None:
+        return
+
 
 
 

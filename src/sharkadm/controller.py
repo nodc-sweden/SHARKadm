@@ -31,6 +31,12 @@ class SHARKadmController:
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}'
 
+    def __add__(self, other):
+        cdh = self.data_holder + other.data_holder
+        new_controller = SHARKadmController()
+        new_controller.set_data_holder(cdh)
+        return new_controller
+
     @classmethod
     def get_validators(cls) -> dict[str, dict]:
         return validators.get_validators_info()

@@ -26,13 +26,14 @@ class CopyVariable(Transformer):
                 data_holder.data.drop(col, axis=1, inplace=True)
 
     def _wide_to_long(self, data_holder: archive.ArchiveDataHolder) -> None:
-        # copy_columns = [col for col in data_holder.data.columns if col.startswith('COPY_VARIABLE')]
         data_holder.data = data_holder.data.melt(id_vars=[col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')],
                                                  var_name='parameter')
 
     def _cleanup(self, data_holder: archive.ArchiveDataHolder) -> None:
         data_holder.data['unit'] = data_holder.data['parameter'].apply(self._fix_unit)
         data_holder.data['parameter'] = data_holder.data['parameter'].apply(self._fix_parameter)
+        keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
+        data_holder.data = data_holder.data[keep_columns]
 
     def _fix_unit(self, x) -> str:
         return x.split('.')[-1]
