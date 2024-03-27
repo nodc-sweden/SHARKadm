@@ -144,7 +144,7 @@ class SamplingInfo:
 
     @property
     def columns(self) -> list[str]:
-        return list(self.data[list(self._data)[0]])
+        return list(self.data[list(self._data)[0]][0])
 
 
 def _get_date(date_str: str):
