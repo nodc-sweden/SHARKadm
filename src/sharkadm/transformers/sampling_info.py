@@ -9,11 +9,6 @@ from sharkadm import adm_logger
 from sharkadm.utils import yaml_data
 from sharkadm.data.archive.sampling_info import SamplingInfo
 
-if getattr(sys, 'frozen', False):
-    THIS_DIR = pathlib.Path(sys.executable).parent
-else:
-    THIS_DIR = pathlib.Path(__file__).parent
-
 
 class AddSamplingInfo(Transformer):
     valid_data_holders = ['ArchiveDataHolder']
