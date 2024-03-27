@@ -2,6 +2,7 @@ import pathlib
 
 from .base import FileExporter, DataHolderProtocol
 from sharkadm import utils
+from sharkadm.utils.paths import get_next_incremented_file_path
 from sharkadm.config import get_import_matrix_mapper
 
 
@@ -30,5 +31,9 @@ class TxtAsIs(FileExporter):
             df.columns = new_column_names
         if not self._export_file_name:
             self._export_file_name = f'data_as_is_{data_holder.dataset_name}.txt'
-        df.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
+        try:
+            df.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
+        except PermissionError:
+            self._export_file_name = get_next_incremented_file_path(self.export_file_path)
+            df.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
 

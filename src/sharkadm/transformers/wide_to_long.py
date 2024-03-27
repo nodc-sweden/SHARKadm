@@ -7,6 +7,7 @@ from sharkadm import adm_logger
 from .base import Transformer, DataHolderProtocol
 from sharkadm import config
 from sharkadm.data import archive
+from sharkadm.data import DataHolder
 
 
 class WideToLong(Transformer):
@@ -45,13 +46,14 @@ class WideToLong(Transformer):
     def get_transformer_description() -> str:
         return f'Transposes data from column data to row data'
 
-    def _transform(self, data_holder: archive.ArchiveDataHolder) -> None:
+    def _transform(self, data_holder: DataHolder) -> None:
         if self._column_name_parameter in data_holder.columns:
             adm_logger.log_transformation(f'Could not transform to row format. {self._column_name_parameter} already in data')
             return
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
+        self._cleanup(data_holder)
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
         for col in df.columns:
@@ -116,14 +118,14 @@ class WideToLong(Transformer):
                 new_row = meta + [par, value, qf, unit]
                 data.append(new_row)
 
-        self.meta = meta
-        self.par = par
-        self.value = value
-        self.qf = qf
-        self.unit = unit
-        self.new_row = new_row
-        self.row = row
-        self.data = data
+        # self.meta = meta
+        # self.par = par
+        # self.value = value
+        # self.qf = qf
+        # self.unit = unit
+        # self.new_row = new_row
+        # self.row = row
+        # self.data = data
         self.columns = self._metadata_columns + [self._column_name_parameter,
                                                                            self._column_name_value,
                                                                            self._column_name_qf,
@@ -133,6 +135,10 @@ class WideToLong(Transformer):
                                                                            self._column_name_qf,
                                                                            self._column_name_unit])
         return new_df
+
+    def _cleanup(self, data_holder: DataHolder):
+        keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
+        data_holder.data = data_holder.data[keep_columns]
 
     @staticmethod
     def _get_unit_from_parameter(par: str) -> str:
@@ -150,21 +156,21 @@ class WideToLong(Transformer):
             return par.split('[')[0].strip()
         return par
 
-    def _remove_columns(self, data_holder: archive.ArchiveDataHolder) -> None:
-        for col in ['parameter', 'value', 'unit']:
-            if col in data_holder.data.columns:
-                data_holder.data.drop(col, axis=1, inplace=True)
-
-    def _wide_to_long(self, data_holder: archive.ArchiveDataHolder) -> None:
-        data_holder.data = data_holder.data.melt(id_vars=[col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')],
-                                                 var_name='parameter')
-
-    def _cleanup(self, data_holder: archive.ArchiveDataHolder) -> None:
-        data_holder.data['unit'] = data_holder.data['parameter'].apply(self._fix_unit)
-        data_holder.data['parameter'] = data_holder.data['parameter'].apply(self._fix_parameter)
-
-    def _fix_unit(self, x) -> str:
-        return x.split('.')[-1]
-
-    def _fix_parameter(self, x) -> str:
-        return x.split('.')[1]
+    # def _old_remove_columns(self, data_holder: archive.ArchiveDataHolder) -> None:
+    #     for col in ['parameter', 'value', 'unit']:
+    #         if col in data_holder.data.columns:
+    #             data_holder.data.drop(col, axis=1, inplace=True)
+    #
+    # def _wide_to_long(self, data_holder: archive.ArchiveDataHolder) -> None:
+    #     data_holder.data = data_holder.data.melt(id_vars=[col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')],
+    #                                              var_name='parameter')
+    #
+    # def _cleanup(self, data_holder: archive.ArchiveDataHolder) -> None:
+    #     data_holder.data['unit'] = data_holder.data['parameter'].apply(self._fix_unit)
+    #     data_holder.data['parameter'] = data_holder.data['parameter'].apply(self._fix_parameter)
+    #
+    # def _fix_unit(self, x) -> str:
+    #     return x.split('.')[-1]
+    #
+    # def _fix_parameter(self, x) -> str:
+    #     return x.split('.')[1]

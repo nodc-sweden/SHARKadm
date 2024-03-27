@@ -2,11 +2,13 @@ import datetime
 from abc import abstractmethod, ABC
 import pathlib
 from sharkadm import utils
+from sharkadm.utils.paths import get_next_incremented_file_path
 from sharkadm.utils import matching_strings
 import logging
 import pandas as pd
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .sharkadm_logger import SHARKadmLogger
 
@@ -51,16 +53,16 @@ class SharkadmExporter(ABC):
         if not self.file_path.parent.exists():
             raise NotADirectoryError(self.file_path.parent)
 
-    def _set_incremented_file_path(self):
-        i = 1
-        path = self._get_incremented_file_path(i)
-        while path.exists():
-            i += 1
-            path = self._get_incremented_file_path(i)
-        self.file_path = path
-
-    def _get_incremented_file_path(self, nr):
-        return self.file_path.parent / f'{self.file_path.stem}({nr}){self.file_path.suffix}'
+    # def _set_incremented_file_path(self):
+    #     i = 1
+    #     path = self._get_incremented_file_path(i)
+    #     while path.exists():
+    #         i += 1
+    #         path = self._get_incremented_file_path(i)
+    #     self.file_path = path
+    #
+    # def _get_incremented_file_path(self, nr):
+    #     return self.file_path.parent / f'{self.file_path.stem}({nr}){self.file_path.suffix}'
 
 
     def _open_directory(self):
@@ -92,7 +94,7 @@ class XlsxExporter(SharkadmExporter):
             self._save_as_xlsx_with_table(df)
             logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
         except PermissionError:
-            self._set_incremented_file_path()
+            self.file_path = get_next_incremented_file_path(self.file_path)
             self._save_as_xlsx_with_table(df)
             logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
 

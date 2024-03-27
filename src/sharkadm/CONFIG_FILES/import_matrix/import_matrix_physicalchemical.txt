@@ -18,7 +18,7 @@ visit.positioning_system_code	POSYS	POSYS	POSYS
 visit.water_depth_m	WADEP	WADEP	WADEP
 visit.additional_sampling	ADD_SMP	ADD_SMP	ADD_SMP
 visit.visit_comment	COMNT_VISIT	COMNT_VISIT	COMNT_VISIT
-			
+visit.nr_depths			NODEPTH
 visit.wind_direction_code	WINDIR<or>WINDR	WINDIR	WINDIR
 visit.wind_speed_ms	WINSP	WINSP	WINSP
 visit.air_temperature_degc	AIRTEMP	AIRTEMP	AIRTEMP
