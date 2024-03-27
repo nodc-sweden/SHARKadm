@@ -28,6 +28,8 @@ class DataHolder(ABC):
             adm_logger.log_workflow(f'Not allowed to merge to instances of the same dataset: {self.dataset_name}')
             return
         concat_data = pd.concat([self.data, other.data], axis=0)
+        concat_data.fillna('', inplace=True)
+        concat_data.reset_index(inplace=True)
         cdh = ConcatDataHolder()
         cdh.data = concat_data
         cdh.data_type = self.data_type

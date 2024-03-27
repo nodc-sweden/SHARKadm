@@ -34,7 +34,7 @@ class SortData(Transformer):
                 col].str.zfill(4)
         data_holder.data.sort_values(sort_column_name, inplace=True)
         if self._remove_sorting_column:
-            data_holder.data.drop(sort_column_name, axis='columns')
+            data_holder.data.drop(sort_column_name, axis='columns', inplace=True)
     # def _transform(self, data_holder: DataHolderProtocol) -> None:
     #     sort_by_columns = [col for col in self.sort_by_columns if col in data_holder.data.columns]
     #     column_string = ', '.join(sort_by_columns)
