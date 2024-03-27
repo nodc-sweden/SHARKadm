@@ -6,7 +6,7 @@ from typing import Protocol
 
 from sharkadm.data.data_holder import DataHolder
 from sharkadm.data import data_source
-from sharkadm.data.archive import sampling_info
+from sharkadm.data.archive import sampling_info, analyse_info
 from sharkadm import adm_logger
 
 logger = logging.getLogger(__name__)
@@ -37,8 +37,10 @@ class LimsDataHolder(DataHolder):
         self._dataset_name: str | None = None
 
         self._sampling_info: sampling_info.SamplingInfo | None = None
+        self._analyse_info: analyse_info.AnalyseInfo | None = None
 
         self._load_sampling_info()
+        self._load_analyse_info()
         self._load_data()
 
     @staticmethod
@@ -54,8 +56,16 @@ class LimsDataHolder(DataHolder):
         return self._lims_root_directory / 'Raw_data' / 'sampling_info.txt'
 
     @property
+    def analyse_info_path(self) -> pathlib.Path:
+        return self._lims_root_directory / 'Raw_data' / 'analyse_info.txt'
+
+    @property
     def sampling_info(self) -> sampling_info.SamplingInfo:
         return self._sampling_info
+
+    @property
+    def analyse_info(self) -> analyse_info.AnalyseInfo:
+        return self._analyse_info
 
     def _load_data(self) -> None:
         d_source = data_source.TxtColumnFormatDataFile(path=self.data_file_path, data_type=self.data_type)
@@ -69,6 +79,13 @@ class LimsDataHolder(DataHolder):
             adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
             return
         self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path,
+                                                                       mapper=self._header_mapper)
+
+    def _load_analyse_info(self) -> None:
+        if not self.analyse_info_path.exists():
+            adm_logger.log_workflow(f'No analyse info file for {self.dataset_name}', level=adm_logger.INFO)
+            return
+        self._analyse_info = analyse_info.AnalyseInfo.from_lims_txt_file(self.analyse_info_path,
                                                                        mapper=self._header_mapper)
 
 

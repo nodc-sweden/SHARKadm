@@ -9,7 +9,7 @@ from sharkadm import config
 from sharkadm.config.import_matrix import ImportMatrixConfig
 from sharkadm.config.import_matrix import ImportMatrixMapper
 from sharkadm.data import data_source
-from sharkadm.data.archive import delivery_note
+from sharkadm.data.archive import delivery_note, analyse_info
 from sharkadm.data.archive import sampling_info
 from sharkadm.data.data_holder import DataHolder
 from sharkadm import adm_logger
@@ -31,6 +31,7 @@ class ArchiveDataHolder(DataHolder, ABC):
 
         self._delivery_note: delivery_note.DeliveryNote | None = None
         self._sampling_info: sampling_info.SamplingInfo | None = None
+        self._analyse_info: analyse_info.AnalyseInfo | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -40,6 +41,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         self._initiate()
         self._load_delivery_note()
         self._load_sampling_info()
+        self._load_analyse_info()
         self._load_import_matrix()
         self._load_data()
 
@@ -68,6 +70,10 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self._sampling_info
 
     @property
+    def analyse_info(self) -> analyse_info.AnalyseInfo:
+        return self._analyse_info
+
+    @property
     def dataset_name(self) -> str:
         return self._dataset_name
 
@@ -94,6 +100,10 @@ class ArchiveDataHolder(DataHolder, ABC):
     @property
     def sampling_info_path(self) -> pathlib.Path:
         return self.processed_data_directory / 'sampling_info.txt'
+
+    @property
+    def analyse_info_path(self) -> pathlib.Path:
+        return self.processed_data_directory / 'analyse_info.txt'
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:
@@ -138,7 +148,14 @@ class ArchiveDataHolder(DataHolder, ABC):
         if not self.sampling_info_path.exists():
             adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
             return
-        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path, mapper=self._import_matrix_mapper)
+        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path,
+                                                                       mapper=self._import_matrix_mapper)
+
+    def _load_analyse_info(self) -> None:
+        if not self.analyse_info_path.exists():
+            adm_logger.log_workflow(f'No analyse info file for {self.dataset_name}', level=adm_logger.INFO)
+            return
+        self._analyse_info = analyse_info.AnalyseInfo.from_txt_file(self.analyse_info_path, mapper=self._import_matrix_mapper)
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
