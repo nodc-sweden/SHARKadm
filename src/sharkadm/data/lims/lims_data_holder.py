@@ -6,6 +6,8 @@ from typing import Protocol
 
 from sharkadm.data.data_holder import DataHolder
 from sharkadm.data import data_source
+from sharkadm.data.archive import sampling_info
+from sharkadm import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +26,19 @@ class LimsDataHolder(DataHolder):
                  header_mapper: HeaderMapper = None):
         super().__init__()
         self._lims_root_directory = pathlib.Path(lims_root_directory)
+        if not self._lims_root_directory.is_dir():
+            raise NotADirectoryError(self._lims_root_directory)
+        if self._lims_root_directory.name.lower() == 'raw_data':
+            self._lims_root_directory = self._lims_root_directory.parent
+
         self._header_mapper = header_mapper
 
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
 
+        self._sampling_info: sampling_info.SamplingInfo | None = None
+
+        self._load_sampling_info()
         self._load_data()
 
     @staticmethod
@@ -39,12 +49,28 @@ class LimsDataHolder(DataHolder):
     def data_file_path(self) -> pathlib.Path:
         return self._lims_root_directory / 'Raw_data' / 'data.txt'
 
+    @property
+    def sampling_info_path(self) -> pathlib.Path:
+        return self._lims_root_directory / 'Raw_data' / 'sampling_info.txt'
+
+    @property
+    def sampling_info(self) -> sampling_info.SamplingInfo:
+        return self._sampling_info
+
     def _load_data(self) -> None:
         d_source = data_source.TxtColumnFormatDataFile(path=self.data_file_path, data_type=self.data_type)
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
         self._data = self._get_data_from_data_source(d_source)
         self._dataset_name = self._lims_root_directory.stem
+
+    def _load_sampling_info(self) -> None:
+        if not self.sampling_info_path.exists():
+            adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
+            return
+        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path,
+                                                                       mapper=self._header_mapper)
+
 
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:

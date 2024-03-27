@@ -16,6 +16,7 @@ class DataHolder(ABC):
         self._data = pd.DataFrame()
         self._data_sources: dict[str, DataFile] = dict()
         self._number_metadata_rows = 0
+        self._header_mapper = None
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -89,6 +90,10 @@ class DataHolder(ABC):
         for name, source in self._data_sources.items():
             mapped.update(source.mapped_columns)
         return mapped
+
+    @property
+    def header_mapper(self):
+        return self._header_mapper
 
 
 class ConcatDataHolder(DataHolder):

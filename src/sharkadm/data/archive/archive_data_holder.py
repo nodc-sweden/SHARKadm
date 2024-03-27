@@ -138,7 +138,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         if not self.sampling_info_path.exists():
             adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
             return
-        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path)
+        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path, mapper=self._import_matrix_mapper)
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""

@@ -59,7 +59,7 @@ def open_file_with_default_program(path: str | pathlib.Path) -> None:
 
 
 def open_file_with_excel(path: str | pathlib.Path) -> None:
-    os.system(f"start EXCEL.EXE {path}")
+    os.system(f'start EXCEL.EXE "{path}"')
 
 
 def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
