@@ -5,6 +5,7 @@ from typing import Type
 from sharkadm import utils
 from .arithmetic import Divide
 from .arithmetic import Multiply
+from .analyse_info import AddAnalyseInfo
 from .bacteria import AddBacteriaAsReportedScientificName
 from .base import Transformer
 from .boolean import FixYesNo
@@ -161,16 +162,10 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddColumnsForAutomaticQC(),
         AddCruiseId(),
         AddVisitKey(),
-        # RemoveNonDataLines(), # LIMS
+        RemoveNonDataLines(),  # LIMS
         AddMonth(),
-        AddBacteriaAsReportedScientificName(),
-        AddReportedScientificName(),
-        AddDyntaxaScientificName(),
-        AddScientificName(),
         AddSampleMinAndMaxDepth(),
         ReorderSampleMinAndMaxDepth(),
-        # AddParameterUnitValueFromReported(),
-        AddDyntaxaId(),
         AddDatatype(),
         AddStatus(),
         AddStationInfo(),
@@ -190,7 +185,6 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddLocationSeaBasin(),
         AddLocationTypeArea(),
         AddLocationWaterDistrict(),
-        AddAphiaId(),
         AddStaticInternetAccessInfo(),
         AddDatasetName(),
         AddSwedishReportingInstitute(),
@@ -202,6 +196,9 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         Divide(),
 
         WideToLong(),
+
+        AddAnalyseInfo(),
+        AddSamplingInfo(),
 
         AddColumnViewsColumns(),
         SortData(),
