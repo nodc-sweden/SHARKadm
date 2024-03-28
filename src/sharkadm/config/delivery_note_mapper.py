@@ -5,7 +5,7 @@ class DeliveryNoteMapper:
     def __init__(self, path: str | pathlib.Path, encoding: str = 'cp1252') -> None:
         self._path: pathlib.Path = pathlib.Path(path)
         self._encoding = encoding
-        self._data = []
+        self._data = {}
 
         self._load_file()
 
@@ -21,16 +21,11 @@ class DeliveryNoteMapper:
                     continue
                 if not all(split_line):
                     continue
-                self._data.append(dict(zip(header, split_line)))
+                line_data = dict(zip(header, split_line))
+                for synonym in line_data['synonyms'].split('<or>'):
+                    self._data[synonym.lower()] = line_data['short_key']
+                self._data[line_data['short_key'].lower()] = line_data['short_key']
 
-    def get_txt_key_from_xlsx_key(self, key):
-        for item in self._data:
-            if item['xlsx_keys'].lower() == key.lower():
-                return item['txt_keys']
-        return key
+    def get(self, synonym: str) -> str:
+        return self._data.get(synonym.lower(), synonym)
 
-    def get_xlsx_key_from_txt_key(self, key):
-        for item in self._data:
-            if item['txt_keys'].lower() == key.lower():
-                return item['xlsx_keys']
-        return key

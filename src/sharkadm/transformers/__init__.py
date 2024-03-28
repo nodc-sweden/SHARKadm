@@ -22,6 +22,7 @@ from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
 from .date_and_time import ChangeDateFormat
 from .delivery_note_info import AddStatus
+from .delivery_note_info import AddDeliveryNoteInfo
 from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
@@ -167,9 +168,9 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddSampleMinAndMaxDepth(),
         ReorderSampleMinAndMaxDepth(),
         AddDatatype(),
-        AddStatus(),
+        # AddStatus(),
+        AddDeliveryNoteInfo(),
         AddStationInfo(),
-        AddSharkId(),
         AddEnglishProjectName(),
         AddSwedishProjectName(),
         AddEnglishSampleOrderer(),
@@ -201,6 +202,7 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddSamplingInfo(),
 
         AddColumnViewsColumns(),
+        AddSharkId(),
         SortData(),
     ]
 

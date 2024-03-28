@@ -17,6 +17,7 @@ class AddDateAndTimeToAllLevels(Transformer):
         'sample_date',
         'visit_date'
     ]  # In order of prioritization
+    end_date_col = 'sample_enddate'
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -26,6 +27,7 @@ class AddDateAndTimeToAllLevels(Transformer):
         for par in self.dates_to_sync:
             data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self._check_and_add(p, row), axis=1)
         self._split_date_and_time(data_holder=data_holder)
+        self._fix_end_date(data_holder=data_holder)
 
     def _check_and_add(self, par: str, row: pd.Series) -> str:
         if row.get(par):
@@ -61,6 +63,10 @@ class AddDateAndTimeToAllLevels(Transformer):
 
     def _get_time_par(self, date_par: str) -> str:
         return date_par.replace('date', 'time')
+
+    def _fix_end_date(self, data_holder: DataHolderProtocol):
+        data_holder.data[self.end_date_col] = data_holder.data[self.end_date_col].apply(lambda x: x.split()[0])
+
 
 
 class ChangeDateFormat(Transformer):

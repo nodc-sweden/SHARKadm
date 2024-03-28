@@ -11,7 +11,7 @@ from sharkadm.data.archive.sampling_info import SamplingInfo
 
 
 class AddSamplingInfo(Transformer):
-    valid_data_holders = ['ArchiveDataHolder', 'LimsDataHolder']
+    valid_data_holders = ['ArchiveDataHolder', 'LimsDataHolder', 'DvTemplateDataHolder']
 
     @staticmethod
     def get_transformer_description() -> str:

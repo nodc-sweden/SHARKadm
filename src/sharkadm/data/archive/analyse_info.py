@@ -5,6 +5,9 @@ import logging
 import pathlib
 from typing import Protocol
 
+import openpyxl
+import pandas as pd
+
 from sharkadm import adm_logger
 
 logger = logging.getLogger(__name__)
@@ -18,12 +21,13 @@ class Mapper(Protocol):
 
 class AnalyseInfo:
 
-    def __init__(self, data: dict, mapper: Mapper) -> None:
+    def __init__(self, data: dict, mapper: Mapper = None) -> None:
         self._data = data
         self._path = data.pop('path', None)
         self._mapper = mapper
 
-        self._map_data()
+        if self._mapper:
+            self._map_data()
 
     def _map_data(self):
         new_data = {}
@@ -118,6 +122,37 @@ class AnalyseInfo:
                 data[par].append(line_dict)
         return AnalyseInfo(data, mapper=mapper)
 
+    @classmethod
+    def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None) -> 'AnalyseInfo':
+        wb = openpyxl.load_workbook(path)
+        sheet_name = None
+        for name in ['Analysinfo']:
+            if name in wb.sheetnames:
+                sheet_name = name
+                break
+        if not sheet_name:
+            adm_logger.log_workflow(f'Could not find analyse_info sheet in file: {path}', level=adm_logger.WARNING)
+            return
+            # raise Exception(f'Could not find analyse_info sheet in file: {path}')
+
+        ws = wb.get_sheet_by_name(sheet_name)
+        skip_nr_rows = 0
+        for r in range(1, 5):
+            if ws.cell(r, 1).value in ['Tabellhuvud:']:
+                skip_nr_rows = r - 1
+                break
+        df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
+        data = dict()
+        data['path'] = path
+        for row in df.iterrows():
+            line_dict = row[1].to_dict()
+            line_dict['VALIDFR'] = _get_date(line_dict['VALIDFR'])
+            line_dict['VALIDTO'] = _get_date(line_dict['VALIDTO'])
+            par = line_dict['PARAM']
+            data.setdefault(par, [])
+            data[par].append(line_dict)
+        return AnalyseInfo(data, mapper=mapper)
+
     @property
     def data(self) -> dict[str, str]:
         return self._data
@@ -135,4 +170,4 @@ class AnalyseInfo:
 def _get_date(date_str: str):
     if not date_str:
         return ''
-    return datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+    return datetime.datetime.strptime(date_str.split()[0], '%Y-%m-%d').date()
