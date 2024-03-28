@@ -45,7 +45,7 @@ class DeliveryNote:
         new_data = {}
         for par, value in self._data.items():
             internal_par = self._mapper.get_internal_name(par)
-            new_data[internal_par.upper()] = value
+            new_data[internal_par] = value
         self._data = new_data
 
     def __str__(self):
@@ -55,7 +55,7 @@ class DeliveryNote:
         return '\n'.join(lst)
 
     def __getitem__(self, item: str) -> str:
-        return self._data.get(item.upper())
+        return self._data.get(item)
 
     @classmethod
     def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252') -> 'DeliveryNote':
@@ -119,7 +119,7 @@ class DeliveryNote:
         data['import_matrix_key'] = data['FORMAT']
         if data['FORMAT'] == 'PP':
             data['data_format'] = 'Phytoplankton'
-            data['datatyp'] = 'Phytoplankton'
+            data['DTYPE'] = 'Phytoplankton'
             data['import_matrix_key'] = 'PP_REG'
         return DeliveryNote(data, mapper=mapper)
 
