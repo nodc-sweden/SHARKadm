@@ -29,7 +29,6 @@ class AddSamplingInfo(Transformer):
                 continue
             info = data_holder.sampling_info.get_info(par, dtime.date())
             i += 1
-            print(f'{i=}   :   {par=}   :    {dtime=}   :   {info=}')
             for col in data_holder.sampling_info.columns:
                 if col in ['VALIDFR', 'VALIDTO']:
                     continue

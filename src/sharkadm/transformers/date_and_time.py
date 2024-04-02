@@ -65,7 +65,7 @@ class AddDateAndTimeToAllLevels(Transformer):
         return date_par.replace('date', 'time')
 
     def _fix_end_date(self, data_holder: DataHolderProtocol):
-        data_holder.data[self.end_date_col] = data_holder.data[self.end_date_col].apply(lambda x: x.split()[0])
+        data_holder.data[self.end_date_col] = data_holder.data[self.end_date_col].apply(lambda x: x.split()[0] if x else x)
 
 
 
