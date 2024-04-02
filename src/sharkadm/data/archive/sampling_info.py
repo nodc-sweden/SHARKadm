@@ -2,6 +2,8 @@
 
 import datetime
 import pathlib
+
+import openpyxl
 import pandas as pd
 import logging
 from typing import Protocol
@@ -21,12 +23,13 @@ class Mapper(Protocol):
 
 class SamplingInfo:
 
-    def __init__(self, data: dict, mapper: Mapper) -> None:
+    def __init__(self, data: dict, mapper: Mapper = None) -> None:
         self._data = data
         self._path = data.pop('path', None)
         self._mapper = mapper
 
-        self._map_data()
+        if self._mapper:
+            self._map_data()
 
     def _map_data(self):
         new_data = {}
@@ -50,9 +53,6 @@ class SamplingInfo:
     def get_info(self, par: str, date: datetime.date) -> dict:
         info = {}
         for info in self.data.get(par, []):
-            # if not any([info['VALIDFR'], info['VALIDTO']]):
-            #     # No time information
-            #     return info
             if info['VALIDFR'] and info['VALIDTO'] and (info['VALIDFR'] <= date <= info['VALIDTO']):
                 return info
             if info['VALIDFR'] and (info['VALIDFR'] <= date):
@@ -65,12 +65,8 @@ class SamplingInfo:
         info = self.get_info(par=par, date=date)
         return info.get(col)
 
-        # for info in self.data.get(par, []):
-        #     if info['VALIDFR'] <= date <= info['VALIDTO']:
-        #         return info.get(col)
-
     @classmethod
-    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper, encoding: str = 'cp1252') -> 'SamplingInfo':
+    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252') -> 'SamplingInfo':
         path = pathlib.Path(path)
         if path.suffix != '.txt':
             msg = f'File is not a valid sampling_info text file: {path}'
@@ -98,40 +94,36 @@ class SamplingInfo:
                 data[par].append(line_dict)
         return SamplingInfo(data, mapper=mapper)
 
-    # @classmethod
-    # def from_dv_template(cls, path: str | pathlib.Path):
-    #     path = pathlib.Path(path)
-    #     if path.suffix != '.xlsx':
-    #         msg = f'Fil is not a valid xlsx dv template: {path}'
-    #         logger.error(msg)
-    #         raise FileNotFoundError(msg)
-    #
-    #     mapper = config.get_delivery_note_mapper()
-    #
-    #     dn = pd.read_excel(path, sheet_name='Förklaring')
-    #     dn['key_row'] = dn[dn.columns[0]].apply(lambda x: True if type(x) == str and x.isupper() else False)
-    #
-    #     fdn = dn[dn['key_row']]
-    #
-    #     col_mapping = dict((c, col) for c, col in enumerate(dn.columns))
-    #
-    #     data = dict()
-    #     data['path'] = path
-    #     for key, value in zip(fdn[col_mapping[0]], fdn[col_mapping[2]]):
-    #         if str(value) == 'nan':
-    #             value = ''
-    #         elif type(value) == datetime.datetime:
-    #             value = value.date()
-    #         data[mapper.get_txt_key_from_xlsx_key(key)] = str(value)
-    #     data['data_format'] = data['format']
-    #     data['import_matrix_key'] = data['format']
-    #     if data['format'] == 'PP':
-    #         data['data_format'] = 'Phytoplankton'
-    #         data['datatyp'] = 'Phytoplankton'
-    #         data['import_matrix_key'] = 'PP_REG'
-    #
-    #     return DeliveryNote(data)
+    @classmethod
+    def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None) -> 'SamplingInfo':
+        wb = openpyxl.load_workbook(path)
+        sheet_name = None
+        for name in ['Provtagningsinfo']:
+            if name in wb.sheetnames:
+                sheet_name = name
+                break
+        if not sheet_name:
+            adm_logger.log_workflow(f'Could not find analyse_info sheet in file: {path}', level=adm_logger.WARNING)
+            return
+            # raise Exception(f'Could not find analyse_info sheet in file: {path}')
 
+        ws = wb.get_sheet_by_name(sheet_name)
+        skip_nr_rows = 0
+        for r in range(1, 5):
+            if ws.cell(r, 1).value in ['Tabellhuvud:']:
+                skip_nr_rows = r - 1
+                break
+        df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
+        data = dict()
+        data['path'] = path
+        for row in df.iterrows():
+            line_dict = row[1].to_dict()
+            line_dict['VALIDFR'] = _get_date(line_dict['VALIDFR'])
+            line_dict['VALIDTO'] = _get_date(line_dict['VALIDTO'])
+            par = line_dict['PARAM']
+            data.setdefault(par, [])
+            data[par].append(line_dict)
+        return SamplingInfo(data, mapper=mapper)
 
     @property
     def data(self) -> dict[str, str]:
@@ -150,4 +142,4 @@ class SamplingInfo:
 def _get_date(date_str: str):
     if not date_str:
         return ''
-    return datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+    return datetime.datetime.strptime(date_str.split()[0], '%Y-%m-%d').date()

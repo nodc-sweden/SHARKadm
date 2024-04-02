@@ -8,27 +8,45 @@ import logging
 from sharkadm import config
 from sharkadm import adm_logger
 from sharkadm import sharkadm_exceptions
+from typing import Protocol
 
 import nodc_codes
 
 logger = logging.getLogger(__name__)
 
 
+class Mapper(Protocol):
+
+    def get_internal_name(self, external_par: str) -> str:
+        ...
+
+
 class DeliveryNote:
     translate_codes = nodc_codes.get_translate_codes_object()
 
     # def __init__(self, path: str | pathlib.Path, encoding: str = 'cp1252') -> None:
-    def __init__(self, data: dict) -> None:
-        self._data = data
+    def __init__(self, data: dict, mapper: Mapper = None) -> None:
+        self._data = {key.upper(): value for key, value in data.items()}
         self._path = data.pop('path', None)
         self._data_format = data.get('data_format', None)
         self._import_matrix_key = data.get('import_matrix_key', None)
+        self._mapper = mapper
 
-        self._data['datatyp'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['datatyp'], translate_to='public_value')
+        self._data['DTYPE'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['DTYPE'], translate_to='public_value')
 
         #TODO: Fullhack
-        if self._data['datatyp'] == 'Physical and Chemical':
-            self._data['datatyp'] = 'PhysicalChemical'
+        if self._data['DTYPE'] == 'Physical and Chemical':
+            self._data['DTYPE'] = 'PhysicalChemical'
+
+        if self._mapper:
+            self._map_data()
+
+    def _map_data(self):
+        new_data = {}
+        for par, value in self._data.items():
+            internal_par = self._mapper.get_internal_name(par)
+            new_data[internal_par] = value
+        self._data = new_data
 
     def __str__(self):
         lst = []
@@ -40,12 +58,15 @@ class DeliveryNote:
         return self._data.get(item)
 
     @classmethod
-    def from_txt_file(cls, path: str | pathlib.Path, encoding: str = 'cp1252') -> 'DeliveryNote':
+    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252') -> 'DeliveryNote':
         path = pathlib.Path(path)
         if path.suffix != '.txt':
             msg = f'File is not a valid delivery_note text file: {path}'
             logger.error(msg)
             raise FileNotFoundError(msg)
+
+        dn_mapper = config.get_delivery_note_mapper()
+
         data = dict()
         data['path'] = path
         with open(path, encoding=encoding) as fid:
@@ -58,8 +79,8 @@ class DeliveryNote:
                     continue
                 key, value = [item.strip() for item in line.split(':', 1)]
                 key = key.lstrip('- ')
-                data[key] = value
-                if key == 'format':
+                data[dn_mapper.get(key)] = value
+                if key == 'FORMAT':
                     parts = [item.strip() for item in value.split(':')]
                     data['data_format'] = parts[0]
                     if len(parts) == 1:
@@ -67,17 +88,17 @@ class DeliveryNote:
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
                     # print(data['import_matrix_key'])
-        return DeliveryNote(data)
+        return DeliveryNote(data, mapper=mapper)
 
     @classmethod
-    def from_dv_template(cls, path: str | pathlib.Path):
+    def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None):
         path = pathlib.Path(path)
         if path.suffix != '.xlsx':
             msg = f'Fil is not a valid xlsx dv template: {path}'
             logger.error(msg)
             raise FileNotFoundError(msg)
 
-        mapper = config.get_delivery_note_mapper()
+        dn_mapper = config.get_delivery_note_mapper()
 
         dn = pd.read_excel(path, sheet_name='Förklaring')
         dn['key_row'] = dn[dn.columns[0]].apply(lambda x: True if type(x) == str and x.isupper() else False)
@@ -93,14 +114,14 @@ class DeliveryNote:
                 value = ''
             elif type(value) == datetime.datetime:
                 value = value.date()
-            data[mapper.get_txt_key_from_xlsx_key(key)] = str(value)
-        data['data_format'] = data['format']
-        data['import_matrix_key'] = data['format']
-        if data['format'] == 'PP':
+            data[dn_mapper.get(key)] = str(value)
+        data['data_format'] = data['FORMAT']
+        data['import_matrix_key'] = data['FORMAT']
+        if data['FORMAT'] == 'PP':
             data['data_format'] = 'Phytoplankton'
-            data['datatyp'] = 'Phytoplankton'
+            data['DTYPE'] = 'Phytoplankton'
             data['import_matrix_key'] = 'PP_REG'
-        return DeliveryNote(data)
+        return DeliveryNote(data, mapper=mapper)
 
     @property
     def data(self) -> dict[str, str]:
@@ -108,7 +129,7 @@ class DeliveryNote:
 
     @property
     def data_type(self) -> str:
-        return self._data['datatyp'].lower()
+        return self._data['DTYPE'].lower()
 
     @property
     def data_format(self) -> str:
@@ -126,12 +147,12 @@ class DeliveryNote:
 
     @property
     def status(self) -> str:
-        return self['status']
+        return self['STATUS']
 
     @property
     def date_reported(self):
-        return datetime.datetime.strptime(self['rapporteringsdatum'], '%Y-%m-%d')
+        return datetime.datetime.strptime(self['rapporteringsdatum'.upper()], '%Y-%m-%d')
 
     @property
     def reporting_institute(self):
-        return self['rapporterande institut']
+        return self['rapporterande institut'.upper()]

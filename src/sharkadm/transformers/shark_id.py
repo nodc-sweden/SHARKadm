@@ -21,26 +21,34 @@ class AddSharkId(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         import_matrix = config.get_import_matrix_config(data_type=data_holder.data_type)
         for level, cols in import_matrix.get_columns_by_level().items():
+            if level == 'variable':
+                continue
             col_name = f'shark_{level}_id'
-            # missing = set(cols) - set(data_holder.data.columns)
-            # if missing:
-            #     adm_logger.log_transformation(f'Missing columns for creating {col_name}: {", ".join(list(missing))}',
-            #                                   level='warning')
-            #     continue
-
+            cols = self._filter_cols(cols)
             if not all([col in data_holder.data.columns for col in cols]):
                 adm_logger.log_transformation(f'Can not create shark_id. All columns are not in data',
                                               add=', '.join(cols), level=adm_logger.WARNING)
                 continue
 
-            data_holder.data[col_name] = data_holder.data[cols].apply('_'.join, axis=1).replace('/', '_')
-            # data_holder.data[col_name] = data_holder.data.apply(lambda row,
-            #                                                            dtype=data_holder.data_type,
-            #                                                            cols=cols: self._get_id(row, cols),
-            #                                                     axis=1)
+            data_holder.data[col_name] = data_holder.data[cols].astype(str).apply('_'.join, axis=1).replace('/', '_')
             if self._add_md5:
                 col_name_md5 = f'{col_name}_md5'
                 data_holder.data[col_name_md5] = data_holder.data[col_name].apply(self.get_md5)
+
+    @staticmethod
+    def _filter_cols(cols: list[str]) -> list[str]:
+        new_cols = []
+        for col in cols:
+            if col in ['parameter', 'unit', 'value', 'quality_flag']:
+                continue
+            if col.startswith('COPY_VARIABLE'):
+                continue
+            if col.startswith('QFLAG'):
+                continue
+            if col.startswith('TEMP'):
+                continue
+            new_cols.append(col)
+        return new_cols
 
     def _get_id(self, row: pd.Series, cols: list[str]) -> str:
         """Returns the id based on the given data"""

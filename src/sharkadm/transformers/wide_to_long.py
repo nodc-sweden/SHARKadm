@@ -47,6 +47,9 @@ class WideToLong(Transformer):
         return f'Transposes data from column data to row data'
 
     def _transform(self, data_holder: DataHolder) -> None:
+        self._metadata_columns = []
+        self._data_columns = []
+        self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
             adm_logger.log_transformation(f'Could not transform to row format. {self._column_name_parameter} already in data')
             return

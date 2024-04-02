@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
-import datetime
-import openpyxl
 import logging
 import pathlib
-from abc import ABC, abstractmethod
 import re
+
+import openpyxl
 import pandas as pd
 
-from sharkadm import config
 from sharkadm import adm_logger
+from sharkadm import config
 # from sharkadm.config import get_data_type_mapper
 from sharkadm.config.import_matrix import ImportMatrixConfig
 from sharkadm.config.import_matrix import ImportMatrixMapper
 from sharkadm.data import data_source
 from sharkadm.data.archive import delivery_note
+from sharkadm.data.archive import analyse_info
+from sharkadm.data.archive import sampling_info
 from sharkadm.data.data_holder import DataHolder
 
 logger = logging.getLogger(__name__)
 
 
-class DvTemplateDataHolder(DataHolder, ABC):
+class DvTemplateDataHolder(DataHolder):
     _data_type: str | None = None
     _data_format: str | None = None
 
@@ -37,6 +38,9 @@ class DvTemplateDataHolder(DataHolder, ABC):
         self._mandatory_nat_columns: list = []
 
         self._delivery_note: delivery_note.DeliveryNote | None = None
+        self._analyse_info: analyse_info.AnalyseInfo | None = None
+        self._sampling_info: sampling_info.SamplingInfo | None = None
+
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -48,6 +52,9 @@ class DvTemplateDataHolder(DataHolder, ABC):
         self._load_mandatory_columns()
         self._load_import_matrix()
         self._load_data()
+        self._load_delivery_note()  # Reload to map
+        self._load_analyse_info()
+        self._load_sampling_info()
         self._map_mandatory_lists()
 
     @staticmethod
@@ -55,20 +62,16 @@ class DvTemplateDataHolder(DataHolder, ABC):
         return """Holds data from a Data host delivery templates"""
 
     def _initiate(self) -> None:
-        self._dataset_name = self.template_path.name
+        self._dataset_name = self.template_path.stem
 
-    # @property
-    # def data(self) -> pd.DataFrame:
-    #     return self._data
+    @property
+    def header_mapper(self):
+        return self._import_matrix_mapper
 
     @property
     def data_type(self) -> str:
         # return self._data_type_mapper.get(self.data_format)
         return self._data_type
-
-    # @property
-    # def data_format(self) -> str:
-    #     return self._data_format
 
     @property
     def dataset_name(self) -> str:
@@ -79,20 +82,16 @@ class DvTemplateDataHolder(DataHolder, ABC):
         return self._template_path
 
     @property
-    def received_data_directory(self) -> pathlib.Path:
-        return self.template_path / 'received_data'
-
-    @property
-    def processed_data_directory(self) -> pathlib.Path:
-        return self.template_path / 'processed_data'
-
-    @property
-    def delivery_note_path(self) -> pathlib.Path:
-        return self.processed_data_directory / 'delivery_note.txt'
-
-    @property
     def delivery_note(self) -> delivery_note.DeliveryNote:
         return self._delivery_note
+
+    @property
+    def analyse_info(self) -> analyse_info.AnalyseInfo:
+        return self._analyse_info
+
+    @property
+    def sampling_info(self) -> sampling_info.SamplingInfo:
+        return self._sampling_info
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:
@@ -139,7 +138,13 @@ class DvTemplateDataHolder(DataHolder, ABC):
         return str(max(self.data['sample_reported_latitude'].astype(float)))
 
     def _load_delivery_note(self) -> None:
-        self._delivery_note = delivery_note.DeliveryNote.from_dv_template(self._template_path)
+        self._delivery_note = delivery_note.DeliveryNote.from_dv_template(self._template_path, mapper=self._import_matrix_mapper)
+
+    def _load_analyse_info(self) -> None:
+        self._analyse_info = analyse_info.AnalyseInfo.from_dv_template(self._template_path, mapper=self._import_matrix_mapper)
+
+    def _load_sampling_info(self) -> None:
+        self._sampling_info = sampling_info.SamplingInfo.from_dv_template(self._template_path, mapper=self._import_matrix_mapper)
 
     def _load_mandatory_columns(self):
         dn = pd.read_excel(self._template_path, sheet_name='Kolumnförklaring')
@@ -238,7 +243,6 @@ class DvTemplateDataHolder(DataHolder, ABC):
 
         ws = wb.get_sheet_by_name(sheet_name)
         for r in range(1, 5):
-            print(f'{ws.cell(r, 1).value=}')
             if ws.cell(r, 1).value in ['Tabellhuvud:']:
                 self._number_metadata_rows = r - 1
                 break
