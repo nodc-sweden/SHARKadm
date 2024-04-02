@@ -2,10 +2,22 @@ import datetime
 import os
 import pathlib
 import platform
+import shutil
 import subprocess
 import zipfile
 
 SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
+
+
+def _remove_empty_directories(directory: pathlib.Path):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for name in dirs:
+            directory = pathlib.Path(root, name)
+            if not any(directory.iterdir()):
+                try:
+                    shutil.rmtree(directory)
+                except PermissionError:
+                    pass
 
 
 def get_root_directory(*subfolders: str) -> pathlib.Path:
@@ -17,34 +29,68 @@ def get_root_directory(*subfolders: str) -> pathlib.Path:
     return folder
 
 
+TEMP_DIRECTORY = get_root_directory() / '_temp'
+CONFIG_DIRECTORY = get_root_directory() / 'config'
+EXPORT_DIRECTORY = get_root_directory() / 'exports'
+
+
 def get_temp_directory(*subfolders: str) -> pathlib.Path:
-    temp_directory = get_root_directory() / '_temp'
-    if not temp_directory.parent.exists():
-        raise NotADirectoryError(f'Cant create temp directory under {temp_directory.parent}. Directory does not exist!')
-    folder = pathlib.Path(temp_directory, *subfolders)
+    if not TEMP_DIRECTORY.parent.exists():
+        raise NotADirectoryError(f'Cant create temp directory under {TEMP_DIRECTORY.parent}. Directory does not exist!')
+    folder = pathlib.Path(TEMP_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 
 
+def clear_temp_directory(days_old: int = 7):
+    """Clears temp directory from files and directories older than <days_old>"""
+    remove_before_date = datetime.datetime.now() - datetime.timedelta(days=days_old)
+    for root, dirs, files in os.walk(TEMP_DIRECTORY, topdown=False):
+        for name in files:
+            path = pathlib.Path(root, name)
+            ts = os.path.getmtime(path)
+            mod_time = datetime.datetime.fromtimestamp(ts, datetime.UTC)
+            if mod_time.date() < remove_before_date.date():
+                try:
+                    os.remove(path)
+                except PermissionError:
+                    pass
+        _remove_empty_directories(TEMP_DIRECTORY)
+
+
+def clear_export_directory(days_old: int = 7):
+    """Clears export directory from files and directories older than <days_old>"""
+    remove_before_date = datetime.datetime.now() - datetime.timedelta(days=days_old)
+    for root, dirs, files in os.walk(EXPORT_DIRECTORY, topdown=False):
+        for name in files:
+            path = pathlib.Path(root, name)
+            ts = os.path.getmtime(path)
+            mod_time = datetime.datetime.fromtimestamp(ts, datetime.UTC)
+            if mod_time.date() < remove_before_date.date():
+                try:
+                    os.remove(path)
+                except PermissionError:
+                    pass
+    _remove_empty_directories(EXPORT_DIRECTORY)
+
+
 def get_config_directory(*subfolders: str) -> pathlib.Path:
-    config_directory = get_root_directory() / 'config'
-    if not config_directory.parent.exists():
-        raise NotADirectoryError(f'Cant create config directory under {config_directory.parent}. Directory does not '
+    if not CONFIG_DIRECTORY.parent.exists():
+        raise NotADirectoryError(f'Cant create config directory under {CONFIG_DIRECTORY.parent}. Directory does not '
                                  f'exist!')
-    folder = pathlib.Path(config_directory, *subfolders)
+    folder = pathlib.Path(CONFIG_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 
 
 def get_export_directory(*subdirectories: str, date_directory=True) -> pathlib.Path:
-    export_directory = get_root_directory() / 'exports'
-    if not export_directory.parent.exists():
-        raise NotADirectoryError(f'Cant create export directory under {export_directory.parent}. Directory does not '
+    if not EXPORT_DIRECTORY.parent.exists():
+        raise NotADirectoryError(f'Cant create export directory under {EXPORT_DIRECTORY.parent}. Directory does not '
                                  f'exist!')
     if date_directory:
-        folder = pathlib.Path(export_directory, datetime.datetime.now().strftime('%Y%m%d'), *subdirectories)
+        folder = pathlib.Path(EXPORT_DIRECTORY, datetime.datetime.now().strftime('%Y%m%d'), *subdirectories)
     else:
-        folder = pathlib.Path(export_directory, *subdirectories)
+        folder = pathlib.Path(EXPORT_DIRECTORY, *subdirectories)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 

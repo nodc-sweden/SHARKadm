@@ -10,6 +10,7 @@ from sharkadm.data.data_holder import DataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.transformers import Transformer
 from sharkadm.validators import Validator
+from sharkadm import utils
 
 from sharkadm import adm_logger
 
@@ -27,6 +28,9 @@ class SHARKadmController:
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
         self._exporters: list[Exporter] = []
+
+        utils.clear_temp_directory(7)
+        utils.clear_export_directory(7)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}'
