@@ -98,7 +98,7 @@ class SamplingInfo:
     def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None) -> 'SamplingInfo':
         wb = openpyxl.load_workbook(path)
         sheet_name = None
-        for name in ['Analysinfo']:
+        for name in ['Provtagningsinfo']:
             if name in wb.sheetnames:
                 sheet_name = name
                 break

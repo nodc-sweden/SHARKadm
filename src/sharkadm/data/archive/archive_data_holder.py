@@ -57,6 +57,11 @@ class ArchiveDataHolder(DataHolder, ABC):
     #     return self._data
 
     @property
+    def header_mapper(self):
+        # TODO: Change
+        return self._import_matrix_mapper
+
+    @property
     def data_type(self) -> str:
         # return self._data_type_mapper.get(self.data_format)
         return self._data_type

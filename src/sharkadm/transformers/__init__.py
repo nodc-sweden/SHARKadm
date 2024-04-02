@@ -197,9 +197,9 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         Divide(),
 
         WideToLong(),
-
-        AddAnalyseInfo(),
-        AddSamplingInfo(),
+        #
+        # AddAnalyseInfo(),
+        # AddSamplingInfo(),
 
         AddColumnViewsColumns(),
         AddSharkId(),

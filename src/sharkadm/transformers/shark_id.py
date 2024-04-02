@@ -45,6 +45,8 @@ class AddSharkId(Transformer):
                 continue
             if col.startswith('QFLAG'):
                 continue
+            if col.startswith('TEMP'):
+                continue
             new_cols.append(col)
         return new_cols
 

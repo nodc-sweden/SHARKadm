@@ -62,7 +62,11 @@ class DvTemplateDataHolder(DataHolder):
         return """Holds data from a Data host delivery templates"""
 
     def _initiate(self) -> None:
-        self._dataset_name = self.template_path.name
+        self._dataset_name = self.template_path.stem
+
+    @property
+    def header_mapper(self):
+        return self._import_matrix_mapper
 
     @property
     def data_type(self) -> str:
