@@ -29,7 +29,25 @@ def decmin_to_decdeg(pos: str, nr_decimals: int | None = 2):
     return str(output)
 
 
+# def decdeg_to_sweref99tm(lat: float, lon: float) -> (float, float):
+#     pp = pyproj.Proj(proj='utm', zone=33, ellps='WGS84', preserve_units=False)
+#     x, y = pp(lon, lat)
+#     return x, y
+
 def decdeg_to_sweref99tm(lat: float, lon: float) -> (float, float):
-    pp = pyproj.Proj(proj='utm', zone=33, ellps='WGS84', preserve_units=False)
-    x, y = pp(lon, lat)
+    wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
+    sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
+    transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
+    x, y = transformer.transform(lon, lat)
     return x, y
+
+
+def sweref99tm_to_decdeg(x: float | str, y: float | str) -> (float, float):
+    x = float(x)
+    y = float(y)
+    wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
+    sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
+    transformer = pyproj.Transformer.from_crs(sweref99tm, wgs84, always_xy=True)
+    # Konvertera från SWEREF 99TM till decimalgrader
+    lon, lat = transformer.transform(x, y)
+    return lat, lon

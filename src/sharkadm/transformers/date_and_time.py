@@ -54,9 +54,6 @@ class FixTimeFormat(Transformer):
         return xx
 
 
-
-
-
 class AddDateAndTimeToAllLevels(Transformer):
     dates_to_sync = [
         'sample_date',
