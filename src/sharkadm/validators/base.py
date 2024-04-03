@@ -41,6 +41,14 @@ class Validator(ABC):
     def get_validator_description() -> str:
         """Verbal description describing what the validator is doing"""
         ...
+
+    @property
+    def description(self) -> str:
+        return self.get_validator_description()
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
     
     def validate(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,

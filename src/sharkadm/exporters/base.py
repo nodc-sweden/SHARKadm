@@ -42,11 +42,19 @@ class Exporter(ABC):
     def __repr__(self) -> str:
         return f'Exporter: {self.__class__.__name__}'
 
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
     @staticmethod
     @abstractmethod
     def get_exporter_description() -> str:
         """Verbal description describing what the exporter is doing"""
         ...
+
+    @property
+    def description(self) -> str:
+        return self.get_exporter_description()
     
     def export(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,

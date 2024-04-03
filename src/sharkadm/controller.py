@@ -182,6 +182,23 @@ class SHARKadmController:
             exp.export(self._data_holder)
         return self
 
+    def get_workflow_description(self):
+        lines = []
+        lines.append(f'Data holder: {self.data_holder}')
+        lines.append('Validators before:')
+        for oper in self._validators_before:
+            lines.append(f'  {oper.description} ({oper.name})')
+        lines.append('Transformers:')
+        for oper in self._transformers:
+            lines.append(f'  {oper.description} ({oper.name})')
+        lines.append('Validators after:')
+        for oper in self._validators_after:
+            lines.append(f'  {oper.description} ({oper.name})')
+        lines.append('Exporters:')
+        for oper in self._exporters:
+            lines.append(f'  {oper.description} ({oper.name})')
+        return '\n'.join(lines)
+
     def start_data_handling(self):
         self.validate_before_all()
         self.transform_all()
