@@ -21,6 +21,8 @@ class AddAnalyseInfo(Transformer):
             return
         pars = data_holder.analyse_info.parameters
         for (par, dtime), df in data_holder.data.groupby(['parameter', 'datetime']):
+            if not dtime:
+                continue
             if par not in pars:
                 continue
             info = data_holder.analyse_info.get_info(par, dtime.date())

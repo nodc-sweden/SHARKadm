@@ -25,6 +25,8 @@ class AddSamplingInfo(Transformer):
         pars = data_holder.sampling_info.parameters
         i = 0
         for (par, dtime), df in data_holder.data.groupby(['parameter', 'datetime']):
+            if not dtime:
+                continue
             if par not in pars:
                 continue
             info = data_holder.sampling_info.get_info(par, dtime.date())

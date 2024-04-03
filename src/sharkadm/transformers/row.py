@@ -32,10 +32,8 @@ class AddRowNumber(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds row number. This column can typically be used to reference dta in log. If needed, use this as ' \
-               f'one of ' \
-               f'the ' \
-               f'first transformers!'
+        return (f'Adds row number. This column can typically be used to reference data in log. '
+                f'Transformer should be set by the controller when setting the data holder')
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set in data_holder.data:

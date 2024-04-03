@@ -12,6 +12,51 @@ DATETIME_FORMATS = [
 ]
 
 
+class FixTimeFormat(Transformer):
+    time_cols = [
+        'sample_time',
+        'visit_time',
+        'sample_endtime'
+        ]
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        cols_str = ', '.join(FixTimeFormat.time_cols)
+        return f'Reformat time values in columns: {cols_str}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        self._buffer = {}
+        for col in self.time_cols:
+            if col not in data_holder.data:
+                continue
+            self._current_col = col
+            data_holder.data[col] = data_holder.data[col].apply(self._fix)
+
+    def _fix(self, x: str):
+        xx = x.strip()
+        if not xx:
+            return ''
+        fixed_x = self._buffer.get(xx)
+        if fixed_x:
+            return fixed_x
+        xx = xx.replace('.', ':')
+        if ':' in xx:
+            if len(xx) > 5:
+                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x, level=adm_logger.ERROR)
+                return ''
+            xx = xx.zfill(5)
+        else:
+            if len(xx) > 4:
+                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x, level=adm_logger.ERROR)
+                return ''
+            xx = f'{xx[:2]}:{xx[2:]}'.zfill(5)
+        self._buffer[x.strip()] = xx
+        return xx
+
+
+
+
+
 class AddDateAndTimeToAllLevels(Transformer):
     dates_to_sync = [
         'sample_date',
@@ -68,7 +113,6 @@ class AddDateAndTimeToAllLevels(Transformer):
         data_holder.data[self.end_date_col] = data_holder.data[self.end_date_col].apply(lambda x: x.split()[0] if x else x)
 
 
-
 class ChangeDateFormat(Transformer):
     dates_to_check = [
         'sample_date',
@@ -117,12 +161,13 @@ class AddDatetime(Transformer):
         # data_holder.data.drop('date_and_time', axis=1, inplace=True)
 
     @staticmethod
-    def to_datetime(x: str) -> datetime.datetime:
+    def to_datetime(x: str) -> datetime.datetime | str:
         for form in DATETIME_FORMATS:
             try:
                 return datetime.datetime.strptime(x.strip(), form)
             except ValueError:
                 continue
+        return ''
 
 
 class AddMonth(Transformer):

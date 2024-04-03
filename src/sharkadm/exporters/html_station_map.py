@@ -52,6 +52,7 @@ class HtmlStationMap(Exporter):
 
         list_name = 'sharkadm_data'
         df = self._get_position_dataframe(data_holder.data)
+        print(df)
         app.add_list_data(df, list_name=list_name)
 
         export_path = self._get_path(data_holder)
@@ -75,6 +76,6 @@ class HtmlStationMap(Exporter):
         unique_df = df.drop_duplicates(
             subset=['sample_latitude_dd', 'sample_longitude_dd'],
             keep='last').reset_index(drop=True)
-        print(f'{unique_df.sample_latitude_dd=}')
-        return unique_df
+        remove_boolean = (unique_df['sample_latitude_dd'] == '') | (unique_df['sample_longitude_dd'] == '')
+        return unique_df[~remove_boolean]
 

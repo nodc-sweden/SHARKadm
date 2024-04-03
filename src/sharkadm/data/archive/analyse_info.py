@@ -142,6 +142,7 @@ class AnalyseInfo:
                 skip_nr_rows = r - 1
                 break
         df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
+        df.fillna('', inplace=True)
         data = dict()
         data['path'] = path
         for row in df.iterrows():
@@ -170,4 +171,13 @@ class AnalyseInfo:
 def _get_date(date_str: str):
     if not date_str:
         return ''
-    return datetime.datetime.strptime(date_str.split()[0], '%Y-%m-%d').date()
+    d_string = date_str.split()[0]
+    if date_str.strip() != d_string:
+        adm_logger.log_workflow(f'Date has the wrong format in analysinfo', add=d_string, level=adm_logger.WARNING)
+
+    date = ''
+    try:
+        date = datetime.datetime.strptime(d_string, '%Y-%m-%d').date()
+    except ValueError:
+        adm_logger.log_workflow(f'Invalid date or date format in analysinfo', add=d_string, level=adm_logger.ERROR)
+    return date

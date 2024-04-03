@@ -17,6 +17,7 @@ from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
+from .date_and_time import FixTimeFormat
 from .date_and_time import AddDateAndTimeToAllLevels
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
@@ -153,6 +154,7 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddDEPHqcColumn(),
         AddPositionToAllLevels(),
         ReplaceCommaWithDot(),
+        FixTimeFormat(),
         AddDateAndTimeToAllLevels(),
         ChangeDateFormat(),
         AddDatetime(),

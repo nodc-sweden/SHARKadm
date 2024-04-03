@@ -114,6 +114,7 @@ class SamplingInfo:
                 skip_nr_rows = r - 1
                 break
         df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
+        df.fillna('', inplace=True)
         data = dict()
         data['path'] = path
         for row in df.iterrows():

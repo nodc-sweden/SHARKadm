@@ -154,6 +154,9 @@ class AddPositionSweref99tm(Transformer):
         data_holder.data[self.y_column_to_set] = ''
         # data_holder.data[self.x_column_to_set], data_holder.data[self.y_column_to_set] = \
         for (lat, lon), df in data_holder.data.groupby([self.lat_source_col, self.lon_source_col]):
+            if not all([lat, lon]):
+                adm_logger.log_transformation(f'Missing position when trying to set {self.x_column_to_set} and {self.y_column_to_set}')
+                continue
             x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
             boolean = (data_holder.data[self.lat_source_col] == lat) & (data_holder.data[self.lon_source_col] == lon)
             data_holder.data.loc[boolean, self.x_column_to_set] = x
