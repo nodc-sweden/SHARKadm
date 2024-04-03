@@ -35,10 +35,9 @@ from .lims import RemoveNonDataLines
 from .map_header import ArchiveMapper
 from .parameter_unit_value import AddParameterUnitValueFromReported
 from .parameter_unit_value import RemoveRowsWithNoParameterValue
-from .position import AddPositionDD
-from .position import AddPositionDM
-from .position import AddPositionSweref99tm
-from .position import AddPositionToAllLevels
+from .position import AddSamplePosition
+from .position import AddSamplePositionDM
+from .position import AddSamplePositionSweref99tm
 from .qc import AddColumnsForAutomaticQC
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .row import AddRowNumber
@@ -152,15 +151,14 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
     return [
         AddRowNumber(),
         AddDEPHqcColumn(),
-        AddPositionToAllLevels(),
         ReplaceCommaWithDot(),
         FixTimeFormat(),
+        # AddSamplePosition(),
         AddDateAndTimeToAllLevels(),
         ChangeDateFormat(),
         AddDatetime(),
-        AddPositionDD(),
-        AddPositionDM(),
-        AddPositionSweref99tm(),
+        AddSamplePositionDM(),
+        AddSamplePositionSweref99tm(),
         MoveLessThanFlagColumnFormat(),
         AddColumnsForAutomaticQC(),
         AddCruiseId(),

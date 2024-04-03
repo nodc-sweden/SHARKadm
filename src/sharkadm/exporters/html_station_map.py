@@ -26,7 +26,7 @@ class HtmlStationMap(Exporter):
             export_directory = utils.get_export_directory()
         self._export_directory = pathlib.Path(export_directory)
         self._export_file_name = export_file_name
-        self._open_map = open_map
+        self._open_map = kwargs.get('open_file', kwargs.get('open', open_map))
 
     def _get_path(self, data_holder: DataHolderProtocol) -> pathlib.Path:
         if not self._export_file_name:
@@ -52,13 +52,12 @@ class HtmlStationMap(Exporter):
 
         list_name = 'sharkadm_data'
         df = self._get_position_dataframe(data_holder.data)
-        print(df)
+        if df.empty:
+            adm_logger.log_export(f'No data to plot html map', level=adm_logger.WARNING)
+            return
         app.add_list_data(df, list_name=list_name)
 
         export_path = self._get_path(data_holder)
-
-        print(f'{DEFAULT_STATION_FILE_PATH=}')
-        print(f'{export_path=}')
 
         app.write_list(
             writer='map',
@@ -77,5 +76,8 @@ class HtmlStationMap(Exporter):
             subset=['sample_latitude_dd', 'sample_longitude_dd'],
             keep='last').reset_index(drop=True)
         remove_boolean = (unique_df['sample_latitude_dd'] == '') | (unique_df['sample_longitude_dd'] == '')
-        return unique_df[~remove_boolean]
+        dframe = unique_df[~remove_boolean]
+        dframe['lat_dd'] = dframe['sample_latitude_dd']
+        dframe['lon_dd'] = dframe['sample_longitude_dd']
+        return dframe.reset_index(drop=True)
 
