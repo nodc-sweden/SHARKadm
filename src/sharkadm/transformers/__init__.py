@@ -18,10 +18,11 @@ from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
 from .date_and_time import FixTimeFormat
-from .date_and_time import AddDateAndTimeToAllLevels
+from .date_and_time import FixDateFormat
+from .date_and_time import AddSampleDate
+from .date_and_time import AddSampleTime
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
-from .date_and_time import ChangeDateFormat
 from .delivery_note_info import AddStatus
 from .delivery_note_info import AddDeliveryNoteInfo
 from .depth import AddSampleMinAndMaxDepth
@@ -154,7 +155,6 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         ReplaceCommaWithDot(),
         FixTimeFormat(),
         # AddSamplePosition(),
-        AddDateAndTimeToAllLevels(),
         ChangeDateFormat(),
         AddDatetime(),
         AddSamplePositionDM(),

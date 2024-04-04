@@ -17,7 +17,7 @@ class FixTimeFormat(Transformer):
         'sample_time',
         'visit_time',
         'sample_endtime'
-        ]
+    ]
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -42,79 +42,27 @@ class FixTimeFormat(Transformer):
         xx = xx.replace('.', ':')
         if ':' in xx:
             if len(xx) > 5:
-                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x, level=adm_logger.ERROR)
+                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x,
+                                              level=adm_logger.ERROR)
                 return ''
             xx = xx.zfill(5)
         else:
             if len(xx) > 4:
-                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x, level=adm_logger.ERROR)
+                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x,
+                                              level=adm_logger.ERROR)
                 return ''
+            xx = xx.zfill(4)
             xx = f'{xx[:2]}:{xx[2:]}'.zfill(5)
         self._buffer[x.strip()] = xx
         return xx
 
 
-class AddDateAndTimeToAllLevels(Transformer):
-    dates_to_sync = [
-        'sample_date',
-        'visit_date'
-    ]  # In order of prioritization
-    end_date_col = 'sample_enddate'
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return 'Adds date and time column to all levels'
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for par in self.dates_to_sync:
-            data_holder.data[par] = data_holder.data.apply(lambda row, p=par: self._check_and_add(p, row), axis=1)
-        self._split_date_and_time(data_holder=data_holder)
-        self._fix_end_date(data_holder=data_holder)
-
-    def _check_and_add(self, par: str, row: pd.Series) -> str:
-        if row.get(par):
-            return row[par]
-        for date_par in self.dates_to_sync:
-            if row.get(date_par):
-                adm_logger.log_transformation(f'Added {par} from {date_par}', level=adm_logger.INFO)
-                return row[date_par]
-        return ''
-
-    def _split_date_and_time(self, data_holder: DataHolderProtocol):
-        for date_par in self.dates_to_sync:
-            time_par = self._get_time_par(date_par)
-            # data_holder.data[time_par] = data_holder.data[date_par].apply(self._get_time_from_date)
-            data_holder.data[time_par] = data_holder.data.apply(lambda row, p=date_par: self._get_time_from_date(p, row), axis=1)
-            data_holder.data[date_par] = data_holder.data[date_par].apply(self._get_date_from_date)
-
-    # def _get_time_from_date(self, x: str) -> str:
-    def _get_time_from_date(self, date_par: str, row: pd.Series) -> str:
-        time_par = self._get_time_par(date_par)
-        if row.get(time_par):
-            return row[time_par]
-        parts = row[date_par].strip().split()
-        if len(parts) == 2:
-            adm_logger.log_transformation('Setting time string from date string', level=adm_logger.DEBUG)
-            return parts[1]
-        return ''
-
-    def _get_date_from_date(self, x: str) -> str:
-        if ' ' not in x:
-            return x
-        return x.strip().split()[0]
-
-    def _get_time_par(self, date_par: str) -> str:
-        return date_par.replace('date', 'time')
-
-    def _fix_end_date(self, data_holder: DataHolderProtocol):
-        data_holder.data[self.end_date_col] = data_holder.data[self.end_date_col].apply(lambda x: x.split()[0] if x else x)
-
-
-class ChangeDateFormat(Transformer):
+class FixDateFormat(Transformer):
     dates_to_check = [
         'sample_date',
         'visit_date'
     ]
+
     from_format = '%Y%m%d'
     to_format = '%Y-%m-%d'
 
@@ -122,10 +70,12 @@ class ChangeDateFormat(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Changes date format from {ChangeDateFormat.from_format} to {ChangeDateFormat.to_format}'
+        return f'Changes date format from {FixDateFormat.from_format} to {FixDateFormat.to_format}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for par in self.dates_to_check:
+            if par not in data_holder.data:
+                continue
             data_holder.data[par] = data_holder.data[par].apply(self._set_new_format)
 
     def _set_new_format(self, x: str):
@@ -133,6 +83,38 @@ class ChangeDateFormat(Transformer):
             return self.mapping.setdefault(x, datetime.datetime.strptime(x, self.from_format).strftime(self.to_format))
         except ValueError:
             return x
+
+
+class AddSampleTime(Transformer):
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adding time format sample_time'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if 'sample_time' in data_holder.data:
+            data_holder.data['reported_sample_time'] = data_holder.data['sample_time']
+            if 'visit_time' in data_holder.data:
+                has_no_sample_time = data_holder.data['sample_time'].str.strip() == ''
+                data_holder.data.loc[has_no_sample_time, 'sample_time'] = data_holder.data.loc[has_no_sample_time, 'visit_time']
+        else:
+            data_holder.data['sample_time'] = data_holder.data['visit_time']
+
+
+class AddSampleDate(Transformer):
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adding time format sample_date'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if 'sample_date' in data_holder.data:
+            data_holder.data['reported_sample_date'] = data_holder.data['sample_date']
+            if 'visit_date' in data_holder.data:
+                has_no_sample_date = data_holder.data['sample_date'].str.strip() == ''
+                data_holder.data.loc[has_no_sample_date, 'sample_date'] = data_holder.data.loc[has_no_sample_date, 'visit_date']
+        else:
+            data_holder.data['sample_date'] = data_holder.data['visit_date']
 
 
 class AddDatetime(Transformer):
@@ -169,13 +151,12 @@ class AddDatetime(Transformer):
 
 class AddMonth(Transformer):
     month_columns = [
-        'sample_month',
-        'visit_month'
+        'sample_month'
     ]
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds month column to date. Month is taken from the datetime column and will overwrite old value'
+        return f'Adds month column to data. Month is taken from the datetime column and will overwrite old value'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'datetime' not in data_holder.data.columns:
