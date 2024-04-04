@@ -29,8 +29,10 @@ class AddStationInfo(Transformer):
 
         for (lat_str, lon_str, reported_station), df in data_holder.data.groupby([self.source_lon_column, self.source_lon_column, self.reported_station_col]):
             if not (lat_str and lon_str):
+                adm_logger.log_transformation(adm_logger.feedback.missing_position(rows=sorted(set(df['row_number']))),
+                                              level=adm_logger.ERROR, purpose=adm_logger.FEEDBACK)  # Ska kanske vara i validator istället
                 adm_logger.log_transformation(f'Missing {self.source_lat_column} and/or {self.source_lon_column} in {self.__class__.__name__}',
-                                              level=adm_logger.WARNING)
+                                              level=adm_logger.ERROR)
                 continue
 
             boolean = (data_holder.data[self.source_lat_column] == lat_str) & (data_holder.data[self.source_lon_column] == lon_str) & (data_holder.data[self.reported_station_col] == reported_station)

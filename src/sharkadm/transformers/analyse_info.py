@@ -25,10 +25,11 @@ class AddAnalyseInfo(Transformer):
                 continue
             if par not in pars:
                 adm_logger.log_transformation(f'No analyse info for parameter "{par}"', level=adm_logger.WARNING)
-                adm_logger.log_transformation(f'No analyse info for parameter "{data_holder.get_original_name(par)}"', level=adm_logger.WARNING, purpose=adm_logger.FEEDBACK)
+                adm_logger.log_transformation(adm_logger.feedback.missing_in_analyse_info(par, data_holder), level=adm_logger.WARNING, purpose=adm_logger.FEEDBACK)
                 continue
             info = data_holder.analyse_info.get_info(par, dtime.date())
             for col in data_holder.analyse_info.columns:
                 if col in ['VALIDFR', 'VALIDTO']:
                     continue
+                print(f'%%%% {col=}')
                 data_holder.data.loc[df.index, col] = info.get(col, '')

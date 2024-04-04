@@ -13,21 +13,10 @@ from typing import Optional
 
 from sharkadm import event
 from sharkadm import utils
-from .exporter import SharkadmExporter
+from sharkadm.sharkadm_logger.exporter import SharkadmExporter
+from sharkadm.sharkadm_logger.feedback import Feedback
 
 logger = logging.getLogger(__name__)
-
-
-# class LogEntry(SQLModel, table=True):
-#     id: Optional[int] = Field(default=None, primary_key=True)
-#     timestamp: datetime.datetime
-#     log_type: str
-#     msg: str
-#     count: int = Field(default=1)
-#     level: str = Field(default='info')
-#     line: Optional[str]
-#     data_source: Optional[str]
-#     cls: Optional[str]
 
 
 class SHARKadmLogger:
@@ -74,6 +63,7 @@ class SHARKadmLogger:
     _data = dict()
 
     def __init__(self):
+        self.feedback = Feedback()
         self._initiate_log()
 
     def _initiate_log(self) -> None:
@@ -143,12 +133,12 @@ class SHARKadmLogger:
                        level: str = 'warning',
                        add: str | None = None,
                        purpose: str = '',
-                       data_row: str | int | None = None) -> None:
+                       row_number: str | int | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, data_row=data_row)
+        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
         # level = self._check_level(level)
         # self._validations[level].setdefault(msg, 0)
         # self._validations[level][msg] += 1
@@ -211,8 +201,8 @@ class SHARKadmLogger:
         item = []
         if add:
             item.append(f'({self._nr_log_entries}) {add}')
-        if kwargs.get('data_row'):
-            item.append(f"at row {kwargs.get('data_row')}")
+        if kwargs.get('row_number'):
+            item.append(f"at row {kwargs.get('row_number')}")
         if item:
             self._data[level][purpose][log_type][msg]['items'].append(' '.join(item))
         event.post_event('log', msg)

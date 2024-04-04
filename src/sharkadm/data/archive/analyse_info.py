@@ -172,12 +172,10 @@ def _get_date(date_str: str):
     if not date_str:
         return ''
     d_string = date_str.split()[0]
-    if date_str.strip() != d_string:
-        adm_logger.log_workflow(f'Date has the wrong format in analysinfo', add=d_string, level=adm_logger.WARNING)
-
     date = ''
     try:
         date = datetime.datetime.strptime(d_string, '%Y-%m-%d').date()
     except ValueError:
         adm_logger.log_workflow(f'Invalid date or date format in analysinfo', add=d_string, level=adm_logger.ERROR)
+        adm_logger.log_workflow(adm_logger.feedback.invalid_date_in_analys_info(d_string), level=adm_logger.ERROR, purpose=adm_logger.FEEDBACK)
     return date
