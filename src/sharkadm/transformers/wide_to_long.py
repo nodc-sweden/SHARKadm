@@ -26,7 +26,7 @@ class WideToLong(Transformer):
         super().__init__(**kwargs)
 
         self._qf_prefix = qf_prefix or ['QFLAG.', 'Q_']
-        if type(self._qf_prefix) == str:
+        if type(self._qf_prefix) is str:
             self._qf_prefix = [self._qf_prefix]
 
         self._ignore_containing = ignore_containing or []

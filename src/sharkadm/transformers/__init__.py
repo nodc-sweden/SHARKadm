@@ -12,7 +12,6 @@ from .boolean import FixYesNo
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns
-from .copy_variable import CopyVariable
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName
