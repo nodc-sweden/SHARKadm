@@ -13,6 +13,9 @@ class ImportMapper(Protocol):
     def get_internal_name(self, external_par: str) -> str:
         ...
 
+    def get_external_name(self, external_par: str) -> str:
+        ...
+
 
 class DataFile(ABC):
 

@@ -32,17 +32,24 @@ logger = logging.getLogger(__name__)
 
 class SHARKadmLogger:
     """Class to log events etc. in the SHARKadm data model"""
+
+    # Levels
     DEBUG = 'debug'
     INFO = 'info'
     WARNING = 'warning'
     ERROR = 'error'
     CRITICAL = 'critical'
 
+    # Log types
     VALIDATION = 'validation'
     TRANSFORMATION = 'transformation'
     EXPORT = 'export'
 
     WORKFLOW = 'workflow'
+
+    # Purposes
+    GENERAL = 'general'
+    FEEDBACK = 'feedback'
 
     _levels = [
         DEBUG,
@@ -57,6 +64,11 @@ class SHARKadmLogger:
         TRANSFORMATION,
         EXPORT,
         WORKFLOW
+    ]
+
+    _purposes = [
+        GENERAL,
+        FEEDBACK,
     ]
 
     _data = dict()
@@ -93,7 +105,11 @@ class SHARKadmLogger:
     def dataset_name(self, dataset_name: str):
         self._dataset_name = str(dataset_name)
 
-    def log_workflow(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+    def log_workflow(self,
+                     msg: str,
+                     level: str = 'info',
+                     purpose: str = '',
+                     add: str | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
@@ -102,39 +118,52 @@ class SHARKadmLogger:
             # msg = f'{the_class}: {msg}'
             # print(f'{the_class=}')
             # print(f'{the_method=}')
-        self.log(log_type=self.WORKFLOW, msg=msg, level=level, cls=cls, add=add)
+        self.log(log_type=self.WORKFLOW, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
         # time_str = str(datetime.datetime.now())
         # self._workflow.append((time_str, msg))
         event.post_event('log_workflow', msg)
 
-    def log_transformation(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+    def log_transformation(self,
+                           msg: str,
+                           level: str = 'info',
+                           purpose: str = '',
+                           add: str | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add)
+        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
         # level = self._check_level(level)
         # self._transformations[level].setdefault(msg, 0)
         # self._transformations[level][msg] += 1
         event.post_event('log_transformation', msg)
 
-    def log_validation(self, msg: str, level: str = 'warning', add: str | None = None, data_row: str | int | None = None) -> None:
+    def log_validation(self,
+                       msg: str,
+                       level: str = 'warning',
+                       add: str | None = None,
+                       purpose: str = '',
+                       data_row: str | int | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, data_row=data_row)
+        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, data_row=data_row)
         # level = self._check_level(level)
         # self._validations[level].setdefault(msg, 0)
         # self._validations[level][msg] += 1
         event.post_event('log_validation', msg)
 
-    def log_export(self, msg: str, level: str = 'info', add: str | None = None) -> None:
+    def log_export(self,
+                   msg: str,
+                   level: str = 'info',
+                   purpose: str = '',
+                   add: str | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.EXPORT, msg=msg, level=level, cls=cls, add=add)
+        self.log(log_type=self.EXPORT, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
         # level = self._check_level(level)
         # self._exports[level].setdefault(msg, 0)
         # self._exports[level][msg] += 1
@@ -155,24 +184,37 @@ class SHARKadmLogger:
 
         return timeit_wrapper
 
-    def log(self, msg: str, level: str = 'info', log_type: str = 'workflow', add: str | None = None, cls: str = '', **kwargs) -> None:
+    def log(self,
+            msg: str,
+            level: str = '',
+            log_type: str = '',
+            add: str | None = None,
+            cls: str = '',
+            purpose: str = '',
+            **kwargs) -> None:
+
+        level = level or self.INFO
+        log_type = log_type or self.WORKFLOW
+        purpose = purpose or self.GENERAL
+
         self._nr_log_entries += 1
         level = self._check_level(level)
-        self._data[level].setdefault(log_type, dict())
+        self._data[level].setdefault(purpose, dict())
+        self._data[level][purpose].setdefault(log_type, dict())
         # self._data[level][log_type].setdefault(msg, dict(count=0, items=[], time=datetime.datetime.now()))
-        self._data[level][log_type].setdefault(msg, dict(count=0, items=[]))
-        # self._data[level].setdefault(msg, 0)
-        self._data[level][log_type][msg]['count'] += 1
-        self._data[level][log_type][msg]['log_nr'] = self._nr_log_entries
-        self._data[level][log_type][msg]['cls'] = cls
-        self._data[level][log_type][msg]['dataset_name'] = self.dataset_name
+        self._data[level][purpose][log_type].setdefault(msg, dict(count=0, items=[]))
+        # self._data[level][purpose].setdefault(msg, 0)
+        self._data[level][purpose][log_type][msg]['count'] += 1
+        self._data[level][purpose][log_type][msg]['log_nr'] = self._nr_log_entries
+        self._data[level][purpose][log_type][msg]['cls'] = cls
+        self._data[level][purpose][log_type][msg]['dataset_name'] = self.dataset_name
         item = []
         if add:
             item.append(f'({self._nr_log_entries}) {add}')
         if kwargs.get('data_row'):
             item.append(f"at row {kwargs.get('data_row')}")
         if item:
-            self._data[level][log_type][msg]['items'].append(' '.join(item))
+            self._data[level][purpose][log_type][msg]['items'].append(' '.join(item))
         event.post_event('log', msg)
 
     def reset_log(self) -> 'SHARKadmLogger':
@@ -196,9 +238,9 @@ class SHARKadmLogger:
                      levels: str | list | None = None,
                      in_msg: str | None = None,
                      **kwargs) -> 'SHARKadmLogger':
-        if level and type(level) == str:
+        if level and type(level) is str:
             levels = [level]
-        if log_type and type(log_type) == str:
+        if log_type and type(log_type) is str:
             log_types = [log_type]
         self._filtered_data = self._get_filtered_data(*args,
                                                       log_types=log_types,
@@ -212,7 +254,7 @@ class SHARKadmLogger:
         for arg in args:
             if arg.lower().strip('<>') in self._levels:
                 use_levels.append(arg.lower())
-        if type(levels) == str:
+        if type(levels) is str:
             levels = [levels]
         if levels:
             use_levels = list(set(use_levels + levels))
@@ -232,17 +274,30 @@ class SHARKadmLogger:
         for arg in args:
             if arg.lower() in self._log_types:
                 use_log_types.append(arg.lower())
-        if type(log_types) == str:
+        if type(log_types) is str:
             log_types = [log_types]
         if log_types:
             use_log_types = list(set(use_log_types + log_types))
         use_log_types = use_log_types or self._log_types
         return use_log_types
 
+    def _get_purposes(self, *args: str, purposes: str | list | None = None):
+        use_purposes = []
+        for arg in args:
+            if arg.lower() in self._purposes:
+                use_purposes.append(arg.lower())
+        if type(purposes) is str:
+            purposes = [purposes]
+        if purposes:
+            use_purposes = list(set(use_purposes + purposes))
+        use_purposes = use_purposes or self._purposes
+        return use_purposes
+
     def _get_filtered_data(self,
                           *args,
                           log_types: str | list | None = None,
                           levels: str | list | None = None,
+                          purposes: str | list | None = None,
                           in_msg: str | None = None,
                           **kwargs
                           ) -> dict:
@@ -255,25 +310,29 @@ class SHARKadmLogger:
 
         log_types = self._get_log_types(*args, log_types=log_types)
         levels = self._get_levels(*args, levels=levels)
+        purposes = self._get_purposes(*args, purposes=purposes)
 
         filtered_data = dict()
         for level_name, level_data in self.data.items():
             if level_name not in levels:
                 continue
-            for log_type_name, log_type_data in level_data.items():
-                if log_type_name not in log_types:
+            for purpose, purpose_data in level_data.items():
+                if purpose not in purposes:
                     continue
+                for log_type_name, log_type_data in purpose_data.items():
+                    if log_type_name not in log_types:
+                        continue
 
-                if in_msg:
-                    for msg, msg_data in log_type_data.items():
-                        if in_msg and in_msg.lower() not in msg.lower():
-                            continue
+                    if in_msg:
+                        for msg, msg_data in log_type_data.items():
+                            if in_msg and in_msg.lower() not in msg.lower():
+                                continue
+                            filtered_data.setdefault(level_name, dict())
+                            filtered_data[level_name].setdefault(log_type_name, dict())
+                            filtered_data[level_name][log_type_name][msg] = msg_data
+                    else:
                         filtered_data.setdefault(level_name, dict())
-                        filtered_data[level_name].setdefault(log_type_name, dict())
-                        filtered_data[level_name][log_type_name][msg] = msg_data
-                else:
-                    filtered_data.setdefault(level_name, dict())
-                    filtered_data[level_name][log_type_name] = log_type_data
+                        filtered_data[level_name][log_type_name] = log_type_data
         return filtered_data
 
     # def save_as_xlsx(self, path: str | pathlib.Path | None = None, include_items: bool = False, **kwargs) -> 'SHARKadmLogger':
