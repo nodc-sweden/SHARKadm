@@ -117,12 +117,13 @@ class SHARKadmLogger:
                            msg: str,
                            level: str = 'info',
                            purpose: str = '',
+                           row_number: str | int | None = None,
                            add: str | None = None) -> None:
         cls = ''
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
+        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
         # level = self._check_level(level)
         # self._transformations[level].setdefault(msg, 0)
         # self._transformations[level][msg] += 1
