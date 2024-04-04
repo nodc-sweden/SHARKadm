@@ -100,29 +100,34 @@ class XlsxExporter(SharkadmExporter):
 
     def _extract_info(self, data: dict) -> pd.DataFrame:
         info = []
-        header = ['Dataset name', 'Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
+        header = ['Dataset name', 'Purpose', 'Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
         if self.kwargs.get('include_items'):
             header = header + ['Item']
 
         for level, level_data in data.items():
-            for log_type, log_type_data in level_data.items():
-                for msg, msg_data in log_type_data.items():
-                    count = msg_data['count']
-                    log_nr = msg_data['log_nr']
-                    cls = msg_data['cls']
-                    dataset_name = msg_data['dataset_name']
-                    if not self.kwargs.get('include_items'):
-                        line = [dataset_name, level, log_type, cls, msg, count, log_nr]
-                        info.append(line)
-                        continue
-                    if not msg_data['items']:
-                        line = [dataset_name, level, log_type, cls, msg, count, log_nr, '']
-                        info.append(line)
-                        continue
-                    for item in msg_data['items']:
-                        # line[3] = 1
-                        line = [dataset_name, level, log_type, cls, msg, count, log_nr, item]
-                        info.append(line)
+            for purpose, purpose_data in level_data.items():
+                for log_type, log_type_data in purpose_data.items():
+                    for msg, msg_data in log_type_data.items():
+                        count = msg_data['count']
+                        log_nr = msg_data['log_nr']
+                        cls = msg_data['cls']
+                        dataset_name = msg_data['dataset_name']
+                        general_line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr]
+                        if not self.kwargs.get('include_items'):
+                            line = general_line
+                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr]
+                            info.append(line)
+                            continue
+                        if not msg_data['items']:
+                            line = general_line + ['']
+                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr, '']
+                            info.append(line)
+                            continue
+                        for item in msg_data['items']:
+                            line = general_line + [item]
+                            # line[3] = 1
+                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr, item]
+                            info.append(line)
         df = pd.DataFrame(data=info, columns=header)
         df.fillna('', inplace=True)
         if self.kwargs.get('sort_by'):

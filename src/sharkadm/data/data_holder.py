@@ -95,6 +95,9 @@ class DataHolder(ABC):
     def header_mapper(self):
         return self._header_mapper
 
+    def get_original_name(self, internal_name: str):
+        return self.header_mapper.get_external_name(internal_name)
+
 
 class ConcatDataHolder(DataHolder):
 
