@@ -10,7 +10,10 @@ from sharkadm import adm_logger
 from sharkadm import sharkadm_exceptions
 from typing import Protocol
 
-import nodc_codes
+try:
+    import nodc_codes
+except ImportError:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +25,9 @@ class Mapper(Protocol):
 
 
 class DeliveryNote:
-    translate_codes = nodc_codes.get_translate_codes_object()
 
-    # def __init__(self, path: str | pathlib.Path, encoding: str = 'cp1252') -> None:
     def __init__(self, data: dict, mapper: Mapper = None) -> None:
+        self.translate_codes = nodc_codes.get_translate_codes_object()
         self._data = {key.upper(): value for key, value in data.items()}
         self._path = data.pop('path', None)
         self._data_format = data.get('data_format', None)

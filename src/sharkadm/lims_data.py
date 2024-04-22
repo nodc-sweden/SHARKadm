@@ -1,18 +1,18 @@
 
 import pathlib
+
 import pandas as pd
 
 from sharkadm import controller
-from sharkadm import transformers
 from sharkadm import exporters
 from sharkadm import sharkadm_logger
-from sharkadm.data import get_data_holder
-from sharkadm import event
+from sharkadm import transformers
+from sharkadm.data.lims import get_lims_data_holder
 
 
 def get_row_data_from_lims_export(path: str | pathlib.Path, export_directory: str | pathlib.Path = None, export_log: bool = False) -> pd.DataFrame:
     path = pathlib.Path(path)
-    data_holder = get_data_holder(path)
+    data_holder = get_lims_data_holder(path)
     c = controller.SHARKadmController()
     c.set_data_holder(data_holder)
     c.transform(transformers.AddRowNumber())

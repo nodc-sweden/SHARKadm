@@ -1,26 +1,18 @@
 import functools
-import pathlib
-import logging
-from typing import Type
 import inspect
+import logging
+import pathlib
+from typing import Type
 
-# from sharkadm import config
-# from sharkadm.data import data_source
-# from sharkadm.data.archive import delivery_note
-
-
-from .data_holder import DataHolder
+from sharkadm import utils, sharkadm_exceptions
 from .archive import get_archive_data_holder, directory_is_archive
-from .lims import get_lims_data_holder, directory_is_lims
-from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
-from .dv_template import get_dv_template_data_holder
-from .sharkweb import get_sharkweb_data_holder
-
-from .archive import *
-from .lims import LimsDataHolder
+from .data_holder import DataHolder
 from .dv_template import DvTemplateDataHolder
-from sharkadm import utils
-from sharkadm import adm_logger
+from .dv_template import get_dv_template_data_holder
+from .lims import LimsDataHolder
+from .lims import get_lims_data_holder, directory_is_lims
+from .sharkweb import get_sharkweb_data_holder
+from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +87,10 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
 def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs) -> DataHolder:
     if path:
         path = pathlib.Path(path)
+        if not path.exists() and path.suffix:
+            raise FileNotFoundError(path)
+        if not path.exists():
+            raise NotADirectoryError(path)
         if path.suffix == '.xlsx':
             return get_dv_template_data_holder(path)
         if path_is_zip_archive(path):

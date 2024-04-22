@@ -1,6 +1,5 @@
-from .base import Transformer, DataHolderProtocol
-import pandas as pd
 from sharkadm import adm_logger
+from .base import Transformer, DataHolderProtocol
 
 
 class Divide(Transformer):
