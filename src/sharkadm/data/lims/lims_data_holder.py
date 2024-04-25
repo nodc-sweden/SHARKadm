@@ -30,6 +30,9 @@ class LimsDataHolder(DataHolder):
             raise NotADirectoryError(self._lims_root_directory)
         if self._lims_root_directory.name.lower() == 'raw_data':
             self._lims_root_directory = self._lims_root_directory.parent
+        raw_data_path = self._lims_root_directory / 'Raw_data'
+        if not raw_data_path.exists():
+            raise NotADirectoryError(f'Invalid LIMS directory: {self._lims_root_directory}')
 
         self._header_mapper = header_mapper
 

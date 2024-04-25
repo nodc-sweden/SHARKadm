@@ -99,9 +99,9 @@ def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **k
             archive_directory = directory_is_archive(path)
             if archive_directory:
                 return get_archive_data_holder(archive_directory)
-            lims_directory = directory_is_lims(path)
-            if lims_directory:
-                return get_lims_data_holder(lims_directory)
+        lims_directory = directory_is_lims(path)
+        if lims_directory:
+            return get_lims_data_holder(lims_directory)
     if sharkweb:
         return get_sharkweb_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f'Could not find dataholer for: {path}')

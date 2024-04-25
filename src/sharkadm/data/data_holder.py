@@ -124,8 +124,3 @@ class ConcatDataHolder(DataHolder):
     @property
     def number_metadata_rows(self) -> None:
         return
-
-
-
-
-

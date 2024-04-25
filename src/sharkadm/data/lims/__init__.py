@@ -20,12 +20,14 @@ def directory_is_lims(directory: str | pathlib.Path) -> Union[pathlib.Path, Fals
     """Returns path to lims directory if it is recognised as a lims directory. Else returns False
     directory"""
     directory = pathlib.Path(directory)
+    print(f'{directory=}')
+    print(f'{directory.name=}')
+    print(f'{directory.parent.name.lower()=}')
     if directory.name == 'data.txt' and directory.parent.name.lower() == 'raw_data':
         return directory.parent.parent
     if directory.name.lower() == 'raw_data':
         return directory.parent
-    for root, dirs, files in os.walk(directory, topdown=False):
-        for name in dirs:
-            if name.lower() == 'raw_data':
-                return pathlib.Path(root, name).parent
+    raw_data_directory = directory / 'Raw_data'
+    if raw_data_directory.exists():
+        return directory
     return False
