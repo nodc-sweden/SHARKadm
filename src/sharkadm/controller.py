@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+from typing import Any
 
 from sharkadm import exporters
 from sharkadm import transformers
@@ -174,13 +175,13 @@ class SHARKadmController:
     def export_all(self) -> None:
         """Runs all export objects in self._exporters"""
         for exp in self._exporters:
-#             logger.debug(f'Running exporter: {exp}')
             exp.export(self._data_holder)
 
-    def export(self, *exporters: Exporter) -> 'SHARKadmController':
+    def export(self, *exporters: Exporter) -> Any:
         for exp in exporters:
-#             logger.debug(f'Running exporter: {exp}')
-            exp.export(self._data_holder)
+            data = exp.export(self._data_holder)
+            if isinstance(data, pd.DataFrame):
+                return data
         return self
 
     def get_workflow_description(self):
