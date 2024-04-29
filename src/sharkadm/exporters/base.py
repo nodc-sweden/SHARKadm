@@ -2,6 +2,7 @@ import pathlib
 import time
 from abc import ABC, abstractmethod
 from typing import Protocol
+from typing import Any
 
 import pandas as pd
 
@@ -56,7 +57,7 @@ class Exporter(ABC):
     def description(self) -> str:
         return self.get_exporter_description()
     
-    def export(self, data_holder: DataHolderProtocol) -> None:
+    def export(self, data_holder: DataHolderProtocol) -> Any:
         if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,
                                                                             invalid=self.invalid_data_types):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for exporter {self.__class__.__name__}', level=adm_logger.DEBUG)
@@ -69,8 +70,9 @@ class Exporter(ABC):
 
         adm_logger.log_workflow(f'Applying exporter: {self.__class__.__name__}', add=self.get_exporter_description())
         t0 = time.time()
-        self._export(data_holder=data_holder)
+        data = self._export(data_holder=data_holder)
         adm_logger.log_workflow(f'Exporter {self.__class__.__name__} executed in {time.time() - t0} seconds')
+        return data
 
     @abstractmethod
     def _export(self, data_holder: DataHolderProtocol) -> None:

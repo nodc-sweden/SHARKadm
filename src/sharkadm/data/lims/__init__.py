@@ -20,9 +20,6 @@ def directory_is_lims(directory: str | pathlib.Path) -> Union[pathlib.Path, Fals
     """Returns path to lims directory if it is recognised as a lims directory. Else returns False
     directory"""
     directory = pathlib.Path(directory)
-    print(f'{directory=}')
-    print(f'{directory.name=}')
-    print(f'{directory.parent.name.lower()=}')
     if directory.name == 'data.txt' and directory.parent.name.lower() == 'raw_data':
         return directory.parent.parent
     if directory.name.lower() == 'raw_data':

@@ -14,6 +14,7 @@ from .zip_archive import ZipArchive
 from .html_station_map import HtmlStationMap
 from ..utils.inspect_kwargs import get_kwargs_for_class
 from .standard_format import StandardFormat
+from .dataframe import DataFrame
 
 
 @functools.cache
