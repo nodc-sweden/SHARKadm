@@ -30,7 +30,8 @@ class DataFile(ABC):
         self._data: pd.DataFrame = pd.DataFrame()
         self._original_header: list = []
         self._header_mapper: ImportMapper | None = None
-        self._mapped_columns = dict()
+        self._mapped_columns: dict = dict()
+        self._not_mapped_columns: list = []
 
         self._load_file()
         self._strip_column_names()
@@ -72,6 +73,9 @@ class DataFile(ABC):
         mapped_header = []
         for item in self._original_header:
             internal_name = mapper.get_internal_name(item)
+            print(f'&&&&: {item=}  {internal_name=}')
+            if item == internal_name:
+                self._not_mapped_columns.append(item)
             self._mapped_columns[item] = internal_name
             mapped_header.append(internal_name)
         self._data.columns = mapped_header
@@ -113,6 +117,10 @@ class DataFile(ABC):
     @property
     def mapped_columns(self) -> dict[str, str]:
         return self._mapped_columns
+
+    @property
+    def not_mapped_columns(self) -> list[str]:
+        return self._not_mapped_columns
 
     def get_data(self) -> pd.DataFrame:
         return self._data

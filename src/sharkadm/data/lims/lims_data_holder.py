@@ -74,7 +74,8 @@ class LimsDataHolder(DataHolder):
         d_source = data_source.TxtColumnFormatDataFile(path=self.data_file_path, data_type=self.data_type)
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
-        self._data = self._get_data_from_data_source(d_source)
+        self._set_data_source(d_source)
+        # self._data = self._get_data_from_data_source(d_source)
         self._dataset_name = self._lims_root_directory.stem
 
     def _load_sampling_info(self) -> None:
