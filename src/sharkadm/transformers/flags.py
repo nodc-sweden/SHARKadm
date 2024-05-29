@@ -5,12 +5,15 @@ class ConvertFlagsFromLIMStoSDN(Transformer):
     valid_data_holders = ['LimsDataHolder']
     mapping = {
         '': '1',
+        'BLANK': '1',
         'A': '1',
-        'S': '2',
+        'E': '2',
+        'S': '3',
         'B': '4',
-        'R': '5',
         '<': '6',
         '>': '7',
+        'R': '8',
+        'M': '9',
     }
 
     @staticmethod
@@ -23,3 +26,6 @@ class ConvertFlagsFromLIMStoSDN(Transformer):
             stripped_value = value.strip()
             boolean = data_holder.data[column] == value
             data_holder.data.loc[boolean, column] = self.mapping.get(stripped_value, stripped_value)
+        # Missing value
+        boolean = data_holder.data['value'] == ''
+        data_holder.data.loc[boolean, column] = '9'
