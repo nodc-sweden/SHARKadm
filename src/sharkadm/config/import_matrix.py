@@ -37,6 +37,10 @@ class ImportMatrixMapper:
     def import_column(self) -> str:
         return self._import_column
 
+    @property
+    def external_parameters(self) -> list[str]:
+        return sorted(self._data)
+
     def get_internal_name(self, external_par: str) -> str:
         external_par = external_par.strip()
         if not self._data.get(external_par):

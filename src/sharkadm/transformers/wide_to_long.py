@@ -13,7 +13,6 @@ from sharkadm.data import DataHolder
 class WideToLong(Transformer):
 
     def __init__(self,
-                 qf_prefix: str | list[str] | None = None,
                  ignore_containing: str | list[str] | None = None,
                  column_name_parameter: str = 'parameter',
                  column_name_value: str = 'value',
@@ -24,10 +23,6 @@ class WideToLong(Transformer):
 
         # ignore_containing can be regex
         super().__init__(**kwargs)
-
-        self._qf_prefix = qf_prefix or ['QFLAG.', 'Q_']
-        if type(self._qf_prefix) is str:
-            self._qf_prefix = [self._qf_prefix]
 
         self._ignore_containing = ignore_containing or []
         if type(self._ignore_containing) == str:
@@ -47,6 +42,7 @@ class WideToLong(Transformer):
         return f'Transposes data from column data to row data'
 
     def _transform(self, data_holder: DataHolder) -> None:
+        self._qf_prefix = data_holder.qf_column_prefixes
         self._metadata_columns = []
         self._data_columns = []
         self._qf_col_mapping = {}

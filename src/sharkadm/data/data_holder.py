@@ -5,6 +5,7 @@ import pandas as pd
 
 from sharkadm import adm_logger
 from sharkadm.data.data_source.base import DataFile
+from sharkadm.data import data_source
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class DataHolder(ABC):
         self._data_sources: dict[str, DataFile] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
+        self._qf_column_prefix = None
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -92,11 +94,50 @@ class DataHolder(ABC):
         return mapped
 
     @property
+    def not_mapped_columns(self) -> list[str]:
+        not_mapped = set()
+        for name, source in self._data_sources.items():
+            not_mapped.update(source.not_mapped_columns)
+        return list(not_mapped)
+
+    @property
     def header_mapper(self):
         return self._header_mapper
 
+    @property
+    def qf_column_prefixes(self) -> list[str]:
+        prefixes = ['QFLAG.']
+        if self._qf_column_prefix:
+            prefixes.append(self._qf_column_prefix)
+        return prefixes
+
+    @property
+    def original_qf_column_prefix(self) -> str | None:
+        return self._qf_column_prefix
+
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
+
+    @staticmethod
+    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+        data = data_source.get_data()
+        data = data.fillna('')
+        data.reset_index(inplace=True, drop=True)
+        return data
+
+    def _set_data_source(self, data_source: data_source.DataFile) -> None:
+        """Sets a single data source to self._data"""
+        self._add_data_source(data_source)
+        self._data = self._get_data_from_data_source(data_source)
+
+    def _add_data_source(self, data_source: data_source.DataFile) -> None:
+        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
+        self._check_data_source(data_source)
+        self._data_sources[str(data_source)] = data_source
+
+    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+        # Can be overwritten in child classes
+        return
 
 
 class ConcatDataHolder(DataHolder):

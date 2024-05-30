@@ -55,6 +55,7 @@ from .wide_to_long import WideToLong
 from ..utils.inspect_kwargs import get_kwargs_for_class
 from .map_parameter_column import MapperParameterColumn
 from .flags import ConvertFlagsFromLIMStoSDN
+from .long_to_wide import LongToWide
 
 #######
 from .aphia import AddAphiaId
