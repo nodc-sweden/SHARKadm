@@ -18,6 +18,7 @@ class DataHolder(ABC):
         self._data_sources: dict[str, DataFile] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
+        self._qf_column_prefix = None
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -102,6 +103,17 @@ class DataHolder(ABC):
     @property
     def header_mapper(self):
         return self._header_mapper
+
+    @property
+    def qf_column_prefixes(self) -> list[str]:
+        prefixes = ['QFLAG.']
+        if self._qf_column_prefix:
+            prefixes.append(self._qf_column_prefix)
+        return prefixes
+
+    @property
+    def original_qf_column_prefix(self) -> str | None:
+        return self._qf_column_prefix
 
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)

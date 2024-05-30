@@ -42,6 +42,8 @@ class LimsDataHolder(DataHolder):
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
 
+        self._qf_column_prefix = 'Q_'
+
         self._load_sampling_info()
         self._load_analyse_info()
         self._load_data()
