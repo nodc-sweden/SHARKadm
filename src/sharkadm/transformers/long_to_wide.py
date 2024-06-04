@@ -4,6 +4,7 @@ import pandas as pd
 
 class LongToWide(Transformer):
     valid_data_types = ['physicalchemical']
+    valid_data_formats = ['row']
 
     @staticmethod
     def get_transformer_description() -> str:

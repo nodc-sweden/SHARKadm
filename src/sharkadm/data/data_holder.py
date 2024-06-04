@@ -6,6 +6,7 @@ import pandas as pd
 from sharkadm import adm_logger
 from sharkadm.data.data_source.base import DataFile
 from sharkadm.data import data_source
+from sharkadm import config
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class DataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
+        self._data_format = 'row'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -62,6 +64,17 @@ class DataHolder(ABC):
         if type(df) != pd.DataFrame:
             raise 'Data must be of type pd.DataFrame'
         self._data = df
+
+    @property
+    def data_format(self) -> str:
+        return self._data_format
+
+    @data_format.setter
+    def data_format(self, data_format):
+        data_format_lower = data_format.lower()
+        if data_format_lower not in config.DATA_FORMATS:
+            raise ValueError(f'Invalid data format: {data_format}')
+        self._data_format = data_format_lower
 
     # @property
     # @abstractmethod

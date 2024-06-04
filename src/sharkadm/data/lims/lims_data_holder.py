@@ -20,6 +20,7 @@ class HeaderMapper(Protocol):
 
 class LimsDataHolder(DataHolder):
     _data_type = 'physicalchemical'
+    _data_format = 'column'
 
     def __init__(self,
                  lims_root_directory: str | pathlib.Path = None,
