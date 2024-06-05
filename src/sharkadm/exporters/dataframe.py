@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from sharkadm import adm_logger
-from sharkadm.config import get_import_matrix_mapper
+from sharkadm.config import get_import_matrix_mapper, get_header_mapper_from_data_holder
 from .base import Exporter, DataHolderProtocol
 
 
@@ -24,7 +24,7 @@ class DataFrame(Exporter):
             parameter column and position.columns are converted 
         """
 
-    def _export(self, data_holder: DataHolderProtocol) -> pd.DataFrame:
+    def _export(self, data_holder: DataHolderProtocol) -> pd.DataFrame | None:
         df = data_holder.data.copy(deep=True)
         if self._float_columns:
             if self._float_columns is True:
@@ -38,7 +38,14 @@ class DataFrame(Exporter):
                     adm_logger.log_export(f'Could not convert whole column to numeric. Trying one by one', add=col, level=adm_logger.WARNING)
                     df[col] = df[col].apply(self._convert_to_float)
         if self._header_as:
-            mapper = get_import_matrix_mapper(data_type=data_holder.data_type, import_column=self._header_as)
+            mapper = get_header_mapper_from_data_holder(data_holder, import_column=self._header_as)
+            if not mapper:
+                adm_logger.log_export(f'Could not find mapper using header_as = {self._header_as}')
+                return
+            # if self._header_as == 'original':
+            #     mapper = data_holder.header_mapper
+            # else:
+            #     mapper = get_import_matrix_mapper(data_type=data_holder.data_type, import_column=self._header_as)
             new_column_names = [mapper.get_external_name(col) for col in df.columns]
             df.columns = new_column_names
         return df

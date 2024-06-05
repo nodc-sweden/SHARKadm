@@ -69,6 +69,10 @@ class DataFile(ABC):
     def header(self) -> list[str]:
         return list(self._data.columns)
 
+    @property
+    def header_mapper(self):
+        return self._header_mapper
+
     def map_header(self, mapper: ImportMapper) -> None:
         mapped_header = []
         for item in self._original_header:
