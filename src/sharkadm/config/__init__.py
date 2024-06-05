@@ -10,6 +10,8 @@ from .custom_id import CustomIdsHandler
 from .data_type_mapper import DataTypeMapper
 from .delivery_note_mapper import DeliveryNoteMapper
 
+DATA_FORMATS = ['row', 'column']
+
 
 if getattr(sys, 'frozen', False):
     THIS_DIR = pathlib.Path(sys.executable).parent
@@ -82,6 +84,17 @@ def get_valid_data_types(valid: list[str] | None = None,
     elif invalid:
         invalid_lower = [item.lower() for item in invalid]
         return [item for item in get_all_data_types() if item not in invalid_lower]
+
+
+def get_valid_data_formats(valid: list[str] | None = None,
+                           invalid: list[str] | None = None) -> list[str]:
+    if not any([valid, invalid]):
+        return DATA_FORMATS
+    if valid:
+        return [item.lower() for item in valid if item.lower() in DATA_FORMATS]
+    elif invalid:
+        invalid_lower = [item.lower() for item in invalid]
+        return [item for item in DATA_FORMATS if item not in invalid_lower]
 
 
 if __name__ == '__main__':

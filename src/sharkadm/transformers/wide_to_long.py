@@ -11,6 +11,7 @@ from sharkadm.data import DataHolder
 
 
 class WideToLong(Transformer):
+    valid_data_formats = ['column']
 
     def __init__(self,
                  ignore_containing: str | list[str] | None = None,

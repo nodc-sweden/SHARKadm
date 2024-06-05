@@ -8,6 +8,8 @@ from sharkadm import adm_logger, config
 from sharkadm.data import get_valid_data_holders
 
 
+
+
 class DataHolderProtocol(Protocol):
 
     @property
@@ -36,6 +38,9 @@ class Transformer(ABC):
 
     valid_data_holders = []
     invalid_data_holders = []
+
+    valid_data_formats = []
+    invalid_data_formats = []
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -68,6 +73,11 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
             return
+        if data_holder.data_format.lower() not in config.get_valid_data_formats(valid=self.invalid_data_formats,
+                                                                                invalid=self.invalid_data_formats):
+            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_format} for transformer'
+                                    f' {self.__class__.__name__}', level=adm_logger.DEBUG)
+            return
 
         adm_logger.log_workflow(f'Applying transformer: {self.__class__.__name__}', add=self.get_transformer_description())
         t0 = time.time()
@@ -77,3 +87,5 @@ class Transformer(ABC):
     @abstractmethod
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         ...
+
+
