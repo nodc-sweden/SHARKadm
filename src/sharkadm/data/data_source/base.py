@@ -69,11 +69,14 @@ class DataFile(ABC):
     def header(self) -> list[str]:
         return list(self._data.columns)
 
+    @property
+    def header_mapper(self):
+        return self._header_mapper
+
     def map_header(self, mapper: ImportMapper) -> None:
         mapped_header = []
         for item in self._original_header:
             internal_name = mapper.get_internal_name(item)
-            print(f'&&&&: {item=}  {internal_name=}')
             if item == internal_name:
                 self._not_mapped_columns.append(item)
             self._mapped_columns[item] = internal_name

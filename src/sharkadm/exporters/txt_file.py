@@ -1,9 +1,9 @@
 import pathlib
 
 from .base import FileExporter, DataHolderProtocol
-from sharkadm import utils
+from sharkadm import utils, adm_logger
 from sharkadm.utils.paths import get_next_incremented_file_path
-from sharkadm.config import get_import_matrix_mapper
+from sharkadm.config import get_import_matrix_mapper, get_header_mapper_from_data_holder
 
 
 class TxtAsIs(FileExporter):
@@ -26,7 +26,11 @@ class TxtAsIs(FileExporter):
     def _export(self, data_holder: DataHolderProtocol) -> None:
         df = data_holder.data.copy(deep=True)
         if self._header_as:
-            mapper = get_import_matrix_mapper(data_type=data_holder.data_type, import_column=self._header_as)
+            mapper = get_header_mapper_from_data_holder(data_holder, import_column=self._header_as)
+            if not mapper:
+                adm_logger.log_export(f'Could not find mapper using header_as = {self._header_as}')
+                return
+            # mapper = get_import_matrix_mapper(data_type=data_holder.data_type, import_column=self._header_as)
             new_column_names = [mapper.get_external_name(col) for col in df.columns]
             df.columns = new_column_names
         if not self._export_file_name:

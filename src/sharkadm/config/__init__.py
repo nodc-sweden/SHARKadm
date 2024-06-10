@@ -1,6 +1,7 @@
 import pathlib
 import functools
 import sys
+from typing import Protocol
 
 from sharkadm import adm_config_paths
 from .import_matrix import ImportMatrixConfig, ImportMatrixMapper
@@ -17,6 +18,11 @@ if getattr(sys, 'frozen', False):
     THIS_DIR = pathlib.Path(sys.executable).parent
 else:
     THIS_DIR = pathlib.Path(__file__).parent
+
+
+class DataHolderProtocol(Protocol):
+    data_type = None
+    header_mapper = None
 
 
 @functools.cache
@@ -55,6 +61,13 @@ def get_import_matrix_mapper(data_type: str, import_column: str, directory: str 
                                       data_type=data_type.lower(),
                                       )
             return config.get_mapper(import_column)
+
+
+@functools.cache
+def get_header_mapper_from_data_holder(data_holder: DataHolderProtocol, import_column: str) -> ImportMatrixMapper | None:
+    if import_column == 'original':
+        return data_holder.header_mapper
+    return get_import_matrix_mapper(data_holder.data_type, import_column)
 
 
 @functools.cache
