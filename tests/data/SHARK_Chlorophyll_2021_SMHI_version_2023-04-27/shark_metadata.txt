@@ -1,0 +1,20 @@
+datatype: Chlorophyll
+abstract: National monitoring data from the seas surrounding Sweden.
+description: Water samples collected either with a vertically hanging tube that is sealed and provides a mixed samples from different depths or with a bottle of fixed depth. The water is filtered . Based on fluorescence measurements on blanket stripe can chlorophyll content be determined.
+originator: 
+data_holding_centre: Swedish National Oceanographic Data Centre at Swedish Meteorological and Hydrological Institute (SMHI)
+data_distributor: Swedish National Oceanographic Data Centre at Swedish Meteorological and Hydrological Institute (SMHI)
+database_reference: SHARK
+internet_access: http://sharkweb.smhi.se, http://sharkdata.se
+contact: 
+discipline: Marine biology
+address: Sven Källfelts gata 15
+city: Västra Frölunda
+postal code: SE-426 71
+phone: +46-(0)11-495 80 00
+email: shark@smhi.se
+measuring area type: point
+coordinate system: WGS84
+platform class: ship
+access constraints: unrestricted
+citation: The data used in this (project/report/etc) has been downloaded from the Swedish National Oceanographic Data Centre at the Swedish Meteorological and Hydrological Institute (SMHI). Data has been collected within Swedish coordinated marine monitoring by (originator/orderer).
