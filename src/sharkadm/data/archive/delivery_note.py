@@ -82,14 +82,13 @@ class DeliveryNote:
                 key, value = [item.strip() for item in line.split(':', 1)]
                 key = key.lstrip('- ')
                 data[dn_mapper.get(key)] = value
-                if key == 'FORMAT':
+                if key.upper() == 'FORMAT':
                     parts = [item.strip() for item in value.split(':')]
                     data['data_format'] = parts[0]
                     if len(parts) == 1:
                         msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
-                    # print(data['import_matrix_key'])
         return DeliveryNote(data, mapper=mapper)
 
     @classmethod

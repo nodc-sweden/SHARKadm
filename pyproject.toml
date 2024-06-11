@@ -33,6 +33,7 @@ dev = [
     "-e file:///C:/mw/git/nodc-geography#egg=nodc-geography",
     "-e file:///C:/mw/git/nodc-station#egg=nodc-station",
     "-e file:///C:/mw/git/nodc-worms#egg=nodc-worms",
+    "pytest>=8.2.2",
 ]
 
 [tool.setuptools.packages.find]

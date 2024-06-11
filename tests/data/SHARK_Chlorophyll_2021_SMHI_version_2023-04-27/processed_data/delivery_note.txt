@@ -1,0 +1,12 @@
+provtagningsår: 2021
+datatyp: Chlorophyll
+rapporterande institut: SMHI 
+rapporteringsdatum: 2022-03-16
+kontaktperson: Kristin Andreasson
+format: Chlorophyll:Chla
+data kontrollerad av: Leverantör
+övervakningsprogram: NATL
+beställare: HAV
+projekt: NAT
+kommentarer:
+status: prod

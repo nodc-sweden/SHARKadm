@@ -1,0 +1,4 @@
+Ändrade ORDERER från BAS till HAV. Ej bekräftat av leverantör. 2022-03-16 MH
+Rad 23 flyttade < från kolumn CHLA_CONC till QFLAG. Ej bekräftat av leverantör. 2022-03-16 MH
+Tog bort samtliga rader PROJ BOS. Dessa finns i datapaket SHARK_Chlorophyll_2021_SMHI_BVVF. Bekräftat av leverantör. 2022-03-21 MH
+Tog bort F3/A5 2021-12-11, C3 2021-12-12, MS5/C14 2021-12-12 och SR3/C24 2021-12-13. Dessa finns i datapaket SHARK_Chlorophyll_2021_UMSC. Bekfräftat av leverantör. 2022-05-02 MH
