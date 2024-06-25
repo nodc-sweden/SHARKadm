@@ -20,10 +20,12 @@ logger = logging.getLogger(__name__)
 class ArchiveDataHolder(DataHolder, ABC):
     _data_type: str | None = None
     _data_format: str | None = None
+    _data_structure: str | None = None
 
     _date_str_format = '%Y-%m-%d'
 
     def __init__(self, archive_root_directory: str | pathlib.Path = None, **kwargs):
+        super().__init__()
         self._archive_root_directory = pathlib.Path(archive_root_directory)
 
         self._data: pd.DataFrame = pd.DataFrame()

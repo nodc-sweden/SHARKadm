@@ -99,7 +99,7 @@ class ZoobenthosArchiveDataHolder(ArchiveDataHolder):
 
     def _add_data_sources(self) -> None:
         for name, path in self._file_paths.items():
-            print(f'{path.name=}')
+            # print(f'{path.name=}')
             d_source = self._get_data_source(path)
 
             self._add_visit_column_to_data_source(d_source)

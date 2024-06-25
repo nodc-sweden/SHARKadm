@@ -181,7 +181,6 @@ class DvTemplateDataHolder(DataHolder):
             adm_logger.log_workflow(msg)
             return
         try:
-            print(f'{self.delivery_note.import_matrix_key=}')
             self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
         except KeyError as e:
             msg = f'Could not get import matrix mapper for import_matrix_key: {self.delivery_note.import_matrix_key}'
