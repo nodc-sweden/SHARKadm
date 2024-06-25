@@ -27,3 +27,7 @@ class ArchiveDataHolderError(SHARKadmException):
 class DataHolderError(SHARKadmException):
     pass
 
+
+class InvalidTransformer(SHARKadmException):
+    pass
+

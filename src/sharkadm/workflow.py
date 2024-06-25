@@ -5,11 +5,13 @@ import yaml
 from sharkadm import adm_logger
 from sharkadm import exporters
 from sharkadm import transformers
+from sharkadm import multi_transformers
 from sharkadm import utils
 from sharkadm import validators
 from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
 from sharkadm.sharkadm_logger.exporter import get_exporter
+from sharkadm import sharkadm_exceptions
 
 
 class SHARKadmWorkflow:
@@ -71,7 +73,12 @@ class SHARKadmWorkflow:
     def _set_transformers(self) -> None:
         trans_list = []
         for tran in self._transformers or []:
-            trans_list.append(transformers.get_transformer_object(**tran))
+            tran_obj = transformers.get_transformer_object(**tran)
+            if not tran_obj:
+                tran_obj = multi_transformers.get_multi_transformer_object(**tran)
+            if not tran_obj:
+                raise sharkadm_exceptions.InvalidTransformer(tran)
+            trans_list.append(tran_obj)
         self._controller.set_transformers(*trans_list)
 
     def _set_exporters(self) -> None:

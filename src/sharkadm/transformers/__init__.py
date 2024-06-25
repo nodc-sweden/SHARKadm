@@ -87,6 +87,7 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .station import AddStationInfo
 from .taxon_rank import AddTaxonRanks
 
+
 @functools.cache
 def get_transformer_list() -> list[str]:
     """Returns a sorted list of name of all available transformers"""
@@ -98,10 +99,12 @@ def get_transformers() -> dict[str, Type[Transformer]]:
     return utils.get_all_class_children(Transformer)
 
 
-def get_transformer_object(name: str, **kwargs) -> Transformer:
+def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
-    tran = all_trans[name]
+    tran = all_trans.get(name)
+    if not tran:
+        return
     return tran(**kwargs)
 
 
