@@ -10,6 +10,7 @@ from sharkadm import validators
 from sharkadm.data.data_holder import DataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.transformers import Transformer
+from sharkadm.multi_transformers import MultiTransformer
 from sharkadm.validators import Validator
 from sharkadm import utils
 
@@ -25,7 +26,7 @@ class SHARKadmController:
 
         self._data_holder: DataHolder | None = None
 
-        self._transformers: list[Transformer] = []
+        self._transformers: list[Transformer | MultiTransformer] = []
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
         self._exporters: list[Exporter] = []
@@ -120,7 +121,7 @@ class SHARKadmController:
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.AddRowNumber())
 
-    def set_transformers(self, *args: Transformer) -> None:
+    def set_transformers(self, *args: Transformer | MultiTransformer) -> None:
         """Add one or more Transformers to the data holder"""
         self._transformers = args
 
@@ -130,7 +131,7 @@ class SHARKadmController:
             # logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
 
-    def transform(self, *transformers: Transformer) -> 'SHARKadmController':
+    def transform(self, *transformers: Transformer | MultiTransformer) -> 'SHARKadmController':
         for trans in transformers:
 #             logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
