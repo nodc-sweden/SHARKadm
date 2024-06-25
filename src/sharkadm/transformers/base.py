@@ -27,6 +27,11 @@ class DataHolderProtocol(Protocol):
 
     @property
     @abstractmethod
+    def data_structure(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
     def dataset_name(self) -> str:
         ...
 
@@ -39,8 +44,8 @@ class Transformer(ABC):
     valid_data_holders = []
     invalid_data_holders = []
 
-    valid_data_formats = []
-    invalid_data_formats = []
+    valid_data_structures = []
+    invalid_data_structures = []
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -73,9 +78,9 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
             return
-        if data_holder.data_format.lower() not in config.get_valid_data_formats(valid=self.invalid_data_formats,
-                                                                                invalid=self.invalid_data_formats):
-            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_format} for transformer'
+        if data_holder.data_structure.lower() not in config.get_valid_data_structures(valid=self.invalid_data_structures,
+                                                                                invalid=self.invalid_data_structures):
+            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_structure} for transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 

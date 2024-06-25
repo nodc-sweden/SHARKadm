@@ -20,7 +20,7 @@ class DataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_format = 'row'
+        self._data_structure = 'row'
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
@@ -66,15 +66,15 @@ class DataHolder(ABC):
         self._data = df
 
     @property
-    def data_format(self) -> str:
-        return self._data_format
+    def data_structure(self) -> str:
+        return self._data_structure
 
-    @data_format.setter
-    def data_format(self, data_format):
-        data_format_lower = data_format.lower()
-        if data_format_lower not in config.DATA_FORMATS:
-            raise ValueError(f'Invalid data format: {data_format}')
-        self._data_format = data_format_lower
+    @data_structure.setter
+    def data_structure(self, data_structure):
+        data_structure_lower = data_structure.lower()
+        if data_structure_lower not in config.DATA_STRUCTURES:
+            raise ValueError(f'Invalid data structure: {data_structure}')
+        self._data_structure = data_structure_lower
 
     # @property
     # @abstractmethod

@@ -31,7 +31,7 @@ class DataHolderProtocol(Protocol):
 
     @property
     @abstractmethod
-    def data_format(self) -> str:
+    def data_structure(self) -> str:
         ...
 
 
@@ -43,8 +43,8 @@ class MultiTransformer(ABC):
     valid_data_holders: list[str] = []
     invalid_data_holders: list[str] = []
 
-    valid_data_formats: list[str] = []
-    invalid_data_formats: list[str] = []
+    valid_data_structures: list[str] = []
+    invalid_data_structures: list[str] = []
 
     transformers: list[Transformer] = []
 
@@ -79,9 +79,10 @@ class MultiTransformer(ABC):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for multi transformer'
                                     f' {self.__class__.__name__}')
             return
-        if data_holder.data_format.lower() not in config.get_valid_data_formats(valid=self.invalid_data_formats,
-                                                                                invalid=self.invalid_data_formats):
-            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_format} for multi transformer'
+        if data_holder.data_structure.lower() not in config.get_valid_data_structures(
+                valid=self.invalid_data_structures,
+                invalid=self.invalid_data_structures):
+            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_structure} for multi transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 
