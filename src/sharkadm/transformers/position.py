@@ -54,10 +54,13 @@ class AddSamplePosition(Transformer):
             return '', ''
 
         if self._is_sweref99tm(value=lat_value, info=self.lat_info) and self._is_sweref99tm(value=lon_value, info=self.lon_info):
+            print(f'{geography.sweref99tm_to_decdeg(lon_value, lat_value)=}')
             return geography.sweref99tm_to_decdeg(lon_value, lat_value)
-        elif self._is_dm(lat_value) and self._is_dm(lon_value):
+        elif self._is_dm_lat(lat_value) and self._is_dm_lon(lon_value):
+            print(f'{geography.decmin_to_decdeg(lat_value), geography.decmin_to_decdeg(lon_value)=}')
             return geography.decmin_to_decdeg(lat_value), geography.decmin_to_decdeg(lon_value)
         elif self._is_dd(lat_value) and self._is_dd(lon_value):
+            print(f'{lat_value, lon_value=}')
             return lat_value, lon_value
 
     def _is_sweref99tm(self, value: str, info: dict) -> bool:
@@ -65,9 +68,15 @@ class AddSamplePosition(Transformer):
             return True
         return False
 
-    def _is_dm(self, value: str) -> bool:
+    def _is_dm_lat(self, value: str) -> bool:
         parts = value.split('.')
         if len(parts[0].zfill(4)) == 4:
+            return True
+        return False
+
+    def _is_dm_lon(self, value: str) -> bool:
+        parts = value.split('.')
+        if len(parts[0].zfill(5)) == 5:
             return True
         return False
 

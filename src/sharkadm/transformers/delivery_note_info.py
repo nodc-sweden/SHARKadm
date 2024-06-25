@@ -35,7 +35,6 @@ class AddDeliveryNoteInfo(Transformer):
                 adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.')
                 continue
             adm_logger.log_transformation(f'Adding {key} info from delivery_note')
-            print(f'{key=}')
             data_holder.data[key] = data_holder.delivery_note[key]
             # data_holder.data.loc[:, key] = data_holder.delivery_note[key]
 
