@@ -5,7 +5,9 @@ import pyproj
 def decdeg_to_decmin(pos: float | str, nr_decimals: int | None = 2, with_space: bool = False):
     pos = float(pos)
     deg = np.floor(pos)
-    minute = pos % deg * 60.0
+    minute = 0
+    if deg:
+        minute = pos % deg * 60.0
     if nr_decimals:
         output = ('%%2.%sf' % nr_decimals % (deg * 100.0 + minute))
     else:

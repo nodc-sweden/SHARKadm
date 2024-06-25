@@ -5,9 +5,12 @@ from sharkadm import transformers
 class GeneralInitial(MultiTransformer):
     transformers = [
         transformers.AddRowNumber(),
+        transformers.ReplaceCommaWithDot(),
         transformers.FixTimeFormat(),
+        transformers.AddSampleDate(),
         transformers.AddDatetime(),
         transformers.AddMonth(),
+        transformers.AddSamplePosition(),
         transformers.AddSamplePositionDM(),
         transformers.AddSamplePositionSweref99tm(),
 

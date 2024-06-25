@@ -22,22 +22,24 @@ class AddDeliveryNoteInfo(Transformer):
     def get_transformer_description() -> str:
         return f'Adds info from delivery_note'
 
-    def _transform(self, data_holder: DataHolder) -> None:
+    def _transform(self, data_holder: DataHolder | ArchiveDataHolder) -> None:
         if not hasattr(data_holder, 'delivery_note'):
             adm_logger.log_transformation(f'No delivery note found for data holder {data_holder}', level=adm_logger.WARNING)
             return
         self._add_delivery_note_info(data_holder)
         self._add_status(data_holder)
 
-    def _add_delivery_note_info(self, data_holder: DataHolder):
+    def _add_delivery_note_info(self, data_holder: DataHolder | ArchiveDataHolder):
         for key in data_holder.delivery_note.fields:
             if key in data_holder.data and any(data_holder.data[key]):
                 adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.')
                 continue
             adm_logger.log_transformation(f'Adding {key} info from delivery_note')
+            print(f'{key=}')
             data_holder.data[key] = data_holder.delivery_note[key]
+            # data_holder.data.loc[:, key] = data_holder.delivery_note[key]
 
-    def _add_status(self, data_holder: DataHolder):
+    def _add_status(self, data_holder: DataHolder | ArchiveDataHolder):
         if not hasattr(data_holder, 'delivery_note'):
             adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING,
                                     add=data_holder.dataset_name)

@@ -5,7 +5,6 @@ from sharkadm import transformers
 class Lims(MultiTransformer):
     transformers = [
         transformers.RemoveNonDataLines(),
-        transformers.ReplaceCommaWithDot(),
         transformers.MoveLessThanFlagColumnFormat(),
     ]
 
