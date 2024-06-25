@@ -151,60 +151,20 @@ def write_transformers_description_to_file(path: str | pathlib.Path) -> None:
 
 def get_physical_chemical_transformer_objects() -> list[Transformer]:
     return [
-        AddRowNumber(),
         AddDEPHqcColumn(),
-        ReplaceCommaWithDot(),
-        FixTimeFormat(),
+
         # AddSamplePosition(),
         # ChangeDateFormat(),
-        AddDatetime(),
-        AddSamplePositionDM(),
-        AddSamplePositionSweref99tm(),
-        MoveLessThanFlagColumnFormat(),
         AddColumnsForAutomaticQC(),
         AddCruiseId(),
         AddVisitKey(),
-        RemoveNonDataLines(),  # LIMS
-        AddMonth(),
-        AddSampleMinAndMaxDepth(),
-        ReorderSampleMinAndMaxDepth(),
-        AddDatatype(),
-        # AddStatus(),
-        AddDeliveryNoteInfo(),
-        AddStationInfo(),
-        AddEnglishProjectName(),
-        AddSwedishProjectName(),
-        AddEnglishSampleOrderer(),
-        AddEnglishSamplingLaboratory(),
-        AddSwedishSampleOrderer(),
-        AddSwedishSamplingLaboratory(),
-        AddSwedishAnalyticalLaboratory(),
-        AddEnglishAnalyticalLaboratory(),
-        AddLocationCounty(),
-        AddLocationHelcomOsparArea(),
-        AddLocationMunicipality(),
-        AddLocationNation(),
-        AddLocationSeaBasin(),
-        AddLocationTypeArea(),
-        AddLocationWaterDistrict(),
-        AddStaticInternetAccessInfo(),
-        AddDatasetName(),
-        AddSwedishReportingInstitute(),
-        AddEnglishReportingInstitute(),
-        AddStaticDataHoldingCenter(),
-        FixYesNo(),
 
-        Multiply(),
-        Divide(),
+
+        # AddStatus(),
+
 
         WideToLong(),
-        #
-        AddAnalyseInfo(),
-        AddSamplingInfo(),
 
-        AddColumnViewsColumns(),
-        AddSharkId(),
-        SortData(),
     ]
 
 
