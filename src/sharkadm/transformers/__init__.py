@@ -12,6 +12,7 @@ from .boolean import FixYesNo
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns
+from .columns import SortColumn
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName

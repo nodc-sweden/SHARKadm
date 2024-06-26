@@ -41,11 +41,16 @@ class GeneralDV(MultiTransformer):
         transformers.Multiply(),
         transformers.Divide(),
 
+        # transformers.WideToLong(),
+
         transformers.AddDatasetName(),
         transformers.FixYesNo(),
 
         transformers.AddColumnViewsColumns(),
         transformers.AddSharkId(),
+
+        # Temp
+        transformers.SortColumn(),
     ]
 
     @staticmethod

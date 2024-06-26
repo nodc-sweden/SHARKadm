@@ -12,6 +12,7 @@ from sharkadm.data import DataHolder
 
 class WideToLong(Transformer):
     valid_data_structures = ['column']
+    invalid_data_holders = ['ZoobenthosBedaArchiveDataHolder']
 
     def __init__(self,
                  ignore_containing: str | list[str] | None = None,

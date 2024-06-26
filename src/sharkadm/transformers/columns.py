@@ -62,5 +62,20 @@ class RemoveColumns(Transformer):
         data_holder.data = data_holder.data[keep_columns]
 
 
+class SortColumn(Transformer):
+    def __init__(self, key=None, **kwargs):
+        self._key = key
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Sorting columns in data. Option to give "key" for the sort funktion'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        new_col_order = sorted(data_holder.data.columns, key=self._key)
+        data_holder.data = data_holder.data[new_col_order]
+
+
+
 
 
