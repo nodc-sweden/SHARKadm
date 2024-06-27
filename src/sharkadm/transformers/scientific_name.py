@@ -5,7 +5,7 @@ from .base import Transformer, DataHolderProtocol
 
 
 class AddReportedScientificName(Transformer):
-    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    invalid_data_types = ['physicalchemical', 'chlorophyll', 'bacterioplankton']
     col_to_set = 'reported_scientific_name'
     check_columns = ['scientific_name', 'dyntaxa_id']
 

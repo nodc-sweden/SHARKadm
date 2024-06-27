@@ -41,10 +41,16 @@ class GeneralDV(MultiTransformer):
         transformers.Multiply(),
         transformers.Divide(),
 
-        # transformers.WideToLong(),
+        transformers.SetBacteriaAsReportedScientificName(),
+        transformers.AddReportedScientificName(),
+        transformers.AddDyntaxaScientificName(),
+        transformers.AddScientificName(),
+        transformers.AddDyntaxaId(),
+        transformers.AddAphiaId(),
 
         transformers.AddDatasetName(),
         transformers.FixYesNo(),
+
 
         transformers.AddColumnViewsColumns(),
         transformers.AddSharkId(),

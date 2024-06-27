@@ -6,8 +6,8 @@ import re
 
 class ReplaceCommaWithDot(Transformer):
     apply_on_columns = [
-        'sample_reported_latitude',
-        'sample_reported_longitude',
+        '.*latitude.*',
+        '.*longitude.*',
         'water_depth_m',
         '.*DIVIDE.*',
         '.*MULTIPLY.*',
