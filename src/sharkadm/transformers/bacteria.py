@@ -2,9 +2,9 @@ from .base import Transformer, DataHolderProtocol
 from sharkadm import adm_logger
 
 
-class AddBacteriaAsReportedScientificName(Transformer):
+class SetBacteriaAsReportedScientificName(Transformer):
     valid_data_types = ['Bacterioplankton']
-    col_to_set = 'reported_scientific_name'
+    col_to_set = 'scientific_name'
     value_to_set = 'Bacteria'
 
     def __init__(self, apply_on_columns: list[str] | None = None, **kwargs):
@@ -14,7 +14,7 @@ class AddBacteriaAsReportedScientificName(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds {AddBacteriaAsReportedScientificName.value_to_set} as {AddBacteriaAsReportedScientificName.col_to_set} if column does not exist'
+        return f'Adds {SetBacteriaAsReportedScientificName.value_to_set} as {SetBacteriaAsReportedScientificName.col_to_set} if column does not exist'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:

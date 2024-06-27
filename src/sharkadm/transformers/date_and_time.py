@@ -151,7 +151,8 @@ class AddDatetime(Transformer):
 
 class AddMonth(Transformer):
     month_columns = [
-        'sample_month'
+        'sample_month',
+        'visit_month'
     ]
 
     @staticmethod
