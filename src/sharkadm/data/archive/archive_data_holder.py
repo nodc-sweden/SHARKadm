@@ -54,9 +54,9 @@ class ArchiveDataHolder(DataHolder, ABC):
     def _initiate(self) -> None:
         self._dataset_name = self.archive_root_directory.name
 
-    # @property
-    # def data(self) -> pd.DataFrame:
-    #     return self._data
+    @property
+    def data_format(self) -> str:
+        return self._data_format
 
     @property
     def header_mapper(self):

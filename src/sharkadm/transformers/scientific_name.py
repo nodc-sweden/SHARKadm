@@ -4,7 +4,7 @@ from sharkadm import adm_logger
 from .base import Transformer, DataHolderProtocol
 
 
-class AddReportedScientificName(Transformer):
+class old_AddReportedScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll', 'bacterioplankton']
     col_to_set = 'reported_scientific_name'
     check_columns = ['scientific_name', 'dyntaxa_id']
@@ -39,10 +39,10 @@ class AddReportedScientificName(Transformer):
         return row[self.col_to_set]
 
 
-class AddScientificName(Transformer):
+class AddScientificNameFromDyntaxaTranslatedScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'scientific_name'
-    source_col = 'dyntaxa_scientific_name'
+    source_col = 'translate_dyntaxa_scientific_name'
 
     @staticmethod
     def get_transformer_description() -> str:

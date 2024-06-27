@@ -1,5 +1,6 @@
 from .base import MultiTransformer
 from sharkadm import transformers
+from .dyntaxa import Dyntaxa
 
 
 class GeneralDV(MultiTransformer):
@@ -10,8 +11,8 @@ class GeneralDV(MultiTransformer):
         transformers.AddAnalyseInfo(),
         transformers.AddSamplingInfo(),
 
-        transformers.AddSampleMinAndMaxDepth(),
-        transformers.ReorderSampleMinAndMaxDepth(),
+        # transformers.AddSampleMinAndMaxDepth(),
+        # transformers.ReorderSampleMinAndMaxDepth(),
 
         transformers.AddStationInfo(),
 
@@ -41,18 +42,20 @@ class GeneralDV(MultiTransformer):
         transformers.Multiply(),
         transformers.Divide(),
 
-        transformers.SetBacteriaAsReportedScientificName(),
-        transformers.AddReportedScientificName(),
-        transformers.AddDyntaxaScientificName(),
-        transformers.AddScientificName(),
-        transformers.AddDyntaxaId(),
-        transformers.AddAphiaId(),
+        Dyntaxa(),
+
+        # transformers.SetBacteriaAsReportedScientificName(),
+        # transformers.AddReportedScientificName(),
+        # transformers.AddTranslatedDyntaxaScientificName(),
+        # transformers.AddScientificNameFromDyntaxaTranslatedScientificName(),
+        # transformers.AddDyntaxaId(),
+        # transformers.AddAphiaId(),
 
         transformers.AddDatasetName(),
         transformers.FixYesNo(),
 
 
-        transformers.AddColumnViewsColumns(),
+        # transformers.AddColumnViewsColumns(),
         transformers.AddSharkId(),
 
         # Temp
