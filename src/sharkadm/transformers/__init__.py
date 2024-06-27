@@ -35,8 +35,9 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
-from .dyntaxa import AddDyntaxaId
-from .dyntaxa import AddDyntaxaScientificName
+from .dyntaxa import AddReportedDyntaxaId
+from .dyntaxa import AddTranslatedDyntaxaScientificName
+from .dyntaxa import MoveDyntaxaIdInReportedScientificNameToDyntaxaId
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
 from .flags import ConvertFlagsFromLIMStoSDN
@@ -74,8 +75,8 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
-from .scientific_name import AddReportedScientificName
-from .scientific_name import AddScientificName
+# from .scientific_name import AddReportedScientificName
+from .scientific_name import AddScientificNameFromDyntaxaTranslatedScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
 from .static_data_holding_center import AddStaticDataHoldingCenter
