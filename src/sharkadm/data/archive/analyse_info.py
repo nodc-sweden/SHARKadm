@@ -36,12 +36,14 @@ class AnalyseInfo:
             if internal_par.startswith('COPY_VARIABLE'):
                 internal_par = internal_par.split('.')[1]
             new_data.setdefault(internal_par, [])
+            new_data.setdefault(par, [])
             for info in info_list:
                 new_info = dict()
                 for key, value in info.items():
                     internal_key = self._mapper.get_internal_name(key)
                     new_info[internal_key] = value
                 new_data[internal_par].append(new_info)
+                new_data[par].append(new_info)
         self._data = new_data
 
     def __str__(self):
@@ -63,8 +65,13 @@ class AnalyseInfo:
         info = self.get_info(par=par, date=date)
         return info.get(col)
 
+    def get_uncertainty(self, par: str, date: datetime.date, value: float | str | None = None) -> str:
+        if value is None:
+            return self.get(par=par, date=date, col='UNCERT')
+
+
     @classmethod
-    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper, encoding: str = 'cp1252') -> 'AnalyseInfo':
+    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252') -> 'AnalyseInfo':
         path = pathlib.Path(path)
         if path.suffix != '.txt':
             msg = f'File is not a valid analyse_info text file: {path}'
