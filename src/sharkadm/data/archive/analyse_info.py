@@ -3,6 +3,7 @@
 import datetime
 import logging
 import pathlib
+import re
 from typing import Protocol
 
 import openpyxl
@@ -17,6 +18,78 @@ class Mapper(Protocol):
 
     def get_internal_name(self, external_par: str) -> str:
         ...
+
+
+class UncertString:
+    def __init__(self, string: str):
+        self._string = string.strip()
+
+        self._value: str = None
+        self._percent: int = None
+        self._interval = []
+
+        self._save_data()
+
+    @property
+    def value(self) -> str | None:
+        if self._value is None:
+            return None
+        return str(self._value)
+
+    @property
+    def percent(self) -> str | None:
+        if not self._percent:
+            return None
+        return f'{self._percent} %'
+
+    def __repr__(self):
+        return self.value or self.percent
+
+    def _save_data(self):
+        if not self._string:
+            return
+        if self._string.lower() in ['calculated']:
+            self._value = self._string.capitalize()
+            return
+        try:
+            float(self._string)
+            self._value = self._string
+            return
+        except:
+            pass
+        if '%' in self._string:
+            self._percent = int(self._string.split('%')[0].strip())
+        else:
+            self._value = re.search('[0-9\.]+', self._string).group()
+
+        if '-' in self._string:
+            range = re.search('[0-9\.-]+', self._string.replace(' ', '').split('%')[-1]).group()
+            self._interval = [float(item.strip()) for item in range.split('-')]
+
+    def get(self, value: str | float | int):
+        val = float(value)
+        if self._interval and not (self._interval[0] <= val <= self._interval[-1]):
+            return False
+        if self._percent:
+            return str(round((val * self._percent / 100), 2))
+        return str(self._value)
+
+
+class UncertComment:
+    def __init__(self, comment: str | float | int):
+        self._orig_comment = str(comment)
+        self._info = []
+        self._save_data()
+
+    def _save_data(self):
+        for string in self._orig_comment.split(','):
+            self._info.append(UncertString(string))
+
+    def get(self, value: str | float | int) -> str:
+        for item in self._info:
+            val = item.get(value)
+            if val:
+                return str(val)
 
 
 class AnalyseInfo:
@@ -66,8 +139,11 @@ class AnalyseInfo:
         return info.get(col)
 
     def get_uncertainty(self, par: str, date: datetime.date, value: float | str | None = None) -> str:
+        comment = self.get(par=par, date=date, col='UNCERT')
         if value is None:
-            return self.get(par=par, date=date, col='UNCERT')
+            return comment
+        obj = UncertComment(comment)
+        return obj.get(value)
 
 
     @classmethod
