@@ -88,6 +88,7 @@ class FileExporter(Exporter, ABC):
         if not export_directory:
             export_directory = utils.get_export_directory()
         self._export_directory = pathlib.Path(export_directory)
+        self._export_directory.mkdir(parents=True, exist_ok=True)
         self._export_file_name = export_file_name
         self._encoding = kwargs.get('encoding', 'cp1252')
 

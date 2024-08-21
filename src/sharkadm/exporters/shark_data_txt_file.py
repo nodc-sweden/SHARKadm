@@ -61,7 +61,7 @@ class SHARKdataTxtAsGiven(Exporter):
     @staticmethod
     def get_exporter_description() -> str:
         exclude_columns_string = ', '.join(SHARKdataTxtAsGiven.exclude_columns)
-        return f'Writes data to file with all given columns except the flowing: {exclude_columns_string}.'
+        return f'Writes data to file with all given columns except the these: {exclude_columns_string}.'
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
         columns = [col for col in data_holder.data.columns if col not in self.exclude_columns]

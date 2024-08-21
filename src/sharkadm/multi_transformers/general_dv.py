@@ -64,4 +64,7 @@ class GeneralDV(MultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Multi transformers that performs transformations related to Datavärdskapet.'
+        string_list = ['Performs transformations related to Datavärdskapet.']
+        for trans in GeneralDV.transformers:
+            string_list.append(f'    {trans.name}')
+        return '\n'.join(string_list)

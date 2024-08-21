@@ -60,6 +60,7 @@ def get_multi_transformers_description_text() -> str:
     lines.append('-' * line_length)
     for key in sorted(info):
         lines.append(f'{key.ljust(40)}{info[key]}')
+        lines.append('')
     lines.append('=' * line_length)
     return '\n'.join(lines)
 

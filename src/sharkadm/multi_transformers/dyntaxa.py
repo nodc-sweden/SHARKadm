@@ -12,5 +12,7 @@ class Dyntaxa(MultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f'Multi transformers that performs all necessary final transformations. '
-                f'The idea is that this multi transformer should be applicable to all data types.')
+        string_list = ['Performs all transformations related to Dyntaxa.']
+        for trans in Dyntaxa.transformers:
+            string_list.append(f'    {trans.name}')
+        return '\n'.join(string_list)

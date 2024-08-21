@@ -102,7 +102,7 @@ class AddDyntaxaId(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds {AddTranslatedDyntaxaScientificName.col_to_set} translated from nodc_dyntaxa. Source column is {AddTranslatedDyntaxaScientificName.source_col}'
+        return f'Adds {AddDyntaxaId.col_to_set} translated from nodc_dyntaxa. Source column is {AddDyntaxaId.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data.columns:

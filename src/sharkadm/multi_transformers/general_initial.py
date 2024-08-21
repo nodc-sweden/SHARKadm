@@ -19,5 +19,7 @@ class GeneralInitial(MultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f'Multi transformers that performs all necessary initial transformations. '
-                f'The idea is that this multi transformer should be applicable to all data types.')
+        string_list = ['Performs all necessary initial transformations. The idea is that this multi transformer should be applicable to all data types.']
+        for trans in GeneralInitial.transformers:
+            string_list.append(f'    {trans.name}')
+        return '\n'.join(string_list)

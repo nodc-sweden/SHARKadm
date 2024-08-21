@@ -10,4 +10,7 @@ class Lims(MultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Multi transformers that performs transformations related to LIMS export. '
+        string_list = [f'Performs transformations related to LIMS export:']
+        for trans in Lims.transformers:
+            string_list.append(f'    {trans.name}')
+        return '\n'.join(string_list)

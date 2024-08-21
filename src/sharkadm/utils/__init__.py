@@ -71,7 +71,6 @@ def clear_export_directory(days_old: int = 7):
                     os.remove(path)
                 except PermissionError:
                     pass
-    _remove_empty_directories(EXPORT_DIRECTORY)
 
 
 def get_config_directory(*subfolders: str) -> pathlib.Path:
