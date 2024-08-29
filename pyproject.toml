@@ -12,6 +12,7 @@ dependencies = [
     "pandas>=2.2.1",
     "requests>=2.31.0",
     "xlsxwriter>=3.2.0",
+    "sqlalchemy>=2.0.32",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
