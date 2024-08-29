@@ -25,8 +25,8 @@ class ZipArchiveDataHolder(DataHolder, ABC):
     _date_str_format = '%Y-%m-%d'
 
     def __init__(self, zip_archive_path: str | pathlib.Path = None, **kwargs):
+        super().__init__()
         self._zip_archive_path = pathlib.Path(zip_archive_path)
-        print(f'=== {self._zip_archive_path=}')
 
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
