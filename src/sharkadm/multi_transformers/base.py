@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Protocol, Type
 import time
 
 import pandas as pd
@@ -46,7 +46,7 @@ class MultiTransformer(ABC):
     valid_data_structures: list[str] = []
     invalid_data_structures: list[str] = []
 
-    transformers: list[Transformer] = []
+    transformers: list[Type[Transformer]] = []
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -89,7 +89,7 @@ class MultiTransformer(ABC):
         adm_logger.log_workflow(f'Applying multi transformer: {self.__class__.__name__}', add=self.get_transformer_description())
         t0 = time.time()
         for trans in self.transformers:
-            trans.transform(data_holder=data_holder)
+            trans().transform(data_holder=data_holder)
         adm_logger.log_workflow(f'Multi transformer {self.__class__.__name__} executed in {time.time()-t0} seconds')
 
 
