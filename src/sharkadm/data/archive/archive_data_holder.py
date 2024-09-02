@@ -42,9 +42,9 @@ class ArchiveDataHolder(DataHolder, ABC):
 
         self._initiate()
         self._load_delivery_note()
+        self._load_import_matrix()
         self._load_sampling_info()
         self._load_analyse_info()
-        self._load_import_matrix()
         self._load_data()
 
     @staticmethod

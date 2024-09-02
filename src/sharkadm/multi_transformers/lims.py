@@ -4,8 +4,8 @@ from sharkadm import transformers
 
 class Lims(MultiTransformer):
     transformers = [
-        transformers.RemoveNonDataLines(),
-        transformers.MoveLessThanFlagColumnFormat(),
+        transformers.RemoveNonDataLines,
+        transformers.MoveLessThanFlagColumnFormat,
     ]
 
     @staticmethod

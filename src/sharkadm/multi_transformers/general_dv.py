@@ -5,61 +5,61 @@ from .dyntaxa import Dyntaxa
 
 class GeneralDV(MultiTransformer):
     transformers = [
-        transformers.WideToLong(),
+        transformers.WideToLong,
 
-        transformers.AddDeliveryNoteInfo(),
-        transformers.AddAnalyseInfo(),
-        transformers.AddSamplingInfo(),
+        transformers.AddDeliveryNoteInfo,
+        transformers.AddAnalyseInfo,
+        transformers.AddSamplingInfo,
 
-        # transformers.AddSampleMinAndMaxDepth(),
-        # transformers.ReorderSampleMinAndMaxDepth(),
+        # transformers.AddSampleMinAndMaxDepth,
+        # transformers.ReorderSampleMinAndMaxDepth,
 
-        transformers.AddStationInfo(),
+        transformers.AddStationInfo,
 
-        transformers.AddSwedishProjectName(),
-        transformers.AddSwedishSampleOrderer(),
-        transformers.AddSwedishSamplingLaboratory(),
-        transformers.AddSwedishAnalyticalLaboratory(),
-        transformers.AddSwedishReportingInstitute(),
+        transformers.AddSwedishProjectName,
+        transformers.AddSwedishSampleOrderer,
+        transformers.AddSwedishSamplingLaboratory,
+        transformers.AddSwedishAnalyticalLaboratory,
+        transformers.AddSwedishReportingInstitute,
 
-        transformers.AddEnglishProjectName(),
-        transformers.AddEnglishSampleOrderer(),
-        transformers.AddEnglishSamplingLaboratory(),
-        transformers.AddEnglishAnalyticalLaboratory(),
-        transformers.AddEnglishReportingInstitute(),
+        transformers.AddEnglishProjectName,
+        transformers.AddEnglishSampleOrderer,
+        transformers.AddEnglishSamplingLaboratory,
+        transformers.AddEnglishAnalyticalLaboratory,
+        transformers.AddEnglishReportingInstitute,
 
-        transformers.AddStaticInternetAccessInfo(),
-        transformers.AddStaticDataHoldingCenter(),
+        transformers.AddStaticInternetAccessInfo,
+        transformers.AddStaticDataHoldingCenter,
 
-        transformers.AddLocationCounty(),
-        transformers.AddLocationHelcomOsparArea(),
-        transformers.AddLocationMunicipality(),
-        transformers.AddLocationNation(),
-        transformers.AddLocationSeaBasin(),
-        transformers.AddLocationTypeArea(),
-        transformers.AddLocationWaterDistrict(),
+        transformers.AddLocationCounty,
+        transformers.AddLocationHelcomOsparArea,
+        transformers.AddLocationMunicipality,
+        transformers.AddLocationNation,
+        transformers.AddLocationSeaBasin,
+        transformers.AddLocationTypeArea,
+        transformers.AddLocationWaterDistrict,
 
-        transformers.Multiply(),
-        transformers.Divide(),
+        transformers.Multiply,
+        transformers.Divide,
 
-        Dyntaxa(),
+        Dyntaxa,
 
-        # transformers.SetBacteriaAsReportedScientificName(),
-        # transformers.AddReportedScientificName(),
-        # transformers.AddTranslatedDyntaxaScientificName(),
-        # transformers.AddScientificNameFromDyntaxaTranslatedScientificName(),
-        # transformers.AddDyntaxaId(),
-        # transformers.AddAphiaId(),
+        # transformers.SetBacteriaAsReportedScientificName,
+        # transformers.AddReportedScientificName,
+        # transformers.AddTranslatedDyntaxaScientificName,
+        # transformers.AddScientificNameFromDyntaxaTranslatedScientificName,
+        # transformers.AddDyntaxaId,
+        # transformers.AddAphiaId,
 
-        transformers.AddDatasetName(),
-        transformers.FixYesNo(),
+        transformers.AddDatasetName,
+        transformers.FixYesNo,
 
 
-        # transformers.AddColumnViewsColumns(),
-        transformers.AddSharkId(),
+        # transformers.AddColumnViewsColumns,
+        transformers.AddSharkId,
 
         # Temp
-        transformers.SortColumn(),
+        transformers.SortColumn,
     ]
 
     @staticmethod

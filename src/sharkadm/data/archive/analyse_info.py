@@ -103,6 +103,9 @@ class AnalyseInfo:
             self._map_data()
 
     def _map_data(self):
+        if not self._mapper:
+            adm_logger.log_workflow(f'No mapper found when trying to map AnalyseInfo file: {self._path}')
+            return
         new_data = {}
         for par, info_list in self._data.items():
             internal_par = self._mapper.get_internal_name(par)
