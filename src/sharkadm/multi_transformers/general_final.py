@@ -4,8 +4,8 @@ from sharkadm import transformers
 
 class GeneralFinal(MultiTransformer):
     transformers = [
-        transformers.StripAllValues(),
-        transformers.SortData(),
+        transformers.StripAllValues,
+        transformers.SortData,
     ]
 
     @staticmethod
