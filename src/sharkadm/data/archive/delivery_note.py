@@ -34,7 +34,7 @@ class DeliveryNote:
         self._import_matrix_key = data.get('import_matrix_key', None)
         self._mapper = mapper
 
-        self._data['DTYPE'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['DTYPE'], translate_to='public_value')
+        self._data['DTYPE'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['DTYPE'], translate_to='internal_value')
 
         #TODO: Fullhack
         if self._data['DTYPE'] == 'Physical and Chemical':
@@ -75,7 +75,6 @@ class DeliveryNote:
             for line in fid:
                 if not line.strip():
                     continue
-                print(f'{data.keys()=}')
                 if ':' not in line:
                     # Belongs to previous row
                     data[mapped_key] = f'{data[mapped_key]} {line.strip()}'

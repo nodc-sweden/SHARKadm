@@ -32,11 +32,11 @@ class AddSwedishSamplingLaboratory(Transformer):
 
     def _get(self, row, col):
         code = row[col]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for {col}: {code}')
             return ''
-        return info['swedish']
+        return info['swedish_name']
 
 
 class AddEnglishSamplingLaboratory(Transformer):
@@ -60,11 +60,11 @@ class AddEnglishSamplingLaboratory(Transformer):
 
     def _get_code(self, row):
         code = row[self.source_col]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for sampling_laboratory_code: {code}')
             return ''
-        return info['english']
+        return info['english_name']
 
 
 class AddSwedishAnalyticalLaboratory(Transformer):
@@ -91,11 +91,11 @@ class AddSwedishAnalyticalLaboratory(Transformer):
 
     def _get(self, row, col):
         code = row[col]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for {col}: {code}')
             return ''
-        return info['swedish']
+        return info['swedish_name']
 
 
 class AddEnglishAnalyticalLaboratory(Transformer):
@@ -120,10 +120,10 @@ class AddEnglishAnalyticalLaboratory(Transformer):
 
     def _get_code(self, row):
         code = row[self.source_column]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for analytical_laboratory_code: {code}')
             return ''
-        return info['english']
+        return info['english_name']
 
 
