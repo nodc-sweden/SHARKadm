@@ -75,13 +75,15 @@ class DeliveryNote:
             for line in fid:
                 if not line.strip():
                     continue
+                print(f'{data.keys()=}')
                 if ':' not in line:
                     # Belongs to previous row
-                    data[key] = f'{data[key]} {line.strip()}'
+                    data[mapped_key] = f'{data[mapped_key]} {line.strip()}'
                     continue
                 key, value = [item.strip() for item in line.split(':', 1)]
                 key = key.lstrip('- ')
-                data[dn_mapper.get(key)] = value
+                mapped_key = dn_mapper.get(key)
+                data[mapped_key] = value
                 if key.upper() == 'FORMAT':
                     parts = [item.strip() for item in value.split(':')]
                     data['data_format'] = parts[0]
