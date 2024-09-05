@@ -57,6 +57,16 @@ def clear_temp_directory(days_old: int = 7):
                     pass
         _remove_empty_directories(TEMP_DIRECTORY)
 
+def clear_all_in_temp_directory():
+    if TEMP_DIRECTORY.name != '_temp':
+        print(f'I do not dare ro remove temp directory: {TEMP_DIRECTORY}')
+        return
+    for path in TEMP_DIRECTORY.iterdir():
+        if path.is_dir():
+            shutil.rmtree(path, ignore_errors=True)
+        else:
+            os.remove(path)
+
 
 def clear_export_directory(days_old: int = 7):
     """Clears export directory from files and directories older than <days_old>"""
