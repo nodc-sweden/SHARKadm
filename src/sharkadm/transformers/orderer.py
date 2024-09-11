@@ -29,11 +29,14 @@ class AddSwedishSampleOrderer(Transformer):
 
     def _get(self, row, col):
         code = row[col]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
-        if not info:
-            adm_logger.log_transformation(f'Could not find information for {col}: {code}')
-            return ''
-        return info['swedish_name']
+        translations = []
+        for part in code.split(','):
+            info = self._loaded_code_info.setdefault(part, self._codes.get_info('LABO', part))
+            if not info:
+                adm_logger.log_transformation(f'Could not find information for {col}: {code}')
+                return ''
+            translations.append(info['swedish_name'])
+        return ', '.join(translations)
 
     # def _get_code(self, row, col):
     #     code = row['sample_orderer_code']
