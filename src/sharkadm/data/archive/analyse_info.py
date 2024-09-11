@@ -11,6 +11,12 @@ import pandas as pd
 
 from sharkadm import adm_logger
 
+
+DATE_FORMATS = [
+    '%Y-%m-%d',
+    '%Y-%m'
+    ]
+
 logger = logging.getLogger(__name__)
 
 
@@ -254,14 +260,15 @@ class AnalyseInfo:
         return list(self.data[list(self._data)[0]][0])
 
 
-def _get_date(date_str: str):
+def _get_date(date_str: str) -> datetime.date | str:
     if not date_str:
         return ''
     d_string = date_str.split()[0]
-    date = ''
-    try:
-        date = datetime.datetime.strptime(d_string, '%Y-%m-%d').date()
-    except ValueError:
-        adm_logger.log_workflow(f'Invalid date or date format in analysinfo', add=d_string, level=adm_logger.ERROR)
-        adm_logger.log_workflow(adm_logger.feedback.invalid_date_in_analys_info(d_string), level=adm_logger.ERROR, purpose=adm_logger.FEEDBACK)
-    return date
+    for form in DATE_FORMATS:
+        try:
+            return datetime.datetime.strptime(d_string, form).date()
+        except ValueError:
+            pass
+    adm_logger.log_workflow(f'Invalid date or date format in analys_info', add=date_str, level=adm_logger.ERROR)
+    adm_logger.log_workflow(adm_logger.feedback.invalid_date_in_analys_info(date_str), level=adm_logger.ERROR, purpose=adm_logger.FEEDBACK)
+    return ''
