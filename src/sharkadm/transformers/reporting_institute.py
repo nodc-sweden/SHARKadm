@@ -24,7 +24,6 @@ class DataHolderProtocol(Protocol):
 
 
 class AddSwedishReportingInstitute(Transformer):
-    valid_data_holders = get_archive_data_holder_names()
     col_to_set = 'reporting_institute_name_sv'
 
     def __init__(self, **kwargs):
@@ -50,22 +49,21 @@ class AddSwedishReportingInstitute(Transformer):
 
     def _get_from_en(self, row, col):
         code = row[col]
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for {col}: {code}')
             return ''
-        return info['swedish']
+        return info['swedish_name']
 
     def _get_name(self, code):
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for reporting_institute_code: {code}')
             return ''
-        return info['swedish']
+        return info['swedish_name']
 
 
 class AddEnglishReportingInstitute(Transformer):
-    valid_data_holders = get_archive_data_holder_names()
     col_to_set = 'reporting_institute_name_en'
 
     def __init__(self, **kwargs):
@@ -86,11 +84,11 @@ class AddEnglishReportingInstitute(Transformer):
         data_holder.data[self.col_to_set] = self._get_name(data_holder.reporting_institute)
 
     def _get_name(self, code):
-        info = self._loaded_code_info.setdefault(code, self._codes.get_info('laboratory', code))
+        info = self._loaded_code_info.setdefault(code, self._codes.get_info('LABO', code))
         if not info:
             adm_logger.log_transformation(f'Could not find information for reporting_institute_code: {code}')
             return ''
-        return info['english']
+        return info['english_name']
 
 
 

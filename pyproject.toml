@@ -1,6 +1,6 @@
 [project]
 name = "sharkadm"
-version = "0.1.5"
+version = "0.2.0"
 description = "Handles workflows for Swedish NODC"
 authors = [
     {name = "Magnus Wenzer", email = "magnus.wenzer@smhi.se"},
@@ -28,12 +28,6 @@ distribution = true
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "-e file:///C:/mw/git/nodc-bvol#egg=nodc-bvol",
-    "-e file:///C:/mw/git/nodc-codes#egg=nodc-codes",
-    "-e file:///C:/mw/git/nodc-dyntaxa#egg=nodc-dyntaxa",
-    "-e file:///C:/mw/git/nodc-geography#egg=nodc-geography",
-    "-e file:///C:/mw/git/nodc-station#egg=nodc-station",
-    "-e file:///C:/mw/git/nodc-worms#egg=nodc-worms",
     "pytest>=8.2.2",
 ]
 
