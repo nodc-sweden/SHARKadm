@@ -180,15 +180,18 @@ class AddReportedDates(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Copies column date-columns to reported_date-columns'
+        rep_cols = [f'{AddReportedDates.reported_col_prefix}_{item}' for item in AddReportedDates.source_columns]
+        return f'Copies columns {AddReportedDates.source_columns} to columns {rep_cols}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:
-
             if source_col not in data_holder.data.columns:
                 adm_logger.log_transformation(f'Missing column: {source_col}', level=adm_logger.WARNING)
                 continue
             target_col = f'{self.reported_col_prefix}_{source_col}'
+            if target_col in data_holder.data.columns:
+                adm_logger.log_transformation(f'Column already present. Will do nothing: {target_col}', level=adm_logger.INFO)
+                continue
             data_holder.data[target_col] = data_holder.data[source_col]
 
 
