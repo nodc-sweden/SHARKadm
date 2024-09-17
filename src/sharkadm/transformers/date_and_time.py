@@ -105,7 +105,7 @@ class AddSampleDate(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adding time format sample_date'
+        return f'Adding sample_date if missing'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'sample_date' in data_holder.data:
@@ -187,5 +187,46 @@ class AddReportedVisitDate(Transformer):
             adm_logger.log_transformation(f'Missing column: {self.source_column}', level=adm_logger.WARNING)
             return
         data_holder.data[self.target_column] = data_holder.data[self.source_column]
+
+
+class CreateFullVisitDate(Transformer):
+    col_to_use = 'visit_date'
+    date_format = '%Y-%m-%d'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (f'Creates fake date in column {CreateFullVisitDate.col_to_use} if incomplete. '
+                f'Sets first date in month or year depending of precision')
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for date_str in set(data_holder.data[self.col_to_use]):
+            date_str = date_str.strip()
+            try:
+                datetime.datetime.strptime(date_str, self.date_format)
+                # All is good
+            except ValueError:
+                new_date_str = None
+                if len(date_str) == 4:
+                    # Probably only year
+                    adm_logger.log_transformation(f'{self.col_to_use} is {date_str}. Will be handled as <YEAR>. First day of year will be set!', level=adm_logger.WARNING)
+                    new_date_str = f'{date_str}-01-01'
+                elif len(date_str) == 6:
+                    # Probably only year
+                    adm_logger.log_transformation(f'{self.col_to_use} is {date_str}. Will be handled as <YEAR><MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
+                    new_date_str = f'{date_str[:4]}-{date_str[4:]}-01'
+                else:
+                    date_parts = date_str.split('-')
+                    if len(date_parts) == 2:
+                        adm_logger.log_transformation(
+                            f'{self.col_to_use} is {date_str}. Will be handled as <YEAR>-<MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
+                        new_date_str = f'{date_parts[0]}-{date_parts[1]}-01'
+                if new_date_str is None:
+                    adm_logger.log_transformation(f'Unable to interpret visit_date {date_str}', level=adm_logger.WARNING)
+                    continue
+                index = data_holder.data[self.col_to_use].str.strip() == date_str
+                data_holder.data.loc[index, self.col_to_use] = new_date_str
+
+
+
 
 
