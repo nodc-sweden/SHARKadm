@@ -174,61 +174,78 @@ class AddMonth(Transformer):
         return str(x.month).zfill(2)
 
 
-class AddReportedVisitDate(Transformer):
-    source_column = 'visit_date'
-    target_column = 'reported_visit_date'
+class AddReportedDates(Transformer):
+    source_columns = ['visit_date', 'sample_date']
+    reported_col_prefix = 'reported'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Copies column {AddReportedVisitDate.source_column} to {AddReportedVisitDate.target_column}'
+        return f'Copies column date-columns to reported_date-columns'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.source_column not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Missing column: {self.source_column}', level=adm_logger.WARNING)
-            return
-        data_holder.data[self.target_column] = data_holder.data[self.source_column]
+        for source_col in self.source_columns:
+
+            if source_col not in data_holder.data.columns:
+                adm_logger.log_transformation(f'Missing column: {source_col}', level=adm_logger.WARNING)
+                continue
+            target_col = f'{self.reported_col_prefix}_{source_col}'
+            data_holder.data[target_col] = data_holder.data[source_col]
 
 
-class CreateFullVisitDate(Transformer):
-    mandatory_col = 'reported_visit_date'
-    col_to_use = 'visit_date'
+class CreateFakeFullDates(Transformer):
+    shark_comment_column = 'shark_comment'
+    mandatory_col_prefix = 'reported'
+    source_columns = ['visit_date', 'sample_date']
     date_format = '%Y-%m-%d'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f'Creates fake date in column {CreateFullVisitDate.col_to_use} if incomplete. '
+        return (f'Creates fake date in columns {CreateFakeFullDates.source_columns} if incomplete. '
                 f'Sets first date in month or year depending of precision')
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.mandatory_col not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Could not transform {self.__class__.__name__}. Missing column {self.mandatory_col}', level=adm_logger.WARNING)
-            return
-        for date_str in set(data_holder.data[self.col_to_use]):
-            date_str = date_str.strip()
-            try:
-                datetime.datetime.strptime(date_str, self.date_format)
-                # All is good
-            except ValueError:
-                new_date_str = None
-                if len(date_str) == 4:
-                    # Probably only year
-                    adm_logger.log_transformation(f'{self.col_to_use} is {date_str}. Will be handled as <YEAR>. First day of year will be set!', level=adm_logger.WARNING)
-                    new_date_str = f'{date_str}-01-01'
-                elif len(date_str) == 6:
-                    # Probably only year
-                    adm_logger.log_transformation(f'{self.col_to_use} is {date_str}. Will be handled as <YEAR><MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
-                    new_date_str = f'{date_str[:4]}-{date_str[4:]}-01'
-                else:
-                    date_parts = date_str.split('-')
-                    if len(date_parts) == 2:
-                        adm_logger.log_transformation(
-                            f'{self.col_to_use} is {date_str}. Will be handled as <YEAR>-<MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
-                        new_date_str = f'{date_parts[0]}-{date_parts[1]}-01'
-                if new_date_str is None:
-                    adm_logger.log_transformation(f'Unable to interpret visit_date {date_str}', level=adm_logger.WARNING)
-                    continue
-                index = data_holder.data[self.col_to_use].str.strip() == date_str
-                data_holder.data.loc[index, self.col_to_use] = new_date_str
+        if self.shark_comment_column not in data_holder.data.columns:
+            data_holder.data[self.shark_comment_column] = ''
+        for source_col in self.source_columns:
+            if source_col not in data_holder.data.columns:
+                adm_logger.log_transformation(f'Could not transform {self.__class__.__name__}. Missing column {source_col}', level=adm_logger.INFO)
+                continue
+            mandatory_col = f'{self.mandatory_col_prefix}_{source_col}'
+            if mandatory_col not in data_holder.data.columns:
+                adm_logger.log_transformation(f'Could not transform {self.__class__.__name__}. Missing column {mandatory_col}', level=adm_logger.INFO)
+                continue
+            for date_str in set(data_holder.data[source_col]):
+                date_str = date_str.strip()
+                try:
+                    datetime.datetime.strptime(date_str, self.date_format)
+                    # All is good
+                except ValueError:
+                    new_date_str = None
+                    if len(date_str) == 4:
+                        # Probably only year
+                        adm_logger.log_transformation(f'{source_col} is {date_str}. Will be handled as <YEAR>. First day of year will be set!', level=adm_logger.WARNING)
+                        new_date_str = f'{date_str}-01-01'
+                    elif len(date_str) == 6:
+                        # Probably only year
+                        adm_logger.log_transformation(f'{source_col} is {date_str}. Will be handled as <YEAR><MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
+                        new_date_str = f'{date_str[:4]}-{date_str[4:]}-01'
+                    else:
+                        date_parts = date_str.split('-')
+                        if len(date_parts) == 2:
+                            adm_logger.log_transformation(
+                                f'{source_col} is {date_str}. Will be handled as <YEAR>-<MONTH>. First day of month in that year will be set!', level=adm_logger.WARNING)
+                            new_date_str = f'{date_parts[0]}-{date_parts[1]}-01'
+
+                    index = data_holder.data[source_col].str.strip() == date_str
+
+                    if new_date_str is None:
+                        comment_str = f'Unable to interpret {source_col} "{date_str}"'
+                        adm_logger.log_transformation(comment_str, level=adm_logger.ERROR)
+                    else:
+                        data_holder.data.loc[index, source_col] = new_date_str
+                        comment_str = f'Fake {source_col} set from {date_str} to {new_date_str}'
+                    data_holder.data.loc[index, self.shark_comment_column] = data_holder.data.loc[
+                                                                                 index, self.shark_comment_column] + comment_str + '; '
 
 
 
