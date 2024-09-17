@@ -161,7 +161,7 @@ class AddMonth(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if 'datetime' not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Missing key: datetime')
+            adm_logger.log_transformation(f'Missing column: datetime', level=adm_logger.WARNING)
             return
         for col in self.month_columns:
             data_holder.data[col] = data_holder.data['datetime'].apply(lambda x, dh=data_holder: self.get_month(x, dh))
@@ -172,5 +172,20 @@ class AddMonth(Transformer):
             adm_logger.log_transformation(f'Missing datetime in {data_holder}')
             return ''
         return str(x.month).zfill(2)
+
+
+class AddReportedVisitDate(Transformer):
+    source_column = 'visit_date'
+    target_column = 'reported_visit_date'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Copies column {AddReportedVisitDate.source_column} to {AddReportedVisitDate.target_column}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_column not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Missing column: {self.source_column}', level=adm_logger.WARNING)
+            return
+        data_holder.data[self.target_column] = data_holder.data[self.source_column]
 
 
