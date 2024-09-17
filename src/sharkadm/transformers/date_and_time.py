@@ -190,6 +190,7 @@ class AddReportedVisitDate(Transformer):
 
 
 class CreateFullVisitDate(Transformer):
+    mandatory_col = 'reported_visit_date'
     col_to_use = 'visit_date'
     date_format = '%Y-%m-%d'
 
@@ -199,6 +200,9 @@ class CreateFullVisitDate(Transformer):
                 f'Sets first date in month or year depending of precision')
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.mandatory_col not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Could not transform {self.__class__.__name__}. Missing column {self.mandatory_col}', level=adm_logger.WARNING)
+            return
         for date_str in set(data_holder.data[self.col_to_use]):
             date_str = date_str.strip()
             try:
