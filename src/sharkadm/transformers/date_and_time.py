@@ -52,7 +52,7 @@ class FixTimeFormat(Transformer):
                                               level=adm_logger.ERROR)
                 return ''
             xx = xx.zfill(4)
-            xx = f'{xx[:2]}:{xx[2:]}'.zfill(5)
+            xx = f'{xx[:2]}:{xx[2:]}'
         self._buffer[x.strip()] = xx
         return xx
 
