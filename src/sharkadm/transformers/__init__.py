@@ -29,6 +29,8 @@ from .date_and_time import AddSampleDate
 from .date_and_time import AddSampleTime
 from .date_and_time import FixDateFormat
 from .date_and_time import FixTimeFormat
+from .date_and_time import AddReportedDates
+from .date_and_time import CreateFakeFullDates
 from .delivery_note_info import AddDeliveryNoteInfo
 from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
