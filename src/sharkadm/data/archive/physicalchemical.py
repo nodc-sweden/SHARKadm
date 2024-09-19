@@ -26,6 +26,6 @@ class PhysicalChemicalArchiveDataHolder(ArchiveDataHolder):
             return
 
         d_source = data_source.TxtRowFormatDataFile(path=data_file_path, data_type=self.delivery_note.data_type)
-        # d_source.map_header(self.import_matrix_mapper)
+        d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)

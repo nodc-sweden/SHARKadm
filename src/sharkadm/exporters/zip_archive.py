@@ -32,7 +32,6 @@ class ZipArchive(Exporter):
     @property
     def _temp_zip_directory(self) -> pathlib.Path:
         return utils.get_temp_directory(f'{self._metadata_auto.dataset_file_name.split(".")[0]}')
-        # return pathlib.Path.home() / '_temp_sharkadm' / f'{self._metadata_auto.dataset_file_name.split(".")[0]}'
 
     @property
     def _save_zip_directory(self) -> pathlib.Path:
@@ -90,10 +89,12 @@ class ZipArchive(Exporter):
         pass
 
     def _create_shark_metadata_auto(self) -> None:
+        print(f'{self._save_zip_directory=}')
         self._metadata_auto.create_file(export_directory=self._save_zip_directory,
                                         export_file_name='shark_metadata_auto.txt')
 
     def _create_data_file(self) -> None:
+        print(f'{self._save_zip_directory=}')
         exporter = exporters.SHARKdataTxt(export_directory=self._save_zip_directory,
                                           export_file_name='shark_data.txt')
         exporter.export(self._data_holder)
