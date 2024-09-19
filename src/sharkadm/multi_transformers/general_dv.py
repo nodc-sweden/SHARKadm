@@ -1,6 +1,8 @@
 from .base import MultiTransformer
 from sharkadm import transformers
 from .dyntaxa import Dyntaxa
+from .location import Location
+from .translate import Translate
 
 
 class GeneralDV(MultiTransformer):
@@ -16,28 +18,12 @@ class GeneralDV(MultiTransformer):
 
         transformers.AddStationInfo,
 
-        transformers.AddSwedishProjectName,
-        transformers.AddSwedishSampleOrderer,
-        transformers.AddSwedishSamplingLaboratory,
-        transformers.AddSwedishAnalyticalLaboratory,
-        transformers.AddSwedishReportingInstitute,
-
-        transformers.AddEnglishProjectName,
-        transformers.AddEnglishSampleOrderer,
-        transformers.AddEnglishSamplingLaboratory,
-        transformers.AddEnglishAnalyticalLaboratory,
-        transformers.AddEnglishReportingInstitute,
+        Translate,
 
         transformers.AddStaticInternetAccessInfo,
         transformers.AddStaticDataHoldingCenter,
 
-        transformers.AddLocationCounty,
-        transformers.AddLocationHelcomOsparArea,
-        transformers.AddLocationMunicipality,
-        transformers.AddLocationNation,
-        transformers.AddLocationSeaBasin,
-        transformers.AddLocationTypeArea,
-        transformers.AddLocationWaterDistrict,
+        Location,
 
         transformers.Multiply,
         transformers.Divide,
