@@ -116,10 +116,11 @@ class SHARKadmController:
     def data_holder(self) -> DataHolder:
         return self._data_holder
 
-    def set_data_holder(self, data_holder: DataHolder) -> None:
+    def set_data_holder(self, data_holder: DataHolder) -> 'SHARKadmController':
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.AddRowNumber())
+        return self
 
     def set_transformers(self, *args: Transformer | MultiTransformer) -> None:
         """Add one or more Transformers to the data holder"""
@@ -147,9 +148,8 @@ class SHARKadmController:
 #             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
 
-    def validate_before(self, *validators: Validator) -> 'SHARKadmController':
+    def validate(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
-#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
         return self
 
@@ -160,14 +160,7 @@ class SHARKadmController:
     def validate_after_all(self) -> None:
         """Runs all set validator objects in self._validators_after"""
         for val in self._validators_after:
-#             logger.debug(f'Running validator: {val}')
             val.validate(self._data_holder)
-
-    def validate_after(self, *validators: Validator) -> 'SHARKadmController':
-        for val in validators:
-#             logger.debug(f'Running validator: {val}')
-            val.validate(self._data_holder)
-        return self
 
     def set_exporters(self, *args: Exporter) -> None:
         """Add one or more Exporters to the data holder"""
