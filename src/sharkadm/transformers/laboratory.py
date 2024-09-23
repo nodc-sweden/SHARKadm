@@ -2,7 +2,7 @@ from ._codes import _AddCodesLab
 
 
 class AddSwedishSamplingLaboratory(_AddCodesLab):
-    source_cols = ['sampling_laboratory_code', 'sampling_laboratory_name_en']
+    source_cols = ['sampling_laboratory_code', 'sampling_laboratory_code_phyche', 'sampling_laboratory_name_en']
     col_to_set = 'sampling_laboratory_name_sv'
     lookup_key = 'swedish_name'
 
@@ -12,7 +12,7 @@ class AddSwedishSamplingLaboratory(_AddCodesLab):
 
 
 class AddEnglishSamplingLaboratory(_AddCodesLab):
-    source_cols = ['sampling_laboratory_code', 'sampling_laboratory_name_sv']
+    source_cols = ['sampling_laboratory_code', 'sampling_laboratory_code_phyche', 'sampling_laboratory_name_sv']
     col_to_set = 'sampling_laboratory_name_en'
     lookup_key = 'english_name'
 

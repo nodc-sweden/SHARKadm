@@ -25,10 +25,7 @@ def get_data_holder_list() -> list[str]:
 
 def get_data_holders() -> dict[str, Type[DataHolder]]:
     """Returns a dictionary with data_holders"""
-    trans = {}
-    for cls in DataHolder.__subclasses__():
-        trans[cls.__name__] = cls
-    return trans
+    return utils.get_all_class_children(DataHolder)
 
 
 def get_data_holder_object(trans_name: str, **kwargs) -> DataHolder:
@@ -125,6 +122,19 @@ def get_valid_data_holders(valid: list[str] | None = None,
             if item_lower not in invalid_lower:
                 data_holders.append(item)
         return data_holders
+
+
+def is_valid_data_holder(data_holder: Type[DataHolder],
+                         valid: list[str] | None = None,
+                         invalid: list[str] | None = None) -> bool:
+    if not any([valid, invalid]):
+        return True
+    holders = get_data_holders()
+    if any([val for val in invalid if isinstance(data_holder, holders[val])]):
+        return False
+    if any([val for val in valid if isinstance(data_holder, holders[val])]):
+        return True
+    return True
 
 
 

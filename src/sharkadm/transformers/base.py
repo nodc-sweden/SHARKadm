@@ -6,6 +6,7 @@ import pandas as pd
 
 from sharkadm import adm_logger, config
 from sharkadm.data import get_valid_data_holders
+from sharkadm.data import is_valid_data_holder
 
 
 class DataHolderProtocol(Protocol):
@@ -71,8 +72,10 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
-        if data_holder.__class__.__name__ not in get_valid_data_holders(valid=self.valid_data_holders,
-                                                                        invalid=self.invalid_data_holders):
+        valid_data_holders = get_valid_data_holders(valid=self.valid_data_holders, invalid=self.invalid_data_holders)
+        # print(f'{valid_data_holders=}')
+        # if data_holder.__class__.__name__ not in valid_data_holders:
+        if not is_valid_data_holder(data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
             return
@@ -80,7 +83,6 @@ class Transformer(ABC):
                                                                                 invalid=self.invalid_data_structures):
             adm_logger.log_workflow(f'Invalid data_format {data_holder.data_structure} for transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
-            raise
             return
 
         adm_logger.log_workflow(f'Applying transformer: {self.__class__.__name__}', add=self.get_transformer_description())

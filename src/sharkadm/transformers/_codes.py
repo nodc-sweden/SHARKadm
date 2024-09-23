@@ -32,8 +32,9 @@ class _AddCodes(Transformer):
                 source_col = col
                 break
         if not source_col:
-            adm_logger.log_transformation(f'None of the source columns {self.source_cols} found when trying to set {self.col_to_set}',
-                                          level=adm_logger.WARNING)
+            adm_logger.log_transformation(
+                f'None of the source columns {self.source_cols} found when trying to set {self.col_to_set}',
+                level=adm_logger.WARNING)
             return
         if self.col_to_set not in data_holder.data.columns:
             data_holder.data[self.col_to_set] = ''

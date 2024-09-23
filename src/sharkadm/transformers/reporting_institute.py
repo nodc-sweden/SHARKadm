@@ -41,7 +41,7 @@ class _ReportingInstitute(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._set_from_data(data_holder=data_holder):
             return
-        self._set_from_other()
+        self._set_from_other(data_holder=data_holder)
 
     def _set_from_other(self, data_holder: DataHolderProtocol) -> None:
         if hasattr(data_holder, 'reporting_institute') and data_holder.reporting_institute:

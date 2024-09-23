@@ -58,7 +58,7 @@ class AddStationInfo(Transformer):
                 else:
                     station_names_str = ', '.join([info["STATION_NAME"] for info in closest_info])
                     adm_logger.log_transformation(
-                            f'Station "{reported_station}" is not found as a synonym in station list'
+                            f'Station "{reported_station}" is not found as a synonym in station list. '
                             f'Closest station(s) is/are {station_names_str}', level=adm_logger.WARNING)
                     continue
             if not info['accepted']:
