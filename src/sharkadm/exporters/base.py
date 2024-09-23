@@ -1,14 +1,14 @@
 import pathlib
 import time
 from abc import ABC, abstractmethod
-from typing import Protocol
 from typing import Any
+from typing import Protocol
 
 import pandas as pd
 
 from sharkadm import adm_logger, config
-from sharkadm.data import get_valid_data_holders
 from sharkadm import utils
+from sharkadm.data import is_valid_data_holder
 
 
 class DataHolderProtocol(Protocol):
@@ -62,8 +62,8 @@ class Exporter(ABC):
                                                                             invalid=self.invalid_data_types):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for exporter {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
-        if data_holder.__class__.__name__ not in get_valid_data_holders(valid=self.valid_data_holders,
-                                                                        invalid=self.invalid_data_holders):
+
+        if not is_valid_data_holder(data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for exporter'
                                     f' {self.__class__.__name__}')
             return

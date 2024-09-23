@@ -134,19 +134,19 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     @property
     def min_longitude(self) -> str:
-        return str(min(self.data['sample_reported_longitude'].astype(float)))
+        return str(min(self.data['visit_reported_longitude'].astype(float)))
 
     @property
     def max_longitude(self) -> str:
-        return str(max(self.data['sample_reported_longitude'].astype(float)))
+        return str(max(self.data['visit_reported_longitude'].astype(float)))
 
     @property
     def min_latitude(self) -> str:
-        return str(min(self.data['sample_reported_latitude'].astype(float)))
+        return str(min(self.data['visit_reported_latitude'].astype(float)))
 
     @property
     def max_latitude(self) -> str:
-        return str(max(self.data['sample_reported_latitude'].astype(float)))
+        return str(max(self.data['visit_reported_latitude'].astype(float)))
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(self.delivery_note_path)

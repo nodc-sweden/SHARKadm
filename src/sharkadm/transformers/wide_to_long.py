@@ -20,6 +20,7 @@ class WideToLong(Transformer):
                  column_name_value: str = 'value',
                  column_name_qf: str = 'quality_flag',
                  column_name_unit: str = 'unit',
+                 keep_empty_rows: bool = False,
                  **kwargs
                  ):
 
@@ -34,6 +35,7 @@ class WideToLong(Transformer):
         self._column_name_value = column_name_value
         self._column_name_qf = column_name_qf
         self._column_name_unit = column_name_unit
+        self._keep_empty_rows = keep_empty_rows
 
         self._metadata_columns = []
         self._data_columns = []
@@ -106,8 +108,7 @@ class WideToLong(Transformer):
             meta = list(row[self._metadata_columns].values)
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
-                if not row[col]:
-                    # print(f'{col=}')
+                if not row[col] and not self._keep_empty_rows:
                     continue
                 par = self._get_parameter_name_from_parameter(col)
                 value = row[col]

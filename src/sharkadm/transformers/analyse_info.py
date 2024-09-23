@@ -31,4 +31,6 @@ class AddAnalyseInfo(Transformer):
             for col in data_holder.analyse_info.columns:
                 if col in ['VALIDFR', 'VALIDTO']:
                     continue
+                if col not in data_holder.data.columns:
+                    data_holder.data[col] = ''
                 data_holder.data.loc[df.index, col] = info.get(col, '')
