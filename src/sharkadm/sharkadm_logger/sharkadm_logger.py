@@ -307,23 +307,22 @@ class SHARKadmLogger:
         for level_name, level_data in self.data.items():
             if level_name not in levels:
                 continue
+            filtered_data.setdefault(level_name, dict())
             for purpose, purpose_data in level_data.items():
                 if purpose not in purposes:
                     continue
+                filtered_data[level_name].setdefault(purpose, dict())
                 for log_type_name, log_type_data in purpose_data.items():
                     if log_type_name not in log_types:
                         continue
-
+                    filtered_data[level_name][purpose].setdefault(log_type_name, dict())
                     if in_msg:
                         for msg, msg_data in log_type_data.items():
                             if in_msg and in_msg.lower() not in msg.lower():
                                 continue
-                            filtered_data.setdefault(level_name, dict())
-                            filtered_data[level_name].setdefault(log_type_name, dict())
-                            filtered_data[level_name][log_type_name][msg] = msg_data
+                            filtered_data[level_name][purpose][log_type_name][msg] = msg_data
                     else:
-                        filtered_data.setdefault(level_name, dict())
-                        filtered_data[level_name][log_type_name] = log_type_data
+                        filtered_data[level_name][purpose][log_type_name] = log_type_data
         return filtered_data
 
     # def save_as_xlsx(self, path: str | pathlib.Path | None = None, include_items: bool = False, **kwargs) -> 'SHARKadmLogger':
