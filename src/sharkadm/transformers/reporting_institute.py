@@ -1,7 +1,6 @@
 from sharkadm import adm_logger
 from ._codes import _translate_codes
 from .base import Transformer
-from sharkadm.data.archive import get_archive_data_holder_names
 
 from typing import Protocol
 import pandas as pd
