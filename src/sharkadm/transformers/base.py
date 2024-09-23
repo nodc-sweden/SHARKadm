@@ -72,9 +72,6 @@ class Transformer(ABC):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
-        valid_data_holders = get_valid_data_holders(valid=self.valid_data_holders, invalid=self.invalid_data_holders)
-        # print(f'{valid_data_holders=}')
-        # if data_holder.__class__.__name__ not in valid_data_holders:
         if not is_valid_data_holder(data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders):
             adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for transformer'
                                     f' {self.__class__.__name__}')
