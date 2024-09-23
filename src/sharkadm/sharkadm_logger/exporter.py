@@ -102,10 +102,15 @@ class XlsxExporter(SharkadmExporter):
             for purpose, purpose_data in level_data.items():
                 for log_type, log_type_data in purpose_data.items():
                     for msg, msg_data in log_type_data.items():
-                        count = msg_data['count']
-                        log_nr = msg_data['log_nr']
-                        cls = msg_data['cls']
-                        dataset_name = msg_data['dataset_name']
+                        print(f'{level=}')
+                        print(f'{purpose=}')
+                        print(f'{log_type=}')
+                        print(f'{msg=}')
+                        print(f'{msg_data=}')
+                        count = msg_data.get('count', '')
+                        log_nr = msg_data.get('log_nr', '')
+                        cls = msg_data.get('cls', '')
+                        dataset_name = msg_data.get('dataset_name', '')
                         general_line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr]
                         if not self.kwargs.get('include_items'):
                             line = general_line
@@ -177,11 +182,21 @@ class XlsxExporter(SharkadmExporter):
         # Make the columns wider for clarity.
         worksheet.set_column(0, 0, 40)
         worksheet.set_column(1, 1, 10)
-        worksheet.set_column(2, 2, 20)
-        worksheet.set_column(3, 3, 40)
-        worksheet.set_column(4, 4, 90)
-        worksheet.set_column(5, 5, 8)
-        worksheet.set_column(6, 6, 70)
+        worksheet.set_column(2, 2, 15)
+        worksheet.set_column(3, 3, 20)
+        worksheet.set_column(4, 4, 30)
+        worksheet.set_column(5, 5, 110)
+        worksheet.set_column(6, 6, 10)
+        worksheet.set_column(7, 7, 10)
+        worksheet.set_column(8, 8, 100)
+
+        # worksheet.set_column(0, 0, 40)
+        # worksheet.set_column(1, 1, 10)
+        # worksheet.set_column(2, 2, 20)
+        # worksheet.set_column(3, 3, 40)
+        # worksheet.set_column(4, 4, 90)
+        # worksheet.set_column(5, 5, 8)
+        # worksheet.set_column(6, 6, 70)
 
         # Close the Pandas Excel writer and output the Excel file.
         writer.close()
