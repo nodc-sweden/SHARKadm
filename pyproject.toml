@@ -1,6 +1,6 @@
 [project]
 name = "sharkadm"
-version = "0.2.0"
+version = "0.3.0"
 description = "Handles workflows for Swedish NODC"
 authors = [
     {name = "Magnus Wenzer", email = "magnus.wenzer@smhi.se"},
@@ -12,7 +12,6 @@ dependencies = [
     "pandas>=2.2.1",
     "requests>=2.31.0",
     "xlsxwriter>=3.2.0",
-    "sqlalchemy>=2.0.32",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
