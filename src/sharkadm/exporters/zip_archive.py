@@ -30,16 +30,16 @@ class ZipArchive(Exporter):
         return 'Creates the SHARKadm zip package'
 
     @property
-    def _temp_zip_directory(self) -> pathlib.Path:
+    def _temp_target_directory(self) -> pathlib.Path:
         return utils.get_temp_directory(f'{self._metadata_auto.dataset_file_name.split(".")[0]}')
 
     @property
-    def _save_zip_directory(self) -> pathlib.Path:
-        return self._save_to_directory / self._temp_zip_directory.name
+    def _save_zip_path(self) -> pathlib.Path:
+        return self._save_to_directory / f'{self._temp_target_directory.name}.zip'
 
-    def _reset_temp_zip_directory(self):
-        self._temp_zip_directory.mkdir(parents=True, exist_ok=True)
-        for path in self._temp_zip_directory.iterdir():
+    def _reset_temp_target_directory(self):
+        self._temp_target_directory.mkdir(parents=True, exist_ok=True)
+        for path in self._temp_target_directory.iterdir():
             try:
                 if path.is_file():
                     os.remove(path)
@@ -51,7 +51,7 @@ class ZipArchive(Exporter):
     def _export(self, data_holder: ArchiveDataHolder) -> None:
         self._data_holder = data_holder
         self._load_metadata_auto_object()
-        self._reset_temp_zip_directory()
+        self._reset_temp_target_directory()
         self._copy_received_files()
         self._copy_processed_files()
 
@@ -61,15 +61,17 @@ class ZipArchive(Exporter):
         self._create_shark_metadata_auto()
         self._create_data_file()
 
+        self._create_zip_package()
+
     def _copy_received_files(self) -> None:
-        target_dir = self._save_zip_directory / self._data_holder.received_data_directory.name
+        target_dir = self._temp_target_directory / self._data_holder.received_data_directory.name
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.received_data_directory.iterdir():
             target_path = target_dir / path.name
             shutil.copy2(path, target_path)
 
     def _copy_processed_files(self) -> None:
-        target_dir = self._save_zip_directory / self._data_holder.processed_data_directory.name
+        target_dir = self._temp_target_directory / self._data_holder.processed_data_directory.name
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.processed_data_directory.iterdir():
             target_path = target_dir / path.name
@@ -89,14 +91,16 @@ class ZipArchive(Exporter):
         pass
 
     def _create_shark_metadata_auto(self) -> None:
-        print(f'{self._save_zip_directory=}')
-        self._metadata_auto.create_file(export_directory=self._save_zip_directory,
+        print(f'{self._temp_target_directory=}')
+        self._metadata_auto.create_file(export_directory=self._temp_target_directory,
                                         export_file_name='shark_metadata_auto.txt')
 
     def _create_data_file(self) -> None:
-        print(f'{self._save_zip_directory=}')
-        exporter = exporters.SHARKdataTxt(export_directory=self._save_zip_directory,
+        print(f'{self._temp_target_directory=}')
+        exporter = exporters.SHARKdataTxt(export_directory=self._temp_target_directory,
                                           export_file_name='shark_data.txt')
         exporter.export(self._data_holder)
 
+    def _create_zip_package(self):
+        shutil.make_archive(str(self._save_zip_path.with_suffix('')), 'zip', str(self._temp_target_directory))
 
