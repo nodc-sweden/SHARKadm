@@ -54,7 +54,7 @@ class _AddCodes(Transformer):
 
 
 class _AddCodesLab(_AddCodes):
-    lookup_field = 'LAB'
+    lookup_field = 'LABO'
 
 
 class _AddCodesProj(_AddCodes):

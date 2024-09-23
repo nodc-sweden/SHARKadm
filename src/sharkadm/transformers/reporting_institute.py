@@ -41,12 +41,18 @@ class _ReportingInstitute(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._set_from_data(data_holder=data_holder):
             return
-        self._set_from_other(data_holder=data_holder)
+        if not self._set_from_other(data_holder=data_holder):
+            adm_logger.log_transformation(
+                f'None of the source columns {self.source_cols} found when trying to set {self.col_to_set}. And no other reporting institute found.',
+                level=adm_logger.WARNING)
 
-    def _set_from_other(self, data_holder: DataHolderProtocol) -> None:
+    def _set_from_other(self, data_holder: DataHolderProtocol) -> bool:
         if hasattr(data_holder, 'reporting_institute') and data_holder.reporting_institute:
             info = _translate_codes.get_info(self.lookup_field, data_holder.reporting_institute)
+            adm_logger.log_transformation('Setting')
             data_holder.data[self.col_to_set] = info[self.lookup_key]
+            return True
+        return False
 
     def _set_from_data(self, data_holder: DataHolderProtocol) -> bool:
         source_col = ''
@@ -55,9 +61,6 @@ class _ReportingInstitute(Transformer):
                 source_col = col
                 break
         if not source_col:
-            adm_logger.log_transformation(
-                f'None of the source columns {self.source_cols} found when trying to set {self.col_to_set}',
-                level=adm_logger.WARNING)
             return False
         if self.col_to_set not in data_holder.data.columns:
             data_holder.data[self.col_to_set] = ''
