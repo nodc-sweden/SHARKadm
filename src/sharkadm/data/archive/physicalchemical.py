@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class PhysicalChemicalArchiveDataHolder(ArchiveDataHolder):
-    # _data_type = 'Physical and Chemical'
+    _data_structure = 'column'
     _data_type = 'PhysicalChemical'
     _data_format = 'PhysicalChemical'
 

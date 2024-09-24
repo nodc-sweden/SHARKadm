@@ -141,6 +141,7 @@ class WideToLong(Transformer):
     def _cleanup(self, data_holder: DataHolder):
         keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
         data_holder.data = data_holder.data[keep_columns]
+        data_holder.data_structure = 'row'
 
     @staticmethod
     def _get_unit_from_parameter(par: str) -> str:

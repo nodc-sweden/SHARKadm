@@ -5,6 +5,7 @@ from sharkadm import adm_logger
 
 
 class MoveLessThanFlagRowFormat(Transformer):
+    valid_data_structures = ['row']
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -27,7 +28,9 @@ class MoveLessThanFlagRowFormat(Transformer):
         if nr_flags:
             adm_logger.log_transformation(f'Moving {nr_flags} "<"-flags to quality_flag column')
 
+
 class MoveLessThanFlagColumnFormat(Transformer):
+    valid_data_structures = ['column']
     valid_data_holders = ['LimsDataHolder']
 
     def __init__(self, **kwargs):
