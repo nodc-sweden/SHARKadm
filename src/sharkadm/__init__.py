@@ -1,6 +1,8 @@
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.settings import adm_settings
 from sharkadm.config_paths import adm_config_paths
+from sharkadm.controller import SHARKadmController
+from sharkadm.data import get_data_holder
 import pathlib
 from sharkadm.transformers import get_transformers_description_text
 from sharkadm.multi_transformers import get_multi_transformers_description_text
@@ -23,6 +25,12 @@ def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None
             get_exporters_description_text()
         ]))
 
+
+def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
+    c = SHARKadmController()
+    holder = get_data_holder(path)
+    c.set_data_holder(holder)
+    return c
 
 
 
