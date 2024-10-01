@@ -12,6 +12,8 @@ dependencies = [
     "pandas>=2.2.1",
     "requests>=2.31.0",
     "xlsxwriter>=3.2.0",
+    "nodc-codes @ git+https://github.com/nodc-sweden/nodc-codes@v0.3.0",
+    "numpy==1.26.4",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
