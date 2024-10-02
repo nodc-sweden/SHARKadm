@@ -21,6 +21,7 @@ def get_row_data_from_lims_export(path: str | pathlib.Path, export_directory: st
     c.transform(transformers.AddSampleDate())
     c.transform(transformers.AddSampleTime())
     c.transform(transformers.AddDatetime())
+    c.transform(transformers.AddVisitKey())
     c.transform(transformers.MoveLessThanFlagRowFormat())
     c.transform(transformers.ConvertFlagsFromLIMStoSDN())
     c.transform(transformers.RemoveColumns('COPY_VARIABLE.*'))

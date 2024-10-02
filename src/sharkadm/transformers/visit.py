@@ -12,5 +12,5 @@ class AddVisitKey(Transformer):
         boolean = data_holder.data['datetime'] != ''
         data_holder.data.loc[boolean, 'visit_key'] = data_holder.data.loc[boolean, 'datetime'].apply(lambda x: x.strftime('%Y%m%d_%H%M')).str.cat(
             data_holder.data.loc[boolean, 'platform_code'], '_'
-            ).str.cat(data_holder.data.loc[boolean, 'visit_id'], '_')
+            ).str.cat(data_holder.data.loc[boolean, 'reported_station_name'], '_')
 
