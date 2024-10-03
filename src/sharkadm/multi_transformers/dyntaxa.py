@@ -14,5 +14,5 @@ class Dyntaxa(MultiTransformer):
     def get_transformer_description() -> str:
         string_list = ['Performs all transformations related to Dyntaxa.']
         for trans in Dyntaxa.transformers:
-            string_list.append(f'    {trans.name}')
+            string_list.append(f'    {trans.get_transformer_description()}')
         return '\n'.join(string_list)

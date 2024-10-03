@@ -35,7 +35,7 @@ class DataHolderProtocol(Protocol):
         ...
 
 
-class MultiTransformer(ABC):
+class MultiTransformer(Transformer):
     """Abstract base class used as a blueprint for doing multiple changes in data in a DataHolder"""
     valid_data_types: list[str] = []
     invalid_data_types: list[str] = []

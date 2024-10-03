@@ -166,16 +166,16 @@ class SHARKadmWorkflow:
             yaml.safe_dump(data, fid)
 
     def get_transformer_descriptions(self) -> dict[str, str]:
-        return {tran: TRANSFORMER_DESCRIPTIONS[tran] for tran in self._transformers}
+        return {tran['name']: TRANSFORMER_DESCRIPTIONS[tran['name']] for tran in self._transformers}
 
     def get_validator_before_descriptions(self) -> dict[str, str]:
-        return {val: VALIDATOR_DESCRIPTIONS[val] for val in self._validators_before}
+        return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_before}
 
     def get_validator_after_descriptions(self) -> dict[str, str]:
-        return {val: VALIDATOR_DESCRIPTIONS[val] for val in self._validators_after}
+        return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_after}
 
     def get_exporter_descriptions(self) -> dict[str, str]:
-        return {exp: EXPORTER_DESCRIPTIONS[exp] for exp in self._exporters}
+        return {exp['name']: EXPORTER_DESCRIPTIONS[exp['name']] for exp in self._exporters}
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
@@ -203,3 +203,12 @@ def get_dv_workflow_for_data_type(data_type: str, default_if_missing: bool = Tru
         return get_workflow(name)
     if default_if_missing:
         return get_workflow('workflow_dv')
+
+
+def get_dv_validation_workflow_for_data_type(data_type: str, default_if_missing: bool = True) -> SHARKadmWorkflow | None:
+    name = f'workflow_dv_validation_{data_type.lower()}'
+    workflows = get_workflows()
+    if workflows.get(name):
+        return get_workflow(name)
+    if default_if_missing:
+        return get_workflow('workflow_dv_validation')
