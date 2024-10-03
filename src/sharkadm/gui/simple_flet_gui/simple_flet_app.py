@@ -24,7 +24,6 @@ from sharkadm import validators
 from sharkadm import exporters
 from sharkadm.controller import SHARKadmController
 from sharkadm.workflow import SHARKadmWorkflow
-from sharkadm.workflow import SHARKadmArchiveWorkflow
 
 
 logger = logging.getLogger(__name__)
