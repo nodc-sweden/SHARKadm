@@ -25,12 +25,12 @@ from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
+from .date_and_time import AddReportedDates
 from .date_and_time import AddSampleDate
 from .date_and_time import AddSampleTime
+from .date_and_time import CreateFakeFullDates
 from .date_and_time import FixDateFormat
 from .date_and_time import FixTimeFormat
-from .date_and_time import AddReportedDates
-from .date_and_time import CreateFakeFullDates
 from .delivery_note_info import AddDeliveryNoteInfo
 from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
@@ -80,6 +80,7 @@ from .sampling_info import AddSamplingInfo
 # from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificNameFromDyntaxaTranslatedScientificName
 from .shark_id import AddSharkId
+from .sharklog import AddCdiId
 from .sort_data import SortData
 from .static_data_holding_center import AddStaticDataHoldingCenter
 from .static_internet_access import AddStaticInternetAccessInfo

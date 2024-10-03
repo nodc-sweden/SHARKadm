@@ -31,3 +31,7 @@ class DataHolderError(SHARKadmException):
 class InvalidTransformer(SHARKadmException):
     pass
 
+
+class InvalidWorkflow(SHARKadmException):
+    pass
+
