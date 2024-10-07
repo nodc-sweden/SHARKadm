@@ -161,7 +161,7 @@ class SHARKadmWorkflow:
                 file_name = f'config_{name_str}.yaml'
             config_save_path = self._workflow_config['export_directory'] / file_name
         if not config_save_path.suffix == '.yaml':
-            raise UserWarning(f'Export file name is not a yaml-file: {file_name}')
+            raise UserWarning(f'Export file name is not a yaml-file: {config_save_path}')
         data = dict(
             workflow_config=self._paths_to_string(self._workflow_config),
             adm_logger_config=self._paths_to_string(self._adm_logger_config),
