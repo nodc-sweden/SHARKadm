@@ -37,6 +37,8 @@ class SHARKadmWorkflow:
         self._validators_after = validators_after or []
         self._exporters = exporters or []
 
+        self._file_path: pathlib.Path = kwargs.get('file_path')
+
         self._workflow_config = dict(
             export_directory=utils.get_export_directory(),
             file_name=False,
@@ -142,14 +144,22 @@ class SHARKadmWorkflow:
                 new_info[key] = value
         return new_info
 
-    def save_config(self) -> None:
-        if not self._workflow_config['save_config']:
-            return
-        file_name = self._workflow_config['file_name']
-        if not file_name:
-            name_str = '-'.join([pathlib.Path(source['path']).stem for source in self._data_sources])
-            file_name = f'config_{name_str}.yaml'
-        config_save_path = self._workflow_config['export_directory'] / file_name
+    def save_config(self,
+                    path: str | pathlib.Path = None,
+                    ) -> None:
+        if path:
+            config_save_path = pathlib.Path(path)
+        else:
+            if not self._workflow_config['save_config']:
+                return
+            file_name = self._workflow_config['file_name']
+            if not file_name:
+                if self._file_path:
+                    name_str = self._file_path.stem
+                else:
+                    name_str = '-'.join([pathlib.Path(source['path']).stem for source in self._data_sources])
+                file_name = f'config_{name_str}.yaml'
+            config_save_path = self._workflow_config['export_directory'] / file_name
         if not config_save_path.suffix == '.yaml':
             raise UserWarning(f'Export file name is not a yaml-file: {file_name}')
         data = dict(
@@ -181,7 +191,7 @@ class SHARKadmWorkflow:
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
         with open(path) as fid:
             config = yaml.safe_load(fid)
-        workflow = SHARKadmWorkflow(**config)
+        workflow = SHARKadmWorkflow(file_path=pathlib.Path(path), **config)
         return workflow
 
 
