@@ -105,22 +105,6 @@ class WideToLong(Transformer):
         return ''
 
     def _get_transposed_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        print()
-        print('self._metadata_columns')
-        print('=' * 100)
-        for col in self._metadata_columns:
-            if 'quality_flag' in col:
-                print(col)
-        print('-' * 100)
-        print()
-        print()
-        print('self._data_columns')
-        print('=' * 100)
-        for col in self._data_columns:
-            if 'quality_flag' in col:
-                print(col)
-        print('-' * 100)
-        print()
         data = []
         for i, row in df.iterrows():
             meta = list(row[self._metadata_columns].values)
@@ -132,7 +116,7 @@ class WideToLong(Transformer):
                 value = row[col]
                 qf = row.get(q_col)
                 if qf is None:
-                    adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
+                    # adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
                     qf = ''
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
@@ -150,10 +134,6 @@ class WideToLong(Transformer):
                                                  self._column_name_value,
                                                  self._column_name_qf,
                                                  self._column_name_unit]
-        print('¤'*100)
-        for col in self.columns:
-            if 'quality' in col:
-                print(f'meta: {col=}')
         new_df = pd.DataFrame(data=data, columns=self._metadata_columns + [self._column_name_parameter,
                                                                            self._column_name_value,
                                                                            self._column_name_qf,

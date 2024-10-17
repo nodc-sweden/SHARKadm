@@ -111,7 +111,7 @@ class SamplingInfo:
                 sheet_name = name
                 break
         if not sheet_name:
-            adm_logger.log_workflow(f'Could not find analyse_info sheet in file: {path}', level=adm_logger.WARNING)
+            adm_logger.log_workflow(f'Could not find sampling_info sheet in file: {path}', level=adm_logger.WARNING)
             return
             # raise Exception(f'Could not find analyse_info sheet in file: {path}')
 

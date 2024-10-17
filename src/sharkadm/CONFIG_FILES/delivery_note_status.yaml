@@ -1,15 +1,20 @@
 default_physical_chemical:
   check_status_sv: "Klar"
   check_status_en: "Completed"
-  data_checked_by_sv: "Leverantör"
+  data_checked_by_sv: "LeverantÃ¶r"
   data_checked_by_en: "Deliverer"
 deliverer:
-  check_status_sv: "Pågående-SMHI"
-  check_status_en: "Pending-SMHI"
-  data_checked_by_sv: "Leverantör"
+  check_status_sv: "Klar"
+  check_status_en: "Completed"
+  data_checked_by_sv: "LeverantÃ¶r"
   data_checked_by_en: "Deliverer"
+#deliverer:
+#  check_status_sv: "PÃ¥gÃ¥ende-SMHI"
+#  check_status_en: "Pending-SMHI"
+#  data_checked_by_sv: "LeverantÃ¶r"
+#  data_checked_by_en: "Deliverer"
 deliverer_and_datahost:
   check_status_sv: "Klar"
   check_status_en: "Completed"
-  data_checked_by_sv: "Leverantör och Datavärd"
+  data_checked_by_sv: "LeverantÃ¶r och DatavÃ¤rd"
   data_checked_by_en: "Deliverer and Datacenter"

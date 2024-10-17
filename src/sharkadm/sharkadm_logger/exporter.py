@@ -39,13 +39,15 @@ class SharkadmExporter(ABC):
 
     def _set_save_path(self, suffix):
         file_path = self.kwargs.get('export_file_path')
-        file_name = self.kwargs.get('export_file_name', self._get_default_file_name())
+        file_name = self.kwargs.get('export_file_name') or self._get_default_file_name()
         export_directory = self.kwargs.get('export_directory')
         if file_path:
             self.file_path = file_path
         else:
             if not export_directory:
                 export_directory = utils.get_export_directory()
+            print(export_directory)
+            print(file_name)
             self.file_path = pathlib.Path(export_directory, file_name)
         if self.file_path.suffix != suffix:
             self.file_path = self.file_path.with_suffix(suffix)
@@ -102,11 +104,11 @@ class XlsxExporter(SharkadmExporter):
             for purpose, purpose_data in level_data.items():
                 for log_type, log_type_data in purpose_data.items():
                     for msg, msg_data in log_type_data.items():
-                        print(f'{level=}')
-                        print(f'{purpose=}')
-                        print(f'{log_type=}')
-                        print(f'{msg=}')
-                        print(f'{msg_data=}')
+                        # print(f'{level=}')
+                        # print(f'{purpose=}')
+                        # print(f'{log_type=}')
+                        # print(f'{msg=}')
+                        # print(f'{msg_data=}')
                         count = msg_data.get('count', '')
                         log_nr = msg_data.get('log_nr', '')
                         cls = msg_data.get('cls', '')

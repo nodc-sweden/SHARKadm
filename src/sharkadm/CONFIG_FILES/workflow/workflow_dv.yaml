@@ -1,0 +1,50 @@
+workflow_config:
+  save_config: true
+#  export_directory: null
+#  file_name: false
+  open_export_directory: false
+
+adm_logger_config:
+  exporters:
+    - name: 'xlsx'
+      include_items: true
+      include_columns: []
+      exclude_columns: []
+      sort_by: null
+      export_file_path: null
+      export_file_name: null
+      export_directory: null
+      open_directory: true
+      open_file: false
+      filter:
+        log_types: null # str | list | None = None,
+#        levels: ">warning"
+        in_msg: null #str | None = None
+data_sources:
+#  - path: ""
+#  - sharkweb: true
+#    from_year: 2020
+#    to_year: 2021
+validators_before:
+validators_after:
+transformers:
+  - name: DateTime
+  - name: WideToLong
+
+  - name: AddColumnViewsColumns
+exporters:
+#  - name: ZipArchive
+#    kwargs:
+#      directory: ""
+#  - name: SHARKMetadataAuto
+#    kwargs:
+#      path: ""
+#  - name: HtmlStationMap
+#    open_map: true
+#  - name: PrintDataFrame
+#  - name: TxtAsIs
+  - name: SHARKdataTxt
+#    header_as: "SHARKarchive"
+    open_file: true
+#    kwargs:
+#      path: ""

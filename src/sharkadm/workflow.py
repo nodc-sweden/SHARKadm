@@ -96,6 +96,7 @@ class SHARKadmWorkflow:
     def start_workflow(self) -> None:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
+        print(f'{self._data_sources=}')
         for data_source in self._data_sources:
             adm_logger.reset_log()
             d_holder = get_data_holder(**data_source)
@@ -186,6 +187,11 @@ class SHARKadmWorkflow:
 
     def get_exporter_descriptions(self) -> dict[str, str]:
         return {exp['name']: EXPORTER_DESCRIPTIONS[exp['name']] for exp in self._exporters}
+
+    def set_data_sources(self, *paths: str | pathlib.Path) -> None:
+        sources = [dict(path=str(path)) for path in paths]
+        self._workflow_config['data_source_paths'] = sources
+        self._data_sources = sources
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":

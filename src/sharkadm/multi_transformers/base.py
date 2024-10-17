@@ -92,5 +92,9 @@ class MultiTransformer(Transformer):
             trans().transform(data_holder=data_holder)
         adm_logger.log_workflow(f'Multi transformer {self.__class__.__name__} executed in {time.time()-t0} seconds')
 
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        # Dummy method must be present to implement MultiTransformers
+        pass
+
 
 

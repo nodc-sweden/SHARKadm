@@ -23,7 +23,8 @@ class AddColumnViewsColumns(Transformer):
         for col in columns_to_add:
             if col in data_holder.data.columns:
                 continue
-            data_holder.data[col] = ''
+            # data_holder.data[col] = ''
+            data_holder.data.loc[:, col] = ''
 
 
 class AddDEPHqcColumn(Transformer):

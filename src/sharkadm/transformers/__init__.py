@@ -80,12 +80,13 @@ from .sampling_info import AddSamplingInfo
 # from .scientific_name import AddReportedScientificName
 from .scientific_name import AddScientificNameFromDyntaxaTranslatedScientificName
 from .shark_id import AddSharkId
-from .sharklog import AddCdiId
 from .sort_data import SortData
 from .static_data_holding_center import AddStaticDataHoldingCenter
 from .static_internet_access import AddStaticInternetAccessInfo
 from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
+from .status import SetStatusDataHost
+from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .taxon_rank import AddTaxonRanks
 from .visit import AddVisitKey
@@ -108,6 +109,8 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
+    print(f'{name=}')
+    print(f'{tran=}')
     if not tran:
         return
     return tran(**kwargs)
