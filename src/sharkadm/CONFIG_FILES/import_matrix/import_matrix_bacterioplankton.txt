@@ -1,70 +1,76 @@
-cluster.table.column	Bact_abu	Bact_abu_2	Bact_gr	Bact_BIOMAD	Bact_FCM
-visit.visit_year	MYEAR	MYEAR	MYEAR	MYEAR	MYEAR
-visit.visit_date	SDATE	SDATE	SDATE	SDATE	SDATE
-visit.reported_station_name	STATN	STATN	STATN	STATN	STATN
-visit.platform_code	SHIPC	SHIPC	SHIPC	SHIPC	SHIPC
-visit.water_land_station_type_code				WLTYP	
-visit.water_depth_m	WADEP	WADEP	WADEP	WADEP	WADEP
-visit.visit_reported_latitude	LATIT	LATIT	LATIT	LATIT	LATIT
-visit.visit_reported_longitude	LONGI	LONGI	LONGI	LONGI	LONGI
-visit.cloud_observation_code	CLOUD	CLOUD	CLOUD		CLOUD
-visit.ice_observation_code	ICEOB	ICEOB	ICEOB		ICEOB
-visit.weather_observation_code	WEATH	WEATH	WEATH		WEATH
-visit.wave_observation_code	WAVES	WAVES	WAVES		WAVES
-visit.visit_comment	COMNT_VISIT	COMNT_VISIT	COMNT_VISIT		COMNT_VISIT
-visit.positioning_system_code	POSYS	POSYS	POSYS		POSYS
-visit.monitoring_station_type_code	MSTAT	MSTAT	MSTAT		MSTAT
-visit.secchi_depth_m	SECCHI	SECCHI	SECCHI		SECCHI
-visit.wind_direction_code	WINDIR	WINDIR	WINDIR		WINDIR
-visit.wind_speed_ms	WINSP	WINSP	WINSP		WINSP
-visit.expedition_id	CRUISE_NO	CRUISE_NO	CRUISE_NO		CRUISE_NO<or>EXPID
-sample.method_documentation	METDC	METDC	METDC		METDC
-sample.sample_id	SMPNO	SMPNO	SMPNO	SMPNO	SMPNO
-sample.sample_series	SERNO	SERNO	SERNO	SERNO	SERNO
-sample.sample_time	STIME	STIME	STIME	STIME	STIME
-sample.sample_depth_m	SMPDEP	SMPDEP	SMPDEP	SMDEP	SMPDEP
-sample.sample_project_code	PROJ	PROJ	PROJ	PROJ	PROJ
-sample.sample_orderer_code	ORDERER	ORDERER	ORDERER	ORDERER	ORDERER
-sample.monitoring_program_code	MPROG	MPROG	MPROG		MPROG
-sample.sampling_laboratory_code	SLABO	SLABO	SLABO	SLABO	SLABO
-sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP
-sample.method_reference_code	REFSK	REFSK	REFSK		REFSK
-sample.sample_comment	COMNT_SAMP	COMNT_SAMP	COMNT_SAMP	COMNT	COMNT_SAMP<or>COMNT_SMP
-sample.sampler_type_code	SMTYP	SMTYP	SMTYP	SMTYP	SMTYP
-sample.sampled_volume_l	SMVOL	SMVOL	SMVOL		SMVOL
-sample.sample_reported_latitude	SMPLAT	SMPLAT	SMPLAT		
-sample.sample_reported_longitude	SMPLONG	SMPLONG	SMPLONG		
-variable.analysis_method_code	METOA	METOA			METOA
-variable.analytical_laboratory_code	ALABO	ALABO	ALABO	ALABO	ALABO
-variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA	ACKR_ANA		
-variable.analysed_by	ANA_RESP	ANA_RESP	ANA_RESP		
-variable.analysis_date	ANADATE	ANADATE	ANADATE		ANADATE
-variable.analysed_volume_cm3	SPVOL	SPVOL	SPVOL		
-variable.variable_comment	COMNT_VAR	COMNT_VAR	COMNT_VAR	Rättningskommentar	
-variable.counted_portions	CPORT	CPORT			
-variable.coefficient	COEFF<or>BACOEFF	COEFF<or>BACOEFF	BGTCF		
-variable.sample_part_id	SUBNO	SUBNO	SUBNO		
-variable.preservation_method_code	METFP	METFP	METFP	METFP	
-variable.QFLAG.Bacterial concentration	BABUFLG	BABUFLG		CNTFLG	
-variable.QFLAG.Bacterial production	BGFLG	BGFLG	BGRFLG<or>BGFLG<or>PRFLG	PRFLG	
-variable.QFLAG.Bacterial cell volume	BAVOLFLG	BAVOLFLG	BAVOLFLG		
-variable.COPY_VARIABLE.Bacterial concentration.cells/l	BCTCNT			BCTCNT	
-variable.COPY_VARIABLE.Bacterial production.cells/l/d			BCTGR<or>BCTPR<or>BGCELLP	BCTPR	
-variable.COPY_VARIABLE_MULTIPLY.Bacterial concentration.cells/l.1000	BCTABU<or>BACTABU				
-variable.COPY_VARIABLE.Bacterial concentration.cells/ml		BCTABU<or>BACTABU			
-variable.COPY_VARIABLE.Bacterial cell volume.um3/cell	BACVOL<or>BCTVOL	BACVOL<or>BCTVOL	BACVOL<or>BCTVOL		
-variable.COPY_VARIABLE.Bacterial cell carbon content.fg C/cell	BACTDENS<or>BACDENS	BACTDENS<or>BACDENS			
-variable.COPY_VARIABLE.# counted.ind/analysed sample fraction					COUNT
-variable.COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l					ABUND
-variable.COPY_VARIABLE.Biovolume concentration.mm3/l					BIOVOL
-variable.COPY_VARIABLE.Carbon concentration.ugC/l					C_CONC<or>mgC/m3
-variable.reported_cell_volume_um3					CEVOL<or>CEVOL_UM3
-variable.reported_scientific_name					LATNM
-variable.species_flag_code					SFLAG
-variable.trophic_type_code					TRPHY
-visit.monitoring_purpose_code					PURPM
-sample.replicate_no					REPLI_NO
-variable.preservation_method_code					METFP
-sample.sample_max_depth_m					MXDEP
-sample.sample_min_depth_m					MNDEP
-sample.plankton_sampling_method_code					PDMET
+cluster.table.column	Bact_abu	Bact_abu_2	Bact_gr	Bact_BIOMAD	Bact_FCM	Bact_prod	Bact_abu_v3
+visit.visit_year	MYEAR	MYEAR	MYEAR	MYEAR	MYEAR	MYEAR	MYEAR
+visit.visit_date	SDATE	SDATE	SDATE	SDATE	SDATE	SDATE	SDATE
+visit.reported_station_name	STATN	STATN	STATN	STATN	STATN	STATN	STATN
+visit.platform_code	SHIPC	SHIPC	SHIPC	SHIPC	SHIPC	SHIPC	SHIPC
+visit.water_land_station_type_code				WLTYP			
+visit.water_depth_m	WADEP	WADEP	WADEP	WADEP	WADEP	WADEP	WADEP
+visit.visit_reported_latitude	LATIT	LATIT	LATIT	LATIT	LATIT	LATIT	LATIT
+visit.visit_reported_longitude	LONGI	LONGI	LONGI	LONGI	LONGI	LONGI	LONGI
+visit.cloud_observation_code	CLOUD	CLOUD	CLOUD		CLOUD	CLOUD	CLOUD
+visit.ice_observation_code	ICEOB	ICEOB	ICEOB		ICEOB	ICEOB	ICEOB
+visit.weather_observation_code	WEATH	WEATH	WEATH		WEATH	WEATH	WEATH
+visit.wave_observation_code	WAVES	WAVES	WAVES		WAVES	WAVES	WAVES
+visit.air_temperature_degc						AIRTEMP	AIRTEMP
+visit.air_pressure_hpa						AIRPRES	AIRPRES
+visit.visit_comment	COMNT_VISIT	COMNT_VISIT	COMNT_VISIT		COMNT_VISIT	COMNT_VISIT	COMNT_VISIT
+visit.positioning_system_code	POSYS	POSYS	POSYS		POSYS	POSYS	POSYS
+visit.monitoring_station_type_code	MSTAT	MSTAT	MSTAT		MSTAT	MSTAT	MSTAT
+visit.secchi_depth_m	SECCHI	SECCHI	SECCHI		SECCHI	SECCHI	SECCHI
+visit.secchi_depth_quality_flag						Q_SECCHI	Q_SECCHI
+visit.wind_direction_code	WINDIR	WINDIR	WINDIR		WINDIR	WINDIR	WINDIR
+visit.wind_speed_ms	WINSP	WINSP	WINSP		WINSP	WINSP	WINSP
+visit.expedition_id	CRUISE_NO	CRUISE_NO	CRUISE_NO		CRUISE_NO<or>EXPID	CRUISE_NO	CRUISE_NO
+sample.method_documentation	METDC	METDC	METDC		METDC	METDC	METDC
+sample.sample_id	SMPNO	SMPNO	SMPNO	SMPNO	SMPNO	SMPNO	SMPNO
+sample.sample_series	SERNO	SERNO	SERNO	SERNO	SERNO	SERNO	SERNO
+sample.sample_time	STIME	STIME	STIME	STIME	STIME	STIME	STIME
+sample.sample_depth_m	SMPDEP	SMPDEP	SMPDEP	SMDEP	SMPDEP	SMPDEP	SMPDEP
+sample.sample_project_code	PROJ	PROJ	PROJ	PROJ	PROJ	PROJ	PROJ
+sample.sample_orderer_code	ORDERER	ORDERER	ORDERER	ORDERER	ORDERER	ORDERER	ORDERER
+sample.monitoring_program_code	MPROG	MPROG	MPROG		MPROG	MPROG	MPROG
+sample.sampling_laboratory_code	SLABO	SLABO	SLABO	SLABO	SLABO	SLABO	SLABO
+sample.sampling_laboratory_accreditated	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP	ACKR_SMP
+sample.method_reference_code	REFSK	REFSK	REFSK		REFSK	REFSK	REFSK
+sample.sample_comment	COMNT_SAMP	COMNT_SAMP	COMNT_SAMP	COMNT	COMNT_SAMP<or>COMNT_SMP	COMNT_SAMP	COMNT_SAMP
+sample.sampler_type_code	SMTYP	SMTYP	SMTYP	SMTYP	SMTYP	SMTYP	SMTYP
+sample.sampled_volume_l	SMVOL	SMVOL	SMVOL		SMVOL	SMVOL	SMVOL
+sample.sample_reported_latitude	SMPLAT	SMPLAT	SMPLAT				
+sample.sample_reported_longitude	SMPLONG	SMPLONG	SMPLONG				
+variable.analysis_method_code	METOA	METOA			METOA	METOA	METOA
+variable.analytical_laboratory_code	ALABO	ALABO	ALABO	ALABO	ALABO	ALABO	ALABO
+variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA	ACKR_ANA			ACKR_ANA	ACKR_ANA
+variable.analysed_by	ANA_RESP	ANA_RESP	ANA_RESP				
+variable.analysis_date	ANADATE	ANADATE	ANADATE		ANADATE	ANADATE	ANADATE
+variable.analysed_volume_cm3	SPVOL	SPVOL	SPVOL			SPVOL	SPVOL
+variable.variable_comment	COMNT_VAR	COMNT_VAR	COMNT_VAR	Rättningskommentar		COMNT_VAR	COMNT_VAR
+variable.counted_portions	CPORT	CPORT					
+variable.coefficient	COEFF<or>BACOEFF	COEFF<or>BACOEFF	BGTCF				COEFF
+variable.sample_part_id	SUBNO	SUBNO	SUBNO			SUBNO	SUBNO
+variable.preservation_method_code	METFP	METFP	METFP	METFP		METFP	METFP
+variable.QFLAG.Bacterial concentration	BABUFLG	BABUFLG		CNTFLG			BABUFLG
+variable.QFLAG.Bacterial production	BGFLG	BGFLG	BGRFLG<or>BGFLG<or>PRFLG	PRFLG		BGFLG	
+variable.QFLAG.Bacterial cell volume	BAVOLFLG	BAVOLFLG	BAVOLFLG				BAVOLFLG
+variable.COPY_VARIABLE.Bacterial abundance.cells/l	BCTCNT			BCTCNT			
+variable.COPY_VARIABLE.Bacterial production.cells/l/d			BCTGR<or>BCTPR<or>BGCELLP	BCTPR		BCTGR	
+variable.COPY_VARIABLE_MULTIPLY.Bacterial abundance.cells/l.1000	BCTABU<or>BACTABU						
+variable.COPY_VARIABLE.Bacterial abundance.cells/ml		BCTABU<or>BACTABU					BCTABU
+variable.COPY_VARIABLE.Bacterial cell volume.um3/cell	BACVOL<or>BCTVOL	BACVOL<or>BCTVOL	BACVOL<or>BCTVOL				BACVOL
+variable.COPY_VARIABLE.Bacterial cell carbon content.fg C/cell	BACTDENS<or>BACDENS	BACTDENS<or>BACDENS				BACTDENS	BACTDENS
+variable.COPY_VARIABLE.# counted.ind/analysed sample fraction					COUNT		BCTCNT
+variable.COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l					ABUND		
+variable.COPY_VARIABLE.Biovolume concentration.mm3/l					BIOVOL		
+variable.COPY_VARIABLE.Carbon concentration.ugC/l					C_CONC<or>mgC/m3		BACTBIOM
+variable.reported_cell_volume_um3					CEVOL<or>CEVOL_UM3		
+variable.reported_scientific_name					LATNM		
+variable.species_flag_code					SFLAG		
+variable.trophic_type_code					TRPHY		
+visit.monitoring_purpose_code					PURPM	PURPM	PURPM
+sample.replicate_no					REPLI_NO		
+variable.preservation_method_code					METFP		
+sample.sample_max_depth_m					MXDEP		
+sample.sample_min_depth_m					MNDEP		
+sample.plankton_sampling_method_code					PDMET		
+variable.COPY_VARIABLE.3H thymidine uptake.mole/cm3/h						THYM_UPT	
+variable.3h_thymidine_factor						BGTCF	
+variable.COPY_VARIABLE.Bacterial carbon production.ug/L/24h						BCP	

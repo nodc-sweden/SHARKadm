@@ -80,7 +80,7 @@ variable.COPY_VARIABLE.Carbon content.ug/m3		BMCCONT		BMCCONT
 variable.COPY_VARIABLE.Body length.mm				BODY_LGTH
 variable.COPY_VARIABLE.Length (mean).um		LENGTH_MEAN	LENGTH_AVERAGE<or>LENGTH_MEAN	
 variable.COPY_VARIABLE.Length (median).um		LENGTH_MEDIAN	LENGTH_MEDIAN	
-variable.COPY_VARIABLE.Abundance.ind/m2	ABUND/M2<or>ABUNDM2		ABUND/M2<or>ABUNDM2	
+variable.COPY_VARIABLE.Integrated abundance.ind/m2	ABUND/M2<or>ABUNDM2		ABUND/M2<or>ABUNDM2	
 variable.COPY_VARIABLE_MULTIPLY.Wet weight/area.mg/m2.1000	WETWTM2		WETWTM2	
 variable.COPY_VARIABLE.Abundance.ind/m3	ABUNDM3	ABUNDM3	ABUNDM3	ABUND
 variable.COPY_VARIABLE_MULTIPLY.Wet weight/volume.mg/m3.1000	WETWTM3		WETWTM3	WETWTM3

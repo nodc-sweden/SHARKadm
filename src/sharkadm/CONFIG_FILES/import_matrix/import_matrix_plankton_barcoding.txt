@@ -39,6 +39,8 @@ variable.filtration_time	FILTTIME
 variable.sample_replicate	NREP
 variable.number_of_replicates	CREP
 variable.sequence_archive_accession	SEQ_ARCHIVE
+variable.gbif_archive	GBIF_ARCHIVE
+variable.sbdi_archive	SBDI_ARCHIVE
 variable.sequence_platform	SEQ_PLATFORM
 variable.bioinformatic_analysis_pipeline	BIOINFOPIPELINE
 variable.annotation_confidence	ANOCONF
@@ -66,3 +68,5 @@ sample.method_documentation	METDC
 sample.method_reference_code	REFSK
 variable.variable_comment	COMNT_VAR
 variable.gene	GENE
+variable.absolute_sequence_variant_alias	ASV_ALIAS
+variable.hypervariable_region	SUBREGION

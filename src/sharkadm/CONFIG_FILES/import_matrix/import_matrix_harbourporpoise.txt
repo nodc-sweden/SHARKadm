@@ -24,15 +24,15 @@ variable.analytical_laboratory_accreditated	ACKR_ANA	ACKR_ANA
 variable.variable_comment	COMNT_VAR	COMNT_VAR
 sample.sample_reported_latitude	LATIT	LATIT
 sample.sample_reported_longitude	LONGI	LONGI
-variable.COPY_VARIABLE.Detection positive minutes per day.Detection minutes/day	porpoise_positive_minutes	porpoise_positive_minutes<or>positive_minutes<or>DPM_day_sum
-variable.COPY_VARIABLE.Detection positive days per month.%		percent_per_month<or>DPD_month_perc
+variable.COPY_VARIABLE.Detection positive minutes per day.Detection minutes/day	porpoise_positive_minutes	porpoise_positive_minutes<or>positive_minutes<or>DPM_day_sum<or>DPM_DAY_SUM
+variable.COPY_VARIABLE.Detection positive days per month.%		percent_per_month<or>DPD_month_perc<or>DPD_MONTH_PERC
 variable.calc_by_dc	calc_by_dc	calc_by_dc
 visit.water_depth_m	WADEP<or>WADEPTH	WADEP<or>WADEPTH
 sample.sample_depth_m	SMPDEP<or>DEPH<or>SMPDEPTH	SMPDEP<or>DEPH<or>SMPDEPTH
 sample.sample_id	SMPNO<or>RAW<or>UNANA	SMPNO<or>RAW<or>UNANA
 sample.sample_max_depth_m		MAXSMPDEPTH
 sample.sample_min_depth_m		MINSMPDEPTH
-sample.deployed_days_per_month		monitored_days_in_month
+sample.deployed_days_per_month		monitored_days_in_month<or>MONITORED_DAYS_IN_MONTH
 visit.NOT_USED.deployment_period_key		deployment_period_key
 visit.visit_logger_startdate		SDATE
 visit.visit_logger_enddate		EDATE
