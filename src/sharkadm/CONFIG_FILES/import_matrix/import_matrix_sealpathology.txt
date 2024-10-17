@@ -1,4 +1,5 @@
 cluster.table.column	Spat
+visit.visit_year	MYEAR
 visit.visit_date	SDATE
 visit.reported_station_name	STATN
 visit.visit_reported_latitude	LATIT
@@ -17,10 +18,10 @@ variable.matrix_analysed_code	MATRIX <or>MATRX
 variable.age_years	AGE
 variable.body_length_cm	BODY_LENGTH <or>BODY_LGTH
 variable.body_weight_kg	BODY_WEIGHT <or>BODY_WGTH
-variable.blubber_thickness_cm	BLUBBER_THICKNESS <or>BLUBB_THICK
+variable.blubber_thickness_mm	BLUBBER_THICKNESS <or>BLUBB_THICK
 variable.autolysis_class	AUTOLYSIS <or>AUTOLYSIS_CL
-variable.regional_skin_changes_class	REGIONAL_SKIN_CHANGES <or>REG_SKIN_CHANGE_CL
-variable.claw_lesions_class	CLAW_LESIONS <or>CLAW_LESION_CL
+variable.regional_skin_changes_y_n	REGIONAL_SKIN_CHANGES <or>REG_SKIN_CHANGE_CL
+variable.claw_lesions_y_n	CLAW_LESIONS <or>CLAW_LESION_CL
 variable.parodontitis_class	PARODONTITIS <or>PARODONTITIS_CL
 variable.cronic_cholangiohepatitis_y_n	CRONIC_CHOLANGIOHEPATITIS
 variable.intestinal_ulcer_class	INTESTINAL_ULCER <or>INTEST_ULCER_CL

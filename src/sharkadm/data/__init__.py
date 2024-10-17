@@ -101,7 +101,7 @@ def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **k
             return get_lims_data_holder(lims_directory)
     if sharkweb:
         return get_sharkweb_data_holder(**kwargs)
-    raise sharkadm_exceptions.DataHolderError(f'Could not find dataholer for: {path}')
+    raise sharkadm_exceptions.DataHolderError(f'Could not find dataholder for: {path}')
 
 
 def get_valid_data_holders(valid: list[str] | None = None,

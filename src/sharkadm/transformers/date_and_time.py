@@ -66,7 +66,8 @@ class FixTimeFormat(Transformer):
 class FixDateFormat(Transformer):
     dates_to_check = [
         'sample_date',
-        'visit_date'
+        'visit_date',
+        'analysis_date'
     ]
 
     from_format = '%Y%m%d'
@@ -79,10 +80,21 @@ class FixDateFormat(Transformer):
         return f'Changes date format from {FixDateFormat.from_format} to {FixDateFormat.to_format}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for par in self.dates_to_check:
-            if par not in data_holder.data:
+        for col in self.dates_to_check:
+            if col not in data_holder.data:
                 continue
-            data_holder.data[par] = data_holder.data[par].apply(self._set_new_format)
+            for d, df in data_holder.data.groupby(col):
+                dd = d.split()[0]
+                msg = f'Changing date format in column {col} from {d} to {dd} in {len(df)} places'
+                try:
+                    dd = datetime.datetime.strptime(dd, self.from_format).strftime(self.to_format)
+                    data_holder.data.loc[df.index, col] = dd
+                    adm_logger.log_transformation(msg)
+                except ValueError:
+                    if d != dd:
+                        data_holder.data.loc[df.index, col] = dd
+                        adm_logger.log_transformation(msg)
+            # data_holder.data[col] = data_holder.data[col].apply(self._set_new_format)
 
     def _set_new_format(self, x: str):
         try:

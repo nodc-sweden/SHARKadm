@@ -25,12 +25,12 @@ from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
+from .date_and_time import AddReportedDates
 from .date_and_time import AddSampleDate
 from .date_and_time import AddSampleTime
+from .date_and_time import CreateFakeFullDates
 from .date_and_time import FixDateFormat
 from .date_and_time import FixTimeFormat
-from .date_and_time import AddReportedDates
-from .date_and_time import CreateFakeFullDates
 from .delivery_note_info import AddDeliveryNoteInfo
 from .delivery_note_info import AddStatus
 from .depth import AddSampleMinAndMaxDepth
@@ -85,6 +85,8 @@ from .static_data_holding_center import AddStaticDataHoldingCenter
 from .static_internet_access import AddStaticInternetAccessInfo
 from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
+from .status import SetStatusDataHost
+from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .taxon_rank import AddTaxonRanks
 from .visit import AddVisitKey
@@ -107,6 +109,8 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
+    print(f'{name=}')
+    print(f'{tran=}')
     if not tran:
         return
     return tran(**kwargs)

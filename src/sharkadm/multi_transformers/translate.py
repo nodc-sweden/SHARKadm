@@ -21,5 +21,5 @@ class Translate(MultiTransformer):
     def get_transformer_description() -> str:
         string_list = ['Performs all transformations related to translations.']
         for trans in Translate.transformers:
-            string_list.append(f'    {trans.name}')
+            string_list.append(f'    {trans.get_transformer_description()}')
         return '\n'.join(string_list)

@@ -35,7 +35,7 @@ class DataHolderProtocol(Protocol):
         ...
 
 
-class MultiTransformer(ABC):
+class MultiTransformer(Transformer):
     """Abstract base class used as a blueprint for doing multiple changes in data in a DataHolder"""
     valid_data_types: list[str] = []
     invalid_data_types: list[str] = []
@@ -91,6 +91,10 @@ class MultiTransformer(ABC):
         for trans in self.transformers:
             trans().transform(data_holder=data_holder)
         adm_logger.log_workflow(f'Multi transformer {self.__class__.__name__} executed in {time.time()-t0} seconds')
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        # Dummy method must be present to implement MultiTransformers
+        pass
 
 
 

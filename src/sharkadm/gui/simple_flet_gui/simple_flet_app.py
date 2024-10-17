@@ -24,7 +24,6 @@ from sharkadm import validators
 from sharkadm import exporters
 from sharkadm.controller import SHARKadmController
 from sharkadm.workflow import SHARKadmWorkflow
-from sharkadm.workflow import SHARKadmArchiveWorkflow
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +53,7 @@ class SimpleFletApp:
         self.logging_format = '%(asctime)s [%(levelname)10s]    %(pathname)s [%(lineno)d] => %(funcName)s():    %(message)s'
         self.logging_format_stdout = '[%(levelname)10s] %(filename)s: %(funcName)s() [%(lineno)d] %(message)s'
         # self._setup_logger()
-        event.subscribe('workflow', self._display_workflow)
+        event.subscribe('log_workflow', self._display_workflow)
 
         self.app = ft.app(target=self.main)
 

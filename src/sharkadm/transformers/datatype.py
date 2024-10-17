@@ -9,5 +9,5 @@ class AddDatatype(Transformer):
         return f'Adds delivery_datatype column'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.datatype_column_name] = data_holder.data_type
+        data_holder.data[self.datatype_column_name] = data_holder.data_type.capitalize()
 

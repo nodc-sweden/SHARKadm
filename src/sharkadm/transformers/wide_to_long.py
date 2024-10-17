@@ -60,6 +60,8 @@ class WideToLong(Transformer):
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
         for col in df.columns:
+            if col == 'quality_flag':
+                continue
             if self._ignore(col):
                 if not self._associated_qf_col(col, df):
                     self._metadata_columns.append(col)
@@ -114,7 +116,7 @@ class WideToLong(Transformer):
                 value = row[col]
                 qf = row.get(q_col)
                 if qf is None:
-                    adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
+                    # adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
                     qf = ''
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
@@ -129,9 +131,9 @@ class WideToLong(Transformer):
         # self.row = row
         # self.data = data
         self.columns = self._metadata_columns + [self._column_name_parameter,
-                                                                           self._column_name_value,
-                                                                           self._column_name_qf,
-                                                                           self._column_name_unit]
+                                                 self._column_name_value,
+                                                 self._column_name_qf,
+                                                 self._column_name_unit]
         new_df = pd.DataFrame(data=data, columns=self._metadata_columns + [self._column_name_parameter,
                                                                            self._column_name_value,
                                                                            self._column_name_qf,

@@ -12,6 +12,7 @@ class Operation(ft.UserControl):
     def __init__(self, **kwargs):
         super().__init__()
         self._data = kwargs
+        print(f'{self._data=}')
         self._settings_controls = {}
 
         self._description_wrap_length = 80
@@ -36,7 +37,7 @@ class Operation(ft.UserControl):
 
     @property
     def description(self) -> str:
-        return textwrap.fill(self._data['description'], self._description_wrap_length)
+        return textwrap.fill(self._data.get('description') or '', self._description_wrap_length)
 
     @property
     def settings(self) -> dict:

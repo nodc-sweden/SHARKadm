@@ -2,7 +2,7 @@ import pathlib
 
 import yaml
 
-from sharkadm import adm_logger
+from sharkadm import adm_logger, adm_config_paths
 from sharkadm import exporters
 from sharkadm import transformers
 from sharkadm import multi_transformers
@@ -12,6 +12,10 @@ from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
 from sharkadm.sharkadm_logger.exporter import get_exporter
 from sharkadm import sharkadm_exceptions
+
+VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
+TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
+EXPORTER_DESCRIPTIONS = exporters.get_exporters_description()
 
 
 class SHARKadmWorkflow:
@@ -32,6 +36,8 @@ class SHARKadmWorkflow:
         self._transformers = transformers or []
         self._validators_after = validators_after or []
         self._exporters = exporters or []
+
+        self._file_path: pathlib.Path = kwargs.get('file_path')
 
         self._workflow_config = dict(
             export_directory=utils.get_export_directory(),
@@ -90,6 +96,7 @@ class SHARKadmWorkflow:
     def start_workflow(self) -> None:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
+        print(f'{self._data_sources=}')
         for data_source in self._data_sources:
             adm_logger.reset_log()
             d_holder = get_data_holder(**data_source)
@@ -121,7 +128,7 @@ class SHARKadmWorkflow:
         if self._workflow_config.get('open_export_directory', self._workflow_config.get('open_directory')):
             utils.open_directory(self._get_directory(self._workflow_config['export_directory']))
 
-    def _paths_to_string(self, info: dict | list):
+    def _paths_to_string(self, info: dict | list) -> dict:
         if isinstance(info, list):
             new_info = []
             for item in info:
@@ -138,16 +145,24 @@ class SHARKadmWorkflow:
                 new_info[key] = value
         return new_info
 
-    def save_config(self):
-        if not self._workflow_config['save_config']:
-            return
-        file_name = self._workflow_config['file_name']
-        if not file_name:
-            name_str = '-'.join([pathlib.Path(source['path']).stem for source in self._data_sources])
-            file_name = f'config_{name_str}.yaml'
-        config_save_path = self._workflow_config['export_directory'] / file_name
+    def save_config(self,
+                    path: str | pathlib.Path = None,
+                    ) -> None:
+        if path:
+            config_save_path = pathlib.Path(path)
+        else:
+            if not self._workflow_config['save_config']:
+                return
+            file_name = self._workflow_config['file_name']
+            if not file_name:
+                if self._file_path:
+                    name_str = self._file_path.stem
+                else:
+                    name_str = '-'.join([pathlib.Path(source['path']).stem for source in self._data_sources])
+                file_name = f'config_{name_str}.yaml'
+            config_save_path = self._workflow_config['export_directory'] / file_name
         if not config_save_path.suffix == '.yaml':
-            raise UserWarning(f'Export file name is not a yaml-file: {file_name}')
+            raise UserWarning(f'Export file name is not a yaml-file: {config_save_path}')
         data = dict(
             workflow_config=self._paths_to_string(self._workflow_config),
             adm_logger_config=self._paths_to_string(self._adm_logger_config),
@@ -161,9 +176,55 @@ class SHARKadmWorkflow:
         with open(config_save_path, 'w') as fid:
             yaml.safe_dump(data, fid)
 
+    def get_transformer_descriptions(self) -> dict[str, str]:
+        return {tran['name']: TRANSFORMER_DESCRIPTIONS[tran['name']] for tran in self._transformers}
+
+    def get_validator_before_descriptions(self) -> dict[str, str]:
+        return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_before}
+
+    def get_validator_after_descriptions(self) -> dict[str, str]:
+        return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_after}
+
+    def get_exporter_descriptions(self) -> dict[str, str]:
+        return {exp['name']: EXPORTER_DESCRIPTIONS[exp['name']] for exp in self._exporters}
+
+    def set_data_sources(self, *paths: str | pathlib.Path) -> None:
+        sources = [dict(path=str(path)) for path in paths]
+        self._workflow_config['data_source_paths'] = sources
+        self._data_sources = sources
+
     @classmethod
-    def from_yaml_config(cls, path: str | pathlib.Path):
+    def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
         with open(path) as fid:
             config = yaml.safe_load(fid)
-        workflow = SHARKadmWorkflow(**config)
+        workflow = SHARKadmWorkflow(file_path=pathlib.Path(path), **config)
         return workflow
+
+
+def get_workflows() -> dict[str, pathlib.Path]:
+    return {path.stem: path for path in adm_config_paths['workflow'].iterdir()}
+
+
+def get_workflow(workflow_name: str) -> SHARKadmWorkflow:
+    workflows = get_workflows()
+    if not workflows.get(workflow_name):
+        raise sharkadm_exceptions.InvalidWorkflow
+    return SHARKadmWorkflow.from_yaml_config(workflows.get(workflow_name))
+
+
+def get_dv_workflow_for_data_type(data_type: str, default_if_missing: bool = True) -> SHARKadmWorkflow | None:
+    name = f'workflow_dv_{data_type.lower()}'
+    workflows = get_workflows()
+    if workflows.get(name):
+        return get_workflow(name)
+    if default_if_missing:
+        return get_workflow('workflow_dv')
+
+
+def get_dv_validation_workflow_for_data_type(data_type: str, default_if_missing: bool = True) -> SHARKadmWorkflow | None:
+    name = f'workflow_dv_validation_{data_type.lower()}'
+    workflows = get_workflows()
+    if workflows.get(name):
+        return get_workflow(name)
+    if default_if_missing:
+        return get_workflow('workflow_dv_validation')
