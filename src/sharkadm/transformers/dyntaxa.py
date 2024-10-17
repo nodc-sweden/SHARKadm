@@ -40,12 +40,12 @@ class AddReportedDyntaxaId(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data.columns:
-            adm_logger.log_transformation(f'No source {self.source_col} in {self.__class__.__name__}. Setting empty column {self.col_to_set}',
+            adm_logger.log_transformation(f'No source column {self.source_col}. Setting empty column {self.col_to_set}',
                                           level='debug')
             data_holder.data[self.col_to_set] = ''
             return
         if self.col_to_set in data_holder.data.columns:
-            adm_logger.log_transformation(f'Column {self.col_to_set} already in {self.__class__.__name__}. Will not ',
+            adm_logger.log_transformation(f'Column {self.col_to_set} already in {self.__class__.__name__}. Will not add',
                                           level='debug')
             return
 
@@ -91,6 +91,40 @@ class AddTranslatedDyntaxaScientificName(Transformer):
 
 
 class AddDyntaxaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    col_to_set = 'dyntaxa_id'
+    source_col = 'translate_dyntaxa_scientific_name'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._dyntaxa_id = nodc_dyntaxa.get_dyntaxa_taxon_object()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddDyntaxaId.col_to_set} translated from nodc_dyntaxa. Source column is {AddDyntaxaId.source_col}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_col not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Could not add column {self.col_to_set}. Source column {self.source_col} not in data.', level='error')
+            return
+        if self.col_to_set not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Adding empty column {self.col_to_set}', level='debug')
+            data_holder.data[self.col_to_set] = ''
+
+        for name, df in data_holder.data.groupby(self.source_col):
+            if not str(name).strip():
+                adm_logger.log_transformation(f'Missing {self.source_col}, {len(df)} rows.', level='warning')
+                continue
+            dyntaxa = self._dyntaxa_id.get(str(name))
+            if not dyntaxa:
+                adm_logger.log_transformation(f'No {self.col_to_set} found for {name}, {len(df)} rows.', level='warning')
+                continue
+            index = df[self.source_col] == name
+            adm_logger.log_transformation(f'Addding {self.col_to_set} {dyntaxa} translated from {name}, {len(df)} rows.')
+            data_holder.data.loc[index, self.col_to_set] = dyntaxa
+
+
+class old_AddDyntaxaId(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     col_to_set = 'dyntaxa_id'
     source_col = 'translate_dyntaxa_scientific_name'
