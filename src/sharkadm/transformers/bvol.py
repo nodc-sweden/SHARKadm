@@ -1,10 +1,7 @@
-import datetime
-
-import pandas as pd
-
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
 import functools
+
+from sharkadm import adm_logger
+from .base import Transformer, DataHolderProtocol
 
 try:
     import nodc_bvol
@@ -13,15 +10,11 @@ except ModuleNotFoundError as e:
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
-
-from sharkadm.config import get_column_views_config
-
-
 class AddBvolScientificName(Transformer):
     valid_data_types = ['Phytoplankton']
     col_to_set = 'bvol_scientific_name'
     # source_col = 'scientific_name'
-    source_col = 'reported_scientific_name'
+    source_col = 'scientific_name'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -49,7 +42,7 @@ class AddBvolSizeClass(Transformer):
     col_to_set_name = 'bvol_scientific_name'
     col_to_set_size = 'bvol_size_class'
     # source_col = 'scientific_name'
-    source_name_col = 'reported_scientific_name'
+    source_name_col = 'scientific_name'
     source_size_class_col = 'size_class'
 
     cash = dict()
@@ -81,7 +74,7 @@ class AddBvolRefList(Transformer):
 
     col_to_set = 'bvol_ref_list'
     # source_col = 'scientific_name'
-    source_col = 'reported_scientific_name'
+    source_col = 'scientific_name'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -108,8 +101,7 @@ class AddBvolAphiaId(Transformer):
     valid_data_types = ['Phytoplankton']
 
     col_to_set = 'bvol_aphia_id'
-    # source_col = 'scientific_name'
-    source_col = 'reported_scientific_name'
+    source_col = 'scientific_name'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
