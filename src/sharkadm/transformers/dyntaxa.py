@@ -45,7 +45,7 @@ class AddReportedDyntaxaId(Transformer):
             data_holder.data[self.col_to_set] = ''
             return
         if self.col_to_set in data_holder.data.columns:
-            adm_logger.log_transformation(f'Column {self.col_to_set} already in {self.__class__.__name__}. Will not add',
+            adm_logger.log_transformation(f'Column {self.col_to_set} already in data. Will not add',
                                           level='debug')
             return
 
