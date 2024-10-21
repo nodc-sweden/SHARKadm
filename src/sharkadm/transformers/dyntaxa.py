@@ -10,23 +10,23 @@ except ModuleNotFoundError as e:
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
-class MoveDyntaxaIdInReportedScientificNameToDyntaxaId(Transformer):
-    source_col = 'reported_scientific_name'
-    col_to_set = 'dyntaxa_id'
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return (f'Moves {MoveDyntaxaIdInReportedScientificNameToDyntaxaId.source_col} to '
-                f'{MoveDyntaxaIdInReportedScientificNameToDyntaxaId.col_to_set} if identified as a dyntaxa_id.')
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for _id in set(data_holder.data[self.source_col]):
-            if not _id.isdigit():
-                continue
-            adm_logger.log_transformation(
-                f'Moving dyntaxa_id from {self.source_col} to {self.col_to_set}', add=_id, level='warning')
-            boolean = data_holder.data[self.source_col] == _id
-            data_holder.data.loc[boolean, self.col_to_set] = _id
+# class MoveDyntaxaIdInReportedScientificNameToDyntaxaId(Transformer):
+#     source_col = 'reported_scientific_name'
+#     col_to_set = 'dyntaxa_id'
+#
+#     @staticmethod
+#     def get_transformer_description() -> str:
+#         return (f'Moves {MoveDyntaxaIdInReportedScientificNameToDyntaxaId.source_col} to '
+#                 f'{MoveDyntaxaIdInReportedScientificNameToDyntaxaId.col_to_set} if identified as a dyntaxa_id.')
+#
+#     def _transform(self, data_holder: DataHolderProtocol) -> None:
+#         for _id in set(data_holder.data[self.source_col]):
+#             if not _id.isdigit():
+#                 continue
+#             adm_logger.log_transformation(
+#                 f'Moving dyntaxa_id from {self.source_col} to {self.col_to_set}', add=_id, level='warning')
+#             boolean = data_holder.data[self.source_col] == _id
+#             data_holder.data.loc[boolean, self.col_to_set] = _id
 
 
 class AddReportedDyntaxaId(Transformer):
