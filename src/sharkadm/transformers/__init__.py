@@ -4,8 +4,8 @@ from typing import Type
 
 from sharkadm import utils
 from .analyse_info import AddAnalyseInfo
-#######
 from .aphia import AddAphiaId
+from .aphia import AddReportedAphiaId
 from .arithmetic import Divide
 from .arithmetic import Multiply
 from .bacteria import SetBacteriaAsReportedScientificName
@@ -39,7 +39,6 @@ from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
 from .dyntaxa import AddReportedDyntaxaId
 from .dyntaxa import AddTranslatedDyntaxaScientificName
-from .dyntaxa import MoveDyntaxaIdInReportedScientificNameToDyntaxaId
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
 from .flags import ConvertFlagsFromLIMStoSDN
