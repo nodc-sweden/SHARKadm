@@ -1,78 +1,20 @@
 import datetime
-from abc import abstractmethod, ABC
-import pathlib
-from sharkadm import utils
-from sharkadm.utils.paths import get_next_incremented_file_path
-from sharkadm.utils import matching_strings
 import logging
-import pandas as pd
-
 from typing import TYPE_CHECKING
 
+import pandas as pd
+
+from sharkadm.utils.paths import get_next_incremented_file_path
+from .base import SharkadmLoggerExporter
+
 if TYPE_CHECKING:
-    from .sharkadm_logger import SHARKadmLogger
+    pass
 
 
 logger = logging.getLogger(__name__)
 
 
-class SharkadmExporter(ABC):
-
-    def __init__(self, **kwargs):
-        self.adm_logger = None
-        self.file_path = None
-        self.kwargs = kwargs
-
-    def export(self, adm_logger: 'SHARKadmLogger'):
-        self.adm_logger = adm_logger
-        self._export()
-        self._open_file()
-        self._open_directory()
-
-    @abstractmethod
-    def _export(self):
-        ...
-
-    @abstractmethod
-    def _get_default_file_name(self):
-        ...
-
-    def _set_save_path(self, suffix):
-        file_path = self.kwargs.get('export_file_path')
-        file_name = self.kwargs.get('export_file_name') or self._get_default_file_name()
-        export_directory = self.kwargs.get('export_directory')
-        if file_path:
-            self.file_path = file_path
-        else:
-            if not export_directory:
-                export_directory = utils.get_export_directory()
-            print(export_directory)
-            print(file_name)
-            self.file_path = pathlib.Path(export_directory, file_name)
-        if self.file_path.suffix != suffix:
-            self.file_path = self.file_path.with_suffix(suffix)
-            # self.file_path = pathlib.Path(str(self.file_path) + f'.{suffix.strip('.')}')
-        if not self.file_path.parent.exists():
-            raise NotADirectoryError(self.file_path.parent)
-
-    def _open_directory(self):
-        if not self.kwargs.get('open_directory', self.kwargs.get('open_export_directory')):
-            return
-        if not self.file_path:
-            logger.info(f'open_directory is not implemented for exporter {self.__class__.__name__}')
-            return
-        utils.open_directory(self.file_path.parent)
-
-    def _open_file(self):
-        if not self.kwargs.get('open_report', self.kwargs.get('open_file', self.kwargs.get('open_export_file'))):
-            return
-        if not self.file_path:
-            logger.info(f'open_file is not implemented for exporter {self.__class__.__name__}')
-            return
-        utils.open_file_with_default_program(self.file_path)
-
-
-class XlsxExporter(SharkadmExporter):
+class XlsxExporter(SharkadmLoggerExporter):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -202,60 +144,3 @@ class XlsxExporter(SharkadmExporter):
 
         # Close the Pandas Excel writer and output the Excel file.
         writer.close()
-
-
-class FeedbackTxtExporter(SharkadmExporter):
-    level_mapper = dict(
-        error='Måste åtgärdas',
-        warning='Bör åtgärdas',
-        info='Se gärna över'
-    )
-
-    def _get_default_file_name(self):
-        date_str = datetime.datetime.now().strftime('%Y%m%d')
-        file_name = f'feedback_{self.adm_logger.name}_{date_str}'
-        return file_name
-
-    def _export(self) -> None:
-        self._set_save_path(suffix='.txt')
-        lines = self._extract_info(self.adm_logger.data)
-        try:
-            self._save_txt(lines)
-            logger.info(f'Saving sharkadm feedback file to {self.file_path}')
-        except PermissionError:
-            self.file_path = get_next_incremented_file_path(self.file_path)
-            self._save_txt(lines)
-            logger.info(f'Saving sharkadm feedback file to {self.file_path}')
-
-    def _extract_info(self, data: dict) -> list[str]:
-        lines = []
-        for level, level_data in data.items():
-            for purpose, purpose_data in level_data.items():
-                if purpose != 'feedback':
-                    continue
-                for log_type, log_type_data in purpose_data.items():
-                    for msg, msg_data in log_type_data.items():
-                        action = self.level_mapper.get(level)
-                        if action:
-                            msg = msg + f' ({action})'
-                        lines.append(msg)
-        return lines
-
-    def _save_txt(self, lines: list[str]) -> None:
-        with open(self.file_path, 'w') as fid:
-            fid.write('\n'.join(lines))
-
-
-
-
-exporter_mapping = {
-    'xlsx': XlsxExporter
-}
-
-
-def get_exporter(**kwargs):
-    name = kwargs.pop('name')
-    obj = exporter_mapping.get(name)
-    if not obj:
-        raise KeyError(f'Invalid sharkadm exporter name: {name}')
-    return obj(**kwargs)

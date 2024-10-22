@@ -68,10 +68,10 @@ class Exporter(ABC):
                                     f' {self.__class__.__name__}')
             return
 
-        adm_logger.log_workflow(f'Applying exporter: {self.__class__.__name__}', add=self.get_exporter_description())
+        adm_logger.log_workflow(f'Applying exporter: {self.__class__.__name__}', add=self.get_exporter_description(), level=adm_logger.DEBUG)
         t0 = time.time()
         data = self._export(data_holder=data_holder)
-        adm_logger.log_workflow(f'Exporter {self.__class__.__name__} executed in {time.time() - t0} seconds')
+        adm_logger.log_workflow(f'Exporter {self.__class__.__name__} executed in {time.time() - t0} seconds', level=adm_logger.DEBUG)
         return data
 
     @abstractmethod
