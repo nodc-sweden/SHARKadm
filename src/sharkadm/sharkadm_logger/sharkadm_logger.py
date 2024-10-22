@@ -1,19 +1,13 @@
 import datetime
 import inspect
 import logging
-import pathlib
 import time
 from functools import wraps
 
 import pandas as pd
 
-from typing import Optional
-# from sqlmodel import Field, Session, SQLModel, create_engine, select
-
-
 from sharkadm import event
-from sharkadm import utils
-from sharkadm.sharkadm_logger.exporter import SharkadmExporter
+from sharkadm.sharkadm_logger.exporter import SharkadmLoggerExporter
 from sharkadm.sharkadm_logger.feedback import Feedback
 
 logger = logging.getLogger(__name__)
@@ -218,7 +212,7 @@ class SHARKadmLogger:
         self._filtered_data = dict()
         return self
 
-    def export(self, exporter: SharkadmExporter):
+    def export(self, exporter: SharkadmLoggerExporter):
         exporter.export(self)
         return self
 

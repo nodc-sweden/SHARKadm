@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class SharkadmExporter(ABC):
+class SharkadmLoggerExporter(ABC):
 
     def __init__(self, **kwargs):
         self.adm_logger = None
@@ -72,7 +72,7 @@ class SharkadmExporter(ABC):
         utils.open_file_with_default_program(self.file_path)
 
 
-class XlsxExporter(SharkadmExporter):
+class XlsxExporter(SharkadmLoggerExporter):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -204,7 +204,7 @@ class XlsxExporter(SharkadmExporter):
         writer.close()
 
 
-class FeedbackTxtExporter(SharkadmExporter):
+class FeedbackTxtExporter(SharkadmLoggerExporter):
     level_mapper = dict(
         error='Måste åtgärdas',
         warning='Bör åtgärdas',
