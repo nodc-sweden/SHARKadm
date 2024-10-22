@@ -97,7 +97,6 @@ class FixDateFormat(Transformer):
                         data_holder.data.loc[df.index, col] = dd
                         adm_logger.log_transformation(msg, level=adm_logger.DEBUG)
                         tot_rows += len(df)
-            # data_holder.data[col] = data_holder.data[col].apply(self._set_new_format)
             if tot_rows:
                 adm_logger.log_transformation(f'Changing date format in column {col} in a total of {tot_rows} places', level=adm_logger.INFO)
 

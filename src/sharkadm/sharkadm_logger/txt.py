@@ -50,7 +50,7 @@ class TxtExporter(SharkadmLoggerExporter):
                     for msg, msg_data in log_type_data.items():
                         line_list = [
                             msg,
-                            level
+                            level,
                         ]
                         info.append('\t'.join(line_list))
         return info

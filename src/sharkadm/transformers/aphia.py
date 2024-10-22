@@ -48,7 +48,7 @@ class AddAphiaId(Transformer):
     @adm_logger.log_time
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Adding column {self.col_to_set} in {self.__class__.__name__}',
+            adm_logger.log_transformation(f'Adding column {self.col_to_set}',
                                           level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ''
 

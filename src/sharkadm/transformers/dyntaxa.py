@@ -143,7 +143,7 @@ class old_AddDyntaxaId(Transformer):
             adm_logger.log_transformation(f'Column {self.source_col} not in data. Could not add column {self.col_to_set} in {self.__class__.__name__}', level='error')
             return
         if self.col_to_set not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Adding column {self.col_to_set} in {self.__class__.__name__}', level='debug')
+            adm_logger.log_transformation(f'Adding column {self.col_to_set}', level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ''
         if all(data_holder.data[self.col_to_set]):
             adm_logger.log_transformation(f'All {self.col_to_set} reported. Will skip {self.__class__.__name__}.')
