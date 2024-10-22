@@ -1,5 +1,6 @@
 import datetime
 import logging
+import pathlib
 from typing import TYPE_CHECKING
 
 from sharkadm.utils.paths import get_next_incremented_file_path
@@ -15,7 +16,14 @@ logger = logging.getLogger(__name__)
 class TxtExporter(SharkadmLoggerExporter):
 
     def __init__(self, **kwargs):
+        self._add_to_file: pathlib.Path | None = None
+        if kwargs.get('add_to_file'):
+            self._add_to_file = pathlib.Path(kwargs.get('add_to_file'))
         super().__init__(**kwargs)
+
+    @property
+    def path(self) -> pathlib.Path:
+        return self._add_to_file or self.file_path
 
     def _get_default_file_name(self):
         date_str = datetime.datetime.now().strftime('%Y%m%d')
@@ -27,12 +35,12 @@ class TxtExporter(SharkadmLoggerExporter):
         self._set_save_path(suffix='.txt')
         info = self._extract_info()
         try:
-            self._save_as_txt(info)
-            logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
+            self._save_as_txt(info, self.path)
+            logger.info(f'Saving sharkadm txt log to {self.path}')
         except PermissionError:
-            self.file_path = get_next_incremented_file_path(self.file_path)
-            self._save_as_txt(info)
-            logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
+            path = get_next_incremented_file_path(self.path)
+            self._save_as_txt(info, path)
+            logger.info(f'Saving sharkadm txt log to {path}')
 
     def _extract_info(self) -> list:
         info = []
@@ -47,6 +55,6 @@ class TxtExporter(SharkadmLoggerExporter):
                         info.append('\t'.join(line_list))
         return info
 
-    def _save_as_txt(self, info: list):
-        with open(self.file_path, 'w') as fid:
+    def _save_as_txt(self, info: list, path: pathlib.Path):
+        with open(path, 'a') as fid:
             fid.write('\n'.join(info))
