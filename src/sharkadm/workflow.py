@@ -10,7 +10,7 @@ from sharkadm import utils
 from sharkadm import validators
 from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
-from sharkadm.sharkadm_logger.exporter import get_exporter
+from sharkadm.sharkadm_logger import get_exporter
 from sharkadm import sharkadm_exceptions
 
 VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
