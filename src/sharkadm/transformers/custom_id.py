@@ -25,7 +25,7 @@ class AddCustomId(Transformer):
             id_handler = self._id_handler.get_level_handler(data_type=data_holder.data_type,
                                                             level=level,
                                                             )
-            col_name = f'{level}_id'
+            col_name = f'custom_{level}_id'
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
                 adm_logger.log_transformation(f'Missing columns for creating {col_name}: {", ".join(list(missing))}',

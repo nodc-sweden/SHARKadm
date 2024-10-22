@@ -29,7 +29,6 @@ class AddSharkId(Transformer):
                 adm_logger.log_transformation(f'Can not create shark_id. All columns are not in data',
                                               add=', '.join(cols), level=adm_logger.WARNING)
                 continue
-
             data_holder.data[col_name] = data_holder.data[cols].astype(str).apply('_'.join, axis=1).replace('/', '_')
             if self._add_md5:
                 col_name_md5 = f'{col_name}_md5'

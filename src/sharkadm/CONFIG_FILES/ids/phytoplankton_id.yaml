@@ -8,3 +8,12 @@ levels:
     - reported_station_name
     - sample_min_depth_m
     - sample_max_depth_m
+  occurrence:
+    - visit_year
+    - platform_code
+    - visit_date
+    - sample_time
+    - reported_station_name
+    - sample_min_depth_m
+    - sample_max_depth_m
+    - reported_scientific_name
