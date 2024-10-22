@@ -7,7 +7,7 @@ from functools import wraps
 import pandas as pd
 
 from sharkadm import event
-from sharkadm.sharkadm_logger.exporter import SharkadmLoggerExporter
+from sharkadm.sharkadm_logger.base import SharkadmLoggerExporter
 from sharkadm.sharkadm_logger.feedback import Feedback
 
 logger = logging.getLogger(__name__)
@@ -551,7 +551,7 @@ class old_SHARKadmLogger:
         print(self.get_log_as_text())
 
 
-class SHARKadmLoggerSql:
+class old_SHARKadmLoggerSql:
     """Class to log events etc. in the SHARKadm data model"""
     DEBUG = 'debug'
     INFO = 'info'
@@ -748,7 +748,7 @@ class SHARKadmLoggerSql:
         print(self.get_log_as_text())
 
 
-class SHARKadmLoggerDict:
+class old_SHARKadmLoggerDict:
     """Class to log events etc. in the SHARKadm data model"""
     DEBUG = 'debug'
     INFO = 'info'
