@@ -83,18 +83,23 @@ class FixDateFormat(Transformer):
         for col in self.dates_to_check:
             if col not in data_holder.data:
                 continue
+            tot_rows = 0
             for d, df in data_holder.data.groupby(col):
                 dd = d.split()[0]
                 msg = f'Changing date format in column {col} from {d} to {dd} in {len(df)} places'
                 try:
                     dd = datetime.datetime.strptime(dd, self.from_format).strftime(self.to_format)
                     data_holder.data.loc[df.index, col] = dd
-                    adm_logger.log_transformation(msg)
+                    adm_logger.log_transformation(msg, level=adm_logger.DEBUG)
+                    tot_rows += len(df)
                 except ValueError:
                     if d != dd:
                         data_holder.data.loc[df.index, col] = dd
-                        adm_logger.log_transformation(msg)
+                        adm_logger.log_transformation(msg, level=adm_logger.DEBUG)
+                        tot_rows += len(df)
             # data_holder.data[col] = data_holder.data[col].apply(self._set_new_format)
+            if tot_rows:
+                adm_logger.log_transformation(f'Changing date format in column {col} in a total of {tot_rows} places', level=adm_logger.INFO)
 
     def _set_new_format(self, x: str):
         try:
