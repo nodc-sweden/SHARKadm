@@ -1,5 +1,3 @@
-import pandas as pd
-
 from sharkadm import adm_logger
 from .base import Transformer, DataHolderProtocol
 
@@ -122,5 +120,29 @@ class AddDyntaxaId(Transformer):
             index = data_holder.data[self.source_col] == name
             adm_logger.log_transformation(f'Adding {self.col_to_set} {dyntaxa_id} translated from {name}, {len(df)} rows.', level=adm_logger.INFO)
             data_holder.data.loc[index, self.col_to_set] = dyntaxa_id
+
+
+class AddReportedScientificNameDyntaxaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    source_col = 'reported_scientific_name'
+    col_to_set = 'reported_scientific_name_dyntaxa_id'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddReportedScientificNameDyntaxaId.col_to_set} from {AddReportedScientificNameDyntaxaId.source_col}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set] = ''
+        for name, df in data_holder.data.groupby(self.source_col):
+            name = str(name)
+            if not name.isdigit():
+                continue
+            adm_logger.log_transformation(f'Adding dyntaxa_id {name} to {self.col_to_set} from {self.source_col} ({len(df)} places)', level=adm_logger.DEBUG)
+
+            boolean = data_holder.data[self.source_col] == name
+            data_holder.data.loc[boolean, self.col_to_set] = name
 
 
