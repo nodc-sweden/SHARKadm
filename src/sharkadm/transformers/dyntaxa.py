@@ -49,14 +49,26 @@ class AddDyntaxaScientificName(Transformer):
         data_holder.data[self.col_to_set] = ''
         for name, df in data_holder.data.groupby(self.source_col):
             name = str(name)
-            # if name.isdigit():
-            #     adm_logger.log_transformation(f'{self.source_col} seems to be a dyntaxa_id {name}. Will not translate.', level=adm_logger.WARNING)
-            #     continue
             new_name = translate_dyntaxa.get(name)
             if new_name:
-                adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
+                if name.isdigit():
+                    new_name_2 = translate_dyntaxa.get(new_name)
+                    if new_name_2:
+                        adm_logger.log_transformation(
+                            f'Translated from dyntaxa: {name} -> {new_name} -> {new_name_2} ({len(df)} places)',
+                            level=adm_logger.INFO)
+                    else:
+                        adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
+                                                      level=adm_logger.DEBUG)
+                else:
+                    adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)',
+                                                  level=adm_logger.INFO)
             else:
-                adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
+                if name.isdigit():
+                    adm_logger.log_transformation(f'{self.source_col} {name} seems to be a dyntaxa_id and could not be translation ({len(df)} places)',
+                                                  level=adm_logger.WARNING)
+                else:
+                    adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
                                               level=adm_logger.DEBUG)
                 new_name = name
 
