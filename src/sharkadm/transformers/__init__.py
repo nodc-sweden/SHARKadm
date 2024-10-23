@@ -4,8 +4,8 @@ from typing import Type
 
 from sharkadm import utils
 from .analyse_info import AddAnalyseInfo
-from .aphia import AddAphiaId
-from .aphia import AddReportedAphiaId
+from .worms import AddAphiaId
+from .worms import AddReportedAphiaId
 from .arithmetic import Divide
 from .arithmetic import Multiply
 from .bacteria import SetBacteriaAsReportedScientificName
