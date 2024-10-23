@@ -56,7 +56,7 @@ class AddTranslatedDyntaxaScientificName(Transformer):
             new_name = self.translate_dyntaxa.get(name)
             if not new_name:
                 continue
-            adm_logger.log_transformation(f'Translated: {name} -> {new_name} ({len(df)} places)')
+            adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)')
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = new_name
 
