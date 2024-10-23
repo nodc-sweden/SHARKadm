@@ -39,14 +39,14 @@ class old_AddReportedScientificName(Transformer):
         return row[self.col_to_set]
 
 
-class AddScientificNameFromDyntaxaTranslatedScientificName(Transformer):
+class SetScientificNameFromDyntaxaScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
+    source_col = 'dyntaxa_scientific_name'
     col_to_set = 'scientific_name'
-    source_col = 'translate_dyntaxa_scientific_name'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds scientific_name from dyntaxa_scientific_name '
+        return f'Sets {SetScientificNameFromDyntaxaScientificName.col_to_set} from {SetScientificNameFromDyntaxaScientificName.source_col} '
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]

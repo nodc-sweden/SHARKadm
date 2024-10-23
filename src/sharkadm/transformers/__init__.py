@@ -77,7 +77,7 @@ from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
 # from .scientific_name import AddReportedScientificName
-from .scientific_name import AddScientificNameFromDyntaxaTranslatedScientificName
+from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
 from .static_data_holding_center import AddStaticDataHoldingCenter
