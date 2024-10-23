@@ -8,7 +8,6 @@ class Dyntaxa(MultiTransformer):
         transformers.AddDyntaxaScientificName,
         transformers.AddDyntaxaId,
         transformers.AddTaxonRanks,
-        transformers.AddScientificNameFromDyntaxaTranslatedScientificName,
         transformers.AddRedList,
     ]
 

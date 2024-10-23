@@ -4,7 +4,7 @@ from .base import Transformer, DataHolderProtocol
 try:
     import nodc_dyntaxa
     translate_dyntaxa = nodc_dyntaxa.get_translate_dyntaxa_object()
-    taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
+    dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
@@ -125,7 +125,7 @@ class AddDyntaxaId(Transformer):
             if not str(name).strip():
                 adm_logger.log_transformation(f'Missing {self.source_col}, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
-            dyntaxa_id = taxon.get(str(name))
+            dyntaxa_id = dyntaxa_taxon.get(str(name))
             if not dyntaxa_id:
                 adm_logger.log_transformation(f'No {self.col_to_set} found for {name}, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
@@ -156,5 +156,39 @@ class AddReportedScientificNameDyntaxaId(Transformer):
 
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = name
+
+
+class AddTaxonRanks(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll', 'bacterioplankton']
+    ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
+    cols_to_set = [f'taxon_{rank}' for rank in ranks]
+    source_col = 'translate_dyntaxa_scientific_name'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds taxon rank columns. Data from dyntaxa.'
+
+    def _add_columns(self, data_holder: DataHolderProtocol):
+        for col in self.cols_to_set:
+            data_holder.data[col] = ''
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        self._add_columns(data_holder=data_holder)
+        for name, df in data_holder.data.groupby(self.source_col):
+            info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus='accepted')
+            if not info:
+                adm_logger.log_transformation(f'Could not add information about taxon rank', add=name, level=adm_logger.WARNING)
+                continue
+            if type(info) is list:
+                adm_logger.log_transformation(f'Several matches in dyntaxa', add=name, level=adm_logger.WARNING)
+                continue
+            adm_logger.log_transformation(f'Adding taxon rank for {name} ({len(df)} places)', level=adm_logger.INFO)
+            for rank, col in zip(self.ranks, self.cols_to_set):
+                value = info.get(rank, '')
+                boolean = data_holder.data[self.source_col] == name
+                data_holder.data.loc[boolean, col] = value
 
 

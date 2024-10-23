@@ -87,7 +87,7 @@ from .station import AddStationInfo
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
-from .taxon_rank import AddTaxonRanks
+from .dyntaxa import AddTaxonRanks
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong
 from ..utils.inspect_kwargs import get_kwargs_for_class
