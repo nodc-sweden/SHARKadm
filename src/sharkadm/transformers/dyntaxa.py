@@ -6,7 +6,7 @@ from .base import Transformer, DataHolderProtocol
 try:
     import nodc_dyntaxa
     translate_dyntaxa = nodc_dyntaxa.get_translate_dyntaxa_object()
-    dyntaxa_id = nodc_dyntaxa.get_dyntaxa_taxon_object()
+    taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
@@ -35,7 +35,7 @@ class AddReportedDyntaxaId(Transformer):
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
 
 
-class AddTranslatedDyntaxaScientificName(Transformer):
+class AddDyntaxaScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     source_col = 'reported_scientific_name'
     col_to_set = 'dyntaxa_scientific_name'
@@ -45,7 +45,7 @@ class AddTranslatedDyntaxaScientificName(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds {AddTranslatedDyntaxaScientificName.col_to_set} translated from nodc_dyntaxa. Source column is {AddTranslatedDyntaxaScientificName.source_col}'
+        return f'Adds {AddDyntaxaScientificName.col_to_set} translated from nodc_dyntaxa. Source column is {AddDyntaxaScientificName.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.col_to_set] = ''
@@ -64,6 +64,31 @@ class AddTranslatedDyntaxaScientificName(Transformer):
 
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = new_name
+
+
+class AddDyntaxaScientificNameDyntaxaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    source_col = 'reported_scientific_name'
+    col_to_set = 'dyntaxa_scientific_name_dyntaxa_id'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddDyntaxaScientificName.col_to_set} translated from nodc_dyntaxa. Source column is {AddDyntaxaScientificName.source_col}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set] = ''
+        for name, df in data_holder.data.groupby(self.source_col):
+            name = str(name)
+            _id = translate_dyntaxa.get_dyntaxa_id(name)
+            if not _id:
+                continue
+            adm_logger.log_transformation(f'Adding {_id} to {self.col_to_set} ({len(df)} places)', level=adm_logger.INFO)
+
+            boolean = data_holder.data[self.source_col] == name
+            data_holder.data.loc[boolean, self.col_to_set] = _id
 
 
 class AddDyntaxaId(Transformer):
@@ -90,12 +115,12 @@ class AddDyntaxaId(Transformer):
             if not str(name).strip():
                 adm_logger.log_transformation(f'Missing {self.source_col}, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
-            dyntaxa = dyntaxa_id.get(str(name))
-            if not dyntaxa:
+            dyntaxa_id = taxon.get(str(name))
+            if not dyntaxa_id:
                 adm_logger.log_transformation(f'No {self.col_to_set} found for {name}, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
             index = data_holder.data[self.source_col] == name
-            adm_logger.log_transformation(f'Adding {self.col_to_set} {dyntaxa} translated from {name}, {len(df)} rows.', level=adm_logger.INFO)
-            data_holder.data.loc[index, self.col_to_set] = dyntaxa
+            adm_logger.log_transformation(f'Adding {self.col_to_set} {dyntaxa_id} translated from {name}, {len(df)} rows.', level=adm_logger.INFO)
+            data_holder.data.loc[index, self.col_to_set] = dyntaxa_id
 
 

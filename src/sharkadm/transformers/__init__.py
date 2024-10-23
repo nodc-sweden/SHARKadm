@@ -38,7 +38,7 @@ from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
 from .dyntaxa import AddReportedDyntaxaId
-from .dyntaxa import AddTranslatedDyntaxaScientificName
+from .dyntaxa import AddDyntaxaScientificName
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
 from .flags import ConvertFlagsFromLIMStoSDN

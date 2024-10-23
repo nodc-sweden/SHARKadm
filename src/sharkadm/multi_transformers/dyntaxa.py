@@ -5,7 +5,7 @@ from sharkadm import transformers
 class Dyntaxa(MultiTransformer):
     transformers = [
         transformers.AddReportedDyntaxaId,
-        transformers.AddTranslatedDyntaxaScientificName,
+        transformers.AddDyntaxaScientificName,
         transformers.AddDyntaxaId,
         transformers.AddTaxonRanks,
         transformers.AddScientificNameFromDyntaxaTranslatedScientificName,
