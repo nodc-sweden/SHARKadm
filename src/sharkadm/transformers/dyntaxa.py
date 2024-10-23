@@ -17,7 +17,7 @@ class AddReportedDyntaxaId(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds reported_dyntaxa_id from dyntaxa_id if not given.'
+        return f'Adds {AddReportedDyntaxaId.col_to_set} from {AddReportedDyntaxaId.source_col} if not given.'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data.columns:
@@ -36,7 +36,7 @@ class AddReportedDyntaxaId(Transformer):
 class AddTranslatedDyntaxaScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     source_col = 'reported_scientific_name'
-    col_to_set = 'translate_dyntaxa_scientific_name'
+    col_to_set = 'dyntaxa_scientific_name'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -50,21 +50,25 @@ class AddTranslatedDyntaxaScientificName(Transformer):
         data_holder.data[self.col_to_set] = ''
         for name, df in data_holder.data.groupby(self.source_col):
             name = str(name)
-            if name.isdigit():
-                adm_logger.log_transformation(f'{self.source_col} seems to be a dyntaxa_id {name}. Will not translate.', level='warning')
-                continue
+            # if name.isdigit():
+            #     adm_logger.log_transformation(f'{self.source_col} seems to be a dyntaxa_id {name}. Will not translate.', level='warning')
+            #     continue
             new_name = self.translate_dyntaxa.get(name)
-            if not new_name:
-                continue
-            adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)')
+            if new_name:
+                adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
+            else:
+                adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
+                                              level=adm_logger.DEBUG)
+                new_name = name
+
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = new_name
 
 
 class AddDyntaxaId(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
-    col_to_set = 'dyntaxa_id'
     source_col = 'translate_dyntaxa_scientific_name'
+    col_to_set = 'dyntaxa_id'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
