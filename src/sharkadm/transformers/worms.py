@@ -32,34 +32,6 @@ class AddReportedAphiaId(Transformer):
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
 
 
-class AddAphiaId(Transformer):
-    invalid_data_types = ['physicalchemical', 'chlorophyll']
-    source_col = 'scientific_name'
-    col_to_set = 'aphia_id'
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f'Adds {AddAphiaId.col_to_set} from {AddAphiaId.source_col}'
-
-    @adm_logger.log_time
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_to_set not in data_holder.data.columns:
-            adm_logger.log_transformation(f'Adding column {self.col_to_set}',
-                                          level=adm_logger.DEBUG)
-            data_holder.data[self.col_to_set] = ''
-
-        for source_name, df in data_holder.data.groupby(self.source_col):
-            aphia_id = taxa_worms.get_aphia_id(str(source_name))
-            if not aphia_id:
-                adm_logger.log_transformation(f'No aphia_id found for species', add=source_name, level=adm_logger.WARNING)
-                continue
-            boolean = data_holder.data[self.source_col] == source_name
-            data_holder.data.loc[boolean, self.col_to_set] = aphia_id
-
-
 class AddWormsScientificName(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
     source_col = 'dyntaxa_scientific_name'
@@ -82,5 +54,34 @@ class AddWormsScientificName(Transformer):
                 new_name = name
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = new_name
+
+
+class AddWormsAphiaId(Transformer):
+    invalid_data_types = ['physicalchemical', 'chlorophyll']
+    source_col = 'worms_scientific_name'
+    col_to_set = 'aphia_id'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddWormsAphiaId.col_to_set} from {AddWormsAphiaId.source_col}'
+
+    @adm_logger.log_time
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Adding column {self.col_to_set}',
+                                          level=adm_logger.DEBUG)
+            data_holder.data[self.col_to_set] = ''
+
+        for source_name, df in data_holder.data.groupby(self.source_col):
+            aphia_id = taxa_worms.get_aphia_id(str(source_name))
+            if not aphia_id:
+                adm_logger.log_transformation(f'No aphia_id found for species', add=source_name, level=adm_logger.WARNING)
+                continue
+            boolean = data_holder.data[self.source_col] == source_name
+            data_holder.data.loc[boolean, self.col_to_set] = aphia_id
+
 
 

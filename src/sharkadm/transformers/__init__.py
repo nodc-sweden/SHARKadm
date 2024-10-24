@@ -90,7 +90,7 @@ from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong
-from .worms import AddAphiaId
+from .worms import AddWormsAphiaId
 from .worms import AddReportedAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
@@ -111,8 +111,6 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
-    print(f'{name=}')
-    print(f'{tran=}')
     if not tran:
         return
     return tran(**kwargs)

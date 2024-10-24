@@ -4,9 +4,9 @@ from sharkadm import transformers
 
 class Worms(MultiTransformer):
     _transformers = [
-        transformers.AddAphiaId,
-        transformers.AddReportedAphiaId,
         transformers.AddWormsScientificName,
+        transformers.AddWormsAphiaId,
+        transformers.AddReportedAphiaId,
     ]
 
     @staticmethod
