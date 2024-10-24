@@ -6,7 +6,7 @@ from .translate import Translate
 
 
 class GeneralDV(MultiTransformer):
-    transformers = [
+    _transformers = [
         transformers.WideToLong,
 
         transformers.AddDeliveryNoteInfo,
@@ -51,6 +51,6 @@ class GeneralDV(MultiTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         string_list = ['Performs transformations related to Datavärdskapet.']
-        for trans in GeneralDV.transformers:
+        for trans in GeneralDV._transformers:
             string_list.append(f'    {trans.get_transformer_description()}')
         return '\n'.join(string_list)

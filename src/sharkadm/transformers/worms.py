@@ -12,8 +12,8 @@ except ModuleNotFoundError as e:
 
 class AddReportedAphiaId(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
-    col_to_set = 'reported_aphia_id'
     source_col = 'aphia_id'
+    col_to_set = 'reported_aphia_id'
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -34,8 +34,8 @@ class AddReportedAphiaId(Transformer):
 
 class AddAphiaId(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll']
-    col_to_set = 'aphia_id'
     source_col = 'scientific_name'
+    col_to_set = 'aphia_id'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

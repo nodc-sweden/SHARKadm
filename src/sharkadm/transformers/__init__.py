@@ -4,8 +4,6 @@ from typing import Type
 
 from sharkadm import utils
 from .analyse_info import AddAnalyseInfo
-from .worms import AddAphiaId
-from .worms import AddReportedAphiaId
 from .arithmetic import Divide
 from .arithmetic import Multiply
 from .bacteria import SetBacteriaAsReportedScientificName
@@ -37,8 +35,11 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
-from .dyntaxa import AddReportedDyntaxaId
 from .dyntaxa import AddDyntaxaScientificName
+from .dyntaxa import AddDyntaxaScientificNameDyntaxaId
+from .dyntaxa import AddReportedDyntaxaId
+from .dyntaxa import AddReportedScientificNameDyntaxaId
+from .dyntaxa import AddTaxonRanks
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
 from .flags import ConvertFlagsFromLIMStoSDN
@@ -87,9 +88,11 @@ from .station import AddStationInfo
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
-from .dyntaxa import AddTaxonRanks
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong
+from .worms import AddAphiaId
+from .worms import AddReportedAphiaId
+from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 

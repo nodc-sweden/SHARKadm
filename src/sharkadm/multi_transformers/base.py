@@ -46,7 +46,7 @@ class MultiTransformer(Transformer):
     valid_data_structures: list[str] = []
     invalid_data_structures: list[str] = []
 
-    transformers: list[Type[Transformer]] = []
+    _transformers: list[Type[Transformer]] = []
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -88,7 +88,7 @@ class MultiTransformer(Transformer):
 
         adm_logger.log_workflow(f'Applying multi transformer: {self.__class__.__name__}', add=self.get_transformer_description(), level=adm_logger.DEBUG)
         t0 = time.time()
-        for trans in self.transformers:
+        for trans in self._transformers:
             trans().transform(data_holder=data_holder)
         adm_logger.log_workflow(f'Multi transformer {self.__class__.__name__} executed in {time.time()-t0} seconds', level=adm_logger.DEBUG)
 

@@ -3,7 +3,7 @@ from sharkadm import transformers
 
 
 class DateTime(MultiTransformer):
-    transformers = [
+    _transformers = [
         transformers.AddReportedDates,
         transformers.FixDateFormat,
         transformers.FixTimeFormat,
@@ -16,6 +16,6 @@ class DateTime(MultiTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         string_list = ['Performs all transformations related to time.']
-        for trans in DateTime.transformers:
+        for trans in DateTime._transformers:
             string_list.append(f'    {trans.get_transformer_description()}')
         return '\n'.join(string_list)
