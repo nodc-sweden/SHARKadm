@@ -24,7 +24,7 @@ def get_row_data_from_lims_export(path: str | pathlib.Path, export_directory: st
     c.transform(transformers.AddVisitKey())
     c.transform(transformers.AddAnalyseInfo())
     c.transform(transformers.MoveLessThanFlagRowFormat())
-    c.transform(transformers.ConvertFlagsFromLIMStoSDN())
+    c.transform(transformers.ConvertFlagsToSDN())
     c.transform(transformers.RemoveColumns('COPY_VARIABLE.*'))
     c.transform(transformers.MapperParameterColumn(import_column='SHARKarchive'))
     name = path.name.replace(' ', '_')

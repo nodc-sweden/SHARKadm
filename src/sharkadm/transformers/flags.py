@@ -1,8 +1,10 @@
 from .base import Transformer, DataHolderProtocol
+from sharkadm import adm_logger
 
 
-class ConvertFlagsFromLIMStoSDN(Transformer):
-    valid_data_holders = ['LimsDataHolder']
+class ConvertFlagsToSDN(Transformer):
+    valid_data_types = ['physicalchemical']
+    flag_col = 'quality_flag'
     mapping = {
         '': '1',
         'BLANK': '1',
@@ -18,14 +20,15 @@ class ConvertFlagsFromLIMStoSDN(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Converts values in internal column "quality_flag" from LIMS schema to SeaDataNet schema'
+        return f'Converts values in internal column {ConvertFlagsToSDN.flag_col} to SeaDataNet schema'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        column = 'quality_flag'
-        for value in set(data_holder.data[column]):
-            stripped_value = value.strip()
-            boolean = data_holder.data[column] == value
-            data_holder.data.loc[boolean, column] = self.mapping.get(stripped_value, stripped_value)
+        for flag, df in data_holder.data.groupby(self.flag_col):
+            stripped_flag = str(flag).strip()
+            new_flag = self.mapping.get(stripped_flag)
+            if new_flag:
+                adm_logger.log_transformation(f'Converting flag: {flag} -> {new_flag} ({len(df)} places)', level=adm_logger.INFO)
+                data_holder.data.loc[df.index, self.flag_col] = new_flag
         # Missing value
         boolean = data_holder.data['value'] == ''
-        data_holder.data.loc[boolean, column] = '9'
+        data_holder.data.loc[boolean, self.flag_col] = '9'

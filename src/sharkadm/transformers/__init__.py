@@ -42,7 +42,7 @@ from .dyntaxa import AddReportedScientificNameDyntaxaId
 from .dyntaxa import AddTaxonRanks
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
-from .flags import ConvertFlagsFromLIMStoSDN
+from .flags import ConvertFlagsToSDN
 from .laboratory import AddEnglishAnalyticalLaboratory
 from .laboratory import AddEnglishSamplingLaboratory
 from .laboratory import AddSwedishAnalyticalLaboratory
