@@ -17,7 +17,7 @@ def get_row_data_from_lims_export(df: pd.DataFrame) -> pd.DataFrame:
     c.transform(transformers.AddRowNumber())
     c.transform(transformers.WideToLong())
     c.transform(transformers.MoveLessThanFlagRowFormat())
-    c.transform(transformers.ConvertFlagsFromLIMStoSDN())
+    c.transform(transformers.ConvertFlagsToSDN())
     c.transform(transformers.RemoveColumns('COPY_VARIABLE.*'))
     c.transform(transformers.MapperParameterColumn(import_column='SHARKarchive'))
     # name = path.name.replace(' ', '_')
