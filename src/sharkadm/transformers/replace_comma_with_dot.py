@@ -13,7 +13,10 @@ class ReplaceCommaWithDot(Transformer):
         '.*MULTIPLY.*',
         '.*COPY_VARIABLE.*',
         'sampled_volume.*',
-        'sampler_area.*'
+        'sampler_area.*',
+        '.*wind.*',
+        '.*pressure.*',
+        '.*temperature.*',
     ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:
@@ -29,21 +32,14 @@ class ReplaceCommaWithDot(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):
-            adm_logger.log_transformation(f'Replacing comma with dot in column', add=col)
-            data_holder.data[col] = data_holder.data[col].apply(self.convert)
+            for item, df in data_holder.data.groupby(col):
+                item = str(item)
+                if ',' not in item:
+                    continue
+                new_item = item.replace(',', '.')
+                adm_logger.log_transformation(f'Replacing comma with dot for value {item} in column {col}', level=adm_logger.INFO)
+                data_holder.data.loc[df.index, col] = new_item
 
     def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
         return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
-        # cols = dict()
-        # for item in self.apply_on_columns:
-        #     if item in data_holder.data.columns:
-        #         cols[item] = True
-        #         continue
-        #     for col in data_holder.data.columns:
-        #         if re.match(item, col):
-        #             cols[col] = True
-        # return list(cols)
 
-    @staticmethod
-    def convert(x) -> str:
-        return x.replace(',', '.').replace(' ', '')

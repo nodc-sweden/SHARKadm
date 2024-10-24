@@ -17,6 +17,7 @@ def get_row_data_from_lims_export(path: str | pathlib.Path, export_directory: st
     c.set_data_holder(data_holder)
     c.transform(transformers.AddRowNumber())
     c.transform(transformers.RemoveNonDataLines())
+    c.transform(transformers.ReplaceCommaWithDot())
     c.transform(transformers.WideToLong())
     c.transform(transformers.AddSampleDate())
     c.transform(transformers.AddSampleTime())
