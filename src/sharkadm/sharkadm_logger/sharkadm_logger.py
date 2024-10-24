@@ -192,6 +192,7 @@ class SHARKadmLogger:
             cls=cls,
             purpose=purpose,
         )
+        data.update(kwargs)
         event.post_event('log', data)
 
     def reset_log(self) -> 'SHARKadmLogger':
@@ -304,3 +305,7 @@ class SHARKadmLogger:
                     else:
                         filtered_data[level_name][purpose][log_type_name] = log_type_data
         return filtered_data
+
+    @staticmethod
+    def subscribe(ev: str, func, prio: int = 50) -> None:
+        event.subscribe(ev, func, prio)
