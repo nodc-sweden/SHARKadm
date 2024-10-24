@@ -4,8 +4,6 @@ from typing import Type
 
 from sharkadm import utils
 from .analyse_info import AddAnalyseInfo
-from .aphia import AddAphiaId
-from .aphia import AddReportedAphiaId
 from .arithmetic import Divide
 from .arithmetic import Multiply
 from .bacteria import SetBacteriaAsReportedScientificName
@@ -37,8 +35,11 @@ from .depth import AddSampleMinAndMaxDepth
 from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
+from .dyntaxa import AddDyntaxaScientificName
+from .dyntaxa import AddDyntaxaScientificNameDyntaxaId
 from .dyntaxa import AddReportedDyntaxaId
-from .dyntaxa import AddTranslatedDyntaxaScientificName
+from .dyntaxa import AddReportedScientificNameDyntaxaId
+from .dyntaxa import AddTaxonRanks
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
 from .flags import ConvertFlagsFromLIMStoSDN
@@ -77,7 +78,7 @@ from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
 # from .scientific_name import AddReportedScientificName
-from .scientific_name import AddScientificNameFromDyntaxaTranslatedScientificName
+from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
 from .static_data_holding_center import AddStaticDataHoldingCenter
@@ -87,9 +88,11 @@ from .station import AddStationInfo
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
-from .taxon_rank import AddTaxonRanks
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong
+from .worms import AddWormsAphiaId
+from .worms import AddReportedAphiaId
+from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
@@ -108,8 +111,6 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     """Returns Transformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
-    print(f'{name=}')
-    print(f'{tran=}')
     if not tran:
         return
     return tran(**kwargs)
