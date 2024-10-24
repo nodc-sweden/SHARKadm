@@ -22,7 +22,9 @@ def subscribe(event: str, func, prio: int = 50) -> None:
     _subscribers[event][prio].append(func)
 
 
-def post_event(event: str, data: dict = None) -> None:
+def post_event(event: str, data: dict | str) -> None:
+    if type(data) is str:
+        data = dict(msg=data)
     if event not in _subscribers:
         raise EventNotFound(event)
     for prio in sorted(_subscribers[event]):
