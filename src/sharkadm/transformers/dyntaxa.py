@@ -190,5 +190,6 @@ class AddTaxonRanks(Transformer):
                 value = info.get(rank, '')
                 boolean = data_holder.data[self.source_col] == name
                 data_holder.data.loc[boolean, col] = value
+                adm_logger.log_transformation(f'Adding taxon rank {rank} for {name} ({len(df)} places)', level=adm_logger.DEBUG)
 
 
