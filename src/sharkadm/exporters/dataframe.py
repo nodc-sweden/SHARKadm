@@ -35,17 +35,17 @@ class DataFrame(Exporter):
                 try:
                     df[col] = pd.to_numeric(df[col])
                 except ValueError:
-                    adm_logger.log_export(f'Could not convert whole column to numeric. Trying one by one', add=col, level=adm_logger.WARNING)
-                    df[col] = df[col].apply(self._convert_to_float)
+                    for value, part_df in df.groupby(col):
+                        new_value = self._convert_to_float(str(value))
+                        if new_value == np.nan:
+                            adm_logger.log_export(f'Could not convert {value} to numeric in column {col}. setting value to np.nan ({len(part_df)} places).',
+                                                  add=col, level=adm_logger.WARNING)
+                        df.loc[part_df.index, col] = new_value
         if self._header_as:
             mapper = get_header_mapper_from_data_holder(data_holder, import_column=self._header_as)
             if not mapper:
-                adm_logger.log_export(f'Could not find mapper using header_as = {self._header_as}')
+                adm_logger.log_export(f'Could not find mapper using header_as = {self._header_as}', level=adm_logger.WARNING)
                 return
-            # if self._header_as == 'original':
-            #     mapper = data_holder.header_mapper
-            # else:
-            #     mapper = get_import_matrix_mapper(data_type=data_holder.data_type, import_column=self._header_as)
             new_column_names = [mapper.get_external_name(col) for col in df.columns]
             df.columns = new_column_names
         return df

@@ -25,7 +25,6 @@ class AddAnalyseInfo(Transformer):
                 continue
             if par not in pars:
                 adm_logger.log_transformation(f'No analyse info for parameter "{par}"', level=adm_logger.WARNING)
-                adm_logger.log_transformation(adm_logger.feedback.missing_in_analyse_info(par, data_holder), level=adm_logger.WARNING, purpose=adm_logger.FEEDBACK)
                 continue
             info = data_holder.analyse_info.get_info(par, dtime.date())
             for col in data_holder.analyse_info.columns:
