@@ -95,8 +95,9 @@ class SHARKadmLogger:
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.WORKFLOW, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
-        event.post_event('log_workflow', msg)
+        data = dict(log_type=self.WORKFLOW, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
+        self.log(**data)
+        event.post_event('log_workflow', data)
 
     def log_transformation(self,
                            msg: str,
@@ -108,8 +109,9 @@ class SHARKadmLogger:
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
-        event.post_event('log_transformation', msg)
+        data = dict(log_type=self.TRANSFORMATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
+        self.log(**data)
+        event.post_event('log_transformation', data)
 
     def log_validation(self,
                        msg: str,
@@ -121,8 +123,9 @@ class SHARKadmLogger:
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
-        event.post_event('log_validation', msg)
+        data = dict(log_type=self.VALIDATION, msg=msg, level=level, cls=cls, add=add, purpose=purpose, row_number=row_number)
+        self.log(**data)
+        event.post_event('log_validation', data)
 
     def log_export(self,
                    msg: str,
@@ -133,8 +136,9 @@ class SHARKadmLogger:
         stack = inspect.stack()
         if stack[1][0].f_locals.get('self'):
             cls = stack[1][0].f_locals["self"].__class__.__name__
-        self.log(log_type=self.EXPORT, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
-        event.post_event('log_export', msg)
+        data = dict(log_type=self.EXPORT, msg=msg, level=level, cls=cls, add=add, purpose=purpose)
+        self.log(**data)
+        event.post_event('log_export', data)
 
     def log_time(self, func):
         """https://dev.to/kcdchennai/python-decorator-to-measure-execution-time-54hk"""
@@ -180,7 +184,15 @@ class SHARKadmLogger:
             item.append(f"at row {kwargs.get('row_number')}")
         if item:
             self._data[level][purpose][log_type][msg]['items'].append(' '.join(item))
-        event.post_event('log', msg)
+        data = dict(
+            msg=msg,
+            level=level,
+            log_type=log_type,
+            add=add,
+            cls=cls,
+            purpose=purpose,
+        )
+        event.post_event('log', data)
 
     def reset_log(self) -> 'SHARKadmLogger':
         """Resets all entries to the log"""
