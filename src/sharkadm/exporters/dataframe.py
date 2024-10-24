@@ -69,6 +69,6 @@ class DataFrame(Exporter):
         try:
             return float(value)
         except ValueError:
-            return np.NAN
+            return np.nan
 
 
