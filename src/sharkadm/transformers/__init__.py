@@ -11,8 +11,8 @@ from .base import Transformer
 from .boolean import FixYesNo
 from .bvol import AddBvolAphiaId
 from .bvol import AddBvolRefList
-from .bvol import AddBvolScientificName
-from .bvol import AddBvolSizeClass
+from .bvol import AddBvolScientificNameOriginal
+from .bvol import AddBvolScientificNameAndSizeClass
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns

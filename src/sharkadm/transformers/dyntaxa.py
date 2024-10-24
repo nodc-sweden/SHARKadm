@@ -65,7 +65,7 @@ class AddDyntaxaScientificName(Transformer):
                                                   level=adm_logger.INFO)
             else:
                 if name.isdigit():
-                    adm_logger.log_transformation(f'{self.source_col} {name} seems to be a dyntaxa_id and could not be translation ({len(df)} places)',
+                    adm_logger.log_transformation(f'{self.source_col} {name} seems to be a dyntaxa_id and could not be translated ({len(df)} places)',
                                                   level=adm_logger.WARNING)
                 else:
                     adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
