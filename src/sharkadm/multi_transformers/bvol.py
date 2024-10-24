@@ -4,9 +4,9 @@ from sharkadm import transformers
 
 class Bvol(MultiTransformer):
     _transformers = [
-        transformers.AddBvolScientificName,
+        transformers.AddBvolScientificNameOriginal,
+        transformers.AddBvolScientificNameAndSizeClass,
         transformers.AddBvolAphiaId,
-        transformers.AddBvolSizeClass,
         transformers.AddBvolRefList,
     ]
 
