@@ -1,3 +1,4 @@
+import datetime
 import logging
 from abc import ABC, abstractmethod
 
@@ -134,6 +135,26 @@ class DataHolder(ABC):
     @property
     def original_qf_column_prefix(self) -> str | None:
         return self._qf_column_prefix
+
+    @property
+    def year_span(self) -> list[str]:
+        years = list(set(self.data['visit_year']))
+        if len(years) == 1:
+            return [years[0], years[0]]
+        sorted_years = sorted(years)
+        return [sorted_years[0], sorted_years[-1]]
+
+    @property
+    def zip_archive_name(self) -> str:
+        parts = ['SHARK', self.data_type.capitalize()]
+        if hasattr(self, 'delivery_note'):
+            parts.append(self.delivery_note.reporting_institute_code)
+        years = self.year_span
+        parts.append(years[0])
+        if years[0] != years[1]:
+            parts.append(years[1])
+        parts.append(f'version_{datetime.datetime.now().strftime("%Y-%m-%d")}')
+        return '_'.join(parts)
 
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)

@@ -79,7 +79,7 @@ class ZipArchiveDataHolder(DataHolder, ABC):
 
     @property
     def reporting_institute(self) -> str:
-        return self._delivery_note.reporting_institute
+        return self._delivery_note.reporting_institute_code
 
     @property
     def zip_archive_path(self) -> pathlib.Path:

@@ -152,9 +152,5 @@ class DeliveryNote:
         return self['STATUS']
 
     @property
-    def date_reported(self):
-        return datetime.datetime.strptime(self['rapporteringsdatum'.upper()], '%Y-%m-%d')
-
-    @property
-    def reporting_institute(self):
-        return self['rapporterande institut'.upper()]
+    def reporting_institute_code(self):
+        return self['reporting_institute_code'].upper()

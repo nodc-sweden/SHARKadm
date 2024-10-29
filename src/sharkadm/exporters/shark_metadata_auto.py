@@ -1,9 +1,9 @@
 import datetime
 import pathlib
 
-from sharkadm.data.archive import ArchiveDataHolder
+from sharkadm.data import DataHolder
 from .base import Exporter
-from sharkadm import utils
+from sharkadm import utils, adm_logger
 
 
 class SHARKMetadataAuto(Exporter):
@@ -23,7 +23,7 @@ class SHARKMetadataAuto(Exporter):
         self._export_file_name = export_file_name
 
         self._encoding = kwargs.get('encoding', 'cp1252')
-        self._data_holder: ArchiveDataHolder | None = None
+        self._data_holder: DataHolder | None = None
 
     @property
     def export_file_path(self):
@@ -34,7 +34,7 @@ class SHARKMetadataAuto(Exporter):
         return 'Creates the shark_metadata_auto file'
 
     @property
-    def data_holder(self) -> ArchiveDataHolder:
+    def data_holder(self) -> DataHolder:
         return self._data_holder
 
     @property
@@ -85,12 +85,15 @@ class SHARKMetadataAuto(Exporter):
     def max_latitude(self) -> str:
         return self.data_holder.max_latitude
 
-    def set_data_holder(self, data_holder: ArchiveDataHolder) -> None:
+    def set_data_holder(self, data_holder: DataHolder) -> None:
         self._data_holder = data_holder
 
     def create_file(self,
                     export_directory: pathlib.Path | str = None,
                     export_file_name: pathlib.Path | str = None) -> None:
+        if not self._data_holder:
+            adm_logger.log_export(f'No data_holder set to create shark_metadata_auto.txt', level=adm_logger.CRITICAL)
+            return
         """Creates the file using the loaded data_holder"""
         if export_directory:
             self._export_directory = pathlib.Path(export_directory)
@@ -112,7 +115,7 @@ class SHARKMetadataAuto(Exporter):
         with open(self.export_file_path, 'w') as fid:
             fid.write('\n'.join(lines))
 
-    def _export(self, data_holder: ArchiveDataHolder) -> None:
+    def _export(self, data_holder: DataHolder) -> None:
         self.set_data_holder(data_holder=data_holder)
         self.create_file()
 

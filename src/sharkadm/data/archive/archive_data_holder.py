@@ -86,7 +86,7 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     @property
     def reporting_institute(self) -> str:
-        return self._delivery_note.reporting_institute
+        return self._delivery_note.reporting_institute_code
 
     @property
     def archive_root_directory(self) -> pathlib.Path:
@@ -97,8 +97,25 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self.archive_root_directory / 'received_data'
 
     @property
+    def received_data_files(self) -> list[pathlib.Path]:
+        paths = []
+        for path in self.received_data_directory.iterdir():
+            if path.is_dir():
+                continue
+            paths.append(path)
+        return paths
+
+    @property
     def processed_data_directory(self) -> pathlib.Path:
         return self.archive_root_directory / 'processed_data'
+
+    @property
+    def processed_data_files(self) -> list[pathlib.Path]:
+        return [
+            self.delivery_note_path,
+            self.sampling_info_path,
+            self.analyse_info_path
+        ]
 
     @property
     def delivery_note_path(self) -> pathlib.Path:

@@ -65,6 +65,10 @@ class DvTemplateDataHolder(DataHolder):
         self._dataset_name = self.template_path.stem
 
     @property
+    def received_data_files(self) -> list[pathlib.Path]:
+        return [self._template_path]
+
+    @property
     def header_mapper(self):
         return self._import_matrix_mapper
 
@@ -123,19 +127,19 @@ class DvTemplateDataHolder(DataHolder):
 
     @property
     def min_longitude(self) -> str:
-        return str(min(self.data['sample_reported_longitude'].astype(float)))
+        return str(min(self.data['sample_longitude_dd'].astype(float)))
 
     @property
     def max_longitude(self) -> str:
-        return str(max(self.data['sample_reported_longitude'].astype(float)))
+        return str(max(self.data['sample_longitude_dd'].astype(float)))
 
     @property
     def min_latitude(self) -> str:
-        return str(min(self.data['sample_reported_latitude'].astype(float)))
+        return str(min(self.data['sample_latitude_dd'].astype(float)))
 
     @property
     def max_latitude(self) -> str:
-        return str(max(self.data['sample_reported_latitude'].astype(float)))
+        return str(max(self.data['sample_latitude_dd'].astype(float)))
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_dv_template(self._template_path, mapper=self._import_matrix_mapper)

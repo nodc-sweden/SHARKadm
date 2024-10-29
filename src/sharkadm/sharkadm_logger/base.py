@@ -34,9 +34,9 @@ class SharkadmLoggerExporter(ABC):
         ...
 
     def _set_save_path(self, suffix):
-        file_path = self.kwargs.get('export_file_path')
-        file_name = self.kwargs.get('export_file_name') or self._get_default_file_name()
-        export_directory = self.kwargs.get('export_directory')
+        file_path = self.kwargs.get('export_file_path') or self.kwargs.get('file_path')
+        file_name = self.kwargs.get('export_file_name') or self.kwargs.get('file_name') or self._get_default_file_name()
+        export_directory = self.kwargs.get('export_directory') or self.kwargs.get('directory')
         if file_path:
             self.file_path = file_path
         else:

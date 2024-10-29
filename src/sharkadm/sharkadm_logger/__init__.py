@@ -35,10 +35,10 @@ def create_txt_report(filter: dict = None, **kwargs):
     adm_logger.export(exp)
 
 
-def create_txt_report_for_zip_package(**kwargs):
+def create_changelog_file(**kwargs):
     adm_logger.reset_filter()
     adm_logger.filter(levels='>info')
-    exp = TxtExporter(**kwargs)
+    exp = TxtExporter(file_name='changelog.txt', **kwargs)
     adm_logger.export(exp)
 
 
