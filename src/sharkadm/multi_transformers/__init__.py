@@ -8,6 +8,7 @@ from .base import MultiTransformer
 from .bvol import Bvol
 from .date_time import DateTime
 from .dyntaxa import Dyntaxa
+from .worms import Worms
 from .general_dv import GeneralDV
 from .general_final import GeneralFinal
 from .general_initial import GeneralInitial

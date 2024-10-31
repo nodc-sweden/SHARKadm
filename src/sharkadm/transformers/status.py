@@ -7,7 +7,7 @@ from sharkadm.data.data_holder import DataHolder
 from sharkadm.utils import yaml_data
 from .base import Transformer
 
-STATUS_CONFIG = yaml_data.load_yaml(adm_config_paths('delivery_note_status'))
+STATUS_CONFIG = yaml_data.load_yaml(adm_config_paths('delivery_note_status'), encoding='utf8')
 
 
 class SetStatusDataHost(Transformer):

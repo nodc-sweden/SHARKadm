@@ -129,8 +129,8 @@ class AddSamplePositionDM(Transformer):
                 adm_logger.log_transformation(
                     f'Missing position when trying to set {self.lat_column_to_set} and {self.lon_column_to_set}')
                 continue
-            lat = geography.decdeg_to_decmin(lat)
-            lon = geography.decdeg_to_decmin(lon)
+            lat = geography.decdeg_to_decmin(lat, with_space=True)
+            lon = geography.decdeg_to_decmin(lon, with_space=True)
             data_holder.data.loc[df.index, self.lat_column_to_set] = lat
             data_holder.data.loc[df.index, self.lon_column_to_set] = lon
 

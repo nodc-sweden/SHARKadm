@@ -34,6 +34,7 @@ class AddBvolScientificNameOriginal(Transformer):
             else:
                 adm_logger.log_transformation(f'Adding {name} to {self.col_to_set} ({len(df)} places)',
                                               level=adm_logger.DEBUG)
+                new_name = name
 
             boolean = data_holder.data[self.source_col] == name
             data_holder.data.loc[boolean, self.col_to_set] = new_name
@@ -55,10 +56,18 @@ class AddBvolScientificNameAndSizeClass(Transformer):
         return f'Adds {AddBvolScientificNameAndSizeClass.col_to_set_name} and {AddBvolScientificNameAndSizeClass.col_to_set_size}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set_name] = ''
+        data_holder.data[self.col_to_set_size] = ''
         for (name, size), df in data_holder.data.groupby([self.source_name_col, self.source_size_class_col]):
             info = translate_bvol_name_and_size.get(name, size)
-            data_holder.data.loc[df.index, self.col_to_set_name] = info.get('name', '')
-            data_holder.data.loc[df.index, self.col_to_set_size] = info.get('size_class', '')
+            new_name = info.get('name') or  name
+            new_size_class = info.get('size_class') or size
+            if new_name != name:
+                adm_logger.log_transformation(f'Translate bvol name: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
+            data_holder.data.loc[df.index, self.col_to_set_name] = new_name
+            if new_size_class != size:
+                adm_logger.log_transformation(f'Translate bvol size_class: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
+            data_holder.data.loc[df.index, self.col_to_set_size] = new_size_class
 
 
 class AddBvolRefList(Transformer):
@@ -72,19 +81,21 @@ class AddBvolRefList(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds {AddBvolRefList.col_to_set}'
+        return f'Adds {AddBvolRefList.col_to_set} from {AddBvolRefList.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.col_to_set] = data_holder.data[self.source_col].apply(self._translate)
-
-    @functools.cache
-    def _translate(self, x: str) -> str:
-        lst = bvol_nomp.get_info(Species=x)
-        if not lst:
-            return ''
-        if type(lst) == list:
-            return ', '.join(sorted(set([item['List'] for item in lst if item['List']])))
-        return lst['List']
+        data_holder.data[self.col_to_set] = ''
+        for name, df in data_holder.data.groupby(self.source_col):
+            lst = bvol_nomp.get_info(Species=name)
+            if not lst:
+                continue
+            if type(lst) == list:
+                text = ', '.join(sorted(set([item['List'] for item in lst if item['List']])))
+            else:
+                text = lst['List']
+            adm_logger.log_transformation(f'Setting {self.col_to_set} for {name}: {text} ({len(df)} places)',
+                                          level=adm_logger.INFO)
+            data_holder.data.loc[df.index, self.col_to_set] = text
 
 
 class AddBvolAphiaId(Transformer):
@@ -98,45 +109,47 @@ class AddBvolAphiaId(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds {AddBvolAphiaId.col_to_set}'
+        return f'Adds {AddBvolAphiaId.col_to_set} from {AddBvolAphiaId.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.col_to_set] = data_holder.data[self.source_col].apply(self._translate)
+        data_holder.data[self.col_to_set] = ''
+        for name, df in data_holder.data.groupby(self.source_col):
+            lst = bvol_nomp.get_info(Species=name)
+            if not lst:
+                continue
+            if type(lst) == list:
+                text = ', '.join(sorted(set([item['AphiaID'] for item in lst if item['AphiaID']])))
+            else:
+                text = lst['AphiaID']
+            adm_logger.log_transformation(f'Setting {self.col_to_set} for {name}: {text} ({len(df)} places)',
+                                          level=adm_logger.INFO)
+            data_holder.data.loc[df.index, self.col_to_set] = text
 
-    @functools.cache
-    def _translate(self, x: str) -> str:
-        lst = bvol_nomp.get_info(Species=x)
-        if not lst:
-            return ''
-        if type(lst) == list:
-            return ', '.join(sorted(set([item['AphiaID'] for item in lst if item['AphiaID']])))
-        return lst['AphiaID']
 
-
-class AddBvolCalculatedVolume(Transformer):
-    valid_data_types = ['Phytoplankton']
-
-    col_to_set = 'bvol_calculated_volume_um3'
-    source_col = 'bvol_scientific_name'
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f'Adds {AddBvolCalculatedVolume.col_to_set}'
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.col_to_set] = data_holder.data[self.source_col].apply(self._translate)
-
-    @functools.cache
-    def _translate(self, x: str) -> str:
-        lst = bvol_nomp.get_info(Species=x)
-        if not lst:
-            return ''
-        if type(lst) == list:
-            return ', '.join(sorted(set([item['Calculated_volume_um3'] for item in lst if item['Calculated_volume_um3']])))
-        return lst['Calculated_volume_um3']
+# class AddBvolCalculatedVolume(Transformer):
+#     valid_data_types = ['Phytoplankton']
+#
+#     col_to_set = 'bvol_calculated_volume_um3'
+#     source_col = 'bvol_scientific_name'
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#
+#     @staticmethod
+#     def get_transformer_description() -> str:
+#         return f'Adds {AddBvolCalculatedVolume.col_to_set}'
+#
+#     def _transform(self, data_holder: DataHolderProtocol) -> None:
+#         data_holder.data[self.col_to_set] = data_holder.data[self.source_col].apply(self._translate)
+#
+#     @functools.cache
+#     def _translate(self, x: str) -> str:
+#         lst = bvol_nomp.get_info(Species=x)
+#         if not lst:
+#             return ''
+#         if type(lst) == list:
+#             return ', '.join(sorted(set([item['Calculated_volume_um3'] for item in lst if item['Calculated_volume_um3']])))
+#         return lst['Calculated_volume_um3']
 
 
 

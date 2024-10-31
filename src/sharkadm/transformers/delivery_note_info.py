@@ -16,7 +16,7 @@ class AddDeliveryNoteInfo(Transformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._status_config = yaml_data.load_yaml(adm_config_paths('delivery_note_status'))
+        self._status_config = yaml_data.load_yaml(adm_config_paths('delivery_note_status'), encoding='utf8')
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -55,6 +55,7 @@ class AddDeliveryNoteInfo(Transformer):
         else:
             if checked_by == r'Leverantör':
                 data = self._status_config['deliverer']
+                raise
             elif checked_by == r'Leverantör och Datavärd':
                 data = self._status_config['deliverer_and_datahost']
         data_holder.data['check_status_sv'] = data['check_status_sv']

@@ -4,12 +4,13 @@ from sharkadm import transformers
 
 class Dyntaxa(MultiTransformer):
     _transformers = [
-        transformers.AddDyntaxaId,
-        transformers.AddDyntaxaScientificName,
-        transformers.AddDyntaxaScientificNameDyntaxaId,
         transformers.AddReportedDyntaxaId,
         transformers.AddReportedScientificNameDyntaxaId,
+        transformers.AddDyntaxaScientificName,
+        transformers.AddDyntaxaTranslatedScientificNameDyntaxaId,
+
         transformers.AddTaxonRanks,
+        transformers.AddDyntaxaId,
     ]
 
     @staticmethod

@@ -145,16 +145,19 @@ class DataHolder(ABC):
         return [sorted_years[0], sorted_years[-1]]
 
     @property
-    def zip_archive_name(self) -> str:
+    def zip_archive_base(self) -> str:
         parts = ['SHARK', self.data_type.capitalize()]
-        if hasattr(self, 'delivery_note'):
-            parts.append(self.delivery_note.reporting_institute_code)
         years = self.year_span
         parts.append(years[0])
         if years[0] != years[1]:
             parts.append(years[1])
-        parts.append(f'version_{datetime.datetime.now().strftime("%Y-%m-%d")}')
+        if hasattr(self, 'delivery_note'):
+            parts.append(self.delivery_note.reporting_institute_code)
         return '_'.join(parts)
+
+    @property
+    def zip_archive_name(self) -> str:
+        return f'{self.zip_archive_base}_version_{datetime.datetime.now().strftime("%Y-%m-%d")}'
 
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)

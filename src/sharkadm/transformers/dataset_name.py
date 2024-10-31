@@ -1,4 +1,5 @@
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer
+from sharkadm.data import DataHolder
 
 
 class AddDatasetName(Transformer):
@@ -8,6 +9,6 @@ class AddDatasetName(Transformer):
     def get_transformer_description() -> str:
         return f'Adds dataset_name column'
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.datatype_column_name] = data_holder.dataset_name
+    def _transform(self, data_holder: DataHolder) -> None:
+        data_holder.data[self.datatype_column_name] = data_holder.zip_archive_base
 

@@ -36,7 +36,7 @@ from .depth import AddSectionStartAndEndDepth
 from .depth import ReorderSampleMinAndMaxDepth
 from .dyntaxa import AddDyntaxaId
 from .dyntaxa import AddDyntaxaScientificName
-from .dyntaxa import AddDyntaxaScientificNameDyntaxaId
+from .dyntaxa import AddDyntaxaTranslatedScientificNameDyntaxaId
 from .dyntaxa import AddReportedDyntaxaId
 from .dyntaxa import AddReportedScientificNameDyntaxaId
 from .dyntaxa import AddTaxonRanks
