@@ -10,8 +10,9 @@ from .unique import ValidateUniqueSampleId
 from .columns import ValidateColumnViewColumnsNotInDataset
 from .mandatory import ValidateValuesInMandatoryNatColumns
 from .mandatory import ValidateValuesInMandatoryRegColumns
-from .aphia_id import ValidateAphiaId
-
+from .aphia_id import ValidateReportedVsAphiaId
+from .aphia_id import ValidateReportedVsBvolAphiaId
+from .aphia_id import ValidateAphiaIdVsBvolAphiaId
 
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
@@ -24,10 +25,6 @@ def get_validator_list() -> list[Type[Validator]]:
 def get_validators() -> dict[str, Type[Validator]]:
     """Returns a dictionary with validators"""
     return utils.get_all_class_children(Validator)
-    # validators = {}
-    # for cls in Validator.__subclasses__():
-    #     validators[cls.__name__] = cls
-    # return validators
 
 
 def get_validator_object(name: str, **kwargs) -> Validator:
@@ -52,11 +49,6 @@ def get_validators_info() -> dict:
         result[name]['name'] = name
         result[name]['description'] = val.get_validator_description()
         result[name]['kwargs'] = get_kwargs_for_class(val)
-        # result[name]['kwargs'] = dict()
-        # for key, value in inspect.signature(val.__init__).parameters.items():
-        #     if key in ['self', 'kwargs']:
-        #         continue
-        #     result[name]['kwargs'][key] = value.default
     return result
 
 
