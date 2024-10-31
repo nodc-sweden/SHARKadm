@@ -38,6 +38,8 @@ def get_validators_description() -> dict[str, str]:
     """Returns a dictionary with validator name as key and the description as value"""
     result = dict()
     for name, val in get_validators().items():
+        if name.startswith('_'):
+            continue
         result[name] = val.get_validator_description()
     return result
 

@@ -183,6 +183,8 @@ class SHARKadmWorkflow:
         return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_before}
 
     def get_validator_after_descriptions(self) -> dict[str, str]:
+        for val in VALIDATOR_DESCRIPTIONS:
+            print(f'{val=}')
         return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_after}
 
     def get_exporter_descriptions(self) -> dict[str, str]:

@@ -7,6 +7,7 @@ import pathlib
 from sharkadm.transformers import get_transformers_description_text
 from sharkadm.multi_transformers import get_multi_transformers_description_text
 from sharkadm.validators import get_validators_description_text
+from sharkadm.multi_validators import get_multi_validators_description_text
 from sharkadm.exporters import get_exporters_description_text
 
 from sharkadm.lims_data import get_row_data_from_lims_export
@@ -22,6 +23,7 @@ def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None
     with open(path, 'w') as fid:
         fid.write('\n\n\n\n'.join([
             get_validators_description_text(),
+            get_multi_validators_description_text(),
             get_transformers_description_text(),
             get_multi_transformers_description_text(),
             get_exporters_description_text()
