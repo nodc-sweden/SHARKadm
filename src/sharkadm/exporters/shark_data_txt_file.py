@@ -1,26 +1,24 @@
 import pathlib
 
-from .base import Exporter, DataHolderProtocol
+from .base import FileExporter, DataHolderProtocol
 
 from sharkadm.config import get_column_views_config
 from sharkadm import utils
 
 
-class SHARKdataTxt(Exporter):
+class SHARKdataTxt(FileExporter):
     """Writes data to file filtered by the columns specified for the given data type in column_views."""
 
     def __init__(self,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
-        super().__init__()
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self._export_directory = pathlib.Path(export_directory)
+        super().__init__(export_directory,
+                         export_file_name,
+                         **kwargs)
         if not export_file_name:
             export_file_name = 'shark_data.txt'
         self._export_file_name = export_file_name
-        self._encoding = kwargs.get('encoding', 'cp1252')
         self._column_views = get_column_views_config()
 
     @property
@@ -37,21 +35,19 @@ class SHARKdataTxt(Exporter):
         data.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
 
 
-class SHARKdataTxtAsGiven(Exporter):
+class SHARKdataTxtAsGiven(FileExporter):
     exclude_columns = ['source']
 
     def __init__(self,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
-        super().__init__()
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self._export_directory = pathlib.Path(export_directory)
+        super().__init__(export_directory,
+                         export_file_name,
+                         **kwargs)
         if not export_file_name:
             export_file_name = 'shark_data.txt'
         self._export_file_name = export_file_name
-        self._encoding = kwargs.get('encoding', 'cp1252')
         self._column_views = get_column_views_config()
 
     @property

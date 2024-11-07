@@ -52,11 +52,11 @@ exporters:
 #  - name: ZipArchive
 #    kwargs:
 #      directory: ""
-#  - name: SHARKMetadataAuto
+  - name: SHARKMetadataAuto
 #    kwargs:
 #      path: ""
-#  - name: HtmlStationMap
-#    open_map: true
+  - name: HtmlStationMap
+    open_map: true
 #  - name: PrintDataFrame
 #  - name: TxtAsIs
   - name: SHARKdataTxt

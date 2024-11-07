@@ -7,23 +7,22 @@ from sharkadm.data import DataHolder
 from sharkadm import exporters
 from sharkadm import utils
 
-from .base import Exporter, DataHolderProtocol
+from .base import FileExporter, DataHolderProtocol
 from sharkadm import sharkadm_logger
 from sharkadm import adm_logger
 
 
-class ZipArchive(Exporter):
+class ZipArchive(FileExporter):
     """Class to export zip package that are sent to SHARKdata"""
 
-    def __init__(self, directory: str | pathlib.Path | None = None, **kwargs):
-        super().__init__(**kwargs)
-        if not directory:
-            directory = utils.get_export_directory()
-        self._export_directory = pathlib.Path(directory)
-        print(f'{self._export_directory=}')
-        if not self._export_directory.is_dir():
-            raise NotADirectoryError(self._export_directory)
-        self._encoding = kwargs.get('encoding', 'cp1252')
+    def __init__(self,
+                 export_directory: str | pathlib.Path | None = None,
+                 export_file_name: str | pathlib.Path | None = None,
+                 **kwargs):
+        super().__init__(export_directory,
+                         export_file_name,
+                         **kwargs)
+
         self._data_holder: DataHolder | None = None
         self._metadata_auto: exporters.SHARKMetadataAuto | None = None
 

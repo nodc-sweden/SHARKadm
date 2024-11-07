@@ -102,6 +102,7 @@ class FileExporter(Exporter, ABC):
 
     def export(self, data_holder: DataHolderProtocol):
         super().export(data_holder=data_holder)
+        print(f'¤¤¤¤¤: {self._kwargs=}')
         self.open_file()
         self.open_file_with_excel()
         self.open_directory()

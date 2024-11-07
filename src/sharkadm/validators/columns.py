@@ -15,7 +15,7 @@ class ValidateColumnViewColumnsNotInDataset(Validator):
 
     @staticmethod
     def get_validator_description() -> str:
-        return 'Checks which columns in column views that are not present in dataset. Use this asn an early validation'
+        return 'Checks which columns in column views that are not present in dataset. Use this as an early validation'
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in self._column_views.get_columns_for_view(data_holder.data_type):

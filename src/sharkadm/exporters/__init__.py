@@ -36,6 +36,7 @@ def get_exporters() -> dict[str, Type[Exporter]]:
 
 def get_exporter_object(name: str, **kwargs) -> Exporter:
     """Returns Exporter object that matches the given exporter name"""
+    print(f'#¤#¤#¤:::::: {kwargs=}')
     all_exporters = get_exporters()
     exporter = all_exporters[name]
     return exporter(**kwargs)

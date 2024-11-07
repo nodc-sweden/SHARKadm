@@ -67,18 +67,24 @@ class SHARKadmWorkflow:
     def _set_validators_before(self) -> None:
         vals_list = []
         for val in self._validators_before or []:
+            if not val.get('active', True):
+                continue
             vals_list.append(validators.get_validator_object(**val))
         self._controller.set_validators_before(*vals_list)
 
     def _set_validators_after(self) -> None:
         vals_list = []
         for val in self._validators_after or []:
+            if not val.get('active', True):
+                continue
             vals_list.append(validators.get_validator_object(**val))
         self._controller.set_validators_after(*vals_list)
 
     def _set_transformers(self) -> None:
         trans_list = []
         for tran in self._transformers or []:
+            if not tran.get('active', True):
+                continue
             tran_obj = transformers.get_transformer_object(**tran)
             if not tran_obj:
                 tran_obj = multi_transformers.get_multi_transformer_object(**tran)
@@ -90,6 +96,8 @@ class SHARKadmWorkflow:
     def _set_exporters(self) -> None:
         exporter_list = []
         for exp in self._exporters or []:
+            if not exp.get('active', True):
+                continue
             exporter_list.append(exporters.get_exporter_object(**exp))
         self._controller.set_exporters(*exporter_list)
 
@@ -183,8 +191,6 @@ class SHARKadmWorkflow:
         return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_before}
 
     def get_validator_after_descriptions(self) -> dict[str, str]:
-        for val in VALIDATOR_DESCRIPTIONS:
-            print(f'{val=}')
         return {val['name']: VALIDATOR_DESCRIPTIONS[val['name']] for val in self._validators_after}
 
     def get_exporter_descriptions(self) -> dict[str, str]:
@@ -194,6 +200,14 @@ class SHARKadmWorkflow:
         sources = [dict(path=str(path)) for path in paths]
         self._workflow_config['data_source_paths'] = sources
         self._data_sources = sources
+
+    @property
+    def exporters(self) -> list[dict]:
+        return self._exporters
+
+    @exporters.setter
+    def exporters(self, exporters: list[dict]):
+        self._exporters = exporters
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
