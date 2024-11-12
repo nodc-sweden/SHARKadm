@@ -56,7 +56,8 @@ exporters:
 #    kwargs:
 #      path: ""
   - name: HtmlStationMap
-    open_map: true
+    open_file: true
+    open_directory: true
 #  - name: PrintDataFrame
 #  - name: TxtAsIs
   - name: SHARKdataTxt

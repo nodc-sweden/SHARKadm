@@ -209,6 +209,12 @@ class SHARKadmWorkflow:
     def exporters(self, exporters: list[dict]):
         self._exporters = exporters
 
+    def export(self, **kwargs):
+        exp = exporters.get_exporter_object(**kwargs)
+        if not self._controller.data_holder:
+            raise sharkadm_exceptions.DataHolderError('No data holder set')
+        self._controller.export(exp)
+
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
         with open(path) as fid:

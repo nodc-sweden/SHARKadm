@@ -108,7 +108,7 @@ class FileExporter(Exporter, ABC):
         self.open_directory()
 
     def open_file(self):
-        if self._kwargs.get('open_file', self._kwargs.get('open_export_file')) and self.export_file_path:
+        if self._kwargs.get('open_file', self._kwargs.get('open_export_file', self._kwargs.get('open'))) and self.export_file_path:
             utils.open_file_with_default_program(self.export_file_path)
         return self
 

@@ -13,12 +13,11 @@ class SHARKdataTxt(FileExporter):
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
+        if not export_file_name:
+            export_file_name = 'shark_data.txt'
         super().__init__(export_directory,
                          export_file_name,
                          **kwargs)
-        if not export_file_name:
-            export_file_name = 'shark_data.txt'
-        self._export_file_name = export_file_name
         self._column_views = get_column_views_config()
 
     @property

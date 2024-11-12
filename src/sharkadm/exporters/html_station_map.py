@@ -11,22 +11,19 @@ except ModuleNotFoundError as e:
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
 
 
-from .base import Exporter, DataHolderProtocol
+from .base import FileExporter, DataHolderProtocol
 
 
-class HtmlStationMap(Exporter):
+class HtmlStationMap(FileExporter):
     """Creates a html station map"""
 
     def __init__(self,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
-                 open_map: bool = False, **kwargs):
-        super().__init__(**kwargs)
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self._export_directory = pathlib.Path(export_directory)
-        self._export_file_name = export_file_name
-        self._open_map = kwargs.get('open_file', kwargs.get('open', open_map))
+                 **kwargs):
+        super().__init__(export_directory,
+                         export_file_name,
+                         **kwargs)
 
     def _get_path(self, data_holder: DataHolderProtocol) -> pathlib.Path:
         if not self._export_file_name:
@@ -67,8 +64,6 @@ class HtmlStationMap(Exporter):
             new_stations_as_cluster=False,
             file_path=str(export_path)
         )
-        if self._open_map:
-            utils.open_file_with_default_program(export_path)
 
     def _get_position_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """Removes duplicated positions in dataframe"""
