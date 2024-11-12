@@ -4,7 +4,7 @@ from sharkadm import transformers
 
 class Position(MultiTransformer):
     _transformers = [
-        transformers.AddSamplePosition,
+        transformers.AddSamplePositionDD,
         transformers.AddSamplePositionDM,
         transformers.AddSamplePositionSweref99tm,
     ]

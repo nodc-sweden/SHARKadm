@@ -93,12 +93,16 @@ class FileExporter(Exporter, ABC):
         self._encoding = kwargs.get('encoding', 'cp1252')
 
     @property
-    def export_file_path(self):
-        return pathlib.Path(self._export_directory, self._export_file_name)
+    def export_directory(self):
+        return self._export_directory
 
     @property
-    def export_directory(self):
-        return self.export_file_path.parent
+    def export_file_name(self):
+        return self._export_file_name
+
+    @property
+    def export_file_path(self):
+        return pathlib.Path(self._export_directory, self._export_file_name)
 
     def export(self, data_holder: DataHolderProtocol):
         super().export(data_holder=data_holder)
@@ -108,18 +112,29 @@ class FileExporter(Exporter, ABC):
         self.open_directory()
 
     def open_file(self):
+        if not self.export_file_name:
+            return
         if self._kwargs.get('open_file', self._kwargs.get('open_export_file', self._kwargs.get('open'))) and self.export_file_path:
             utils.open_file_with_default_program(self.export_file_path)
         return self
 
     def open_file_with_excel(self):
-        if self._kwargs.get('open_file_with_excel', self._kwargs.get('open_export_file_with_excel', self._kwargs.get('open_with_excel'))) and self.export_file_path:
+        if not self.export_file_name:
+            return
+        if self.export_file_path and any([
+            self._kwargs.get('open_file_with_excel'),
+            self._kwargs.get('open_export_file_with_excel'),
+            self._kwargs.get('open_with_excel'),
+            self._kwargs.get('open_file_in_excel'),
+            self._kwargs.get('open_export_file_in_excel'),
+            self._kwargs.get('open_in_excel'),
+        ]):
             utils.open_file_with_excel(self.export_file_path)
         return self
 
     def open_directory(self):
-        if self._kwargs.get('open_directory') and self.export_file_path:
-            utils.open_directory(self.export_file_path.parent)
+        if self._kwargs.get('open_directory') and self.export_directory:
+            utils.open_directory(self.export_directory)
         return self
 
     @staticmethod
