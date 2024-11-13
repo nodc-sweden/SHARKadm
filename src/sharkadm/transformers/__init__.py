@@ -11,8 +11,8 @@ from .base import Transformer
 from .boolean import FixYesNo
 from .bvol import AddBvolAphiaId
 from .bvol import AddBvolRefList
-from .bvol import AddBvolScientificNameOriginal
 from .bvol import AddBvolScientificNameAndSizeClass
+from .bvol import AddBvolScientificNameOriginal
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns
@@ -26,6 +26,7 @@ from .date_and_time import AddMonth
 from .date_and_time import AddReportedDates
 from .date_and_time import AddSampleDate
 from .date_and_time import AddSampleTime
+from .date_and_time import AddVisitDateFromObservationDate
 from .date_and_time import CreateFakeFullDates
 from .date_and_time import FixDateFormat
 from .date_and_time import FixTimeFormat
@@ -58,6 +59,7 @@ from .location import AddLocationSeaBasin
 from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
 from .long_to_wide import LongToWide
+from .manual import ManualSealPathology
 from .map_header import ArchiveMapper
 from .map_parameter_column import MapperParameterColumn
 from .orderer import AddEnglishSampleOrderer
@@ -77,7 +79,6 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
-# from .scientific_name import AddReportedScientificName
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
@@ -90,8 +91,8 @@ from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .visit import AddVisitKey
 from .wide_to_long import WideToLong
-from .worms import AddWormsAphiaId
 from .worms import AddReportedAphiaId
+from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
 

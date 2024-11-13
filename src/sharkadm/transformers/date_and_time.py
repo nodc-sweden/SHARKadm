@@ -67,7 +67,8 @@ class FixDateFormat(Transformer):
     dates_to_check = [
         'sample_date',
         'visit_date',
-        'analysis_date'
+        'analysis_date',
+        'observation_date'
     ]
 
     from_format = '%Y%m%d'
@@ -273,6 +274,20 @@ class CreateFakeFullDates(Transformer):
                                                                                  index, self.shark_comment_column] + comment_str + '; '
 
 
+class AddVisitDateFromObservationDate(Transformer):
+    valid_data_types = ['HarbourPorpoise']
+    valid_data_holders = ['ZipArchiveDataHolder']
+    source_col = 'observation_date'
+    col_to_set = 'visit_date'
 
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Sets {AddVisitDateFromObservationDate.col_to_set} from {AddVisitDateFromObservationDate.source_col}'
 
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_col not in data_holder.data:
+            adm_logger.log_transformation(f'Source column {self.source_col} not found', level=adm_logger.DEBUG)
+            return
+        data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
+        adm_logger.log_transformation(f'Column {self.col_to_set} set from source column {self.source_col}', level=adm_logger.INFO)
 
