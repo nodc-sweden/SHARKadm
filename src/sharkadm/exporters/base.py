@@ -102,11 +102,12 @@ class FileExporter(Exporter, ABC):
 
     @property
     def export_file_path(self):
+        if not (self.export_directory and self.export_file_name):
+            return
         return pathlib.Path(self._export_directory, self._export_file_name)
 
     def export(self, data_holder: DataHolderProtocol):
         super().export(data_holder=data_holder)
-        print(f'¤¤¤¤¤: {self._kwargs=}')
         self.open_file()
         self.open_file_with_excel()
         self.open_directory()
