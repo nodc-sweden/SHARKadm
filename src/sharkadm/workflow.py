@@ -10,6 +10,7 @@ from sharkadm import utils
 from sharkadm import validators
 from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
+from sharkadm.exporters.base import FileExporter
 from sharkadm.sharkadm_logger import get_exporter
 from sharkadm import sharkadm_exceptions
 
@@ -36,6 +37,8 @@ class SHARKadmWorkflow:
         self._transformers = transformers or []
         self._validators_after = validators_after or []
         self._exporters = exporters or []
+
+        self.export_paths = {}
 
         self._file_path: pathlib.Path = kwargs.get('file_path')
 
@@ -95,16 +98,23 @@ class SHARKadmWorkflow:
 
     def _set_exporters(self) -> None:
         exporter_list = []
+        self.export_paths = {}
         for exp in self._exporters or []:
             if not exp.get('active', True):
                 continue
-            exporter_list.append(exporters.get_exporter_object(**exp))
+            exporter = exporters.get_exporter_object(**exp)
+            if isinstance(exporter, FileExporter):
+                self.export_paths[exporter.name] = dict(
+                    directory=exporter.export_directory,
+                    file_name=exporter.export_file_name,
+                    file_path=exporter.export_file_path,
+                )
+            exporter_list.append(exporter)
         self._controller.set_exporters(*exporter_list)
 
     def start_workflow(self) -> None:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
-        print(f'{self._data_sources=}')
         for data_source in self._data_sources:
             adm_logger.reset_log()
             d_holder = get_data_holder(**data_source)
@@ -126,15 +136,15 @@ class SHARKadmWorkflow:
             return
         adm_logger.filter(**log_filter)
 
-    def _open_log_reports(self) -> None:
-        for path in self._open_report_paths:
-            utils.open_file_with_default_program(path)
+    # def _open_log_reports(self) -> None:
+    #     for path in self._open_report_paths:
+    #         utils.open_file_with_default_program(path)
 
-    def _open_export_directory(self) -> None:
-        for directory in self._open_directory_paths:
-            utils.open_directory(directory)
-        if self._workflow_config.get('open_export_directory', self._workflow_config.get('open_directory')):
-            utils.open_directory(self._get_directory(self._workflow_config['export_directory']))
+    # def _open_export_directory(self) -> None:
+    #     for directory in self._open_directory_paths:
+    #         utils.open_directory(directory)
+    #     if self._workflow_config.get('open_export_directory', self._workflow_config.get('open_directory')):
+    #         utils.open_directory(self._get_directory(self._workflow_config['export_directory']))
 
     def _paths_to_string(self, info: dict | list) -> dict:
         if isinstance(info, list):

@@ -64,7 +64,7 @@ from .orderer import AddEnglishSampleOrderer
 from .orderer import AddSwedishSampleOrderer
 from .parameter_unit_value import AddParameterUnitValueFromReported
 from .parameter_unit_value import RemoveRowsWithNoParameterValue
-from .position import AddSamplePosition
+from .position import AddSamplePositionDD
 from .position import AddSamplePositionDM
 from .position import AddSamplePositionSweref99tm
 from .project_code import AddEnglishProjectName

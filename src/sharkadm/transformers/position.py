@@ -5,10 +5,10 @@ from sharkadm.utils import geography
 from .base import Transformer, DataHolderProtocol
 
 
-class AddSamplePosition(Transformer):
+class AddSamplePositionDD(Transformer):
     lat_info = dict(
         nr_sweref_digits=7,
-        columns = [
+        columns=[
         'sample_reported_latitude',
         'visit_reported_latitude'
     ]  # In order of prioritization
@@ -55,10 +55,11 @@ class AddSamplePosition(Transformer):
 
         if self._is_sweref99tm(value=lat_value, info=self.lat_info) and self._is_sweref99tm(value=lon_value, info=self.lon_info):
             return geography.sweref99tm_to_decdeg(lon_value, lat_value)
-        elif self._is_dm_lat(lat_value) and self._is_dm_lon(lon_value):
-            return geography.decmin_to_decdeg(lat_value), geography.decmin_to_decdeg(lon_value)
         elif self._is_dd(lat_value) and self._is_dd(lon_value):
             return lat_value, lon_value
+        elif self._is_dm_lat(lat_value) and self._is_dm_lon(lon_value):
+            return geography.decmin_to_decdeg(lat_value), geography.decmin_to_decdeg(lon_value)
+
 
     def _is_sweref99tm(self, value: str, info: dict) -> bool:
         if len(value.split('.')[0]) == info['nr_sweref_digits']:

@@ -30,16 +30,16 @@ variable.COPY_VARIABLE.Abundance class.class				ABUND_CLASS				OBSERVED<or>ABUND
 variable.COPY_VARIABLE.Abundance class HAB.class											
 variable.COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l	ABUND	ABUND	ABUND	Abundance cells/L<or>ABUND<or>CONC_IND_L-1<or>ABUND (c/l)	ABUND	ABUND (c/l)	ABUND	CONC_IND_L-1<or>ABUND<or>ABUND (c/l)	ABUND<or>HARMFUL_ALGAE_ABUND		ABUND_UNITS_PER_LITER<or>ABUND
 variable.COPY_VARIABLE.Abundance HAB.ind/l or 100 um pieces/l										CONC_IND_L-1<or>ABUND<or>ABUND (c/l)	
-variable.COPY_VARIABLE.Biovolume concentration.mm3/l				Total Biovolume mm3/L<or>Biovolume   mm3/L<or>Biovol-conc<or>Reported_Biovolume   mm3/L<or>BIOVOL<or>Reported_Biovolume   mm3/L	BIOVOL		Reported_Biovolume   mm3/L<or>BIOVOL<or>mm3/L	BIOVOLYM (mm3/l)<or>Biovol-conc<or>BIOVOL<or>BIOVOLYM			BIOVOL_PER_LITER<or>BIOVOL
+variable.COPY_VARIABLE.Biovolume concentration.mm3/l				Total Biovolume mm3/L<or>Biovolume   mm3/L<or>Biovol-conc<or>Reported_Biovolume   mm3/L<or>BIOVOL<or>Reported_Biovolume   mm3/L	BIOVOL<or>mm3/L		Reported_Biovolume   mm3/L<or>BIOVOL<or>mm3/L	BIOVOLYM (mm3/l)<or>Biovol-conc<or>BIOVOL<or>BIOVOLYM			BIOVOL_PER_LITER<or>BIOVOL
 variable.COPY_VARIABLE.Carbon concentration.ugC/l				Total Phytoplankton Carbon ug C/L (Menden-Dauer & Lessard 2000)<or>Total Phytoplankton Carbon  ug C/L (Menden-Dauer & Lessard 2000)<or>Carbon-conc<or>Cell Carbon  ug C/L (Menden-Dauer & Lessard 2000)<or>Reported_Total Phytoplankton Carbon  ug C/L (Menden-Deuer & Lessard 2000)<or>Reported_Total Phytoplankton Carbon  µg C/L (Menden-Deuer & Lessard 2000)<or>C_CONC	C_CONC	mgC/m3	Reported_Total Phytoplankton Carbon  ug C/L (Menden-Deuer & Lessard 2000)<or>ug C/L<or>µgC/L	CARBON_CONC_ugC/l<or>Carbon-conc<or>CARBON_CONC<or>C_CONC			C_CONC_PER_LITER<or>C_CONC
 variable.COPY_VARIABLE_DIVIDE.Biovolume concentration.mm3/l.1000000000						BIOVOLYM (um3/l)		BIOVOLYM (um3/l)			
-variable.counter_program					COUNTPROG		COUNTPROG	COUNTPROG			COUNTPROG
+variable.counter_program					COUNTPROG		COUNTPROG	COUNTPROG			
 variable.magnification	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	MAGNI	
 variable.mesh_size_um									MESHS	MESHS	
 variable.analysis_method_code				METOA	METOA		METOA	METOA		METOA	METOA
 variable.preservation_method_code	METFP	METFP	METFP	METFP	METFP	METFP	METFP	METFP	METPR	METFP	METFP
 variable.quality_flag	QFLAG	QFLAG	QFLAG	QFLAG	QFLAG	QFLAG	QFLAG	QFLAG		QFLAG	
-variable.reported_cell_volume_um3	CEVOL	CEVOL		CEVOL<or>CVOL<or>PEG CELL VOLUME um3/cell<or>Cellvolym um3<or>Calculated  volume, um3<or>BIOVOL um3/cell<or>Reported_Cellvolym um3<or>BIOVOL µm3/cell<or>Reported_Cellvolym µm3	CEVOL	CEVOL	CEVOL<or>Reported_Cellvolym um3	BIOVOL um3/cell<or>CEVOL	ORIGINALCELLVOLUME	CEVOL<or>CVOL<or>PEG CELL VOLUME um3/cell<or>Cellvolym um3<or>Calculated  volume, um3<or>BIOVOL um3/cell<or>Reported_Cellvolym um3	
+variable.reported_cell_volume_um3	CEVOL	CEVOL		CEVOL<or>CVOL<or>PEG CELL VOLUME um3/cell<or>Cellvolym um3<or>Calculated  volume, um3<or>BIOVOL um3/cell<or>Reported_Cellvolym um3<or>BIOVOL µm3/cell<or>Reported_Cellvolym µm3	CEVOL	CEVOL	CEVOL<or>Reported_Cellvolym um3<or>CEVOL	BIOVOL um3/cell<or>CEVOL	ORIGINALCELLVOLUME	CEVOL<or>CVOL<or>PEG CELL VOLUME um3/cell<or>Cellvolym um3<or>Calculated  volume, um3<or>BIOVOL um3/cell<or>Reported_Cellvolym um3	
 variable.reported_scientific_name	LATNM	LATNM	LATNM	LATNM	LATNM	LATNM	LATNM	LATNM	LATNM	LATNM<or>PW LATNM	LATNM
 variable.sample_part_id									RPSNO		
 variable.sedimentation_time_h	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	SDTIM	
@@ -92,7 +92,7 @@ sample.classifier_created_by											CLASSIFIER_CREATED_BY
 sample.classifier_used											CLASSIFIER_USED
 sample.instrument_number											IFCBNO
 variable.reported_aphia_id											APHIA_ID
-variable.image_verification											IMAGE_VERIFICATION
+variable.image_verification_status											IMAGE_VERIFICATION
 variable.classifier_taxon_name											CLASS_NAME
 variable.classifier_f1_score_percent											CLASS_F1
 variable.training_set											TRAINING_SET
@@ -112,4 +112,9 @@ sample.water_temp_deg_c_fb											TEMP_FB
 sample.psal_psu_fb											PSAL_FB
 sample.osat_percent_fb											OSAT_FB
 sample.doxy_ml_l_fb											DOXY_FB
-variable.quality_flag											QFLAG
+variable.image_instrument_flag											QFLAG
+sample.image_instrument_name											SAMPLING_PLATFORM
+variable.image_verified_by											VERIFIED_BY
+variable.associated_media											ASSOCIATED_MEDIA
+variable.classification_program_image											CLASSPROG<or>COUNTPROG
+variable.reported_scientific_name_species_flag											LATNM_SFLAG

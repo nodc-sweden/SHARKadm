@@ -6,6 +6,7 @@ from sharkadm import utils
 from .base import Exporter
 from .dataframe import DataFrame
 from .html_station_map import HtmlStationMap
+from .ifcb_visualization import IfcbVisualizationFiles
 from .print_on_screen import PrintDataFrame
 from .shark_data_txt_file import SHARKdataTxt
 from .shark_data_txt_file import SHARKdataTxtAsGiven

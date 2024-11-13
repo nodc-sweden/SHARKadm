@@ -10,7 +10,7 @@ class GeneralInitial(MultiTransformer):
         transformers.AddSampleDate,
         transformers.AddDatetime,
         transformers.AddMonth,
-        transformers.AddSamplePosition,
+        transformers.AddSamplePositionDD,
         transformers.AddSamplePositionDM,
         transformers.AddSamplePositionSweref99tm,
 
