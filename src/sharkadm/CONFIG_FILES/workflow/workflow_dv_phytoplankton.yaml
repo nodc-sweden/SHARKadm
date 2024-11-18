@@ -49,7 +49,7 @@ transformers:
   - name: AddStaticDataHoldingCenter
   - name: AddColumnViewsColumns
 exporters:
-#  - name: ZipArchive
+  - name: ZipArchive
 #    kwargs:
 #      directory: ""
   - name: SHARKMetadataAuto

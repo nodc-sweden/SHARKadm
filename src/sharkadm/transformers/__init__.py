@@ -60,6 +60,7 @@ from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
 from .long_to_wide import LongToWide
 from .manual import ManualSealPathology
+from .manual import ManualHarbourPorpoise
 from .map_header import ArchiveMapper
 from .map_parameter_column import MapperParameterColumn
 from .orderer import AddEnglishSampleOrderer
