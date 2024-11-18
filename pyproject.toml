@@ -1,6 +1,6 @@
 [project]
 name = "sharkadm"
-version = "1.0.0"
+version = "1.1.0"
 description = "Handles workflows for Swedish NODC"
 authors = [
     {name = "Magnus Wenzer", email = "magnus.wenzer@smhi.se"},
