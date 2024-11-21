@@ -38,19 +38,44 @@ class _AddCodes(Transformer):
             return
         if self.col_to_set not in data_holder.data.columns:
             data_holder.data[self.col_to_set] = ''
-        for code in set(data_holder.data[source_col]):
+
+        for code, df in data_holder.data.groupby(source_col):
+            len_df = len(df)
+            code = str(code)
             names = []
-            for part in code.split(','):
-                part = part.strip()
-                info = _translate_codes.get_info(self.lookup_field, part)
-                if info:
-                    names.append(info[self.lookup_key])
-                else:
-                    adm_logger.log_transformation(f'Could not find information for {source_col}: {part}',
-                                                  level=adm_logger.WARNING)
-                    names.append('?')
-            index = data_holder.data[source_col] == code
-            data_holder.data.loc[index, self.col_to_set] = ', '.join(names)
+            info = _translate_codes.get_info(self.lookup_field, code.strip())
+            if info:
+                names = [info[self.lookup_key]]
+                adm_logger.log_transformation(f'{code} translated to {info[self.lookup_key]} ({len_df} places)',
+                                              level=adm_logger.INFO)
+            else:
+                for part in code.split(','):
+                    part = part.strip()
+                    info = _translate_codes.get_info(self.lookup_field, part)
+                    if info:
+                        names.append(info[self.lookup_key])
+                        adm_logger.log_transformation(f'{part} translated to {info[self.lookup_key]} ({len_df} places)',
+                                                      level=adm_logger.INFO)
+                    else:
+                        adm_logger.log_transformation(f'Could not find information for {source_col}: {part}',
+                                                      level=adm_logger.WARNING)
+            data_holder.data.loc[df.index, self.col_to_set] = ', '.join(names)
+
+
+        # for code in set(data_holder.data[source_col]):
+        #     info = _translate_codes.get_info(self.lookup_field, code.strip())
+        #     names = []
+        #     for part in code.split(','):
+        #         part = part.strip()
+        #         info = _translate_codes.get_info(self.lookup_field, part)
+        #         if info:
+        #             names.append(info[self.lookup_key])
+        #         else:
+        #             adm_logger.log_transformation(f'Could not find information for {source_col}: {part}',
+        #                                           level=adm_logger.WARNING)
+        #             names.append('?')
+        #     index = data_holder.data[source_col] == code
+        #     data_holder.data.loc[index, self.col_to_set] = ', '.join(names)
 
 
 class _AddCodesLab(_AddCodes):
