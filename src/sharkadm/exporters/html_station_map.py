@@ -5,7 +5,7 @@ from sharkadm import utils, adm_logger
 import pandas as pd
 try:
     from nodc_station.main import App
-    from nodc_station.station_file import DEFAULT_STATION_FILE_PATH
+    from nodc_station import DEFAULT_STATION_FILE_PATH
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
