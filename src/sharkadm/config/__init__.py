@@ -3,21 +3,116 @@ import functools
 import sys
 from typing import Protocol
 
-from sharkadm import adm_config_paths
+from sharkadm import config_paths
 from .import_matrix import ImportMatrixConfig, ImportMatrixMapper
-from .column_info import ColumnInfoConfig
+# from .column_info import ColumnInfoConfig
 from .column_views import ColumnViews
 from .custom_id import CustomIdsHandler
 from .data_type_mapper import DataTypeMapper
 from .delivery_note_mapper import DeliveryNoteMapper
 
+import functools
+import logging
+import pathlib
+import os
+
+import requests
+import ssl
+
+
+logger = logging.getLogger(__name__)
+
 DATA_STRUCTURES = ['row', 'column']
 
+CONFIG_SUBDIRECTORY = 'sharkadm'
+CONFIG_FILE_NAMES = [
+    'column_views.txt',
+    'data_type_mapping.yaml',
+    'delivery_note_mapping.txt',
+    'delivery_note_status.yaml',
+    'physical_chemical_mapping.txt',
 
-if getattr(sys, 'frozen', False):
-    THIS_DIR = pathlib.Path(sys.executable).parent
-else:
-    THIS_DIR = pathlib.Path(__file__).parent
+    'ids/epibenthos_id.yaml',
+    'ids/physicalchemichal_id.yaml',
+    'ids/phytoplankton_id.yaml',
+    'ids/zoobenthos_id.yaml',
+
+    'import_matrix/import_matrix_bacterioplankton.txt',
+    'import_matrix/import_matrix_chlorophyll.txt',
+    'import_matrix/import_matrix_eelgrass.txt',
+    'import_matrix/import_matrix_epibenthos.txt',
+    'import_matrix/import_matrix_epibenthos_dropvideo.txt',
+    'import_matrix/import_matrix_greyseal.txt',
+    'import_matrix/import_matrix_harbourporpoise.txt',
+    'import_matrix/import_matrix_harbourseal.txt',
+    'import_matrix/import_matrix_jellyfish.txt',
+    'import_matrix/import_matrix_physicalchemical.txt',
+    'import_matrix/import_matrix_phytoplankton.txt',
+    'import_matrix/import_matrix_picoplankton.txt',
+    'import_matrix/import_matrix_plankton_barcoding.txt',
+    'import_matrix/import_matrix_primaryproduction.txt',
+    'import_matrix/import_matrix_profile.txt',
+    'import_matrix/import_matrix_ringedseal.txt',
+    'import_matrix/import_matrix_sealpathology.txt',
+    'import_matrix/import_matrix_sedimentation.txt',
+    'import_matrix/import_matrix_zoobenthos.txt',
+    'import_matrix/import_matrix_zooplankton.txt',
+
+    'workflow/workflow_dv.yaml',
+    'workflow/workflow_dv_phytoplankton.yaml',
+    'workflow/workflow_dv_validation.yaml',
+    'workflow/workflow_ifcb_visualization.yaml',
+    ]
+
+
+CONFIG_DIRECTORY = None
+if os.getenv('NODC_CONFIG'):
+    CONFIG_DIRECTORY = pathlib.Path(os.getenv('NODC_CONFIG')) / CONFIG_SUBDIRECTORY
+TEMP_CONFIG_DIRECTORY = pathlib.Path.home() / 'temp_nodc_config' / CONFIG_SUBDIRECTORY
+
+
+CONFIG_URL = r'https://raw.githubusercontent.com/nodc-sweden/nodc_config/refs/heads/main/' + f'{CONFIG_SUBDIRECTORY}/'
+
+
+def get_config_root_directory() -> pathlib.Path:
+    return CONFIG_DIRECTORY or TEMP_CONFIG_DIRECTORY
+
+
+def get_config_path(name: str) -> pathlib.Path:
+    if name not in CONFIG_FILE_NAMES:
+        raise FileNotFoundError(f'No config file with name "{name}" exists')
+    if CONFIG_DIRECTORY:
+        path = CONFIG_DIRECTORY / name
+        if path.exists():
+            return path
+    temp_path = TEMP_CONFIG_DIRECTORY / name
+    if temp_path.exists():
+        return temp_path
+    update_config_file(temp_path)
+    if temp_path.exists():
+        return temp_path
+    raise FileNotFoundError(f'Could not find config file {name}')
+
+
+def update_config_file(path: pathlib.Path) -> None:
+    path.parent.mkdir(exist_ok=True, parents=True)
+    url = CONFIG_URL + str(path.relative_to(TEMP_CONFIG_DIRECTORY)).replace('\\', '/')
+    print(f'{url=}')
+    try:
+        res = requests.get(url, verify=ssl.CERT_NONE)
+        with open(path, 'w', encoding='utf8') as fid:
+            fid.write(res.text)
+            logger.info(f'Config file "{path.name}" updated from {url}')
+    except requests.exceptions.ConnectionError:
+        logger.warning(f'Connection error. Could not update config file {path.name}')
+        raise
+
+
+def update_config_files() -> None:
+    """Downloads config files from github"""
+    for name in CONFIG_FILE_NAMES:
+        target_path = TEMP_CONFIG_DIRECTORY / name
+        update_config_file(target_path)
 
 
 class DataHolderProtocol(Protocol):
@@ -25,10 +120,10 @@ class DataHolderProtocol(Protocol):
     header_mapper = None
 
 
-@functools.cache
-def get_column_info_config(path: str | pathlib.Path = None) -> ColumnInfoConfig:
-    path = path or adm_config_paths('column_info')
-    return ColumnInfoConfig(path)
+# @functools.cache
+# def get_column_info_config(path: str | pathlib.Path = None) -> ColumnInfoConfig:
+#     path = path or adm_config_paths('column_info')
+#     return ColumnInfoConfig(path)
 
 
 @functools.cache
@@ -110,8 +205,15 @@ def get_valid_data_structures(valid: list[str] | None = None,
         return [item for item in DATA_STRUCTURES if item not in invalid_lower]
 
 
+def get_config_paths():
+    root = get_config_root_directory()
+    if not root.exists() or not list(root.iterdir()):
+        update_config_files()
+    return config_paths.ConfigPaths(root)
+
+
+adm_config_paths = get_config_paths()
+
+
 if __name__ == '__main__':
-    data = {}
-    lev = 'visit'
-    h = get_custom_id_handler()
-    lh = h.get_level_handler('phytoplankton', 'visit')
+    update_config_files()

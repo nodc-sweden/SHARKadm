@@ -1,6 +1,6 @@
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.settings import adm_settings
-from sharkadm.config_paths import adm_config_paths
+from sharkadm.config import adm_config_paths
 from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
 import pathlib
