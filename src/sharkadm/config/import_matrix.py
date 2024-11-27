@@ -1,14 +1,10 @@
 import functools
-import pathlib
 import logging
+import pathlib
+
 from sharkadm import adm_logger
 
-import yaml
-
-
 logger = logging.getLogger(__name__)
-
-from .data_type_mapper import DataTypeMapper
 
 
 class ImportMatrixMapper:
@@ -125,32 +121,6 @@ class ImportMatrixConfig:
     def institutes(self) -> list:
         """Returns a sorted list of all institutes"""
         return sorted(self._data)
-
-    # @functools.cached_property
-    # def all_external_parameters(self) -> list:
-    #     """Returns a sorted list of all external parameters found in the config file"""
-    #     all_pars = set()
-    #     for par_dict in self._data.values():
-    #         all_pars.update(par_dict.keys())
-    #     return sorted(all_pars)
-    #
-    # @functools.cached_property
-    # def all_internal_parameters_with_level(self) -> list:
-    #     """Returns a sorted list of all internal parameters found in the config file including the level"""
-    #     all_pars = set()
-    #     for par_dict in self._data.values():
-    #         all_pars.update(par_dict.values())
-    #     return sorted(all_pars)
-    #
-    # @functools.cached_property
-    # def all_internal_parameters(self) -> list:
-    #     """Returns a sorted list of all internal parameters found in the config file"""
-    #     return sorted([item.split('.', 1)[1] for item in self.all_internal_parameters_with_level])
-    #
-    # @functools.cached_property
-    # def levels(self) -> list:
-    #     """Returns a sorted list of all levels found in the config file"""
-    #     return sorted(set([item.split('.', 1)[0] for item in self.all_internal_parameters_with_level]))
 
     def get_mapper(self, import_column: str) -> ImportMatrixMapper:
         """Returns a mapper object for the given institute. Creates it if not found"""

@@ -6,9 +6,9 @@ from .archive_data_holder import ArchiveDataHolder
 logger = logging.getLogger(__name__)
 
 
-class PhytoplanktonArchiveDataHolder(ArchiveDataHolder):
-    _data_type = 'Phytoplankton'
-    _data_format = 'Phytoplankton'
+class IfcbArchiveDataHolder(ArchiveDataHolder):
+    _data_type = 'IFCB'
+    _data_format = 'PlanktonImaging'
 
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / 'data.txt'
@@ -28,4 +28,3 @@ class PhytoplanktonArchiveDataHolder(ArchiveDataHolder):
         d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)
-

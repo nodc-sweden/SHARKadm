@@ -46,6 +46,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         self._load_sampling_info()
         self._load_analyse_info()
         self._load_data()
+        self._load_delivery_note()  # Reload to map
 
     @staticmethod
     def get_data_holder_description() -> str:
@@ -53,6 +54,10 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     def _initiate(self) -> None:
         self._dataset_name = self.archive_root_directory.name
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
 
     @property
     def data_format(self) -> str:
@@ -166,7 +171,8 @@ class ArchiveDataHolder(DataHolder, ABC):
         return str(max(self.data['visit_reported_latitude'].astype(float)))
 
     def _load_delivery_note(self) -> None:
-        self._delivery_note = delivery_note.DeliveryNote.from_txt_file(self.delivery_note_path)
+        self._delivery_note = delivery_note.DeliveryNote.from_txt_file(self.delivery_note_path,
+                                                                       mapper=self._import_matrix_mapper)
 
     def _load_sampling_info(self) -> None:
         if not self.sampling_info_path.exists():
@@ -184,8 +190,8 @@ class ArchiveDataHolder(DataHolder, ABC):
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
         self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
-        if not self._import_matrix:
-            self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_format)
+        # if not self._import_matrix:
+        #     self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_format)
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
 
     def _add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
@@ -199,7 +205,7 @@ class ArchiveDataHolder(DataHolder, ABC):
     def _check_data_source(self, data_source: data_source.DataFile) -> None:
         #if self._data_type_mapper.get(data_source.data_type) != self._data_type_mapper.get(self.data_type):
         if data_source.data_type.lower() != self.data_type.lower():
-            msg = f'Data source {data_source} is not of type {self.data_type}'
+            msg = f'Data source {data_source} in data holder {self.name} is not of type {self.data_type}'
             logger.error(msg)
             raise ValueError(msg)
 

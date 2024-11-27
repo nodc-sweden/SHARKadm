@@ -82,6 +82,11 @@ class ZipArchive(FileExporter):
         target_dir = self._temp_target_directory / 'processed_data'
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.processed_data_files:
+            if not path.exists():
+                adm_logger.log_export(
+                    f'Missing processed file: {path.name}',
+                    level=adm_logger.WARNING)
+                continue
             target_path = target_dir / path.name
             shutil.copy2(path, target_path)
 

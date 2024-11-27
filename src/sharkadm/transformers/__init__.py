@@ -96,6 +96,7 @@ from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
+from .occurrence_id import AddOccurrenceId
 
 
 @functools.cache

@@ -56,6 +56,10 @@ class AddBvolScientificNameAndSizeClass(Transformer):
         return f'Adds {AddBvolScientificNameAndSizeClass.col_to_set_name} and {AddBvolScientificNameAndSizeClass.col_to_set_size}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_size_class_col not in data_holder.data:
+            adm_logger.log_transformation(f'Missing column {self.source_size_class_col} when trying to set bvol information',
+                                          level=adm_logger.WARNING)
+            return
         data_holder.data[self.col_to_set_name] = ''
         data_holder.data[self.col_to_set_size] = ''
         for (name, size), df in data_holder.data.groupby([self.source_name_col, self.source_size_class_col]):
@@ -84,6 +88,10 @@ class AddBvolRefList(Transformer):
         return f'Adds {AddBvolRefList.col_to_set} from {AddBvolRefList.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_col not in data_holder.data:
+            adm_logger.log_transformation(f'Missing column {self.source_col} when trying to set bvol ref list',
+                                          level=adm_logger.WARNING)
+            return
         data_holder.data[self.col_to_set] = ''
         for name, df in data_holder.data.groupby(self.source_col):
             lst = bvol_nomp.get_info(Species=name)
@@ -112,6 +120,10 @@ class AddBvolAphiaId(Transformer):
         return f'Adds {AddBvolAphiaId.col_to_set} from {AddBvolAphiaId.source_col}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_col not in data_holder.data:
+            adm_logger.log_transformation(f'Missing column {self.source_col} when trying to set bvol aphia_id',
+                                          level=adm_logger.WARNING)
+            return
         data_holder.data[self.col_to_set] = ''
         for name, df in data_holder.data.groupby(self.source_col):
             lst = bvol_nomp.get_info(Species=name)

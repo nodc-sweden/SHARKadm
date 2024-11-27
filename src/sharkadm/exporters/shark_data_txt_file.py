@@ -20,16 +20,13 @@ class SHARKdataTxt(FileExporter):
                          **kwargs)
         self._column_views = get_column_views_config()
 
-    @property
-    def export_file_path(self):
-        return pathlib.Path(self._export_directory, self._export_file_name)
-
     @staticmethod
     def get_exporter_description() -> str:
         return 'Writes data to file filtered by the columns specified for the given data type in column_views.'
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
         column_list = self._column_views.get_columns_for_view(view=data_holder.data_type)
+        print(f'{column_list=}')
         data = data_holder.data[column_list]
         data.to_csv(self.export_file_path, encoding=self._encoding, sep='\t', index=False)
 

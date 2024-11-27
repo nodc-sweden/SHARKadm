@@ -130,7 +130,7 @@ class AddDyntaxaId(Transformer):
                 adm_logger.log_transformation(f'No {self.col_to_set} found for {name}, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
             index = data_holder.data[self.source_col] == name
-            adm_logger.log_transformation(f'Adding {self.col_to_set} {dyntaxa_id} translated from {name}, {len(df)} rows.', level=adm_logger.INFO)
+            adm_logger.log_transformation(f'Adding {self.col_to_set} {dyntaxa_id} translated from {name} ({len(df)} places)', level=adm_logger.INFO)
             data_holder.data.loc[index, self.col_to_set] = dyntaxa_id
 
 

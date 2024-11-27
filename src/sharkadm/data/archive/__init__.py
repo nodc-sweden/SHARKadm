@@ -10,6 +10,7 @@ from .chlorophyll import ChlorophyllArchiveDataHolder
 from .delivery_note import DeliveryNote
 # from .epibenthos import EpibenthosArchiveDataHolder
 from .epibenthos import EpibenthosMartransArchiveDataHolder
+from .ifcb import IfcbArchiveDataHolder
 from .jellyfish import JellyfishArchiveDataHolder
 from .physicalchemical import PhysicalChemicalArchiveDataHolder
 from .phytoplankton import PhytoplanktonArchiveDataHolder

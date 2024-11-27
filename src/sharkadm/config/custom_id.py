@@ -1,8 +1,7 @@
 import logging
 import pathlib
-import yaml
 
-from .data_type_mapper import DataTypeMapper
+import yaml
 
 logger = logging.getLogger(__name__)
 

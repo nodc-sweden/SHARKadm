@@ -19,11 +19,15 @@ class AddColumnViewsColumns(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         columns_to_add = self._column_views.get_columns_for_view(data_holder.data_type)
+        empty_cols_to_add = []
         for col in columns_to_add:
             if col in data_holder.data.columns:
                 continue
             # data_holder.data[col] = ''
-            data_holder.data.loc[:, col] = ''
+            empty_cols_to_add.append(col)
+            # data_holder.data.loc[:, col] = ''
+        print(f'{empty_cols_to_add=}')
+        data_holder.data.loc[:, empty_cols_to_add] = ''
 
 
 class AddDEPHqcColumn(Transformer):
