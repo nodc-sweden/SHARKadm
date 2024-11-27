@@ -13,6 +13,8 @@ from .mandatory import ValidateValuesInMandatoryRegColumns
 from .aphia_id import ValidateReportedVsAphiaId
 from .aphia_id import ValidateReportedVsBvolAphiaId
 from .aphia_id import ValidateAphiaIdVsBvolAphiaId
+from .occurrence_id import ValidateOccurrenceId
+from .position import CheckIfLatLonIsSwitched
 
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
