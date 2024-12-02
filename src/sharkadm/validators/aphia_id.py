@@ -27,13 +27,13 @@ class _ValidateAphiaId(Validator):
             return
 
         for (reported, translated), df in data_holder.data.groupby([self.from_aphia_id_col, self.to_aphia_id_col]):
-            if not reported:
-                adm_logger.log_validation(f'Missing {self.from_aphia_id_col} ({len(df)} places)', level=adm_logger.INFO)
-            if not translated:
-                adm_logger.log_validation(f'Missing {self.to_aphia_id_col} ({len(df)} places)', level=adm_logger.INFO)
             if not (reported and translated):
                 continue
-            if reported == translated:
+            if not reported:
+                adm_logger.log_validation(f'Missing {self.from_aphia_id_col} for {self.to_aphia_id_col}: {translated} ({len(df)} places)', level=adm_logger.INFO)
+                continue
+            if not translated:
+                adm_logger.log_validation(f'Missing {self.to_aphia_id_col} for {self.from_aphia_id_col}: {reported}({len(df)} places)', level=adm_logger.INFO)
                 continue
             adm_logger.log_validation(f'{self.from_aphia_id_col} differs from {self.to_aphia_id_col}: "{reported}" ({self.from_aphia_id_col}) <-> "{translated}" ({self.to_aphia_id_col}) ({len(df)} places)', level=adm_logger.INFO)
 

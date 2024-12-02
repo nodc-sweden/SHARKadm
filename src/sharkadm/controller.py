@@ -7,6 +7,8 @@ from sharkadm import exporters
 from sharkadm import transformers
 from sharkadm import validators
 
+from sharkadm import event
+
 from sharkadm.data.data_holder import DataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.transformers import Transformer
@@ -128,13 +130,19 @@ class SHARKadmController:
 
     def transform_all(self) -> None:
         """Runs all transform objects in self._transformers"""
-        for trans in self._transformers:
-            # logger.debug(f'Running transformer: {trans}')
+        tot_nr_operators = len(self._transformers)
+        for i, trans in enumerate(self._transformers):
             trans.transform(self._data_holder)
+            event.post_event('progress',
+                             dict(
+                                 total=tot_nr_operators,
+                                 current=i,
+                                 title='Transforming'
+                             )
+                             )
 
     def transform(self, *transformers: Transformer | MultiTransformer) -> 'SHARKadmController':
         for trans in transformers:
-#             logger.debug(f'Running transformer: {trans}')
             trans.transform(self._data_holder)
         return self
 
@@ -144,9 +152,16 @@ class SHARKadmController:
 
     def validate_before_all(self) -> None:
         """Runs all set validator objects in self._validators_before"""
-        for val in self._validators_before:
-#             logger.debug(f'Running validator: {val}')
+        tot_nr_operators = len(self._validators_before)
+        for i, val in enumerate(self._validators_before):
             val.validate(self._data_holder)
+            event.post_event('progress',
+                                dict(
+                                     total=tot_nr_operators,
+                                     current=i,
+                                     title='Initial validations'
+                                 )
+                             )
 
     def validate(self, *validators: Validator) -> 'SHARKadmController':
         for val in validators:
@@ -159,8 +174,16 @@ class SHARKadmController:
 
     def validate_after_all(self) -> None:
         """Runs all set validator objects in self._validators_after"""
-        for val in self._validators_after:
+        tot_nr_operators = len(self._validators_after)
+        for i, val in enumerate(self._validators_after):
             val.validate(self._data_holder)
+            event.post_event('progress',
+                             dict(
+                                 total=tot_nr_operators,
+                                 current=i,
+                                 title='Final validations'
+                             )
+                             )
 
     def set_exporters(self, *args: Exporter) -> None:
         """Add one or more Exporters to the data holder"""
@@ -168,8 +191,16 @@ class SHARKadmController:
 
     def export_all(self) -> None:
         """Runs all export objects in self._exporters"""
-        for exp in self._exporters:
+        tot_nr_operators = len(self._exporters)
+        for i, exp in enumerate(self._exporters):
             exp.export(self._data_holder)
+            event.post_event('progress',
+                             dict(
+                                 total=tot_nr_operators,
+                                 current=i,
+                                 title='Exports'
+                             )
+                             )
 
     def export(self, *exporters: Exporter) -> Any:
         for exp in exporters:

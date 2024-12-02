@@ -4,6 +4,7 @@ _subscribers = dict(
     log_transformation=dict(),
     log_validation=dict(),
     log_export=dict(),
+    progress=dict(),
 )
 
 

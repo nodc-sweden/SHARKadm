@@ -1,4 +1,5 @@
 from sharkadm import adm_logger
+from sharkadm import event
 from .base import Transformer, DataHolderProtocol
 
 nodc_occurrence_id = None
@@ -42,6 +43,7 @@ class AddOccurrenceId(Transformer):
         occurrence_event.subscribe('new_id_added_to_data_and_database', self._on_new_id_added_to_data_and_database)
         occurrence_event.subscribe('several_valid_matches_in_database', self._on_several_valid_matches_in_database)
         occurrence_event.subscribe('valid_match_in_database', self._on_valid_match_in_database)
+        occurrence_event.subscribe('progress', self._on_progress)
 
         print(f'{data_holder.data_type=}')
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(data_holder.data_type)
@@ -84,4 +86,7 @@ class AddOccurrenceId(Transformer):
         self.valid_matches.append(data['valid_match'])
         adm_logger.log_transformation(f'Valid match found in database for {self.col_to_set}: {data["temp_id_str"]}',
                                       level=adm_logger.WARNING)
+
+    def _on_progress(self, data: dict) -> None:
+        event.post_event('progress', data)
 

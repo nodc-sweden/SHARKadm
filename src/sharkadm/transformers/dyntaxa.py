@@ -160,8 +160,8 @@ class AddReportedScientificNameDyntaxaId(Transformer):
 
 class AddTaxonRanks(Transformer):
     invalid_data_types = ['physicalchemical', 'chlorophyll', 'bacterioplankton']
-    ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
-    cols_to_set = [f'taxon_{rank}' for rank in ranks]
+    ranks = ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'taxon_hierarchy']
+    cols_to_set = [f'taxon_{rank}' for rank in ranks] + ['taxon_hierarchy']
     source_col = 'dyntaxa_scientific_name'
 
     def __init__(self, **kwargs):
@@ -190,6 +190,7 @@ class AddTaxonRanks(Transformer):
                 value = info.get(rank, '')
                 boolean = data_holder.data[self.source_col] == name
                 data_holder.data.loc[boolean, col] = value
-                adm_logger.log_transformation(f'Adding taxon rank {rank} for {name} ({len(df)} places)', level=adm_logger.DEBUG)
+                adm_logger.log_transformation(f'Adding {col} for {name} ({len(df)} places)', level=adm_logger.DEBUG)
+
 
 

@@ -29,7 +29,7 @@ class AddCustomId(Transformer):
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
                 adm_logger.log_transformation(f'Missing columns for creating {col_name}: {", ".join(list(missing))}',
-                                              level='warning')
+                                              level=adm_logger.WARNING)
                 continue
             data_holder.data[col_name] = data_holder.data.apply(lambda row: id_handler.get_id(row), axis=1)
             if self._add_md5:
