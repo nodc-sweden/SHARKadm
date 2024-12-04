@@ -66,9 +66,10 @@ CONFIG_FILE_NAMES = [
 
 
 CONFIG_DIRECTORY = None
-if os.getenv('NODC_CONFIG'):
+if os.getenv('NODC_CONFIG') and pathlib.Path(os.getenv('NODC_CONFIG')).exists():
     CONFIG_DIRECTORY = pathlib.Path(os.getenv('NODC_CONFIG')) / CONFIG_SUBDIRECTORY
 TEMP_CONFIG_DIRECTORY = pathlib.Path.home() / 'temp_nodc_config' / CONFIG_SUBDIRECTORY
+TEMP_CONFIG_DIRECTORY.mkdir(exist_ok=True, parents=True)
 
 
 CONFIG_URL = r'https://raw.githubusercontent.com/nodc-sweden/nodc_config/refs/heads/main/' + f'{CONFIG_SUBDIRECTORY}/'
