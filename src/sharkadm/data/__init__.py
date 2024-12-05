@@ -11,7 +11,7 @@ from .dv_template import DvTemplateDataHolder
 from .dv_template import get_dv_template_data_holder
 from .lims import LimsDataHolder
 from .lims import get_lims_data_holder, directory_is_lims
-from .sharkweb import get_sharkweb_data_holder
+from .shark_api import get_shark_api_data_holder
 from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
 
 logger = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **k
         if lims_directory:
             return get_lims_data_holder(lims_directory)
     if sharkweb:
-        return get_sharkweb_data_holder(**kwargs)
+        return get_shark_api_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f'Could not find dataholder for: {path}')
 
 

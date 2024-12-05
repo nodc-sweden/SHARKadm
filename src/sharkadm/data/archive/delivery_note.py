@@ -34,7 +34,12 @@ class DeliveryNote:
         self._import_matrix_key = data.get('import_matrix_key', None)
         self._mapper = mapper
 
-        self._data['DTYPE'] = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['DTYPE'], translate_to='internal_value')
+        dtype = self.translate_codes.get_translation(field='delivery_datatype', synonym=self._data['DTYPE'], translate_to='internal_value')
+
+        if not dtype:
+            raise sharkadm_exceptions.DeliveryNoteError(f'Missing translation for datatype {self._data["DTYPE"]} in file {self.translate_codes.path}', level=adm_logger.ERROR)
+
+        self._data['DTYPE'] = dtype
 
         #TODO: Fullhack
         if self._data['DTYPE'] == 'Physical and Chemical':
@@ -96,7 +101,7 @@ class DeliveryNote:
     def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None):
         path = pathlib.Path(path)
         if path.suffix != '.xlsx':
-            msg = f'Fil is not a valid xlsx dv template: {path}'
+            msg = f'File is not a valid xlsx dv template: {path}'
             logger.error(msg)
             raise FileNotFoundError(msg)
 

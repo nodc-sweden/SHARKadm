@@ -2,9 +2,12 @@ from sharkadm import adm_logger
 
 
 class SHARKadmException(Exception):
+    level = adm_logger.WARNING
+
     def __init__(self, msg, *args, **kwargs):
-        extended_msg = f'(EXCEPTION ERROR){self.__class__.__name__}: {msg}'
-        adm_logger.log_workflow(extended_msg, level=adm_logger.WARNING)
+        level = kwargs.pop('level', self.level)
+        extended_msg = f'(EXCEPTION ERROR) {self.__class__.__name__}: {msg}'
+        adm_logger.log_workflow(extended_msg, level=level)
         super().__init__(msg, *args, **kwargs)
 
 

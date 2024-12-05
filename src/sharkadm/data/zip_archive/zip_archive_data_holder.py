@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import shutil
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -59,7 +60,7 @@ class ZipArchiveDataHolder(DataHolder, ABC):
     @property
     def data_type(self) -> str:
         # return self._data_type_mapper.get(self.data_format)
-        return self._data_type
+        return self._data_type.lower()
 
     @property
     def delivery_note(self) -> delivery_note.DeliveryNote:
@@ -205,5 +206,19 @@ class ZipArchiveDataHolder(DataHolder, ABC):
             return
         d_source = data_source.TxtRowFormatDataFile(path=self.shark_data_path, data_type=self.delivery_note.data_type)
         self._set_data_source(d_source)
+
+    def remove_processed_data_directory(self) -> None:
+        directory = self.unzipped_archive_directory / 'processed_data'
+        self._remove_directory(directory)
+
+    def remove_received_data_directory(self) -> None:
+        directory = self.unzipped_archive_directory / 'received_data'
+        self._remove_directory(directory)
+
+    def _remove_directory(self, directory: pathlib.Path) -> None:
+        if not directory.exists():
+            return
+        adm_logger.log_workflow(f'Removing directory: {directory}', level=adm_logger.WARNING)
+        shutil.rmtree(directory)
 
 
