@@ -59,7 +59,7 @@ class AddDyntaxaScientificName(Transformer):
                             level=adm_logger.INFO)
                     else:
                         adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
-                                                      level=adm_logger.DEBUG)
+                                                      level=adm_logger.WARNING)
                 else:
                     adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)',
                                                   level=adm_logger.INFO)
@@ -69,7 +69,7 @@ class AddDyntaxaScientificName(Transformer):
                                                   level=adm_logger.WARNING)
                 else:
                     adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
-                                              level=adm_logger.DEBUG)
+                                              level=adm_logger.WARNING)
                 new_name = name
 
             boolean = data_holder.data[self.source_col] == name
@@ -123,7 +123,7 @@ class AddDyntaxaId(Transformer):
 
         for name, df in data_holder.data.groupby(self.source_col):
             if not str(name).strip():
-                adm_logger.log_transformation(f'Missing {self.source_col}, {len(df)} rows.', level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'Missing {self.source_col} when trying to add dyntaxa_id, {len(df)} rows.', level=adm_logger.WARNING)
                 continue
             dyntaxa_id = dyntaxa_taxon.get(str(name))
             if not dyntaxa_id:
@@ -180,14 +180,15 @@ class AddTaxonRanks(Transformer):
         for name, df in data_holder.data.groupby(self.source_col):
             info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus='accepted')
             if not info:
-                adm_logger.log_transformation(f'Could not add information about taxon rank', add=name, level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'Could not add information about taxon rank for {name} ({len(df)} places)', add=name, level=adm_logger.WARNING)
                 continue
-            if type(info) is list:
-                adm_logger.log_transformation(f'Several matches in dyntaxa', add=name, level=adm_logger.WARNING)
+            if len(info) != 1:
+                adm_logger.log_transformation(f'Several matches in dyntaxa for {name} ({len(df)} places)', add=name, level=adm_logger.WARNING)
                 continue
+            single_info = info[0]
             adm_logger.log_transformation(f'Adding taxon rank for {name} ({len(df)} places)', level=adm_logger.INFO)
             for rank, col in zip(self.ranks, self.cols_to_set):
-                value = info.get(rank, '')
+                value = single_info.get(rank, '')
                 boolean = data_holder.data[self.source_col] == name
                 data_holder.data.loc[boolean, col] = value
                 adm_logger.log_transformation(f'Adding {col} for {name} ({len(df)} places)', level=adm_logger.DEBUG)

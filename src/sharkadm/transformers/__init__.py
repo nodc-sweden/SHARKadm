@@ -59,10 +59,11 @@ from .location import AddLocationSeaBasin
 from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
 from .long_to_wide import LongToWide
-from .manual import ManualSealPathology
 from .manual import ManualHarbourPorpoise
+from .manual import ManualSealPathology
 from .map_header import ArchiveMapper
 from .map_parameter_column import MapperParameterColumn
+from .occurrence_id import AddOccurrenceId
 from .orderer import AddEnglishSampleOrderer
 from .orderer import AddSwedishSampleOrderer
 from .parameter_unit_value import AddParameterUnitValueFromReported
@@ -74,6 +75,11 @@ from .project_code import AddEnglishProjectName
 from .project_code import AddSwedishProjectName
 from .qc import AddColumnsForAutomaticQC
 from .red_list import AddRedList
+from .remove import RemoveDeepestDepthAtEachVisit
+# from .remove import RemoveDeepestDepthAtEachVisitBacterioplankton
+# from .remove import RemoveDeepestDepthAtEachVisitPhysicalChemical
+from .remove import RemoveRowsForParameters
+from .remove import RemoveValuesInColumns
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
@@ -96,8 +102,6 @@ from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
-from .occurrence_id import AddOccurrenceId
-from .remove import RemoveValuesInColumns
 
 
 @functools.cache

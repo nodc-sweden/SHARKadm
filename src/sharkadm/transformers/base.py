@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Protocol, TYPE_CHECKING
 import time
 
 import pandas as pd
@@ -7,6 +7,9 @@ import pandas as pd
 from sharkadm import adm_logger, config
 from sharkadm.data import get_valid_data_holders
 from sharkadm.data import is_valid_data_holder
+
+if TYPE_CHECKING:
+    from sharkadm.data.data_holder import DataHolder
 
 
 class DataHolderProtocol(Protocol):
@@ -66,7 +69,7 @@ class Transformer(ABC):
     def description(self) -> str:
         return self.get_transformer_description()
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    def transform(self, data_holder: 'DataHolder') -> None:
         if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,
                                                                             invalid=self.invalid_data_types):
             adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for transformer'
@@ -88,7 +91,7 @@ class Transformer(ABC):
         adm_logger.log_workflow(f'Transformer {self.__class__.__name__} executed in {time.time()-t0} seconds', level=adm_logger.DEBUG)
 
     @abstractmethod
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: 'DataHolder') -> None:
         ...
 
 

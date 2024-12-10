@@ -11,7 +11,7 @@ from sharkadm.data import DataHolder
 
 
 class WideToLong(Transformer):
-    valid_data_structures = ['column']
+    # valid_data_structures = ['column']
     invalid_data_holders = ['ZoobenthosBedaArchiveDataHolder']
 
     def __init__(self,
@@ -51,7 +51,7 @@ class WideToLong(Transformer):
         self._data_columns = []
         self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
-            adm_logger.log_transformation(f'Could not transform to row format. {self._column_name_parameter} already in data')
+            adm_logger.log_transformation(f'Could not transform to row format. Column {self._column_name_parameter} already in data', level=adm_logger.WARNING)
             return
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)

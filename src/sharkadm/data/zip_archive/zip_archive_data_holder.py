@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import shutil
 from abc import ABC, abstractmethod
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 class ZipArchiveDataHolder(DataHolder, ABC):
     _data_type: str | None = None
     _data_format: str | None = None
+    _data_structure = 'row'
 
     _date_str_format = '%Y-%m-%d'
 
@@ -215,10 +217,23 @@ class ZipArchiveDataHolder(DataHolder, ABC):
         directory = self.unzipped_archive_directory / 'received_data'
         self._remove_directory(directory)
 
+    def remove_readme_files(self) -> None:
+        for path in self.unzipped_archive_directory.iterdir():
+            if 'readme' in path.name.lower():
+                os.remove(path)
+
+    def list_files(self) -> list[pathlib.Path]:
+        paths = []
+        for root, dirs, files in os.walk(self.unzipped_archive_directory):
+            for file in files:
+                path = pathlib.Path(root, file).relative_to(self.unzipped_archive_directory.parent)
+                paths.append(path)
+        return paths
+
     def _remove_directory(self, directory: pathlib.Path) -> None:
         if not directory.exists():
             return
-        adm_logger.log_workflow(f'Removing directory: {directory}', level=adm_logger.WARNING)
+        adm_logger.log_workflow(f'Removing directory: {directory.relative_to(self.unzipped_archive_directory.parent)}', level=adm_logger.WARNING)
         shutil.rmtree(directory)
 
 

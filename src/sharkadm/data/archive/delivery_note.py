@@ -65,7 +65,7 @@ class DeliveryNote:
         return self._data.get(item)
 
     @classmethod
-    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252') -> 'DeliveryNote':
+    def from_txt_file(cls, path: str | pathlib.Path, mapper: Mapper = None, encoding: str = 'cp1252', include_all_column: bool = False) -> 'DeliveryNote':
         path = pathlib.Path(path)
         if path.suffix != '.txt':
             msg = f'File is not a valid delivery_note text file: {path}'
@@ -95,6 +95,9 @@ class DeliveryNote:
                         msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)
                     data['import_matrix_key'] = parts[1]
+        if include_all_column:
+            with open(path, encoding=encoding) as fid:
+                data['all'] = fid.read()
         return DeliveryNote(data, mapper=mapper)
 
     @classmethod
@@ -158,4 +161,6 @@ class DeliveryNote:
 
     @property
     def reporting_institute_code(self):
+        if self['RLABO']:
+            return self['RLABO'].upper()
         return self['reporting_institute_code'].upper()

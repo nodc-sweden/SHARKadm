@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class IfcbArchiveDataHolder(ArchiveDataHolder):
     _data_type = 'IFCB'
-    _data_format = 'PlanktonImaging'
+    _data_format = 'IFCB'
 
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / 'data.txt'

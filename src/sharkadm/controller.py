@@ -1,7 +1,7 @@
 import logging
 
 import pandas as pd
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from sharkadm import exporters
 from sharkadm import transformers

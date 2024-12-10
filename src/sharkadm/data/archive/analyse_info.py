@@ -177,8 +177,14 @@ class AnalyseInfo:
                     adm_logger.log_workflow(f'No or insufficient data in analyse_info for parameter: {split_line[0]}', level=adm_logger.WARNING)
                     continue
                 line_dict = dict(zip(header, split_line))
-                line_dict['VALIDFR'] = _get_date(line_dict['VALIDFR'])
-                line_dict['VALIDTO'] = _get_date(line_dict['VALIDTO'])
+
+                for item in ['VALIDFR', 'VALIDTO']:
+                    if not line_dict.get(item):
+                        adm_logger.log_workflow(f'Missing {item} in analyse_info', level=adm_logger.WARNING)
+                        line_dict[item] = None
+                        continue
+                    line_dict[item] = _get_date(line_dict[item])
+
                 par = line_dict['PARAM']
                 data.setdefault(par, [])
                 data[par].append(line_dict)

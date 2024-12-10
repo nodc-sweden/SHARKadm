@@ -62,7 +62,7 @@ class ArchiveController:
 
     def set_data_type(self, data_type: str):
         for path in self._archive_root_directory.iterdir():
-            if data_type.lower() == path.name.lower():
+            if data_type.lower() in path.name.lower():
                 self._data_type = path.name
                 return self
         raise Exception(f'Invalid data_type: {data_type}')
@@ -129,7 +129,7 @@ class ArchiveController:
                 line_data['delivery_note_missing'] = 'x'
             else:
                 try:
-                    delivery_note = DeliveryNote.from_txt_file(delivery_note_path)
+                    delivery_note = DeliveryNote.from_txt_file(delivery_note_path, include_all_column=True)
                     line_data.update(delivery_note.data)
                     # print(f'{delivery_note.data.keys()=}')
                     info_set.update(list(line_data))
@@ -162,6 +162,87 @@ class ArchiveController:
         self.cols_to_use = cols_to_use
         # print(f'{cols_to_use=}')
         self._create_dataframe(info, cols_to_use)
+        self._save_path = utils.get_export_directory() / f'delivery_note_summary_{self._data_type}.txt'
+        return self
+
+    def create_raw_delivery_note_summary(self):
+        # with open(r'C:\mw\DV_strul\depth_in_delivery_note.txt', 'w') as fid:
+        #     fid.write('')
+        encoding = 'cp1252'
+        if not self.data_type:
+            raise Exception('data_type is not set!')
+        info = []
+        info_set = set()
+        cols_to_use = set()
+        for path in self.archive_list:
+            adm_logger.log_workflow(f'Looking at: {path}')
+            line_data = dict()
+            delivery_note_path = path / 'processed_data' / 'delivery_note.txt'
+            line_data['archive_directory_name'] = path.name
+            if not delivery_note_path.exists():
+                line_data['delivery_note_missing'] = 'x'
+            else:
+                try:
+                    data = dict()
+                    data['path'] = delivery_note_path
+                    with open(delivery_note_path, encoding=encoding) as fid:
+                        for line in fid:
+                            if not line.strip():
+                                continue
+                            if ':' not in line:
+                                # Belongs to previous row
+                                data[mapped_key] = f'{data[mapped_key]} {line.strip()}'
+                                continue
+                            key, value = [item.strip() for item in line.split(':', 1)]
+                            key = key.lstrip('- ')
+                            mapped_key = key.lower()
+                            data[mapped_key] = value
+                            if key.upper() == 'FORMAT':
+                                parts = [item.strip() for item in value.split(':')]
+                                data['data_format'] = parts[0]
+                                if len(parts) == 1:
+                                    msg = f'Can not find any import_matrix_key (data_format) in delivery_note: {path}'
+                                    raise sharkadm_exceptions.NoDataFormatFoundError(msg)
+                                data['import_matrix_key'] = parts[1]
+                    with open(delivery_note_path, encoding=encoding) as fid:
+                        all_data = fid.read().replace('\n', ' <> ')
+                        if 'depth' in all_data.lower() or 'djup' in all_data.lower():
+                            with open(r'C:\mw\DV_strul\depth_in_delivery_note.txt', 'a') as fid:
+                                fid.write(f'{delivery_note_path.parent.parent.name}\t{all_data}\n')
+                            print(f'::::::: {delivery_note_path.parent.parent.name}')
+                        data['all'] = all_data
+                    cols_to_use.update(list(data))
+                    line_data.update(data)
+                    # print(f'{delivery_note.data.keys()=}')
+                    info_set.update(list(line_data))
+                except sharkadm_exceptions.NoDataFormatFoundError:
+                    line_data['data_format_missing'] = 'x'
+            # temp_list = [item for item in list(info_set) if item.startswith('i')]
+            # print(f'{temp_list=}')
+            info.append(line_data)
+        #
+        # # temp_list = [item for item in info_set if item.lower().startswith('kom')]
+        # # print(f'{temp_list=}')
+        # column_mapping = {}
+        # first_cols = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing']
+        # collection = {}
+        # cols_to_use = dict((item, item) for item in first_cols)
+        # for col in info_set:
+        #     col_lower = col.lower().strip()
+        #     collection.setdefault(col_lower, [])
+        #     len_col_string = '.' * len(collection[col_lower])
+        #     col_name = f'{col} {len_col_string}'.strip()
+        #     collection[col_lower].append(col)
+        #     cols_to_use[col] = col_name
+        #
+        # cols_to_use = dict((key, cols_to_use[key]) for key in sorted(cols_to_use, key=lambda x: x.lower()))
+
+        # other_columns = sorted([col for col in info_set if col.lower() not in first_cols])
+        # cols_to_use = ['archive_directory_name', 'delivery_note_missing', 'data_format_missing'] + other_columns
+        self.info = info
+        self.cols_to_use = cols_to_use
+        # print(f'{cols_to_use=}')
+        self._create_dataframe(info, sorted(cols_to_use))
         self._save_path = utils.get_export_directory() / f'delivery_note_summary_{self._data_type}.txt'
         return self
 
@@ -316,6 +397,7 @@ class ArchiveController:
     def save_data_as_txt(self, **kwargs):
         self._save_path = kwargs.get('path', self._save_path)
         self._save_path = self._save_path.with_suffix('.txt')
+        print(f'{self._save_path=}')
         self.data.to_csv(self._save_path, sep=kwargs.get('sep', '\t'), index=False, encoding=kwargs.get('encoding',
                                                                                                         'cp1252'))
         return self
