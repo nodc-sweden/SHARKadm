@@ -16,7 +16,7 @@ from .bvol import AddBvolScientificNameOriginal
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns
-from .columns import SortColumn
+from .columns import SortColumns
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName
@@ -89,10 +89,12 @@ from .sampling_info import AddSamplingInfo
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
-from .static_data_holding_center import AddStaticDataHoldingCenter
+from .static_data_holding_center import AddStaticDataHoldingCenterEnglish
+from .static_data_holding_center import AddStaticDataHoldingCenterSwedish
 from .static_internet_access import AddStaticInternetAccessInfo
 from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
+from .station import CopyReportedStationNameToStationName
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues

@@ -81,4 +81,18 @@ class AddStationInfo(Transformer):
                 data_holder.data[col] = ''
 
 
+class CopyReportedStationNameToStationName(Transformer):
+    valid_data_types = ['IFCB']
+
+    source_column = 'reported_station_name'
+    col_to_set = 'station_name'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Copies {CopyReportedStationNameToStationName.source_column} to {CopyReportedStationNameToStationName.col_to_set}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set] = data_holder.data[self.source_column]
+
+
 

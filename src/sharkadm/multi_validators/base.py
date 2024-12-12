@@ -87,7 +87,7 @@ class MultiValidator(Validator):
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 
-        adm_logger.log_workflow(f'Applying multi validator: {self.__class__.__name__}', add=self.get_validator_description(), level=adm_logger.DEBUG)
+        adm_logger.log_workflow(f'Applying multi validator: {self.__class__.__name__}', item=self.get_validator_description(), level=adm_logger.DEBUG)
         t0 = time.time()
         for vali in self._validators:
             vali().validate(data_holder=data_holder)

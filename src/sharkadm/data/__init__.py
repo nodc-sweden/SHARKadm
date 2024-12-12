@@ -7,6 +7,7 @@ from typing import Type
 from sharkadm import utils, sharkadm_exceptions
 from .archive import get_archive_data_holder, directory_is_archive
 from .data_holder import DataHolder
+from .df import PandasDataFrameDataHolder
 from .dv_template import DvTemplateDataHolder
 from .dv_template import get_dv_template_data_holder
 from .lims import LimsDataHolder

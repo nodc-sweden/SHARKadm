@@ -21,7 +21,7 @@ class GeneralDV(MultiTransformer):
         Translate,
 
         transformers.AddStaticInternetAccessInfo,
-        transformers.AddStaticDataHoldingCenter,
+        transformers.AddStaticDataHoldingCenterSwedish,
 
         Location,
 
@@ -45,7 +45,7 @@ class GeneralDV(MultiTransformer):
         transformers.AddSharkId,
 
         # Temp
-        transformers.SortColumn,
+        transformers.SortColumns,
     ]
 
     @staticmethod

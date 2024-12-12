@@ -66,7 +66,7 @@ class RemoveColumns(Transformer):
         data_holder.data = data_holder.data[keep_columns]
 
 
-class SortColumn(Transformer):
+class SortColumns(Transformer):
     def __init__(self, key=None, **kwargs):
         self._key = key
         super().__init__(**kwargs)
