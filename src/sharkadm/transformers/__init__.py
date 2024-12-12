@@ -80,6 +80,7 @@ from .remove import RemoveDeepestDepthAtEachVisit
 # from .remove import RemoveDeepestDepthAtEachVisitPhysicalChemical
 from .remove import RemoveRowsForParameters
 from .remove import RemoveValuesInColumns
+from .remove import SetMaxLengthOfValuesInColumns
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute

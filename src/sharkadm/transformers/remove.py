@@ -119,90 +119,26 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                                           level=adm_logger.WARNING)
 
 
-# class RemoveDeepestDepthAtEachVisitPhysicalChemical(Transformer):
-#     valid_data_holders = ['ZipArchiveDataHolder']
-#     valid_data_types = ['PhysicalChemical']
-#
-#     visit_id_columns = ['sample_date', 'sample_time', 'sample_latitude_dd', 'sample_longitude_dd', 'platform_code', 'visit_id']
-#     depth_column = 'sample_depth_m'
-#
-#     additional_cols_to_set = ['sample_id', 'shark_sample_id']
-#
-#     def __init__(self, replace_value: int | float | str = '') -> None:
-#         super().__init__()
-#         self._replace_value = str(replace_value)
-#
-#     @staticmethod
-#     def get_transformer_description() -> str:
-#         return f'Removes deepest depth at each visit in datatype PhysicalChemical'
-#
-#     def _transform(self, data_holder: DataHolderProtocol) -> None:
-#         all_index_to_set = []
-#         nr_visits = 0
-#         id_cols = [col for col in self.visit_id_columns if col in data_holder.data]
-#         for _id, df in data_holder.data.groupby(id_cols):
-#             max_depth = max(set(df[self.depth_column]), key=lambda x: float(x))
-#             max_depth_index = df.loc[df[self.depth_column] == max_depth].index
-#             all_index_to_set.extend(list(max_depth_index))
-#             nr_visits += 1
-#
-#         additional_cols = [col for col in self.additional_cols_to_set if col in data_holder.data]
-#         data_holder.data.loc[all_index_to_set, additional_cols] = ''
-#         data_holder.data.loc[all_index_to_set, self.depth_column] = self._replace_value
-#
-#         for col in additional_cols:
-#             adm_logger.log_transformation(f'Removing deepest {col} info at {nr_visits} visits',
-#                                           level=adm_logger.WARNING)
-#
-#         if self._replace_value:
-#             adm_logger.log_transformation(f'Setting deepest depth to {self._replace_value} at {nr_visits} visits',
-#                                           level=adm_logger.WARNING)
-#         else:
-#             adm_logger.log_transformation(f'Removing deepest depth info at {nr_visits} visits',
-#                                           level=adm_logger.WARNING)
-#
-#
-# class RemoveDeepestDepthAtEachVisitBacterioplankton(Transformer):
-#     valid_data_holders = ['ZipArchiveDataHolder']
-#     valid_data_types = ['Bacterioplankton']
-#
-#     visit_id_columns = ['sample_date', 'sample_time', 'sample_latitude_dd', 'sample_longitude_dd', 'platform_code', 'visit_id']
-#     depth_columns = ['sample_min_depth_m', 'sample_max_depth_m']
-#
-#     additional_cols_to_set = ['sample_id', 'shark_sample_id']
-#
-#     def __init__(self, replace_value: int | float | str = '') -> None:
-#         super().__init__()
-#         self._replace_value = str(replace_value)
-#
-#     @staticmethod
-#     def get_transformer_description() -> str:
-#         return f'Removes deepest depth at each visit in datatype Bacterioplankton'
-#
-#     def _transform(self, data_holder: DataHolderProtocol) -> None:
-#         all_index_to_set = {}
-#         nr_visits = 0
-#         id_cols = [col for col in self.visit_id_columns if col in data_holder.data]
-#         for _id, df in data_holder.data.groupby(id_cols):
-#             for column in self.depth_columns:
-#                 all_index_to_set[column] = []
-#                 max_depth = max(set(df[column]), key=lambda x: float(x))
-#                 max_depth_index = df.loc[df[column] == max_depth].index
-#                 all_index_to_set[column].extend(list(max_depth_index))
-#                 nr_visits += 1
-#
-#         for column in self.depth_columns:
-#             additional_cols = [col for col in self.additional_cols_to_set if col in data_holder.data]
-#             data_holder.data.loc[all_index_to_set[column], additional_cols] = ''
-#             data_holder.data.loc[all_index_to_set[column], column] = self._replace_value
-#
-#             for col in additional_cols:
-#                 adm_logger.log_transformation(f'Removing deepest {col} info at {nr_visits} visits',
-#                                               level=adm_logger.WARNING)
-#
-#             if self._replace_value:
-#                 adm_logger.log_transformation(f'Setting deepest depth to {self._replace_value} at {nr_visits} visits',
-#                                               level=adm_logger.WARNING)
-#             else:
-#                 adm_logger.log_transformation(f'Removing deepest depth info at {nr_visits} visits',
-#                                               level=adm_logger.WARNING)
+class SetMaxLengthOfValuesInColumns(Transformer):
+
+    def __init__(self, *columns: str, length: int) -> None:
+        super().__init__()
+        self.apply_on_columns = columns
+        if isinstance(columns[0], list):
+            self.apply_on_columns = columns[0]
+
+        self._length = length
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Set max length och all values in given columns.'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        len_data = len(data_holder.data)
+        for col in self.apply_on_columns:
+            if col not in data_holder.data:
+                continue
+            data_holder.data[col] = data_holder.data[col].str[:self._length]
+            adm_logger.log_transformation(
+                f'Setting all values in column {col} to length {self._length} (all {len_data} places)',
+                level=adm_logger.INFO)
