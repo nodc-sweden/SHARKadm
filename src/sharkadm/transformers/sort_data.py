@@ -11,6 +11,7 @@ class SortData(Transformer):
         'sample_min_depth_m',
         'sample_max_depth_m',
         'scientific_name',
+        'parameter',
     ]
 
     def __init__(self, sort_by_columns: list[str] = None, remove_sorting_column: bool = True) -> None:

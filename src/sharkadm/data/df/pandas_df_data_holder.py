@@ -25,8 +25,8 @@ class PandasDataFrameDataHolder(DataHolder):
     def __init__(self,
                  df: pd.DataFrame,
                  data_structure: str,
+                 data_type: str,
                  header_mapper: HeaderMapper = None,
-                 data_type: str = '',
                  ):
         super().__init__()
 
@@ -48,8 +48,7 @@ class PandasDataFrameDataHolder(DataHolder):
             d_source.map_header(self._header_mapper)
         self._set_data_source(d_source)
         # self._data = self._get_data_from_data_source(d_source)
-        self._dataset_name = self._lims_root_directory.stem
-
+        self._dataset_name = 'Pandas dataframe'
 
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:

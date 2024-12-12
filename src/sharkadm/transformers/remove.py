@@ -124,6 +124,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                                           level=adm_logger.WARNING)
 
 
+<<<<<<< HEAD
 class RemoveInterval(Transformer):
     valid_data_holders = ['ZipArchiveDataHolder']
     valid_data_types = []
@@ -268,3 +269,28 @@ class RemoveInterval(Transformer):
 #             else:
 #                 adm_logger.log_transformation(f'Removing deepest depth info at {nr_visits} visits',
 #                                               level=adm_logger.WARNING)
+=======
+class SetMaxLengthOfValuesInColumns(Transformer):
+
+    def __init__(self, *columns: str, length: int) -> None:
+        super().__init__()
+        self.apply_on_columns = columns
+        if isinstance(columns[0], list):
+            self.apply_on_columns = columns[0]
+
+        self._length = length
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Set max length och all values in given columns.'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        len_data = len(data_holder.data)
+        for col in self.apply_on_columns:
+            if col not in data_holder.data:
+                continue
+            data_holder.data[col] = data_holder.data[col].str[:self._length]
+            adm_logger.log_transformation(
+                f'Setting all values in column {col} to length {self._length} (all {len_data} places)',
+                level=adm_logger.INFO)
+>>>>>>> bad3bb3 (IFCB fix)
