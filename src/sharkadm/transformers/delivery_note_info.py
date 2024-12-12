@@ -34,14 +34,14 @@ class AddDeliveryNoteInfo(Transformer):
             if key in data_holder.data and any(data_holder.data[key]):
                 adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.', level=adm_logger.DEBUG)
                 continue
-            adm_logger.log_transformation(f'Adding {key} info from delivery_note', add=data_holder.delivery_note[key])
+            adm_logger.log_transformation(f'Adding {key} info from delivery_note', item=data_holder.delivery_note[key])
             data_holder.data[key] = data_holder.delivery_note[key]
             # data_holder.data.loc[:, key] = data_holder.delivery_note[key]
 
     def _add_status(self, data_holder: DataHolder | ArchiveDataHolder):
         if not hasattr(data_holder, 'delivery_note'):
             adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING,
-                                    add=data_holder.dataset_name)
+                                    item=data_holder.dataset_name)
             return
         checked_by = data_holder.delivery_note['data kontrollerad av']
         if not checked_by:
@@ -80,7 +80,7 @@ class AddStatus(Transformer):
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
         if not hasattr(data_holder, 'delivery_note'):
-            adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING, add=data_holder.dataset_name)
+            adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING, item=data_holder.dataset_name)
             return
         checked_by = data_holder.delivery_note['data kontrollerad av']
         if not checked_by:

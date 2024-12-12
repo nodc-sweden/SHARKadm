@@ -21,16 +21,20 @@ class XlsxExporter(SharkadmLoggerExporter):
 
     def _get_default_file_name(self):
         date_str = datetime.datetime.now().strftime('%Y%m%d')
-        data_string = '-'.join(list(self.adm_logger.data.keys()))
-        if self.kwargs.get('tag'):
-            file_name = f'sharkadm_log_{self.kwargs.get("tag")}_{self.adm_logger.name}_{date_str}_{data_string}'
-        else:
-            file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
+# <<<<<<< HEAD
+#         data_string = '-'.join(list(self.adm_logger.data.keys()))
+#         if self.kwargs.get('tag'):
+#             file_name = f'sharkadm_log_{self.kwargs.get("tag")}_{self.adm_logger.name}_{date_str}_{data_string}'
+#         else:
+#             file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
+# =======
+        data_string = '-'.join(self.adm_logger.filtered_on_levels)
+        file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
         return file_name
 
     def _export(self) -> None:
         self._set_save_path(suffix='.xlsx')
-        df = self._extract_info(self.adm_logger.data)
+        df = self._extract_info()
         try:
             self._save_as_xlsx_with_table(df)
             logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
@@ -39,43 +43,15 @@ class XlsxExporter(SharkadmLoggerExporter):
             self._save_as_xlsx_with_table(df)
             logger.info(f'Saving sharkadm xlsx log to {self.file_path}')
 
-    def _extract_info(self, data: dict) -> pd.DataFrame:
-        info = []
-        header = ['Dataset name', 'Purpose', 'Level', 'Log type', 'Class', 'Message', 'Nr of logs', 'Log number']
-        if self.kwargs.get('include_items'):
-            header = header + ['Item']
-
-        for level, level_data in data.items():
-            for purpose, purpose_data in level_data.items():
-                for log_type, log_type_data in purpose_data.items():
-                    for msg, msg_data in log_type_data.items():
-                        # print(f'{level=}')
-                        # print(f'{purpose=}')
-                        # print(f'{log_type=}')
-                        # print(f'{msg=}')
-                        # print(f'{msg_data=}')
-                        count = msg_data.get('count', '')
-                        log_nr = msg_data.get('log_nr', '')
-                        cls = msg_data.get('cls', '')
-                        dataset_name = msg_data.get('dataset_name', '')
-                        general_line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr]
-                        if not self.kwargs.get('include_items'):
-                            line = general_line
-                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr]
-                            info.append(line)
-                            continue
-                        if not msg_data['items']:
-                            line = general_line + ['']
-                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr, '']
-                            info.append(line)
-                            continue
-                        for item in msg_data['items']:
-                            line = general_line + [item]
-                            # line[3] = 1
-                            # line = [dataset_name, purpose, level, log_type, cls, msg, count, log_nr, item]
-                            info.append(line)
-        df = pd.DataFrame(data=info, columns=header)
+    def _extract_info(self) -> pd.DataFrame:
+        header = self.adm_logger.keys
+        # translated_header = [item.replace('_', ' ').capitalize() for item in header]
+        print(f'{self.adm_logger.data=}')
+        df = pd.DataFrame(data=self.adm_logger.data, columns=header, dtype=str)
         df.fillna('', inplace=True)
+        if self.kwargs.get('columns'):
+            columns = [col for col in self.kwargs.get('columns') if col in df.columns]
+            df = df[columns]
         if self.kwargs.get('sort_by'):
             sort_by_columns = [col for col in df.columns if self._compress_item(col) in self._compress_list_items(self.kwargs.get('sort_by'))]
             df.sort_values(sort_by_columns, inplace=True)

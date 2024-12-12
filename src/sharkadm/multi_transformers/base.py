@@ -86,7 +86,7 @@ class MultiTransformer(Transformer):
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 
-        adm_logger.log_workflow(f'Applying multi transformer: {self.__class__.__name__}', add=self.get_transformer_description(), level=adm_logger.DEBUG)
+        adm_logger.log_workflow(f'Applying multi transformer: {self.__class__.__name__}', item=self.get_transformer_description(), level=adm_logger.DEBUG)
         t0 = time.time()
         for trans in self._transformers:
             trans().transform(data_holder=data_holder)

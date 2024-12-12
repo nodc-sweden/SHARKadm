@@ -85,7 +85,7 @@ class Transformer(ABC):
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 
-        adm_logger.log_workflow(f'Applying transformer: {self.__class__.__name__}', add=self.get_transformer_description(), level=adm_logger.DEBUG)
+        adm_logger.log_workflow(f'Applying transformer: {self.__class__.__name__}', item=self.get_transformer_description(), level=adm_logger.DEBUG)
         t0 = time.time()
         self._transform(data_holder=data_holder)
         adm_logger.log_workflow(f'Transformer {self.__class__.__name__} executed in {time.time()-t0} seconds', level=adm_logger.DEBUG)

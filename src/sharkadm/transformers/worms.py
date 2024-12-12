@@ -78,7 +78,7 @@ class AddWormsAphiaId(Transformer):
         for source_name, df in data_holder.data.groupby(self.source_col):
             aphia_id = taxa_worms.get_aphia_id(str(source_name))
             if not aphia_id:
-                adm_logger.log_transformation(f'No aphia_id found for species: {source_name}', add=source_name, level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'No aphia_id found for species: {source_name}', item=source_name, level=adm_logger.WARNING)
                 continue
             boolean = data_holder.data[self.source_col] == source_name
             data_holder.data.loc[boolean, self.col_to_set] = aphia_id
