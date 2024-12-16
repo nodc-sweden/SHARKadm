@@ -119,6 +119,59 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                                           level=adm_logger.WARNING)
 
 
+class RemoveInterval(Transformer):
+    valid_data_holders = ['ZipArchiveDataHolder']
+    valid_data_types = []
+
+    min_col = 'sample_min_depth_m'
+    max_col = 'sample_max_depth_m'
+
+    def __init__(self,
+                 valid_data_types: list[str],
+                 keep_intervals: list[str] = None,
+                 keep_if_min_depths_are: list[str] = None,
+                 replace_value: int | float | str = '',
+                 also_replace_columns: list[str] = None,
+                 also_remove_columns: list[str] = None,
+                 ) -> None:
+        super().__init__()
+        self.valid_data_types = valid_data_types
+        self._keep_intervals = keep_intervals or []
+        self._keep_if_min_depths_are = keep_if_min_depths_are or []
+        self._replace_value = str(replace_value)
+        self._also_replace_columns = also_replace_columns or []
+        self._also_remove_columns = also_remove_columns or []
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Removes all intervals [{RemoveInterval.min_col}-{RemoveInterval.max_col}]. Option to set replace_value and keep_intervals'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for (mi, ma), df in data_holder.data.groupby([self.min_col, self.max_col]):
+            inter = f'{mi}-{ma}'
+            if inter in self._keep_intervals:
+                continue
+            msg = f'Removing interval {inter} from columns {self.min_col} and {self.max_col} ({len(df)} places)'
+            if self._replace_value:
+                msg = f'Replacing interval {inter} with {self._replace_value}-{self._replace_value} in columns {self.min_col} and {self.max_col} ({len(df)} places)'
+            adm_logger.log_transformation(msg, level=adm_logger.WARNING)
+            if self._keep_if_min_depths_are and mi in self._keep_if_min_depths_are:
+                pass
+            else:
+                data_holder.data.loc[df.index, self.min_col] = self._replace_value
+            data_holder.data.loc[df.index, self.max_col] = self._replace_value
+            for col in self._also_replace_columns:
+                msg = f'Removing values in column {col} at interval {inter} ({len(df)} places)'
+                if self._replace_value:
+                    msg = f'Replacing values in column {col} with {self._replace_value} at interval {inter} ({len(df)} places)'
+                adm_logger.log_transformation(msg, level=adm_logger.WARNING)
+                data_holder.data.loc[df.index, col] = self._replace_value
+            for col in self._also_remove_columns:
+                msg = f'Removing values in column {col} at interval {inter} ({len(df)} places)'
+                adm_logger.log_transformation(msg, level=adm_logger.WARNING)
+                data_holder.data.loc[df.index, col] = ''
+
+
 # class RemoveDeepestDepthAtEachVisitPhysicalChemical(Transformer):
 #     valid_data_holders = ['ZipArchiveDataHolder']
 #     valid_data_types = ['PhysicalChemical']
