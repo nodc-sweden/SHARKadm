@@ -131,16 +131,16 @@ class RemoveInterval(Transformer):
                  keep_intervals: list[str] = None,
                  keep_if_min_depths_are: list[str] = None,
                  replace_value: int | float | str = '',
-                 also_replace_columns: list[str] = None,
-                 also_remove_columns: list[str] = None,
+                 also_replace_in_columns: list[str] = None,
+                 also_remove_from_columns: list[str] = None,
                  ) -> None:
         super().__init__()
         self.valid_data_types = valid_data_types
         self._keep_intervals = keep_intervals or []
         self._keep_if_min_depths_are = keep_if_min_depths_are or []
         self._replace_value = str(replace_value)
-        self._also_replace_columns = also_replace_columns or []
-        self._also_remove_columns = also_remove_columns or []
+        self._also_replace_in_columns = also_replace_in_columns or []
+        self._also_remove_from_columns = also_remove_from_columns or []
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -160,13 +160,17 @@ class RemoveInterval(Transformer):
             else:
                 data_holder.data.loc[df.index, self.min_col] = self._replace_value
             data_holder.data.loc[df.index, self.max_col] = self._replace_value
-            for col in self._also_replace_columns:
+            for col in self._also_replace_in_columns:
+                if col not in data_holder.data:
+                    continue
                 msg = f'Removing values in column {col} at interval {inter} ({len(df)} places)'
                 if self._replace_value:
                     msg = f'Replacing values in column {col} with {self._replace_value} at interval {inter} ({len(df)} places)'
                 adm_logger.log_transformation(msg, level=adm_logger.WARNING)
                 data_holder.data.loc[df.index, col] = self._replace_value
-            for col in self._also_remove_columns:
+            for col in self._also_remove_from_columns:
+                if col not in data_holder.data:
+                    continue
                 msg = f'Removing values in column {col} at interval {inter} ({len(df)} places)'
                 adm_logger.log_transformation(msg, level=adm_logger.WARNING)
                 data_holder.data.loc[df.index, col] = ''
