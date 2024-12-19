@@ -14,7 +14,7 @@ except ModuleNotFoundError as e:
 
 
 class AddBvolScientificNameOriginal(Transformer):
-    valid_data_types = ['Phytoplankton']
+    valid_data_types = ['Phytoplankton', 'IFCB']
     source_col = 'reported_scientific_name'
     col_to_set = 'bvol_scientific_name_original'
 
@@ -41,7 +41,7 @@ class AddBvolScientificNameOriginal(Transformer):
 
 
 class AddBvolScientificNameAndSizeClass(Transformer):
-    valid_data_types = ['Phytoplankton']
+    valid_data_types = ['Phytoplankton', 'IFCB']
 
     source_name_col = 'bvol_scientific_name_original'
     source_size_class_col = 'size_class'
@@ -57,9 +57,13 @@ class AddBvolScientificNameAndSizeClass(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_size_class_col not in data_holder.data:
-            adm_logger.log_transformation(f'Missing column {self.source_size_class_col} when trying to set bvol information',
-                                          level=adm_logger.WARNING)
-            return
+            adm_logger.log_transformation(f'Missing column {self.source_size_class_col} when setting bvol information. Will search without size_class',
+                                          level=adm_logger.DEBUG)
+            self._transform_without_size_class(data_holder)
+        else:
+            self._transform_with_size_class(data_holder)
+
+    def _transform_with_size_class(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.col_to_set_name] = ''
         data_holder.data[self.col_to_set_size] = ''
         for (name, size), df in data_holder.data.groupby([self.source_name_col, self.source_size_class_col]):
@@ -73,9 +77,19 @@ class AddBvolScientificNameAndSizeClass(Transformer):
                 adm_logger.log_transformation(f'Translate bvol size_class: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
             data_holder.data.loc[df.index, self.col_to_set_size] = new_size_class
 
+    def _transform_without_size_class(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set_name] = ''
+        data_holder.data[self.col_to_set_size] = ''
+        for name, df in data_holder.data.groupby(self.source_name_col):
+            info = translate_bvol_name_and_size.get(str(name))
+            new_name = info.get('name') or  name
+            if new_name != name:
+                adm_logger.log_transformation(f'Translate bvol name: {name} -> {new_name} ({len(df)} places)', level=adm_logger.INFO)
+            data_holder.data.loc[df.index, self.col_to_set_name] = new_name
+
 
 class AddBvolRefList(Transformer):
-    valid_data_types = ['Phytoplankton']
+    valid_data_types = ['Phytoplankton', 'IFCB']
 
     source_col = 'bvol_scientific_name'
     col_to_set = 'bvol_ref_list'
@@ -107,7 +121,7 @@ class AddBvolRefList(Transformer):
 
 
 class AddBvolAphiaId(Transformer):
-    valid_data_types = ['Phytoplankton']
+    valid_data_types = ['Phytoplankton', 'IFCB']
 
     source_col = 'bvol_scientific_name'
     col_to_set = 'bvol_aphia_id'

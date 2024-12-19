@@ -90,6 +90,7 @@ from .sampling_info import AddSamplingInfo
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
+from .sort_data import SortDataIFCB
 from .static_data_holding_center import AddStaticDataHoldingCenterEnglish
 from .static_data_holding_center import AddStaticDataHoldingCenterSwedish
 from .static_internet_access import AddStaticInternetAccessInfo
@@ -105,6 +106,9 @@ from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
+from .calculate import CalculatePhytoplankton
+from .calculate import CalculateZooplankton
+from .calculate import CopyCalculated
 
 
 @functools.cache

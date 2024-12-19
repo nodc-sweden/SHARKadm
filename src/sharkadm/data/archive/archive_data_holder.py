@@ -135,6 +135,10 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self.processed_data_directory / 'analyse_info.txt'
 
     @property
+    def import_matrix(self) -> ImportMatrixConfig:
+        return self._import_matrix
+
+    @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:
         return self._import_matrix_mapper
 

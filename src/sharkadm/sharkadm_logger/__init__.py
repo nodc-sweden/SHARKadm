@@ -2,12 +2,14 @@ from .sharkadm_logger import SHARKadmLogger
 from .xlsx import XlsxExporter
 from .txt import TxtExporter
 from .feedback import FeedbackTxtExporter
+from .print_on_screen import PrintWarnings
 
 
 exporter_mapping = {
     'xlsx': XlsxExporter,
     'txt': TxtExporter,
     'feedback': FeedbackTxtExporter,
+    'print_warnings': PrintWarnings,
 }
 
 
@@ -47,6 +49,11 @@ def create_feedback_report(logger: SHARKadmLogger, filter: dict = None, **kwargs
         logger.reset_filter()
         logger.filter(**filter)
     exp = FeedbackTxtExporter(**kwargs)
+    logger.export(exp)
+
+
+def print_warnings(logger: SHARKadmLogger):
+    exp = PrintWarnings()
     logger.export(exp)
 
 

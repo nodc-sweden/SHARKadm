@@ -18,7 +18,7 @@ class AddStaticDataHoldingCenterEnglish(Transformer):
 class AddStaticDataHoldingCenterSwedish(Transformer):
     valid_data_holders = get_archive_data_holder_names()
     col_to_set = 'data_holding_centre'
-    text_to_set = 'Sveriges meteorologiska och hydrologiska institut (SMHI)'
+    text_to_set = 'Sveriges Meteorologiska och Hydrologiska Institut (SMHI)'
 
     @staticmethod
     def get_transformer_description() -> str:

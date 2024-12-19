@@ -20,14 +20,14 @@ class AddReportedAphiaId(Transformer):
         return f'Adds {AddReportedAphiaId.col_to_set} from {AddReportedAphiaId.source_col} if not given.'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data.columns:
+            adm_logger.log_transformation(f'Column {self.col_to_set} already in data. Will not add',
+                                          level=adm_logger.DEBUG)
+            return
         if self.source_col not in data_holder.data.columns:
             adm_logger.log_transformation(f'No source column {self.source_col}. Setting empty column {self.col_to_set}',
                                           level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ''
-            return
-        if self.col_to_set in data_holder.data.columns:
-            adm_logger.log_transformation(f'Column {self.col_to_set} already in data. Will not add',
-                                          level=adm_logger.DEBUG)
             return
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
 
@@ -76,9 +76,14 @@ class AddWormsAphiaId(Transformer):
             data_holder.data[self.col_to_set] = ''
 
         for source_name, df in data_holder.data.groupby(self.source_col):
-            aphia_id = taxa_worms.get_aphia_id(str(source_name))
+            try:
+                aphia_id = taxa_worms.get_aphia_id(str(source_name))
+            except Exception as e:
+                adm_logger.log_transformation(f'Could not find aphia_id for species {source_name}: {e}', item=source_name,
+                                              level=adm_logger.WARNING)
+                continue
             if not aphia_id:
-                adm_logger.log_transformation(f'No aphia_id found for species: {source_name}', item=source_name, level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'No aphia_id found for species {source_name}', item=source_name, level=adm_logger.WARNING)
                 continue
             boolean = data_holder.data[self.source_col] == source_name
             data_holder.data.loc[boolean, self.col_to_set] = aphia_id
