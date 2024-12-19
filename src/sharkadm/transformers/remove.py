@@ -1,3 +1,5 @@
+import re
+
 from .base import Transformer, DataHolderProtocol
 from sharkadm import adm_logger
 
@@ -18,7 +20,8 @@ class RemoveValuesInColumns(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         len_data = len(data_holder.data)
-        for col in self.apply_on_columns:
+        # for col in self.apply_on_columns:
+        for col in self._get_apply_on_columns(data_holder):
             if col not in data_holder.data:
                 continue
             data_holder.data[col] = self._replace_value
@@ -30,6 +33,15 @@ class RemoveValuesInColumns(Transformer):
                 adm_logger.log_transformation(
                     f'All values in column {col} are removed (all {len_data} places)',
                     level=adm_logger.WARNING)
+
+    def _get_apply_on_columns(self, data_holder: DataHolderProtocol):
+        columns = []
+        for col in data_holder.data.columns:
+            for arg in self.apply_on_columns:
+                if re.match(arg, col):
+                    columns.append(col)
+                    break
+        return columns
 
 
 class RemoveRowsForParameters(Transformer):

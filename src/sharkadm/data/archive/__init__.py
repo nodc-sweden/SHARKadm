@@ -17,6 +17,7 @@ from .phytoplankton import PhytoplanktonArchiveDataHolder
 from .zoobenthos import ZoobenthosArchiveDataHolder
 from .zoobenthos import ZoobenthosBedaArchiveDataHolder
 from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
+from .zooplankton import ZooplanktonArchiveDataHolder
 
 
 def all_subclasses(cls):
@@ -31,8 +32,8 @@ object_mapping = dict((cls._data_format.lower(), cls) for cls in all_subclasses(
 def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / 'processed_data/delivery_note.txt')
-    # print(f'{object_mapping=}')
-    # print(f'{d_note.data_format=}')
+    print(f'{object_mapping=}')
+    print(f'{d_note.data_format=}')
     d_holder = object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
