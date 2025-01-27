@@ -72,12 +72,15 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                  valid_data_types: list[str],
                  depth_column: str,
                  also_remove_from_columns: list[str] = None,
-                 replace_value: int | float | str = '') -> None:
+                 replace_value: int | float | str = '',
+                 keep_single_depth_at_surface: bool = False,
+                 ) -> None:
         super().__init__()
         self.valid_data_types = valid_data_types
         self._depth_column = depth_column
         self._also_remove_from_columns = also_remove_from_columns or []
         self._replace_value = str(replace_value)
+        self._keep_single_depth_at_surface = keep_single_depth_at_surface
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -97,6 +100,8 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
             if not len(depths):
                 adm_logger.log_transformation(f'No depths in column {self._depth_column} at {_id}',
                                               level=adm_logger.WARNING)
+                continue
+            if len(depths) == 1 and float(depths.pop()) == 0 and self._keep_single_depth_at_surface:
                 continue
             max_depth = max(depths, key=lambda x: float(x))
             max_depth_index = df.loc[df[self._depth_column] == max_depth].index
