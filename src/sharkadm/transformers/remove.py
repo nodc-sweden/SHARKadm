@@ -101,7 +101,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                 adm_logger.log_transformation(f'No depths in column {self._depth_column} at {_id}',
                                               level=adm_logger.WARNING)
                 continue
-            if len(depths) == 1 and float(depths.pop()) <= 2 and self._keep_single_depth_at_surface:
+            if len(depths) == 1 and float(list(depths)[0]) <= 2 and self._keep_single_depth_at_surface:
                 continue
             max_depth = max(depths, key=lambda x: float(x))
             max_depth_index = df.loc[df[self._depth_column] == max_depth].index
