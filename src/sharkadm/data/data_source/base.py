@@ -41,6 +41,10 @@ class DataFile(ABC):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} with data type "{self.data_type}": {self._path}'
 
+    @property
+    def path(self) -> pathlib.Path:
+        return self._path
+
     @abstractmethod
     def _load_file(self) -> None:
         ...

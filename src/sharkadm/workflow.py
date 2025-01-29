@@ -208,7 +208,7 @@ class SHARKadmWorkflow:
 
     def set_data_sources(self, *paths: str | pathlib.Path) -> None:
         sources = [dict(path=str(path)) for path in paths]
-        self._workflow_config['data_source_paths'] = sources
+        # self._workflow_config['data_source_paths'] = sources
         self._data_sources = sources
 
     @property

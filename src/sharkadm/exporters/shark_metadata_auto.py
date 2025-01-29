@@ -2,11 +2,11 @@ import datetime
 import pathlib
 
 from sharkadm.data import DataHolder
-from .base import Exporter
+from .base import Exporter, FileExporter
 from sharkadm import utils, adm_logger
 
 
-class SHARKMetadataAuto(Exporter):
+class SHARKMetadataAuto(FileExporter):
     """Creates the shark_metadata_auto file"""
     date_str_format = '%Y-%m-%d'
 
@@ -14,15 +14,11 @@ class SHARKMetadataAuto(Exporter):
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
-        super().__init__()
-        if not export_directory:
-            export_directory = utils.get_export_directory()
-        self._export_directory = pathlib.Path(export_directory)
+        super().__init__(export_directory=export_directory, **kwargs)
         if not export_file_name:
             export_file_name = 'export_metadata_auto.txt'
         self._export_file_name = export_file_name
 
-        self._encoding = kwargs.get('encoding', 'cp1252')
         self._data_holder: DataHolder | None = None
 
     @property

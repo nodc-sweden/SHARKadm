@@ -13,6 +13,7 @@ from sharkadm.data.archive import delivery_note, analyse_info
 from sharkadm.data.archive import sampling_info
 from sharkadm.data.data_holder import DataHolder
 from sharkadm import adm_logger
+from sharkadm.data.data_source import DataFile
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class ArchiveDataHolder(DataHolder, ABC):
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
 
-        self._data_sources = {}
+        self._data_sources: dict[str, DataFile] = {}
 
         self._initiate()
         self._load_delivery_note()
@@ -104,6 +105,9 @@ class ArchiveDataHolder(DataHolder, ABC):
     @property
     def received_data_files(self) -> list[pathlib.Path]:
         paths = []
+        if not self.received_data_directory.exists():
+            adm_logger.log_workflow(f'"Received" folder not found', level=adm_logger.INFO)
+            return paths
         for path in self.received_data_directory.iterdir():
             if path.is_dir():
                 continue
@@ -116,11 +120,15 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     @property
     def processed_data_files(self) -> list[pathlib.Path]:
-        return [
+        paths = [
             self.delivery_note_path,
             self.sampling_info_path,
             self.analyse_info_path
         ]
+        for name, source in self._data_sources.items():
+            print(f'{source.path=}')
+            paths.append(source.path)
+        return paths
 
     @property
     def delivery_note_path(self) -> pathlib.Path:

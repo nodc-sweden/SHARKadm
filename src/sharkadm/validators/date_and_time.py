@@ -8,7 +8,7 @@ class MissingTime(Validator):
     @staticmethod
     def get_validator_description() -> str:
         cols_str = ', '.join(MissingTime.source_cols)
-        return f'Checks if values ar missing in column(s): {cols_str}'
+        return f'Checks if values are missing in column(s): {cols_str}'
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in MissingTime.source_cols:

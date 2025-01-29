@@ -9,6 +9,13 @@ import zipfile
 SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
 
 
+def has_admin_config() -> bool:
+    """Returns True if user has local environment variable for NODC_CONFIG. Else return False"""
+    if os.getenv('NODC_CONFIG') and pathlib.Path(os.getenv('NODC_CONFIG')).exists():
+        return True
+    return False
+
+
 def _remove_empty_directories(directory: pathlib.Path):
     for root, dirs, files in os.walk(directory, topdown=False):
         for name in dirs:
