@@ -21,13 +21,6 @@ class XlsxExporter(SharkadmLoggerExporter):
 
     def _get_default_file_name(self):
         date_str = datetime.datetime.now().strftime('%Y%m%d')
-# <<<<<<< HEAD
-#         data_string = '-'.join(list(self.adm_logger.data.keys()))
-#         if self.kwargs.get('tag'):
-#             file_name = f'sharkadm_log_{self.kwargs.get("tag")}_{self.adm_logger.name}_{date_str}_{data_string}'
-#         else:
-#             file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
-# =======
         data_string = '-'.join(self.adm_logger.filtered_on_levels)
         file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
         return file_name
