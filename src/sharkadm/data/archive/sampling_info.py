@@ -157,7 +157,7 @@ def _get_date(date_str: str) -> datetime.date | str:
             return datetime.datetime.strptime(d_string, form).date()
         except ValueError:
             pass
-    adm_logger.log_workflow(f'Invalid date or date format in sampling_info', add=date_str, level=adm_logger.ERROR)
+    adm_logger.log_workflow(f'Invalid date or date format in sampling_info', item=date_str, level=adm_logger.ERROR)
     adm_logger.log_workflow(adm_logger.feedback.invalid_date_in_analys_info(date_str), level=adm_logger.ERROR,
                             purpose=adm_logger.FEEDBACK)
     return ''

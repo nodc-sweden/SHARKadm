@@ -16,7 +16,7 @@ from .bvol import AddBvolScientificNameOriginal
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns
-from .columns import SortColumn
+from .columns import SortColumns
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .dataset_name import AddDatasetName
@@ -81,6 +81,7 @@ from .remove import RemoveDeepestDepthAtEachVisit
 from .remove import RemoveRowsForParameters
 from .remove import RemoveValuesInColumns
 from .remove import RemoveInterval
+from .remove import SetMaxLengthOfValuesInColumns
 from .replace_comma_with_dot import ReplaceCommaWithDot
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
@@ -90,10 +91,13 @@ from .sampling_info import AddSamplingInfo
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
-from .static_data_holding_center import AddStaticDataHoldingCenter
+from .sort_data import SortDataIFCB
+from .static_data_holding_center import AddStaticDataHoldingCenterEnglish
+from .static_data_holding_center import AddStaticDataHoldingCenterSwedish
 from .static_internet_access import AddStaticInternetAccessInfo
 from .static_internet_access import AddStaticInternetAccessInfo
 from .station import AddStationInfo
+from .station import CopyReportedStationNameToStationName
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
@@ -103,6 +107,9 @@ from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from ..utils.inspect_kwargs import get_kwargs_for_class
+from .calculate import CalculatePhytoplankton
+from .calculate import CalculateZooplankton
+from .calculate import CopyCalculated
 
 
 @functools.cache

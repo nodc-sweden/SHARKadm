@@ -44,19 +44,19 @@ class FixTimeFormat(Transformer):
             xx = ':'.join(parts[:2])
         if ':' in xx:
             if len(xx) > 5:
-                adm_logger.log_transformation(f'Cant handle time format {self._current_col} = {x}', add=x,
+                adm_logger.log_transformation(f'Cant handle time format {self._current_col} = {x}', item=x,
                                               level=adm_logger.ERROR)
                 return x
             xx = xx.zfill(5)
         else:
             if len(xx) > 4:
-                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', add=x,
+                adm_logger.log_transformation(f'Cant handle time format in column {self._current_col}', item=x,
                                               level=adm_logger.ERROR)
                 return x
             xx = xx.zfill(4)
             xx = f'{xx[:2]}:{xx[2:]}'
         if int(xx.split(':')[1]) > 59:
-            adm_logger.log_transformation(f'Invalid minutes in column {self._current_col}', add=x,
+            adm_logger.log_transformation(f'Invalid minutes in column {self._current_col}', item=x,
                                           level=adm_logger.ERROR)
             return x
         self._buffer[x.strip()] = xx

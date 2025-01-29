@@ -39,7 +39,7 @@ class DataFrame(Exporter):
                         new_value = self._convert_to_float(str(value))
                         if new_value == np.nan:
                             adm_logger.log_export(f'Could not convert {value} to numeric in column {col}. setting value to np.nan ({len(part_df)} places).',
-                                                  add=col, level=adm_logger.WARNING)
+                                                  item=col, level=adm_logger.WARNING)
                         df.loc[part_df.index, col] = new_value
         if self._header_as:
             mapper = get_header_mapper_from_data_holder(data_holder, import_column=self._header_as)

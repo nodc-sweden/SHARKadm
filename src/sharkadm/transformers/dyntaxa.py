@@ -180,10 +180,10 @@ class AddTaxonRanks(Transformer):
         for name, df in data_holder.data.groupby(self.source_col):
             info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus='accepted')
             if not info:
-                adm_logger.log_transformation(f'Could not add information about taxon rank for {name} ({len(df)} places)', add=name, level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'Could not add information about taxon rank for {name} ({len(df)} places)', item=name, level=adm_logger.WARNING)
                 continue
             if len(info) != 1:
-                adm_logger.log_transformation(f'Several matches in dyntaxa for {name} ({len(df)} places)', add=name, level=adm_logger.WARNING)
+                adm_logger.log_transformation(f'Several matches in dyntaxa for {name} ({len(df)} places)', item=name, level=adm_logger.WARNING)
                 continue
             single_info = info[0]
             adm_logger.log_transformation(f'Adding taxon rank for {name} ({len(df)} places)', level=adm_logger.INFO)

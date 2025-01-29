@@ -3,21 +3,26 @@ import pandas as pd
 from sharkadm import adm_logger
 
 
-class Occurrence:
+class PhytoplanktonOccurrence:
 
     def __init__(self, df: pd.DataFrame) -> None:
         self._df = df
 
     @property
     def counted(self):
-        return int(list(self._df[self._df['parameter'] == '# counted']['value'])[0])
+        df = self._df[self._df['parameter'] == '# counted']
+        if not len(df):
+            return
+        return int(list(df['value'])[0])
 
     @property
     def coefficient(self):
-        return int(self._df['coefficient'].values[0])
+        return float(self._df['coefficient'].values[0])
 
     @property
     def reported_cell_volume_um3(self) -> float | None:
+        if 'reported_cell_volume_um3' not in self._df:
+            return
         volume = self._df['reported_cell_volume_um3'].values[0]
         if not volume:
             return
@@ -30,41 +35,81 @@ class Occurrence:
             return
         return cell_volume_um3 * 10 ** -9
 
-    @property
-    def bvol_calculated_volume_um3(self) -> float | None:
-        volume = self._df['bvol_calculated_volume_um3'].values[0]
-        if not volume:
-            return
-        return float(volume)
+
+class ZooOccurrence:
+
+    def __init__(self, df: pd.DataFrame) -> None:
+        self._df = df
 
     @property
-    def bvol_calculated_volume_mm3(self) -> float | None:
-        cell_volume_um3 = self.bvol_calculated_volume_um3
-        if not cell_volume_um3:
-            return
-        return cell_volume_um3 * 10 ** -9
+    def counted(self):
+        return int(list(self._df[self._df['parameter'] == '# counted']['value'])[0])
 
     @property
-    def cell_volume_mm3(self) -> float | None:
-        volume = self.bvol_calculated_volume_mm3
-        if volume:
-            return volume
-        return self.reported_cell_volume_mm3
+    def sampler_area_cm2(self):
+        return int(self._df['sampler_area_cm2'].values[0])
+
+    @property
+    def wet_weight(self):
+        df = self._df[self._df['parameter'] == 'Wet weight']
+        if not len(df):
+            return None
+        print('HITTAT')
+        return float(list(self._df[self._df['parameter'] == 'Wet weight']['value'])[0])
+
+    # @property
+    # def reported_cell_volume_um3(self) -> float | None:
+    #     volume = self._df['reported_cell_volume_um3'].values[0]
+    #     if not volume:
+    #         return
+    #     return float(volume)
+    #
+    # @property
+    # def reported_cell_volume_mm3(self) -> float | None:
+    #     cell_volume_um3 = self.reported_cell_volume_um3
+    #     if not cell_volume_um3:
+    #         return
+    #     return cell_volume_um3 * 10 ** -9
+    #
+    # @property
+    # def bvol_calculated_volume_um3(self) -> float | None:
+    #     volume = self._df['bvol_calculated_volume_um3'].values[0]
+    #     if not volume:
+    #         return
+    #     return float(volume)
+    #
+    # @property
+    # def bvol_calculated_volume_mm3(self) -> float | None:
+    #     cell_volume_um3 = self.bvol_calculated_volume_um3
+    #     if not cell_volume_um3:
+    #         return
+    #     return cell_volume_um3 * 10 ** -9
+    #
+    # @property
+    # def cell_volume_mm3(self) -> float | None:
+    #     volume = self.bvol_calculated_volume_mm3
+    #     if volume:
+    #         return volume
+    #     return self.reported_cell_volume_mm3
 
 
-class Calculate(Transformer):
+class CalculatePhytoplankton(Transformer):
     occurrence_id_col = 'custom_occurrence_id'
-    col_to_set_abundance = 'CALC-Abundance'
-    col_to_set_biovolume_concentration = 'CALC-Biovolume concentration'
+    # col_to_set_abundance = 'CALC-Abundance'
+    col_to_set_abundance = 'Abundance'
+    col_to_set_abundance_unit = 'ind/m2'
+    # col_to_set_biovolume_concentration = 'CALC-Biovolume concentration'
+    col_to_set_biovolume_concentration = 'Biovolume concentration'
+    col_to_set_biovolume_concentration_unit = 'mm3/l'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adding calculated columns: {Calculate.col_to_set_abundance}'
+        return f'Adding calculated columns: {CalculatePhytoplankton.col_to_set_abundance}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         series_to_add = []
         for _id, df in data_holder.data.groupby(self.occurrence_id_col):
-            occ = Occurrence(df)
+            occ = PhytoplanktonOccurrence(df)
 
             counted = occ.counted
             coefficient = occ.coefficient
@@ -79,29 +124,31 @@ class Calculate(Transformer):
                 adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.', level=adm_logger.WARNING)
                 continue
 
-            series = df.loc[df.index[0]].squeeze()
             calc_abundance = occ.counted * occ.coefficient
-            series[self.col_to_set_abundance] = str(calc_abundance)
+            series = df.loc[df.index[0]].squeeze()
+            series['parameter'] = self.col_to_set_abundance
+            series['value'] = str(calc_abundance)
+            series['unit'] = self.col_to_set_abundance_unit
+            series['calc_by_dc'] = 'Y'
+            series_to_add.append(series)
 
-            cell_volume_mm3 = occ.cell_volume_mm3
+            cell_volume_mm3 = occ.reported_cell_volume_mm3
             if cell_volume_mm3:
                 calc_bio_volume = cell_volume_mm3 * calc_abundance
-                series[self.col_to_set_biovolume_concentration] = str(calc_bio_volume)
+                series['parameter'] = self.col_to_set_biovolume_concentration
+                series['value'] = str(calc_bio_volume)
+                series['unit'] = self.col_to_set_biovolume_concentration_unit
+                series['calc_by_dc'] = 'Y'
+                series_to_add.append(series)
             else:
                 adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.',
                                               level=adm_logger.WARNING)
-
-            series_to_add.append(series)
 
         if not series_to_add:
             adm_logger.log_transformation('No calculations made', level=adm_logger.DEBUG)
 
         adm_logger.log_transformation(f'Adding {len(series_to_add)} calculated rows.', level=adm_logger.DEBUG)
-        adm_logger.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
-
-
-
-
+        data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
             # Från JAVA-kod biovol
             # class BvolObject {
             #
@@ -112,3 +159,74 @@ class Calculate(Transformer):
             # private String trophicType = "";
             # private String calculatedVolume = "";
             # private String calculatedCarbon = "";
+
+
+class CalculateZooplankton(Transformer):
+    occurrence_id_col = 'custom_occurrence_id'
+    # col_to_set_abundance = 'CALCULATED_Abundance'
+    col_to_set_abundance = 'Abundance'
+    col_to_set_abundance_unit = 'ind/m2'
+
+    col_to_set_wet_weight_per_area = 'Wet weight/area'
+    col_to_set_wet_weight_per_area_unit = 'g wet weight/m2'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adding calculated columns: {CalculateZooplankton.col_to_set_abundance}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        series_to_add = []
+        for _id, df in data_holder.data.groupby(self.occurrence_id_col):
+            occ = ZooOccurrence(df)
+
+            counted = occ.counted
+            sampler_area_cm2 = occ.sampler_area_cm2
+
+            if not any([counted, sampler_area_cm2]):
+                adm_logger.log_transformation(f'Could not calculate anything. Missing counted and sampler_area_cm2.', level=adm_logger.WARNING)
+                continue
+            elif not counted:
+                adm_logger.log_transformation(f'Could not calculate anything. Missing counted.', level=adm_logger.WARNING)
+                continue
+            elif not sampler_area_cm2:
+                adm_logger.log_transformation(f'Could not calculate anything. Missing sampler_area_cm2.', level=adm_logger.WARNING)
+                continue
+
+            #############################################################
+            series = df.loc[df.index[0]].squeeze()
+            calc_abundance = occ.counted / occ.sampler_area_cm2 * 10000.0
+            series['parameter'] = self.col_to_set_abundance
+            series['value'] = str(calc_abundance)
+            series['unit'] = self.col_to_set_abundance_unit
+            series['calc_by_dc'] = 'Y'
+            series_to_add.append(series)
+            #############################################################
+            series = df.loc[df.index[0]].squeeze()
+            wet_weight = occ.wet_weight
+            if wet_weight:
+                calc_wet_weight = occ.counted / occ.wet_weight * 10000.0
+                series['parameter'] = self.col_to_set_wet_weight_per_area
+                series['value'] = str(calc_wet_weight)
+                series['unit'] = self.col_to_set_wet_weight_per_area_unit
+                series['calc_by_dc'] = 'Y'
+                series_to_add.append(series)
+            #############################################################
+
+        if not series_to_add:
+            adm_logger.log_transformation('No calculations made', level=adm_logger.DEBUG)
+
+        adm_logger.log_transformation(f'Adding {len(series_to_add)} calculated rows.', level=adm_logger.DEBUG)
+        data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
+
+
+class CopyCalculated(Transformer):
+    source_cols = ['CALCULATED_Abundance']
+    target_cols = ['Abundance']
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Copies columns {CopyCalculated.source_cols} to {CopyCalculated.target_cols}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for scol, tcol in zip(self.source_cols, self.target_cols):
+            data_holder.data[tcol] = data_holder.data[scol]

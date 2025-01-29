@@ -42,19 +42,17 @@ class TxtExporter(SharkadmLoggerExporter):
             self._save_as_txt(info, path)
             logger.info(f'Saving sharkadm txt log to {path}')
 
-    def _extract_info(self) -> list:
+    def _extract_info(self) -> list[str]:
         info = []
-        for level, level_data in self.adm_logger.data.items():
-            for purpose, purpose_data in level_data.items():
-                for log_type, log_type_data in purpose_data.items():
-                    for msg, msg_data in log_type_data.items():
-                        line_list = [
-                            msg,
-                            level,
-                        ]
-                        info.append('\t'.join(line_list))
+        for data in self.adm_logger.data:
+            line_list = [
+                data.get('msg', ''),
+                data.get('level', ''),
+            ]
+            info.append('\t'.join(line_list))
         return info
 
-    def _save_as_txt(self, info: list, path: pathlib.Path):
+    @staticmethod
+    def _save_as_txt(info: list, path: pathlib.Path):
         with open(path, 'a') as fid:
             fid.write('\n'.join(info))

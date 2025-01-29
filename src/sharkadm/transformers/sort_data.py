@@ -11,6 +11,7 @@ class SortData(Transformer):
         'sample_min_depth_m',
         'sample_max_depth_m',
         'scientific_name',
+        'parameter',
     ]
 
     def __init__(self, sort_by_columns: list[str] = None, remove_sorting_column: bool = True) -> None:
@@ -40,3 +41,17 @@ class SortData(Transformer):
     #     column_string = ', '.join(sort_by_columns)
     #     adm_logger.log_transformation(f'Sorting data based on columns: {column_string}')
     #     data_holder.data.sort_values(sort_by_columns, inplace=True)
+
+
+class SortDataIFCB(SortData):
+    sort_by_columns = [
+        'image_verified_by',
+        'sample_date',
+        'sample_time',
+        'station_name',
+
+        'sample_min_depth_m',
+        'sample_max_depth_m',
+        'scientific_name',
+        'parameter',
+    ]
