@@ -35,7 +35,7 @@ class AddDeliveryNoteInfo(Transformer):
                 adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.', level=adm_logger.DEBUG)
                 continue
             adm_logger.log_transformation(f'Adding {key} info from delivery_note', item=data_holder.delivery_note[key])
-            data_holder.data[key] = data_holder.delivery_note[key]
+            data_holder.data[key] = str(data_holder.delivery_note[key])
             # data_holder.data.loc[:, key] = data_holder.delivery_note[key]
 
     def _add_status(self, data_holder: DataHolder | ArchiveDataHolder):

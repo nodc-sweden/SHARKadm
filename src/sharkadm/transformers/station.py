@@ -82,7 +82,7 @@ class AddStationInfo(Transformer):
 
 
 class CopyReportedStationNameToStationName(Transformer):
-    valid_data_types = ['IFCB', 'Phytoplankton']
+    valid_data_types = ['IFCB']
 
     source_column = 'reported_station_name'
     col_to_set = 'station_name'

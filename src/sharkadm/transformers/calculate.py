@@ -93,7 +93,8 @@ class ZooOccurrence:
     #     return self.reported_cell_volume_mm3
 
 
-class CalculatePhytoplankton(Transformer):
+class old_CalculatePhytoplankton(Transformer):
+    col_must_exist = 'reported_value'
     occurrence_id_col = 'custom_occurrence_id'
     # col_to_set_abundance = 'CALC-Abundance'
     col_to_set_abundance = 'Abundance'
@@ -107,6 +108,10 @@ class CalculatePhytoplankton(Transformer):
         return f'Adding calculated columns: {CalculatePhytoplankton.col_to_set_abundance}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_must_exist not in data_holder.data:
+            adm_logger.log_transformation(f'Could not calculate anything. Missing {self.col_must_exist} column',
+                                          level=adm_logger.ERROR)
+            return
         series_to_add = []
         for _id, df in data_holder.data.groupby(self.occurrence_id_col):
             occ = PhytoplanktonOccurrence(df)
@@ -124,31 +129,37 @@ class CalculatePhytoplankton(Transformer):
                 adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.', level=adm_logger.WARNING)
                 continue
 
-            calc_abundance = occ.counted * occ.coefficient
-            series = df.loc[df.index[0]].squeeze()
-            series['parameter'] = self.col_to_set_abundance
-            series['value'] = str(calc_abundance)
-            series['unit'] = self.col_to_set_abundance_unit
-            series['calc_by_dc'] = 'Y'
-            series_to_add.append(series)
+            calc_abundance = counted * coefficient
 
-            cell_volume_mm3 = occ.reported_cell_volume_mm3
-            if cell_volume_mm3:
-                calc_bio_volume = cell_volume_mm3 * calc_abundance
-                series['parameter'] = self.col_to_set_biovolume_concentration
-                series['value'] = str(calc_bio_volume)
-                series['unit'] = self.col_to_set_biovolume_concentration_unit
-                series['calc_by_dc'] = 'Y'
-                series_to_add.append(series)
-            else:
-                adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.',
-                                              level=adm_logger.WARNING)
+            index = df.loc[df['parameter'] == 'Abundance'].index
+            data_holder.data.loc[index, 'value'] = calc_abundance
 
-        if not series_to_add:
-            adm_logger.log_transformation('No calculations made', level=adm_logger.DEBUG)
+            # series = df.loc[df.index[0]].squeeze()
+            # series['parameter'] = self.col_to_set_abundance
+            # series['value'] = str(calc_abundance)
+            # series['unit'] = self.col_to_set_abundance_unit
+            # series['calc_by_dc'] = 'Y'
+            # series_to_add.append(series)
 
-        adm_logger.log_transformation(f'Adding {len(series_to_add)} calculated rows.', level=adm_logger.DEBUG)
-        data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
+            # cell_volume_mm3 = occ.reported_cell_volume_mm3
+            # if cell_volume_mm3:
+            #     calc_bio_volume = cell_volume_mm3 * calc_abundance
+            #     series['parameter'] = self.col_to_set_biovolume_concentration
+            #     series['value'] = str(calc_bio_volume)
+            #     series['unit'] = self.col_to_set_biovolume_concentration_unit
+            #     series['calc_by_dc'] = 'Y'
+            #     series_to_add.append(series)
+            # else:
+            #     adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.',
+            #                                   level=adm_logger.WARNING)
+
+        # if not series_to_add:
+        #     adm_logger.log_transformation('No calculations made', level=adm_logger.DEBUG)
+        #
+        # adm_logger.log_transformation(f'Adding {len(series_to_add)} calculated rows.', level=adm_logger.DEBUG)
+        # data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
+
+
             # Från JAVA-kod biovol
             # class BvolObject {
             #
@@ -161,7 +172,27 @@ class CalculatePhytoplankton(Transformer):
             # private String calculatedCarbon = "";
 
 
-class CalculateZooplankton(Transformer):
+class CalculateAbundance(Transformer):
+    count_col = 'COPY_VARIABLE.# counted.ind/analysed sample fraction'
+    coef_col = 'coefficient'
+    col_must_exist = 'reported_value'
+    parameter = 'Abundance'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Replacing {CalculateAbundance.parameter} with calculated value'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_must_exist not in data_holder.data:
+            adm_logger.log_transformation(f'Could not calculate anything. Missing {self.col_must_exist} column',
+                                          level=adm_logger.ERROR)
+            return
+
+        boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
+        data_holder.data.loc[boolean, 'value'] = data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)
+
+
+class old_CalculateZooplankton(Transformer):
     occurrence_id_col = 'custom_occurrence_id'
     # col_to_set_abundance = 'CALCULATED_Abundance'
     col_to_set_abundance = 'Abundance'
@@ -219,14 +250,14 @@ class CalculateZooplankton(Transformer):
         data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
 
 
-class CopyCalculated(Transformer):
-    source_cols = ['CALCULATED_Abundance']
-    target_cols = ['Abundance']
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f'Copies columns {CopyCalculated.source_cols} to {CopyCalculated.target_cols}'
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for scol, tcol in zip(self.source_cols, self.target_cols):
-            data_holder.data[tcol] = data_holder.data[scol]
+# class CopyCalculated(Transformer):
+#     source_cols = ['CALCULATED_Abundance']
+#     target_cols = ['Abundance']
+#
+#     @staticmethod
+#     def get_transformer_description() -> str:
+#         return f'Copies columns {CopyCalculated.source_cols} to {CopyCalculated.target_cols}'
+#
+#     def _transform(self, data_holder: DataHolderProtocol) -> None:
+#         for scol, tcol in zip(self.source_cols, self.target_cols):
+#             data_holder.data[tcol] = data_holder.data[scol]

@@ -56,12 +56,16 @@ class WideToLong(Transformer):
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
-        self._cleanup(data_holder)
+        # self._cleanup(data_holder)
+        self._add_reported_columns(data_holder)
+        data_holder.data_structure = 'row'
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
         for col in df.columns:
             if col == 'quality_flag':
                 continue
+            # if 'COPY_VARIABLE' in col:
+            #     continue
             if self._ignore(col):
                 if not self._associated_qf_col(col, df):
                     self._metadata_columns.append(col)
@@ -78,6 +82,30 @@ class WideToLong(Transformer):
             if 'COPY_VARIABLE' in original_col:
                 col = col.split('.')[1]
             qcol = self._associated_qf_col(col, df)
+            if not qcol and 'COPY_VARIABLE' not in original_col:
+                continue
+            if self._ignore(col):
+                continue
+            # print('')
+            # print('******')
+            # print(f'{col=}')
+            # print(f'{qcol=}')
+            # print('......')
+            self._data_columns.append(original_col)
+            self._qf_col_mapping[original_col] = qcol
+            self._qf_col_mapping[col] = qcol
+
+    def old_save_data_columns(self, df: pd.DataFrame) -> None:
+        for original_col in df.columns:
+            col = original_col
+            if 'COPY_VARIABLE' in original_col:
+                col = col.split('.')[1]
+            qcol = self._associated_qf_col(col, df)
+            print('')
+            print('******')
+            print(f'{col=}')
+            print(f'{qcol=}')
+            print('......')
             if not qcol and 'COPY_VARIABLE' not in original_col:
                 continue
             if self._ignore(col):
@@ -143,7 +171,18 @@ class WideToLong(Transformer):
     def _cleanup(self, data_holder: DataHolder):
         keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
         data_holder.data = data_holder.data[keep_columns]
-        data_holder.data_structure = 'row'
+
+    def _add_reported_columns(self, data_holder: DataHolder) -> None:
+        cols_to_save = [
+            'parameter',
+            'value',
+            'quality_flag',
+            'unit',
+        ]
+        for col in cols_to_save:
+            if col not in data_holder.data:
+                continue
+            data_holder.data[f'reported_{col}'] = data_holder.data[col]
 
     @staticmethod
     def _get_unit_from_parameter(par: str) -> str:
