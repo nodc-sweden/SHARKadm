@@ -62,6 +62,8 @@ from .location import AddLocationNation
 from .location import AddLocationSeaBasin
 from .location import AddLocationTypeArea
 from .location import AddLocationWaterDistrict
+from .location import AddLocationTYPNFS06
+from .location import AddLocationWB
 from .long_to_wide import LongToWide
 from .manual import ManualHarbourPorpoise
 from .manual import ManualSealPathology
@@ -86,7 +88,7 @@ from .remove import RemoveRowsForParameters
 from .remove import RemoveValuesInColumns
 from .remove import SetMaxLengthOfValuesInColumns
 from .replace_comma_with_dot import ReplaceCommaWithDot
-from .reported_parameter import SaveIncomingColumnsAsReported
+# from .reported_parameter import SaveIncomingColumnsAsReported
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber

@@ -3,10 +3,12 @@ from typing import Protocol, TYPE_CHECKING
 import time
 
 import pandas as pd
+import numpy as np
 
 from sharkadm import adm_logger, config
 from sharkadm.data import get_valid_data_holders
 from sharkadm.data import is_valid_data_holder
+from sharkadm.utils.data_filter import DataFilter
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import DataHolder
@@ -49,7 +51,8 @@ class Transformer(ABC):
     valid_data_structures = []
     invalid_data_structures = []
 
-    def __init__(self, **kwargs):
+    def __init__(self, data_filter: DataFilter = None, **kwargs):
+        self._data_filter = data_filter
         self._kwargs = kwargs
 
     def __repr__(self) -> str:
@@ -93,5 +96,11 @@ class Transformer(ABC):
     @abstractmethod
     def _transform(self, data_holder: 'DataHolder') -> None:
         ...
+
+    def _get_filter_mask(self, data_holder: 'DataHolder') -> pd.Series | np.ndarray:
+        if not self._data_filter:
+            return np.ones(len(data_holder.data), dtype=bool)
+        adm_logger.log_workflow(f'Using data filter {self._data_filter.name} on transformer {self.name}', level=adm_logger.WARNING)
+        return self._data_filter.get_filter_mask(data_holder)
 
 
