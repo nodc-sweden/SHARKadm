@@ -94,3 +94,19 @@ class AddLocationHelcomOsparArea(_AddLocationBase):
         return f'Adds location_helcom_ospar_area from shape files'
 
 
+class AddLocationWB(_AddLocationBase):
+    col_to_set = 'location_wb'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds location_wb from shape files'
+
+
+class AddLocationTYPNFS06(_AddLocationBase):
+    col_to_set = 'location_typ_nfs06'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds location_typ_nfs06 from shape files'
+
+

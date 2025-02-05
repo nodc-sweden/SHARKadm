@@ -105,7 +105,7 @@ class old_CalculatePhytoplankton(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adding calculated columns: {CalculatePhytoplankton.col_to_set_abundance}'
+        return f'Adding calculated columns: {old_CalculatePhytoplankton.col_to_set_abundance}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_must_exist not in data_holder.data:
@@ -203,7 +203,7 @@ class old_CalculateZooplankton(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adding calculated columns: {CalculateZooplankton.col_to_set_abundance}'
+        return f'Adding calculated columns: {old_CalculateZooplankton.col_to_set_abundance}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         series_to_add = []

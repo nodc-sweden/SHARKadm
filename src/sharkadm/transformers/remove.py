@@ -6,8 +6,8 @@ from sharkadm import adm_logger
 
 class RemoveValuesInColumns(Transformer):
 
-    def __init__(self, *columns: str, replace_value: int | float | str = '') -> None:
-        super().__init__()
+    def __init__(self, *columns: str, replace_value: int | float | str = '', **kwargs) -> None:
+        super().__init__(**kwargs)
         self.apply_on_columns = columns
         if isinstance(columns[0], list):
             self.apply_on_columns = columns[0]
@@ -20,11 +20,12 @@ class RemoveValuesInColumns(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         len_data = len(data_holder.data)
+        filter_bool = self._get_filter_mask(data_holder)
         # for col in self.apply_on_columns:
         for col in self._get_apply_on_columns(data_holder):
             if col not in data_holder.data:
                 continue
-            data_holder.data[col] = self._replace_value
+            data_holder.data.loc[filter_bool, col] = self._replace_value
             if self._replace_value:
                 adm_logger.log_transformation(
                     f'All values in column {col} are set to {self._replace_value} (all {len_data} places)',
@@ -49,8 +50,8 @@ class RemoveRowsForParameters(Transformer):
 
     parameter_column = 'parameter'
 
-    def __init__(self, *parameters: str) -> None:
-        super().__init__()
+    def __init__(self, *parameters: str, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.apply_on_parameters = parameters
         if isinstance(parameters[0], list):
             self.apply_on_parameters = parameters[0]
@@ -63,9 +64,10 @@ class RemoveRowsForParameters(Transformer):
         if 'parameter' not in data_holder.data:
             adm_logger.log_transformation(f'Can not remove rows in data. Missing column "{self.parameter_column}"', level=adm_logger.WARNING)
             return
-
+        filter_bool = self._get_filter_mask(data_holder)
         for par in self.apply_on_parameters:
             boolean = data_holder.data[self.parameter_column].str.strip().str.match(par.strip(), case=False)
+            boolean = boolean & filter_bool
             index = data_holder.data.loc[boolean].index
             if not len(index):
                 continue
@@ -86,8 +88,9 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                  also_remove_from_columns: list[str] = None,
                  replace_value: int | float | str = '',
                  keep_single_depth_at_surface: bool = False,
+                 **kwargs,
                  ) -> None:
-        super().__init__()
+        super().__init__(**kwargs)
         self.valid_data_types = valid_data_types
         self._depth_column = depth_column
         self._also_remove_from_columns = also_remove_from_columns or []
@@ -106,7 +109,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
         all_index_to_set = []
         nr_visits = 0
         id_cols = [col for col in self.visit_id_columns if col in data_holder.data]
-        for _id, df in data_holder.data.groupby(id_cols):
+        for _id, df in data_holder.data.loc[self._get_filter_mask(data_holder)].groupby(id_cols):
             df = df.loc[df[self._depth_column] != '']
             depths = set(df[self._depth_column])
             if not len(depths):
@@ -150,8 +153,9 @@ class RemoveInterval(Transformer):
                  replace_value: int | float | str = '',
                  also_replace_in_columns: list[str] = None,
                  also_remove_from_columns: list[str] = None,
+                 **kwargs,
                  ) -> None:
-        super().__init__()
+        super().__init__(**kwargs)
         self.valid_data_types = valid_data_types
         self._keep_intervals = keep_intervals or []
         self._keep_if_min_depths_are = keep_if_min_depths_are or []
@@ -164,7 +168,7 @@ class RemoveInterval(Transformer):
         return f'Removes all intervals [{RemoveInterval.min_col}-{RemoveInterval.max_col}]. Option to set replace_value and keep_intervals'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for (mi, ma), df in data_holder.data.groupby([self.min_col, self.max_col]):
+        for (mi, ma), df in data_holder.data.loc[self._get_filter_mask(data_holder)].groupby([self.min_col, self.max_col]):
             inter = f'{mi}-{ma}'
             if inter in self._keep_intervals:
                 continue

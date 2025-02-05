@@ -307,13 +307,13 @@ class SHARKadmLogger:
         levels = self._get_levels(*args, levels=levels)
         purposes = self._get_purposes(*args, purposes=purposes)
 
-        print()
-        print()
-        print('===')
-        print(f'{log_types=}')
-        print(f'{levels=}')
-        print(f'{purposes=}')
-        print()
+        # print()
+        # print()
+        # print('===')
+        # print(f'{log_types=}')
+        # print(f'{levels=}')
+        # print(f'{purposes=}')
+        # print()
 
         self._filtered_levels = levels
         self._filtered_purposes = purposes
@@ -321,10 +321,10 @@ class SHARKadmLogger:
 
         self._filtered_data = []
         for data in self.data:
-            print()
-            print(data.get('level'))
-            print(data.get('purpose'))
-            print(data.get('log_type'))
+            # print()
+            # print(data.get('level'))
+            # print(data.get('purpose'))
+            # print(data.get('log_type'))
             if data.get('level') and data.get('level') not in levels:
                 continue
             if data.get('purpose') and data.get('purpose') not in purposes:
