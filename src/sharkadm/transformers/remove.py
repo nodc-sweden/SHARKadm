@@ -80,7 +80,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
     valid_data_holders = ['ZipArchiveDataHolder']
     valid_data_types = []
 
-    visit_id_columns = ['sample_date', 'sample_time', 'sample_latitude_dd', 'sample_longitude_dd', 'platform_code', 'visit_id']
+    visit_id_columns = ['shark_sample_id_md5', 'visit_data', 'sample_date', 'sample_time', 'sample_latitude_dd', 'sample_longitude_dd', 'platform_code', 'visit_id']
 
     def __init__(self,
                  valid_data_types: list[str],

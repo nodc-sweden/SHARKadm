@@ -26,7 +26,6 @@ class AddColumnViewsColumns(Transformer):
             # data_holder.data[col] = ''
             empty_cols_to_add.append(col)
             # data_holder.data.loc[:, col] = ''
-        print(f'{empty_cols_to_add=}')
         data_holder.data.loc[:, empty_cols_to_add] = ''
 
 

@@ -16,6 +16,7 @@ from .statistics import PrintStatistics
 from .statistics import WriteStatisticsToFile
 from .txt_file import TxtAsIs
 from .zip_archive import ZipArchive
+from .species_translation import SpeciesTranslationTxt
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 
