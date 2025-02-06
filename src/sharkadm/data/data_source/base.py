@@ -137,6 +137,10 @@ class DataFile(DataSource, ABC):
         self._load_file()
         self._do_post_init_stuf()
 
+    @property
+    def path(self) -> pathlib.Path:
+        return self._path
+
     @abstractmethod
     def _load_file(self) -> None:
         ...

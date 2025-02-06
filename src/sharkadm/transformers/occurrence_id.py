@@ -44,7 +44,7 @@ class AddOccurrenceId(Transformer):
         # occurrence_event.subscribe('several_valid_matches_in_database', self._on_several_valid_matches_in_database)
         # occurrence_event.subscribe('valid_match_in_database', self._on_valid_match_in_database)
         occurrence_event.subscribe('progress', self._on_progress)
-        occurrence_event.subscribe('report', self._on_result)
+        occurrence_event.subscribe('result', self._on_result)
 
         print(f'{data_holder.data_type=}')
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(data_holder.data_type)
@@ -56,9 +56,9 @@ class AddOccurrenceId(Transformer):
     # def add_valid_matches(self):
     #     self.database.add_matching_to_data(*self.valid_matches)
     #
-    # def _on_missing_mandatory_columns(self, data: dict) -> None:
-    #     adm_logger.log_transformation(f'Could not add {self.col_to_set}. Missing columns: {data["missing_columns"]}',
-    #                                   level=adm_logger.WARNING)
+    def _on_missing_mandatory_columns(self, data: dict) -> None:
+        adm_logger.log_transformation(f'Could not add {self.col_to_set}. Missing columns: {data["missing_columns"]}',
+                                      level=adm_logger.WARNING)
     #
     # def _on_id_added_to_data_from_database(self, data: dict) -> None:
     #     perfect = 'no perfect match'
@@ -91,10 +91,10 @@ class AddOccurrenceId(Transformer):
     def _on_progress(self, data: dict) -> None:
         event.post_event('progress', data)
 
-    def _on_report(self, data: dict) -> None:
-        adm_logger.log_transformation()
-        self._post_event_result('nr_perfect_match', tot_nr_perfect_matches)
-        self._post_event_result('nr_added_valid_suggestions', tot_nr_added_valid_suggestions)
-        self._post_event_result('nr_new_ids', tot_nr_new)
-        self._post_event_result('valid_not_added', valid_not_added)
+    def _on_result(self, data: dict) -> None:
+        adm_logger.log_transformation(data.get('msg', ''), level=adm_logger.INFO)
+        # self._post_event_result('nr_perfect_match', tot_nr_perfect_matches)
+        # self._post_event_result('nr_added_valid_suggestions', tot_nr_added_valid_suggestions)
+        # self._post_event_result('nr_new_ids', tot_nr_new)
+        # self._post_event_result('valid_not_added', valid_not_added)
 

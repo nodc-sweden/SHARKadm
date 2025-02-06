@@ -39,7 +39,7 @@ def create_txt_report(filter: dict = None, **kwargs):
 
 def create_changelog_file(**kwargs):
     adm_logger.reset_filter()
-    adm_logger.filter(levels='info')
+    adm_logger.filter(levels='info', log_type='transformation')
     exp = TxtExporter(file_name='changelog.txt', **kwargs)
     adm_logger.export(exp)
 

@@ -132,7 +132,8 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     tran = all_trans.get(name)
     if not tran:
         return
-    return tran(**kwargs)
+    args = kwargs.pop('args', [])
+    return tran(*args, **kwargs)
 
 
 def get_transformers_description() -> dict[str, str]:
