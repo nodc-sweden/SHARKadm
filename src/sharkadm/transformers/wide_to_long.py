@@ -3,7 +3,7 @@ from abc import abstractmethod
 import pandas as pd
 from sharkadm.utils import matching_strings
 
-from sharkadm import adm_logger
+from sharkadm import adm_logger, event
 from .base import Transformer, DataHolderProtocol
 from sharkadm import config
 from sharkadm.data import archive
@@ -134,14 +134,23 @@ class WideToLong(Transformer):
 
     def _get_transposed_data(self, df: pd.DataFrame) -> pd.DataFrame:
         data = []
-        for i, row in df.iterrows():
+        len_df = len(df)
+        for index, (i, row) in enumerate(df.iterrows()):
             meta = list(row[self._metadata_columns].values)
+            if not index % 1000:
+                event.post_event('progress',
+                                 dict(
+                                     total=len_df,
+                                     current=index,
+                                     title='Transposing data'
+                                 )
+                                 )
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
-                if not row[col] and not self._keep_empty_rows:
+                value = row[col]
+                if not value and not self._keep_empty_rows:
                     continue
                 par = self._get_parameter_name_from_parameter(col)
-                value = row[col]
                 qf = row.get(q_col)
                 if qf is None:
                     # adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
