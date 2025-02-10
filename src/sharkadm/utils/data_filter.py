@@ -22,7 +22,16 @@ class DataFilterRestrictDepth(DataFilter):
     col_to_check = 'location_wb'
 
     def get_filter_mask(self, data_holder: DataHolder) -> pd.Series | None:
-        if self.col_to_check not in data_holder.data:
-            adm_logger.log_workflow(f'Could not filter data. Missing column {self.col_to_check}', level=adm_logger.ERROR)
+        col = 'location_wb'
+        if col not in data_holder.data:
+            adm_logger.log_workflow(f'Could not filter data. Missing column {col}', level=adm_logger.ERROR)
             raise
-        return data_holder.data[self.col_to_check] != 'N'
+        col = 'location_county'
+        if col not in data_holder.data:
+            adm_logger.log_workflow(f'Could not filter data. Missing column {col}', level=adm_logger.ERROR)
+            raise
+
+        boolean_wb = data_holder.data['location_wb'] != 'N'
+        boolean_county = data_holder.data['location_county'] != ''
+        return boolean_wb | boolean_county
+        # return data_holder.data['location_wb'] != 'N'

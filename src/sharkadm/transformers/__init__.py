@@ -60,10 +60,11 @@ from .location import AddLocationHelcomOsparArea
 from .location import AddLocationMunicipality
 from .location import AddLocationNation
 from .location import AddLocationSeaBasin
-from .location import AddLocationTypeArea
-from .location import AddLocationWaterDistrict
 from .location import AddLocationTYPNFS06
+from .location import AddLocationTypeArea
 from .location import AddLocationWB
+from .location import AddLocationWaterCategory
+from .location import AddLocationWaterDistrict
 from .long_to_wide import LongToWide
 from .manual import ManualHarbourPorpoise
 from .manual import ManualSealPathology
@@ -82,6 +83,7 @@ from .qc import AddColumnsForAutomaticQC
 from .red_list import AddRedList
 from .remove import RemoveDeepestDepthAtEachVisit
 from .remove import RemoveInterval
+from .remove import RemoveRowsAtDepthRestriction
 # from .remove import RemoveDeepestDepthAtEachVisitBacterioplankton
 # from .remove import RemoveDeepestDepthAtEachVisitPhysicalChemical
 from .remove import RemoveRowsForParameters

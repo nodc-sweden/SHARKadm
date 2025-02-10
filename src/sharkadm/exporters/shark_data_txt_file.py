@@ -37,6 +37,7 @@ class SHARKdataTxtAsGiven(FileExporter):
     def __init__(self,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
+                 exclude_columns: list[str] = [],
                  **kwargs):
         super().__init__(export_directory,
                          export_file_name,
@@ -44,7 +45,7 @@ class SHARKdataTxtAsGiven(FileExporter):
         if not export_file_name:
             export_file_name = 'shark_data.txt'
         self._export_file_name = export_file_name
-        self._column_views = get_column_views_config()
+        self.exclude_columns = self.exclude_columns + exclude_columns
 
     @property
     def export_file_path(self):

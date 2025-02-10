@@ -17,7 +17,7 @@ class AddCustomId(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return 'Adds custom key and md5 id'
+        return 'Adds custom key and md5 id if add_md5=True'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         """custom_id in taken from self._id_handler"""
