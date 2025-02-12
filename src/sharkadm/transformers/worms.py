@@ -89,4 +89,18 @@ class AddWormsAphiaId(Transformer):
             data_holder.data.loc[boolean, self.col_to_set] = aphia_id
 
 
+class SetAphiaIdFromReportedAphiaId(Transformer):
+    valid_data_types = ['ifcb']
+    source_col = 'reported_aphia_id'
+    col_to_set = 'aphia_id'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Sets {SetAphiaIdFromReportedAphiaId.col_to_set} from {SetAphiaIdFromReportedAphiaId.source_col} if it is a digit.'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
+        adm_logger.log_transformation(
+            f'Setting {self.col_to_set} from {self.source_col}',
+            level=adm_logger.DEBUG)
 

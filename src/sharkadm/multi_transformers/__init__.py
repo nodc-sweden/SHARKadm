@@ -14,6 +14,7 @@ from .general_initial import GeneralInitial
 from .lims import Lims
 from .location import Location
 from .position import Position
+from .static_dv import StaticDV
 from .translate import Translate
 from .worms import Worms
 
