@@ -38,6 +38,7 @@ class SpeciesTranslationTxt(FileExporter):
     def _export(self, data_holder: DataHolderProtocol) -> None:
         if not self.export_file_name:
             self._export_file_name = f'species_translation_{data_holder.dataset_name}.txt'
-        df = data_holder.data[data_holder.data['reported_scientific_name'] != ''].drop_duplicates(self.columns).sort_values(['reported_scientific_name'])
-        df.loc[:, self.columns].to_csv(self.export_file_path, sep='\t', index=False)
+        columns = [col for col in self.columns if col in data_holder.data]
+        df = data_holder.data[data_holder.data['reported_scientific_name'] != ''].drop_duplicates(columns).sort_values(['reported_scientific_name'])
+        df.loc[:, columns].to_csv(self.export_file_path, sep='\t', index=False)
 

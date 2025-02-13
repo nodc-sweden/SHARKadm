@@ -29,7 +29,7 @@ class SortData(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         sort_by_columns = [col for col in self.sort_by_columns if col in data_holder.data.columns]
         column_string = ', '.join(sort_by_columns)
-        adm_logger.log_transformation(f'Sorting data based on columns: {column_string}')
+        adm_logger.log_transformation(f'Sorting data based on columns: {column_string}', level=adm_logger.DEBUG)
         data_holder.data.sort_values(sort_by_columns, ascending=self.ascending, inplace=True)
 
 
