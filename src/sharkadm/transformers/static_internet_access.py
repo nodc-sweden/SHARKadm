@@ -5,7 +5,7 @@ from sharkadm.data.archive import get_archive_data_holder_names
 class AddStaticInternetAccessInfo(Transformer):
     valid_data_holders = get_archive_data_holder_names()
     col_to_set = 'internet_access'
-    text_to_set = 'http://sharkweb.smhi.se, http://sharkdata.se'
+    text_to_set = 'https://shark.smhi.se'
 
     @staticmethod
     def get_transformer_description() -> str:

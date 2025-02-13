@@ -137,7 +137,7 @@ class SHARKadmController:
                              dict(
                                  total=tot_nr_operators,
                                  current=i,
-                                 title='Transforming'
+                                 title=f'Transforming...{trans.name}'
                              )
                              )
 
@@ -159,7 +159,7 @@ class SHARKadmController:
                                 dict(
                                      total=tot_nr_operators,
                                      current=i,
-                                     title='Initial validations'
+                                     title=f'Initial validation...{val.name}'
                                  )
                              )
 
@@ -181,7 +181,7 @@ class SHARKadmController:
                              dict(
                                  total=tot_nr_operators,
                                  current=i,
-                                 title='Final validations'
+                                 title=f'Final validation...{val.name}'
                              )
                              )
 
@@ -198,7 +198,7 @@ class SHARKadmController:
                              dict(
                                  total=tot_nr_operators,
                                  current=i,
-                                 title='Exports'
+                                 title=f'Exporting...{exp.name}'
                              )
                              )
 

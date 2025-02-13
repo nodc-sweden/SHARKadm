@@ -114,6 +114,7 @@ from .wide_to_long import WideToLong
 from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
+from .worms import SetAphiaIdFromReportedAphiaId
 from ..utils.inspect_kwargs import get_kwargs_for_class
 
 

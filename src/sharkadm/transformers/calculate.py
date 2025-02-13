@@ -188,8 +188,10 @@ class CalculateAbundance(Transformer):
                                           level=adm_logger.ERROR)
             return
 
+        data_holder.data['calc_by_dc'] = ''
         boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
-        data_holder.data.loc[boolean, 'value'] = data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)
+        data_holder.data.loc[boolean, 'value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
+        data_holder.data.loc[boolean, 'calc_by_dc'] = 'Y'
 
 
 class old_CalculateZooplankton(Transformer):
