@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import zipfile
 
+
 SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
 
 
