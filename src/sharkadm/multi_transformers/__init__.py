@@ -6,6 +6,7 @@ from sharkadm import utils
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 from .base import MultiTransformer
 from .bvol import Bvol
+from .calculate import Calculate
 from .date_time import DateTime
 from .dyntaxa import Dyntaxa
 from .general_dv import GeneralDV

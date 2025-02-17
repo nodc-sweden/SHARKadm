@@ -52,6 +52,10 @@ class SHARKadmWorkflow:
 
         self._adm_logger_config = adm_logger_config
 
+    @property
+    def path(self) -> pathlib.Path | None:
+        return self._file_path
+
     def _get_directory(self, path: str | pathlib.Path) -> pathlib.Path:
         path = pathlib.Path(path)
         if not path.exists():

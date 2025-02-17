@@ -38,8 +38,6 @@ class XlsxExporter(SharkadmLoggerExporter):
 
     def _extract_info(self) -> pd.DataFrame:
         header = self.adm_logger.keys
-        # translated_header = [item.replace('_', ' ').capitalize() for item in header]
-        print(f'{self.adm_logger.data=}')
         df = pd.DataFrame(data=self.adm_logger.data, columns=header, dtype=str)
         df.fillna('', inplace=True)
         if self.kwargs.get('columns'):

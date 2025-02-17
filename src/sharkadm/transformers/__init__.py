@@ -14,6 +14,7 @@ from .bvol import AddBvolRefList
 from .bvol import AddBvolScientificNameAndSizeClass
 from .bvol import AddBvolScientificNameOriginal
 from .calculate import CalculateAbundance
+from .calculate import CleanupCalculations
 # from .calculate import CalculatePhytoplankton
 # from .calculate import CalculateZooplankton
 # from .calculate import CopyCalculated
@@ -23,6 +24,7 @@ from .columns import RemoveColumns
 from .columns import SortColumns
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
+from .custom_id import AddSharkSampleMd5
 from .dataset_name import AddDatasetName
 from .datatype import AddDatatype
 from .date_and_time import AddDatetime

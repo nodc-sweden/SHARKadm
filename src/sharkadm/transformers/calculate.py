@@ -1,138 +1,140 @@
+import numpy as np
+
 from .base import Transformer, DataHolderProtocol
 import pandas as pd
 from sharkadm import adm_logger
 
-
-class PhytoplanktonOccurrence:
-
-    def __init__(self, df: pd.DataFrame) -> None:
-        self._df = df
-
-    @property
-    def counted(self):
-        df = self._df[self._df['parameter'] == '# counted']
-        if not len(df):
-            return
-        return int(list(df['value'])[0])
-
-    @property
-    def coefficient(self):
-        return float(self._df['coefficient'].values[0])
-
-    @property
-    def reported_cell_volume_um3(self) -> float | None:
-        if 'reported_cell_volume_um3' not in self._df:
-            return
-        volume = self._df['reported_cell_volume_um3'].values[0]
-        if not volume:
-            return
-        return float(volume)
-
-    @property
-    def reported_cell_volume_mm3(self) -> float | None:
-        cell_volume_um3 = self.reported_cell_volume_um3
-        if not cell_volume_um3:
-            return
-        return cell_volume_um3 * 10 ** -9
-
-
-class ZooOccurrence:
-
-    def __init__(self, df: pd.DataFrame) -> None:
-        self._df = df
-
-    @property
-    def counted(self):
-        return int(list(self._df[self._df['parameter'] == '# counted']['value'])[0])
-
-    @property
-    def sampler_area_cm2(self):
-        return int(self._df['sampler_area_cm2'].values[0])
-
-    @property
-    def wet_weight(self):
-        df = self._df[self._df['parameter'] == 'Wet weight']
-        if not len(df):
-            return None
-        print('HITTAT')
-        return float(list(self._df[self._df['parameter'] == 'Wet weight']['value'])[0])
-
-    # @property
-    # def reported_cell_volume_um3(self) -> float | None:
-    #     volume = self._df['reported_cell_volume_um3'].values[0]
-    #     if not volume:
-    #         return
-    #     return float(volume)
-    #
-    # @property
-    # def reported_cell_volume_mm3(self) -> float | None:
-    #     cell_volume_um3 = self.reported_cell_volume_um3
-    #     if not cell_volume_um3:
-    #         return
-    #     return cell_volume_um3 * 10 ** -9
-    #
-    # @property
-    # def bvol_calculated_volume_um3(self) -> float | None:
-    #     volume = self._df['bvol_calculated_volume_um3'].values[0]
-    #     if not volume:
-    #         return
-    #     return float(volume)
-    #
-    # @property
-    # def bvol_calculated_volume_mm3(self) -> float | None:
-    #     cell_volume_um3 = self.bvol_calculated_volume_um3
-    #     if not cell_volume_um3:
-    #         return
-    #     return cell_volume_um3 * 10 ** -9
-    #
-    # @property
-    # def cell_volume_mm3(self) -> float | None:
-    #     volume = self.bvol_calculated_volume_mm3
-    #     if volume:
-    #         return volume
-    #     return self.reported_cell_volume_mm3
-
-
-class old_CalculatePhytoplankton(Transformer):
-    col_must_exist = 'reported_value'
-    occurrence_id_col = 'custom_occurrence_id'
-    # col_to_set_abundance = 'CALC-Abundance'
-    col_to_set_abundance = 'Abundance'
-    col_to_set_abundance_unit = 'ind/m2'
-    # col_to_set_biovolume_concentration = 'CALC-Biovolume concentration'
-    col_to_set_biovolume_concentration = 'Biovolume concentration'
-    col_to_set_biovolume_concentration_unit = 'mm3/l'
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f'Adding calculated columns: {old_CalculatePhytoplankton.col_to_set_abundance}'
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_must_exist not in data_holder.data:
-            adm_logger.log_transformation(f'Could not calculate anything. Missing {self.col_must_exist} column',
-                                          level=adm_logger.ERROR)
-            return
-        series_to_add = []
-        for _id, df in data_holder.data.groupby(self.occurrence_id_col):
-            occ = PhytoplanktonOccurrence(df)
-
-            counted = occ.counted
-            coefficient = occ.coefficient
-
-            if not any([counted, coefficient]):
-                adm_logger.log_transformation(f'Could not calculate anything. Missing counted and coefficient.', level=adm_logger.WARNING)
-                continue
-            elif not counted:
-                adm_logger.log_transformation(f'Could not calculate anything. Missing counted.', level=adm_logger.WARNING)
-                continue
-            elif not coefficient:
-                adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.', level=adm_logger.WARNING)
-                continue
-
-            calc_abundance = counted * coefficient
-
-            index = df.loc[df['parameter'] == 'Abundance'].index
-            data_holder.data.loc[index, 'value'] = calc_abundance
+#
+# class PhytoplanktonOccurrence:
+#
+#     def __init__(self, df: pd.DataFrame) -> None:
+#         self._df = df
+#
+#     @property
+#     def counted(self):
+#         df = self._df[self._df['parameter'] == '# counted']
+#         if not len(df):
+#             return
+#         return int(list(df['value'])[0])
+#
+#     @property
+#     def coefficient(self):
+#         return float(self._df['coefficient'].values[0])
+#
+#     @property
+#     def reported_cell_volume_um3(self) -> float | None:
+#         if 'reported_cell_volume_um3' not in self._df:
+#             return
+#         volume = self._df['reported_cell_volume_um3'].values[0]
+#         if not volume:
+#             return
+#         return float(volume)
+#
+#     @property
+#     def reported_cell_volume_mm3(self) -> float | None:
+#         cell_volume_um3 = self.reported_cell_volume_um3
+#         if not cell_volume_um3:
+#             return
+#         return cell_volume_um3 * 10 ** -9
+#
+#
+# class ZooOccurrence:
+#
+#     def __init__(self, df: pd.DataFrame) -> None:
+#         self._df = df
+#
+#     @property
+#     def counted(self):
+#         return int(list(self._df[self._df['parameter'] == '# counted']['value'])[0])
+#
+#     @property
+#     def sampler_area_cm2(self):
+#         return int(self._df['sampler_area_cm2'].values[0])
+#
+#     @property
+#     def wet_weight(self):
+#         df = self._df[self._df['parameter'] == 'Wet weight']
+#         if not len(df):
+#             return None
+#         print('HITTAT')
+#         return float(list(self._df[self._df['parameter'] == 'Wet weight']['value'])[0])
+#
+#     # @property
+#     # def reported_cell_volume_um3(self) -> float | None:
+#     #     volume = self._df['reported_cell_volume_um3'].values[0]
+#     #     if not volume:
+#     #         return
+#     #     return float(volume)
+#     #
+#     # @property
+#     # def reported_cell_volume_mm3(self) -> float | None:
+#     #     cell_volume_um3 = self.reported_cell_volume_um3
+#     #     if not cell_volume_um3:
+#     #         return
+#     #     return cell_volume_um3 * 10 ** -9
+#     #
+#     # @property
+#     # def bvol_calculated_volume_um3(self) -> float | None:
+#     #     volume = self._df['bvol_calculated_volume_um3'].values[0]
+#     #     if not volume:
+#     #         return
+#     #     return float(volume)
+#     #
+#     # @property
+#     # def bvol_calculated_volume_mm3(self) -> float | None:
+#     #     cell_volume_um3 = self.bvol_calculated_volume_um3
+#     #     if not cell_volume_um3:
+#     #         return
+#     #     return cell_volume_um3 * 10 ** -9
+#     #
+#     # @property
+#     # def cell_volume_mm3(self) -> float | None:
+#     #     volume = self.bvol_calculated_volume_mm3
+#     #     if volume:
+#     #         return volume
+#     #     return self.reported_cell_volume_mm3
+#
+#
+# class old_CalculatePhytoplankton(Transformer):
+#     col_must_exist = 'reported_value'
+#     occurrence_id_col = 'custom_occurrence_id'
+#     # col_to_set_abundance = 'CALC-Abundance'
+#     col_to_set_abundance = 'Abundance'
+#     col_to_set_abundance_unit = 'ind/m2'
+#     # col_to_set_biovolume_concentration = 'CALC-Biovolume concentration'
+#     col_to_set_biovolume_concentration = 'Biovolume concentration'
+#     col_to_set_biovolume_concentration_unit = 'mm3/l'
+#
+#     @staticmethod
+#     def get_transformer_description() -> str:
+#         return f'Adding calculated columns: {old_CalculatePhytoplankton.col_to_set_abundance}'
+#
+#     def _transform(self, data_holder: DataHolderProtocol) -> None:
+#         if self.col_must_exist not in data_holder.data:
+#             adm_logger.log_transformation(f'Could not calculate anything. Missing {self.col_must_exist} column',
+#                                           level=adm_logger.ERROR)
+#             return
+#         series_to_add = []
+#         for _id, df in data_holder.data.groupby(self.occurrence_id_col):
+#             occ = PhytoplanktonOccurrence(df)
+#
+#             counted = occ.counted
+#             coefficient = occ.coefficient
+#
+#             if not any([counted, coefficient]):
+#                 adm_logger.log_transformation(f'Could not calculate anything. Missing counted and coefficient.', level=adm_logger.WARNING)
+#                 continue
+#             elif not counted:
+#                 adm_logger.log_transformation(f'Could not calculate anything. Missing counted.', level=adm_logger.WARNING)
+#                 continue
+#             elif not coefficient:
+#                 adm_logger.log_transformation(f'Could not calculate anything. Missing coefficient.', level=adm_logger.WARNING)
+#                 continue
+#
+#             calc_abundance = counted * coefficient
+#
+#             index = df.loc[df['parameter'] == 'Abundance'].index
+#             data_holder.data.loc[index, 'value'] = calc_abundance
 
             # series = df.loc[df.index[0]].squeeze()
             # series['parameter'] = self.col_to_set_abundance
@@ -177,21 +179,70 @@ class CalculateAbundance(Transformer):
     coef_col = 'coefficient'
     col_must_exist = 'reported_value'
     parameter = 'Abundance'
+    col_to_set = 'calculated_value'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Replacing {CalculateAbundance.parameter} with calculated value'
+        return f'Calculating {CalculateAbundance.parameter}. Setting value to column {CalculateAbundance.col_to_set}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_must_exist not in data_holder.data:
-            adm_logger.log_transformation(f'Could not calculate anything. Missing {self.col_must_exist} column',
+            adm_logger.log_transformation(f'Could not calculate {CalculateAbundance.parameter}. Missing {self.col_must_exist} column',
                                           level=adm_logger.ERROR)
             return
-
-        data_holder.data['calc_by_dc'] = ''
         boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
-        data_holder.data.loc[boolean, 'value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
-        data_holder.data.loc[boolean, 'calc_by_dc'] = 'Y'
+        data_holder.data.loc[boolean, 'calculated_value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
+
+
+class CleanupCalculations(Transformer):
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Compares reported and calculated values, setting value column and gives warnings if needed'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for col in ['reported_value', 'calculated_value', 'parameter']:
+            if col not in data_holder.data:
+                adm_logger.log_transformation(
+                    f'Could not cleanup calculations. Missing column {col}',
+                    level=adm_logger.ERROR)
+                return
+
+        data_holder.data['original_reported_value'] = data_holder.data['reported_value']
+        data_holder.data['original_reported_unit'] = data_holder.data['reported_unit']
+        data_holder.data['original_reported_parameter'] = data_holder.data['reported_parameter']
+        data_holder.data['original_calculated_value'] = data_holder.data['calculated_value']
+
+        abundance_boolean = data_holder.data['parameter'] == 'Abundance'
+        df = data_holder.data.loc[abundance_boolean]
+        reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
+        calculated = df['calculated_value'].astype(float)
+        max_boolean = calculated > (reported * 2)
+        min_boolean = calculated < (reported * 0.5)
+        boolean = max_boolean | min_boolean
+        red_df = df[boolean]
+        for i, row in red_df.iterrows():
+            adm_logger.log_transformation(
+                f"Calculated abundance differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                level=adm_logger.INFO)
+
+        data_holder.data['value'] = data_holder.data['original_reported_value']
+        data_holder.data['reported_value'] = ''
+        data_holder.data['reported_parameter'] = ''
+        data_holder.data['reported_unit'] = ''
+
+        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[red_df.index, 'original_reported_value']
+        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[red_df.index, 'original_reported_parameter']
+        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[red_df.index, 'original_reported_unit']
+        data_holder.data.loqc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
+
+        # Remove non-handled reported values
+        # data_holder.data.loc[~abundance_boolean, 'reported_value'] = ''
+
+        # calc_by_dc
+
+
 
 
 class old_CalculateZooplankton(Transformer):
