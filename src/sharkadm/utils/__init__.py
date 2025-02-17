@@ -6,13 +6,20 @@ import shutil
 import subprocess
 import zipfile
 
+import sharkadm
 
 SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
 
 
+def get_nodc_config_directory() -> pathlib.Path | None:
+    CONFIG_ENV = 'NODC_CONFIG'
+    if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
+        return pathlib.Path(os.getenv(CONFIG_ENV))
+
+
 def has_admin_config() -> bool:
     """Returns True if user has local environment variable for NODC_CONFIG. Else return False"""
-    if os.getenv('NODC_CONFIG') and pathlib.Path(os.getenv('NODC_CONFIG')).exists():
+    if get_nodc_config_directory():
         return True
     return False
 
@@ -64,6 +71,7 @@ def clear_temp_directory(days_old: int = 7):
                 except PermissionError:
                     pass
         _remove_empty_directories(TEMP_DIRECTORY)
+
 
 def clear_all_in_temp_directory():
     if TEMP_DIRECTORY.name != '_temp':
