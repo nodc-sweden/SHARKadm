@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class DvTemplateDataHolder(DataHolder):
     _data_type: str | None = None
+    _data_type_internal: str | None = None
     _data_format: str | None = None
 
     _date_str_format = '%Y-%m-%d'
@@ -74,6 +75,11 @@ class DvTemplateDataHolder(DataHolder):
 
     @property
     def data_type(self) -> str:
+        # return self._data_type_mapper.get(self.data_format)
+        return self._data_type
+
+    @property
+    def data_type_internal(self) -> str:
         # return self._data_type_mapper.get(self.data_format)
         return self._data_type
 
@@ -179,7 +185,9 @@ class DvTemplateDataHolder(DataHolder):
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
-        self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
+        data_type_mapper = config.get_data_type_mapper()
+        dtype = data_type_mapper.get(self.delivery_note.data_type, self.delivery_note.data_type.lower())
+        self._import_matrix = config.get_import_matrix_config(data_type=dtype)
         if not self._import_matrix:
             msg = f'Could not find import matrix for data_type: {self.delivery_note.data_type}'
             adm_logger.log_workflow(msg)

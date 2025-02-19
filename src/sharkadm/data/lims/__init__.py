@@ -12,7 +12,7 @@ def get_lims_data_holder(path: str | pathlib.Path) -> LimsDataHolder:
         path = path.parent.parent
     if path.name.lower() == 'raw_data':
         path = path.parent
-    mapper = config.get_import_matrix_mapper(data_type='PhysicalChemical', import_column='LIMS')
+    mapper = config.get_import_matrix_mapper(data_type='physicalchemical', import_column='LIMS')
     return LimsDataHolder(lims_root_directory=path, header_mapper=mapper)
 
 

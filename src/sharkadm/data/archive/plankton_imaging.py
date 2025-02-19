@@ -6,9 +6,10 @@ from .archive_data_holder import ArchiveDataHolder
 logger = logging.getLogger(__name__)
 
 
-class IfcbArchiveDataHolder(ArchiveDataHolder):
-    _data_type = 'IFCBB'
-    _data_format = 'IFCBB'
+class PlanktonImagingArchiveDataHolder(ArchiveDataHolder):
+    _data_type_internal = 'plankton_imaging'
+    _data_type = 'Plankton Imaging'
+    _data_format = 'PlanktonImaging'
 
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / 'data.txt'

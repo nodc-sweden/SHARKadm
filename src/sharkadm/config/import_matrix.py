@@ -64,8 +64,8 @@ class ImportMatrixConfig:
         self._path = pathlib.Path(path)
         # self._data_type = data_type_mapper.get(data_type)
         self._data_type = data_type
-        if self._data_type != data_type:
-            logger.warning(f'Data type has been mapped: {data_type} -> {self._data_type}')
+        # if self._data_type != data_type:
+        #     logger.warning(f'Data type has been mapped: {data_type} -> {self._data_type}')
         self._encoding = encoding
         self._data = {}
         self._mappers = {}
@@ -79,7 +79,7 @@ class ImportMatrixConfig:
         return f'{self.__class__.__name__} with data type "{self._data_type}": {self._path}'
 
     def _validate(self) -> None:
-        if self.data_type not in self._path.stem.lower():
+        if self.data_type not in self._path.stem:
             msg = f'Datatype {self.data_type} does not match name of file {self._path.name}'
             logger.error(msg)
             raise ValueError(msg)

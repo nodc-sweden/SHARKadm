@@ -97,9 +97,9 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 # @functools.cache
 def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
     for name, path in import_matrix_paths.items():
-        if data_type.lower() in name.lower():
+        if data_type in name:
             return ImportMatrixConfig(path,
-                                      data_type=data_type.lower(),
+                                      data_type=data_type,
                                       )
 
 
@@ -128,6 +128,11 @@ def get_custom_id_handler(config_directory: str | pathlib.Path = None):
 def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMapper:
     path = path or adm_config_paths('delivery_note_mapping')
     return DeliveryNoteMapper(path)
+
+
+def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:
+    path = path or adm_config_paths('data_type_mapping')
+    return DataTypeMapper(path)
 
 
 # @functools.cache

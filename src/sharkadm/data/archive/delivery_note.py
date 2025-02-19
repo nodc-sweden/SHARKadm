@@ -139,11 +139,11 @@ class DeliveryNote:
 
     @property
     def data_type(self) -> str:
-        return self._data['DTYPE'].lower()
+        return self._data['DTYPE']
 
     @property
     def data_format(self) -> str:
-        return self._data_format.lower()
+        return self._data_format
 
     @property
     def import_matrix_key(self) -> str:

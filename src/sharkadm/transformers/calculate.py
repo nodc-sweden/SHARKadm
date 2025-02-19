@@ -234,7 +234,7 @@ class CleanupCalculations(Transformer):
         data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[red_df.index, 'original_reported_value']
         data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[red_df.index, 'original_reported_parameter']
         data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[red_df.index, 'original_reported_unit']
-        data_holder.data.loqc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'original_calculated_value']
         data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
 
         # Remove non-handled reported values
