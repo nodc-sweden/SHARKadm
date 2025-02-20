@@ -135,8 +135,8 @@ def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:
     return DataTypeMapper(path)
 
 
-def get_mapper_archive_data_type_to_internal(path: str | pathlib.Path = None) -> DataTypeMapper:
-    path = path or adm_config_paths('mapper_archive_data_type_to_internal')
+def get_mapper_data_type_to_internal(path: str | pathlib.Path = None) -> DataTypeMapper:
+    path = path or adm_config_paths('mapper_data_type_to_internal')
     return DataTypeMapper(path)
 
 
@@ -190,7 +190,7 @@ def get_import_matrix_config_paths() -> dict[str, pathlib.Path]:
 DEFAULT_COLUMN_VIEWS_PATH = CONFIG_DIRECTORY / 'column_views.txt'
 adm_config_paths = get_adm_config_paths()
 import_matrix_paths = get_import_matrix_config_paths()
-mapper_archive_data_type_to_internal = get_mapper_archive_data_type_to_internal()
+mapper_data_type_to_internal = get_mapper_data_type_to_internal()
 
 
 if __name__ == '__main__':

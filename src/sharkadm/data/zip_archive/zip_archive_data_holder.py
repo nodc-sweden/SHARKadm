@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from sharkadm import config
-from sharkadm.config import mapper_archive_data_type_to_internal
+from sharkadm.config import mapper_data_type_to_internal
 # from sharkadm.config import get_data_type_mapper
 from sharkadm.config.import_matrix import ImportMatrixConfig
 from sharkadm.config.import_matrix import ImportMatrixMapper
@@ -60,7 +60,7 @@ class ZipArchiveDataHolder(DataHolder, ABC):
         self._dataset_name = self.zip_archive_path.stem
         self._data_type = self.zip_archive_path.stem.split('_')[1]
         dtype_lower = self._data_type.lower()
-        self._data_type_internal = mapper_archive_data_type_to_internal.get(dtype_lower, default=dtype_lower)
+        self._data_type_internal = mapper_data_type_to_internal.get(dtype_lower, default=dtype_lower)
 
     @property
     def data_type_internal(self) -> str:
