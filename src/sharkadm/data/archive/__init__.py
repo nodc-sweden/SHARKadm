@@ -10,7 +10,7 @@ from .chlorophyll import ChlorophyllArchiveDataHolder
 from .delivery_note import DeliveryNote
 # from .epibenthos import EpibenthosArchiveDataHolder
 from .epibenthos import EpibenthosMartransArchiveDataHolder
-from .ifcb import IfcbArchiveDataHolder
+# from .ifcb import IfcbArchiveDataHolder
 from .jellyfish import JellyfishArchiveDataHolder
 from .physicalchemical import PhysicalChemicalArchiveDataHolder
 from .phytoplankton import PhytoplanktonArchiveDataHolder
@@ -18,6 +18,7 @@ from .zoobenthos import ZoobenthosArchiveDataHolder
 from .zoobenthos import ZoobenthosBedaArchiveDataHolder
 from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
 from .zooplankton import ZooplanktonArchiveDataHolder
+from .plankton_imaging import PlanktonImagingArchiveDataHolder
 
 
 def all_subclasses(cls):
@@ -25,7 +26,7 @@ def all_subclasses(cls):
         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
 
-object_mapping = dict((cls._data_format.lower(), cls) for cls in all_subclasses(ArchiveDataHolder))
+object_mapping = dict((cls._data_format, cls) for cls in all_subclasses(ArchiveDataHolder))
 # object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
 
 

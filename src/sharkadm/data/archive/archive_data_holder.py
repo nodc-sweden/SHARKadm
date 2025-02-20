@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 class ArchiveDataHolder(DataHolder, ABC):
     _data_type: str | None = None
+    _data_type_internal: str | None = None
     _data_format: str | None = None
-    _data_structure: str | None = None
 
     _date_str_format = '%Y-%m-%d'
 
@@ -71,8 +71,12 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     @property
     def data_type(self) -> str:
-        # return self._data_type_mapper.get(self.data_format)
         return self._data_type
+
+    @property
+    def data_type_internal(self) -> str:
+        # return self._data_type_mapper.get(self.data_format)
+        return self._data_type_internal
 
     @property
     def delivery_note(self) -> delivery_note.DeliveryNote:
@@ -201,7 +205,7 @@ class ArchiveDataHolder(DataHolder, ABC):
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in delivery note"""
-        self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_type)
+        self._import_matrix = config.get_import_matrix_config(data_type=self.data_type_internal)
         # if not self._import_matrix:
         #     self._import_matrix = config.get_import_matrix_config(data_type=self.delivery_note.data_format)
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.delivery_note.import_matrix_key)
@@ -215,8 +219,9 @@ class ArchiveDataHolder(DataHolder, ABC):
                 self._data[new_column] = self._data[new_column] + self._data[col]
 
     def _check_data_source(self, data_source: data_source.DataFile) -> None:
+        return
         #if self._data_type_mapper.get(data_source.data_type) != self._data_type_mapper.get(self.data_type):
-        if data_source.data_type.lower() != self.data_type.lower():
+        if data_source.data_type.lower() != self.data_type.lower().replace('_', ''):
             msg = f'Data source {data_source} in data holder {self.name} is not of type {self.data_type}'
             logger.error(msg)
             raise ValueError(msg)

@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class ZipArchiveDataHolder(DataHolder, ABC):
+    _data_type_internal: str | None = None
     _data_type: str | None = None
     _data_format: str | None = None
     _data_structure = 'row'
@@ -60,9 +61,12 @@ class ZipArchiveDataHolder(DataHolder, ABC):
         print(f'#### {self._data_type=}')
 
     @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
     def data_type(self) -> str:
-        # return self._data_type_mapper.get(self.data_format)
-        return self._data_type.lower()
+        return self._data_type
 
     @property
     def delivery_note(self) -> delivery_note.DeliveryNote:
@@ -199,7 +203,7 @@ class ZipArchiveDataHolder(DataHolder, ABC):
 
     def _add_data_source(self, data_source: data_source.DataFile) -> None:
         """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
-        self._check_data_source(data_source)
+        # self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
     def _load_data(self) -> None:

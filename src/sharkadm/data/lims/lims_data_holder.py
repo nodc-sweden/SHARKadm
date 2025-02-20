@@ -19,7 +19,9 @@ class HeaderMapper(Protocol):
 
 
 class LimsDataHolder(DataHolder):
-    _data_type = 'physicalchemical'
+    _data_type_internal = 'physicalchemical'
+    _data_type = 'Physical and Chemical'
+    _data_format = 'LIMS'
     _data_structure = 'column'
 
     def __init__(self,
@@ -95,7 +97,6 @@ class LimsDataHolder(DataHolder):
         self._analyse_info = analyse_info.AnalyseInfo.from_lims_txt_file(self.analyse_info_path,
                                                                        mapper=self._header_mapper)
 
-
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
         data = data_source.get_data()
@@ -115,6 +116,10 @@ class LimsDataHolder(DataHolder):
 
     @property
     def data_type(self) -> str:
+        return self._data_type
+
+    @property
+    def data_type_internal(self) -> str:
         return self._data_type
 
     @property
