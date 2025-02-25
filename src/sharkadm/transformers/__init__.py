@@ -114,6 +114,7 @@ from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .visit import AddVisitKey
+from .add_uncertainty import AddUncertainty
 from .wide_to_long import WideToLong
 from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
@@ -196,6 +197,7 @@ def get_physical_chemical_transformer_objects() -> list[Transformer]:
         AddColumnsForAutomaticQC(),
         AddCruiseId(),
         AddVisitKey(),
+        AddUncertainty(),
 
 
         # AddStatus(),
