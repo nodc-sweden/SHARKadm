@@ -151,6 +151,19 @@ class DataHolder(ABC):
 
     @property
     def zip_archive_base(self) -> str:
+        if not self._data_sources:
+            return self._get_created_zip_archive_base()
+        source = list(self._data_sources.values())[0]
+        if not hasattr(source, 'path'):
+            return self._get_created_zip_archive_base()
+        if not source.path:
+            return self._get_created_zip_archive_base()
+        parts = source.path.parts
+        if 'processed_data' not in parts:
+            return self._get_created_zip_archive_base()
+        return parts[parts.index('processed_data')-1]
+
+    def _get_created_zip_archive_base(self) -> str:
         parts = ['SHARK', self.data_type.replace(' ', '')]
         years = self.year_span
         parts.append(years[0])
