@@ -98,10 +98,11 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
+from .scientific_name import SetScientificNameFromReportedScientificName
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
-from .sort_data import SortDataIFCB
+from .sort_data import SortDataPlanktonImaging
 from .static_data_holding_center import AddStaticDataHoldingCenterEnglish
 from .static_data_holding_center import AddStaticDataHoldingCenterSwedish
 from .static_internet_access import AddStaticInternetAccessInfo

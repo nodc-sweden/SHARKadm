@@ -25,6 +25,11 @@ class DataHolderProtocol(Protocol):
 
     @property
     @abstractmethod
+    def data_type_internal(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
     def dataset_name(self) -> str:
         ...
 
