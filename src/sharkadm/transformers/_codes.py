@@ -46,7 +46,7 @@ class _AddCodes(Transformer):
             info = _translate_codes.get_info(self.lookup_field, code.strip())
             if info:
                 names = [info[self.lookup_key]]
-                adm_logger.log_transformation(f'{code} translated to {info[self.lookup_key]} ({len_df} places)',
+                adm_logger.log_transformation(f'{source_col} {code} translated to {info[self.lookup_key]} ({len_df} places)',
                                               level=adm_logger.INFO)
             else:
                 for part in code.split(','):
@@ -54,7 +54,7 @@ class _AddCodes(Transformer):
                     info = _translate_codes.get_info(self.lookup_field, part)
                     if info:
                         names.append(info[self.lookup_key])
-                        adm_logger.log_transformation(f'{part} translated to {info[self.lookup_key]} ({len_df} places)',
+                        adm_logger.log_transformation(f'{source_col} {part} translated to {info[self.lookup_key]} ({len_df} places)',
                                                       level=adm_logger.INFO)
                     else:
                         adm_logger.log_transformation(f'Could not find information for {source_col}: {part}',

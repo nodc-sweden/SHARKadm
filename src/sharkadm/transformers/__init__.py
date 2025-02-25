@@ -26,6 +26,7 @@ from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .custom_id import AddSharkSampleMd5
 from .dataset_name import AddDatasetName
+from .dataset_name import AddDatasetFileName
 from .datatype import AddDatatype
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
