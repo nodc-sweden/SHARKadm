@@ -69,9 +69,9 @@ class MultiTransformer(Transformer):
         return self.get_transformer_description()
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
-        if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,
+        if data_holder.data_type_internal not in config.get_valid_data_types(valid=self.valid_data_types,
                                                                             invalid=self.invalid_data_types):
-            adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for multi transformer'
+            adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type_internal} for multi transformer'
                                     f' {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
         if data_holder.__class__.__name__ not in get_valid_data_holders(valid=self.valid_data_holders,

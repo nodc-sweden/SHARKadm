@@ -208,6 +208,12 @@ class CleanupCalculations(Transformer):
                     level=adm_logger.ERROR)
                 return
 
+        if 'original_calculated_value' in data_holder.data:
+            adm_logger.log_transformation(
+                f'CleanupCalculations already made. You dont want to do this again!',
+                level=adm_logger.WARNING)
+            return
+
         data_holder.data['original_reported_value'] = data_holder.data['reported_value']
         data_holder.data['original_reported_unit'] = data_holder.data['reported_unit']
         data_holder.data['original_reported_parameter'] = data_holder.data['reported_parameter']
@@ -241,8 +247,6 @@ class CleanupCalculations(Transformer):
         # data_holder.data.loc[~abundance_boolean, 'reported_value'] = ''
 
         # calc_by_dc
-
-
 
 
 class old_CalculateZooplankton(Transformer):

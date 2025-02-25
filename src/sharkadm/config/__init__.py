@@ -97,7 +97,7 @@ def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
 # @functools.cache
 def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
     for name, path in import_matrix_paths.items():
-        if data_type in name:
+        if data_type == name:
             return ImportMatrixConfig(path,
                                       data_type=data_type,
                                       )
@@ -132,6 +132,11 @@ def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMap
 
 def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:
     path = path or adm_config_paths('data_type_mapping')
+    return DataTypeMapper(path)
+
+
+def get_mapper_data_type_to_internal(path: str | pathlib.Path = None) -> DataTypeMapper:
+    path = path or adm_config_paths('mapper_data_type_to_internal')
     return DataTypeMapper(path)
 
 
@@ -174,13 +179,18 @@ def get_import_matrix_config_paths() -> dict[str, pathlib.Path]:
     for path in CONFIG_DIRECTORY.iterdir():
         if 'import_matrix' not in path.name:
             continue
-        paths[path.stem] = path
+        # key = path.stem.split('import_matrix_')[1].replace('_', '').lower()
+        # paths[key] = path
+        key = path.stem.split('_', 2)[-1]
+        # This key is the valid "data_type_internal
+        paths[key] = path
     return paths
 
 
 DEFAULT_COLUMN_VIEWS_PATH = CONFIG_DIRECTORY / 'column_views.txt'
 adm_config_paths = get_adm_config_paths()
 import_matrix_paths = get_import_matrix_config_paths()
+mapper_data_type_to_internal = get_mapper_data_type_to_internal()
 
 
 if __name__ == '__main__':

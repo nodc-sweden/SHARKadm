@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from sharkadm import config
+from sharkadm.config import mapper_data_type_to_internal
 # from sharkadm.config import get_data_type_mapper
 from sharkadm.config.import_matrix import ImportMatrixConfig
 from sharkadm.config.import_matrix import ImportMatrixMapper
@@ -58,7 +59,8 @@ class ZipArchiveDataHolder(DataHolder, ABC):
     def _initiate(self) -> None:
         self._dataset_name = self.zip_archive_path.stem
         self._data_type = self.zip_archive_path.stem.split('_')[1]
-        print(f'#### {self._data_type=}')
+        dtype_lower = self._data_type.lower()
+        self._data_type_internal = mapper_data_type_to_internal.get(dtype_lower, default=dtype_lower)
 
     @property
     def data_type_internal(self) -> str:
@@ -166,14 +168,13 @@ class ZipArchiveDataHolder(DataHolder, ABC):
         if not self.sampling_info_path.exists():
             adm_logger.log_workflow(f'No sampling info file for {self.dataset_name}', level=adm_logger.INFO)
             return
-        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path,
-                                                                       mapper=self._import_matrix_mapper)
+        self._sampling_info = sampling_info.SamplingInfo.from_txt_file(self.sampling_info_path)
 
     def _load_analyse_info(self) -> None:
         if not self.analyse_info_path.exists():
             adm_logger.log_workflow(f'No analyse info file for {self.dataset_name}', level=adm_logger.INFO)
             return
-        self._analyse_info = analyse_info.AnalyseInfo.from_txt_file(self.analyse_info_path, mapper=self._import_matrix_mapper)
+        self._analyse_info = analyse_info.AnalyseInfo.from_txt_file(self.analyse_info_path)
 
     # def _add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
     #     """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""

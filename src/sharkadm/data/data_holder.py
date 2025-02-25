@@ -151,7 +151,7 @@ class DataHolder(ABC):
 
     @property
     def zip_archive_base(self) -> str:
-        parts = ['SHARK', self.data_type.capitalize()]
+        parts = ['SHARK', self.data_type.replace(' ', '')]
         years = self.year_span
         parts.append(years[0])
         if years[0] != years[1]:

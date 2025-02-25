@@ -90,7 +90,7 @@ class AddWormsAphiaId(Transformer):
 
 
 class SetAphiaIdFromReportedAphiaId(Transformer):
-    valid_data_types = ['ifcb']
+    valid_data_types = ['plankton_imaging']
     source_col = 'reported_aphia_id'
     col_to_set = 'aphia_id'
 

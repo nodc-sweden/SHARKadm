@@ -12,7 +12,7 @@ except ModuleNotFoundError as e:
 
 
 class AddOccurrenceId(Transformer):
-    valid_data_types = ['zoobenthos', 'ifcb']
+    valid_data_types = ['zoobenthos', 'plankton_imaging']
 
     col_to_set = ''  # Is set in self._transform
     database = None
@@ -47,7 +47,7 @@ class AddOccurrenceId(Transformer):
         occurrence_event.subscribe('result', self._on_result)
 
         print(f'{data_holder.data_type=}')
-        self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(data_holder.data_type)
+        self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(data_holder.data_type_internal)
         print(f'{self.database.db_path=}')
         self.col_to_set = self.database.id_column
         self.valid_matches = []

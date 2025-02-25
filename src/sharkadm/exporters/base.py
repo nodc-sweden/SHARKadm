@@ -25,6 +25,11 @@ class DataHolderProtocol(Protocol):
 
     @property
     @abstractmethod
+    def data_type_internal(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
     def dataset_name(self) -> str:
         ...
 
@@ -58,9 +63,9 @@ class Exporter(ABC):
         return self.get_exporter_description()
     
     def export(self, data_holder: DataHolderProtocol) -> Any:
-        if data_holder.data_type.lower() not in config.get_valid_data_types(valid=self.valid_data_types,
+        if data_holder.data_type_internal not in config.get_valid_data_types(valid=self.valid_data_types,
                                                                             invalid=self.invalid_data_types):
-            adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type} for exporter {self.__class__.__name__}', level=adm_logger.DEBUG)
+            adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type_internal} for exporter {self.__class__.__name__}', level=adm_logger.DEBUG)
             return
 
         if not is_valid_data_holder(data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders):

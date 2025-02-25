@@ -26,6 +26,7 @@ from .cruise import AddCruiseId
 from .custom_id import AddCustomId
 from .custom_id import AddSharkSampleMd5
 from .dataset_name import AddDatasetName
+from .dataset_name import AddDatasetFileName
 from .datatype import AddDatatype
 from .date_and_time import AddDatetime
 from .date_and_time import AddMonth
@@ -98,10 +99,11 @@ from .reporting_institute import AddSwedishReportingInstitute
 from .row import AddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
+from .scientific_name import SetScientificNameFromReportedScientificName
 from .scientific_name import SetScientificNameFromDyntaxaScientificName
 from .shark_id import AddSharkId
 from .sort_data import SortData
-from .sort_data import SortDataIFCB
+from .sort_data import SortDataPlanktonImaging
 from .static_data_holding_center import AddStaticDataHoldingCenterEnglish
 from .static_data_holding_center import AddStaticDataHoldingCenterSwedish
 from .static_internet_access import AddStaticInternetAccessInfo

@@ -47,8 +47,7 @@ class AddSharkSampleMd5(Transformer):
         return f'Adds column {AddSharkSampleMd5.col_to_set}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        print(f'{data_holder.data_type=}')
-        id_handler = self._id_handler.get_level_handler(data_type=data_holder.data_type,
+        id_handler = self._id_handler.get_level_handler(data_type=data_holder.data_type_internal,
                                                         level='sample',
                                                         )
         missing = set(id_handler.id_columns) - set(data_holder.data.columns)
