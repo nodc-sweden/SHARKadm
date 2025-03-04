@@ -147,6 +147,10 @@ class ArchiveDataHolder(DataHolder, ABC):
         return self.processed_data_directory / 'analyse_info.txt'
 
     @property
+    def shark_metadata_path(self) -> pathlib.Path:
+        return self.archive_root_directory / 'shark_metadata.txt'
+
+    @property
     def import_matrix(self) -> ImportMatrixConfig:
         return self._import_matrix
 

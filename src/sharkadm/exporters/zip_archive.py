@@ -56,9 +56,9 @@ class ZipArchive(FileExporter):
         self._copy_received_files()
         self._copy_processed_files()
 
+        self._add_shark_metadata()
         self._add_readme_en()
         self._add_readme_sv()
-        self._add_shark_metadata()
         self._create_shark_metadata_auto()
         self._create_data_file()
         self._create_changelog_file()
@@ -94,14 +94,19 @@ class ZipArchive(FileExporter):
         self._metadata_auto = exporters.SHARKMetadataAuto(None)
         self._metadata_auto.set_data_holder(data_holder=self._data_holder)
 
+    def _add_shark_metadata(self) -> None:
+        if not hasattr(self._data_holder, 'shark_metadata_path'):
+            adm_logger.log_export(f'No attribute for shark_metadata_path for data_holder {self._data_holder.data_holder_name}', level=adm_logger.DEBUG)
+            return
+        source_path = self._data_holder.shark_metadata_path
+        target_path = self._temp_target_directory / source_path.name
+        shutil.copy2(source_path, target_path)
+
     def _add_readme_en(self) -> None:
-        pass
+        adm_logger.log_export(f'Add README.txt not implemented', level=adm_logger.DEBUG)
 
     def _add_readme_sv(self) -> None:
-        pass
-
-    def _add_shark_metadata(self) -> None:
-        pass
+        adm_logger.log_export(f'Add README_sv.txt not implemented', level=adm_logger.DEBUG)
 
     def _create_shark_metadata_auto(self) -> None:
         print(f'{self._temp_target_directory=}')
@@ -109,7 +114,6 @@ class ZipArchive(FileExporter):
                                         export_file_name='shark_metadata_auto.txt')
 
     def _create_data_file(self) -> None:
-        print(f'{self._temp_target_directory=}')
         exporter = exporters.SHARKdataTxt(export_directory=self._temp_target_directory,
                                           export_file_name='shark_data.txt')
         exporter.export(self._data_holder)
