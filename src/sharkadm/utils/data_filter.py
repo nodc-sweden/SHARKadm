@@ -31,7 +31,8 @@ class DataFilterRestrictDepth(DataFilter):
             adm_logger.log_workflow(f'Could not filter data. Missing column {col}', level=adm_logger.ERROR)
             raise
 
-        boolean_wb = data_holder.data['location_wb'] != 'N'
+        # boolean_wb = data_holder.data['location_wb'] != 'N'
+        boolean_wb = (data_holder.data['location_wb'] == 'Y') | (data_holder.data['location_wb'] == 'P')
         boolean_county = data_holder.data['location_county'] != ''
         return boolean_wb | boolean_county
         # return data_holder.data['location_wb'] != 'N'
