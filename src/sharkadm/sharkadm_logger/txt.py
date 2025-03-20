@@ -27,7 +27,7 @@ class TxtExporter(SharkadmLoggerExporter):
 
     def _get_default_file_name(self):
         date_str = datetime.datetime.now().strftime('%Y%m%d')
-        data_string = '-'.join(list(self.adm_logger.data.keys()))
+        data_string = '-'.join(list(self.adm_logger.data()))
         file_name = f'sharkadm_log_{self.adm_logger.name}_{date_str}_{data_string}'
         return file_name
 

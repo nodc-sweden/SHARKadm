@@ -213,7 +213,7 @@ class AddReportedDates(Transformer):
                 continue
             target_col = f'{self.reported_col_prefix}_{source_col}'
             if target_col in data_holder.data.columns:
-                adm_logger.log_transformation(f'Column already present. Will do nothing: {target_col}', level=adm_logger.INFO)
+                adm_logger.log_transformation(f'Column already present. Will do nothing: {target_col}', level=adm_logger.DEBUG)
                 continue
             data_holder.data[target_col] = data_holder.data[source_col]
 

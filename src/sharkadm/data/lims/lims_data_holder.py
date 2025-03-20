@@ -120,7 +120,7 @@ class LimsDataHolder(DataHolder):
 
     @property
     def data_type_internal(self) -> str:
-        return self._data_type
+        return self._data_type_internal
 
     @property
     def dataset_name(self) -> str:
