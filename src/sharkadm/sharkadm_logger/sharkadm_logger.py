@@ -78,6 +78,12 @@ class SHARKadmLogger:
         self._filtered_purposes: list[str] = []
         self._filtered_log_types: list[str] = []
 
+    def _reset_filter(self) -> None:
+        self._filtered_data: DATA_DTYPE = []
+        self._filtered_levels: list[str] = []
+        self._filtered_purposes: list[str] = []
+        self._filtered_log_types: list[str] = []
+
     def _check_level(self, level: str) -> str:
         level = level.lower()
         if level not in self._levels:
@@ -224,7 +230,8 @@ class SHARKadmLogger:
         return self
 
     def reset_filter(self) -> 'SHARKadmLogger':
-        self._filtered_data = []
+        logger.info(f'Resetting filter in {self.__class__.__name__}')
+        self._reset_filter()
         return self
 
     def export(self, exporter: SharkadmLoggerExporter):
@@ -315,6 +322,7 @@ class SHARKadmLogger:
         # print(f'{purposes=}')
         # print()
 
+        print(f'{levels=}')
         self._filtered_levels = levels
         self._filtered_purposes = purposes
         self._filtered_log_types = log_types

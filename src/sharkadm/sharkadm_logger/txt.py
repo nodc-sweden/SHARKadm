@@ -56,3 +56,16 @@ class TxtExporter(SharkadmLoggerExporter):
     def _save_as_txt(info: list, path: pathlib.Path):
         with open(path, 'a') as fid:
             fid.write('\n'.join(info))
+
+
+class TxtExporterChangeLog(TxtExporter):
+
+    def _extract_info(self) -> list[str]:
+        info = []
+        for data in self.adm_logger.data:
+            line_list = [
+                data.get('msg', ''),
+            ]
+            info.append('\t'.join(line_list))
+        return sorted(info)
+

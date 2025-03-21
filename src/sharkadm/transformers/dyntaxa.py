@@ -59,7 +59,7 @@ class AddDyntaxaScientificName(Transformer):
                             level=adm_logger.INFO)
                     else:
                         adm_logger.log_transformation(f'No translation for: {name} ({len(df)} places)',
-                                                      level=adm_logger.WARNING)
+                                                      level=adm_logger.DEBUG)
                 else:
                     adm_logger.log_transformation(f'Translated from dyntaxa: {name} -> {new_name} ({len(df)} places)',
                                                   level=adm_logger.INFO)
