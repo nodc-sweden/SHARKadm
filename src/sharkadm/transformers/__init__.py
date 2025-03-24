@@ -115,6 +115,7 @@ from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .visit import AddVisitKey
 from .add_uncertainty import AddUncertainty
+from .add_lmqnt import AddLmqnt
 from .wide_to_long import WideToLong
 from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
