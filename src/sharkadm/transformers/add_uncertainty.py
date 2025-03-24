@@ -27,12 +27,14 @@ class AddUncertainty(Transformer):
         uncert_str = uncert_str.replace('>=', '')
         return uncert_str
 
-    def _ices_conversions_to_shark_units(self, val: float, element: str) -> float:
+    def _conversions_to_shark_units(self, val: float, element: str) -> float:
+        # Unit conversions from ICES: https://www.ices.dk/data/tools/Pages/Unit-conversions.aspx
         # O2 from mg/l to ml/l
         # N from ug/l to umol/l
         # P from ug/l to umol/l
         # S from ug/l to umol/l
-        # Si from ug/l to umol/l
+        # Si from ug/l to umol/l, from
+        # C from ug/l to umol/l, based on standard atomic weigth: 12.011
 
         conversions = {
             "O": 0.700,
@@ -40,6 +42,7 @@ class AddUncertainty(Transformer):
             "P": 0.032285,
             "S": 0.031187,
             "Si": 0.035606,
+            "C": 0.083257
         }
         converted_val = val * conversions[element]
         return converted_val
@@ -49,8 +52,9 @@ class AddUncertainty(Transformer):
         uncert_str = self._clean_uncert_str(uncert_str)
         parameter_name_list = ['Dissolved oxygen O2 bottle', 'Dissolved oxygen O2 CTD', 'Nitrite NO2-N',
                                'Nitrate NO3-N', 'Nitrite+Nitrate NO2+NO3-N', 'Ammonium NH4-N', 'Total Nitrogen Tot-N',
-                               'Phosphate PO4-P', 'Total phosphorus Tot-P', 'Silicate SiO3-Si']
-        element_list = ['O', 'O', 'N', 'N', 'N', 'N', 'N', 'P', 'P', 'Si']
+                               'Particulate organic nitrogen PON', 'Phosphate PO4-P', 'Total phosphorus Tot-P',
+                               'Silicate SiO3-Si', 'Dissolved organic carbon DOC', 'Particulate organic carbon POC']
+        element_list = ['O', 'O', 'N', 'N', 'N', 'N', 'N', 'N', 'P', 'P', 'Si', 'C', 'C']
         element = ''
         if name in parameter_name_list:
             element = element_list[parameter_name_list.index(name)]
@@ -75,28 +79,28 @@ class AddUncertainty(Transformer):
                 item[2] = matches.group(5).strip() if matches.group(5) else ''
 
             if (element != '') & (str(item[1]) == 'ug/l'):
-                uncertainties.loc[i, 'unc'] = self._ices_conversions_to_shark_units(float(item[0]), element)
+                uncertainties.loc[i, 'unc'] = self._conversions_to_shark_units(float(item[0]), element)
                 uncertainties.loc[i, 'unc_unit'] = 'umol/l'
             elif (element != '') & (str(item[1]) == 'mg/l'):
                 if element == 'O':
-                    uncertainties.loc[i, 'unc'] = self._ices_conversions_to_shark_units(float(item[0]), element)
+                    uncertainties.loc[i, 'unc'] = self._conversions_to_shark_units(float(item[0]), element)
                     uncertainties.loc[i, 'unc_unit'] = 'ml/l'
                 else:
-                    uncertainties.loc[i, 'unc'] = self._ices_conversions_to_shark_units(float(item[0])*1000, element)
+                    uncertainties.loc[i, 'unc'] = self._conversions_to_shark_units(float(item[0])*1000, element)
                     uncertainties.loc[i, 'unc_unit'] = 'umol/l'
             else:
                 uncertainties.loc[i, 'unc'] = float(item[0])
                 uncertainties.loc[i, 'unc_unit'] = str(item[1])
 
             if (element != '') & (str(item[3]) == 'ug/l'):
-                uncertainties.loc[i, 'limit'] = self._ices_conversions_to_shark_units(float(item[2]), element)
+                uncertainties.loc[i, 'limit'] = self._conversions_to_shark_units(float(item[2]), element)
                 uncertainties.loc[i, 'limit_unit'] = 'umol/l'
             elif (element != '') & (str(item[3]) == 'mg/l'):
                 if element == 'O':
-                    uncertainties.loc[i, 'limit'] = self._ices_conversions_to_shark_units(float(item[2]), element)
+                    uncertainties.loc[i, 'limit'] = self._conversions_to_shark_units(float(item[2]), element)
                     uncertainties.loc[i, 'limit_unit'] = 'ml/l'
                 else:
-                    uncertainties.loc[i, 'limit'] = self._ices_conversions_to_shark_units(float(item[2])*1000, element)
+                    uncertainties.loc[i, 'limit'] = self._conversions_to_shark_units(float(item[2])*1000, element)
                     uncertainties.loc[i, 'limit_unit'] = 'umol/l'
             elif item[2]:
                 uncertainties.loc[i, 'limit'] = float(item[2])
