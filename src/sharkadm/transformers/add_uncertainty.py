@@ -13,12 +13,11 @@ class AddUncertainty(Transformer):
     def _clean_uncert_str(self, uncert_str: str) -> str:
         uncert_str = uncert_str.replace('nivå', '')
         uncert_str = uncert_str.replace('enheter', '')
-        uncert_str = uncert_str.replace('psu', 'o/oo psu')
-        uncert_str = uncert_str.replace('ml/L', 'ml/l')
-        uncert_str = uncert_str.replace('mg/L', 'mg/l')
-        uncert_str = uncert_str.replace('µmol/L', 'umol/l')
         uncert_str = uncert_str.replace('µM', 'umol/l')
-        uncert_str = uncert_str.replace('µg/L', 'ug/l')
+        uncert_str = re.sub(r'[a-zA-Z]', lambda match: match.group(0).lower() if match.group(0).lower() != 'c' else 'C',
+                            uncert_str)
+        uncert_str = uncert_str.replace('psu', 'o/oo psu')
+        uncert_str = uncert_str.replace('µ', 'u')
         uncert_str = uncert_str.replace('°', '')
         uncert_str = uncert_str.replace('(', '')
         uncert_str = uncert_str.replace(')', '')
