@@ -17,6 +17,7 @@ class AddUncertainty(Transformer):
         uncert_str = re.sub(r'[a-zA-Z]', lambda match: match.group(0).lower() if match.group(0).lower() != 'c' else 'C',
                             uncert_str)
         uncert_str = uncert_str.replace('psu', 'o/oo psu')
+        uncert_str = uncert_str.replace('fnu', 'FNU')
         uncert_str = uncert_str.replace('µ', 'u')
         uncert_str = uncert_str.replace('°', '')
         uncert_str = uncert_str.replace('(', '')
