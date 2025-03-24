@@ -12,6 +12,8 @@ dependencies = [
     "pandas>=2.2.1",
     "requests>=2.31.0",
     "xlsxwriter>=3.2.0",
+    "polars>=1.26.0",
+    "fastexcel>=0.13.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -25,14 +27,11 @@ build-backend = "pdm.backend"
 [tool.pdm]
 distribution = true
 
-[tool.pdm.dev-dependencies]
-dev = [
-    "pytest>=8.2.2",
-    "notebook>=7.3.2",
-]
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["src", "tests"]
 
 [tool.setuptools.package-data]
 mypkg = ["."]
+
+[dependency-groups]
+dev = ["pytest>=8.2.2", "notebook>=7.3.2", "ruff>=0.11.2"]
