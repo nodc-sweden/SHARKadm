@@ -3,7 +3,7 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
-from .analyse_info import AddAnalyseInfo
+from .analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from .arithmetic import Divide
 from .arithmetic import Multiply
 from .bacteria import SetBacteriaAsReportedScientificName
@@ -20,7 +20,7 @@ from .calculate import CleanupCalculations
 # from .calculate import CopyCalculated
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
-from .columns import RemoveColumns
+from .columns import RemoveColumns, PolarsRemoveColumns
 from .columns import SortColumns
 from .cruise import AddCruiseId
 from .custom_id import AddCustomId
@@ -29,11 +29,11 @@ from .dataset_name import AddDatasetName
 from .dataset_name import AddDatasetFileName
 from .datatype import AddDatatype
 from .datatype import AddDatatypePlanktonBarcoding
-from .date_and_time import AddDatetime
+from .date_and_time import AddDatetime, PolarsAddDatetime
 from .date_and_time import AddMonth
 from .date_and_time import AddReportedDates
-from .date_and_time import AddSampleDate
-from .date_and_time import AddSampleTime
+from .date_and_time import AddSampleDate, PolarsAddSampleDate
+from .date_and_time import AddSampleTime, PolarsAddSampleTime
 from .date_and_time import AddVisitDateFromObservationDate
 from .date_and_time import CreateFakeFullDates
 from .date_and_time import FixDateFormat
@@ -51,14 +51,14 @@ from .dyntaxa import AddReportedScientificNameDyntaxaId
 from .dyntaxa import AddTaxonRanks
 from .fake import FakeAddCTDtagToColumns
 from .fake import FakeAddPressureFromDepth
-from .flags import ConvertFlagsToSDN
+from .flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
 from .laboratory import AddEnglishAnalyticalLaboratory
 from .laboratory import AddEnglishSamplingLaboratory
 from .laboratory import AddSwedishAnalyticalLaboratory
 from .laboratory import AddSwedishSamplingLaboratory
 from .lims import MoveLessThanFlagColumnFormat
-from .lims import MoveLessThanFlagRowFormat
-from .lims import RemoveNonDataLines
+from .lims import MoveLessThanFlagRowFormat, PolarsMoveLessThanFlagRowFormat
+from .lims import RemoveNonDataLines, PolarsRemoveNonDataLines
 from .location import AddLocationCounty
 from .location import AddLocationHelcomOsparArea
 from .location import AddLocationMunicipality
@@ -73,7 +73,7 @@ from .long_to_wide import LongToWide
 from .manual import ManualHarbourPorpoise
 from .manual import ManualSealPathology
 from .map_header import ArchiveMapper
-from .map_parameter_column import MapperParameterColumn
+from .map_parameter_column import MapperParameterColumn, PolarsMapperParameterColumn
 from .occurrence_id import AddOccurrenceId
 from .orderer import AddEnglishSampleOrderer
 from .orderer import AddSwedishSampleOrderer
@@ -93,11 +93,11 @@ from .remove import RemoveRowsAtDepthRestriction
 from .remove import RemoveRowsForParameters
 from .remove import RemoveValuesInColumns
 from .remove import SetMaxLengthOfValuesInColumns
-from .replace_comma_with_dot import ReplaceCommaWithDot
+from .replace_comma_with_dot import ReplaceCommaWithDot, PolarsReplaceCommaWithDot
 # from .reported_parameter import SaveIncomingColumnsAsReported
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
-from .row import AddRowNumber
+from .row import AddRowNumber, PolarsAddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
 from .scientific_name import SetScientificNameFromReportedScientificName
@@ -114,8 +114,8 @@ from .station import CopyReportedStationNameToStationName
 from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
-from .visit import AddVisitKey
-from .wide_to_long import WideToLong
+from .visit import AddVisitKey, PolarsAddVisitKey
+from .wide_to_long import WideToLong, PolarsWideToLong
 from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName

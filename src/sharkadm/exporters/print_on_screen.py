@@ -1,4 +1,4 @@
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 from .base import Exporter
 
 
@@ -12,6 +12,6 @@ class PrintDataFrame(Exporter):
     def _get_default_file_name(self):
         return ''
 
-    def _export(self, data_holder: DataHolder) -> None:
+    def _export(self, data_holder: PandasDataHolder) -> None:
         print(data_holder.data)
 

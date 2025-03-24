@@ -3,7 +3,8 @@ import datetime
 import pandas as pd
 import re
 
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsDataHolderProtocol, \
+    PolarsTransformer
 from sharkadm import adm_logger
 from sharkadm.config import get_column_views_config
 
@@ -63,6 +64,22 @@ class RemoveColumns(Transformer):
                     break
         keep_columns = [col for col in data_holder.data.columns if col not in exclude_columns]
         data_holder.data = data_holder.data[keep_columns]
+
+
+class PolarsRemoveColumns(PolarsTransformer):
+    def __init__(self, *args, **kwargs):
+        self._args = args
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Removes columns matching given strings in args'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        columns_to_remove = set()
+        for arg in self._args:
+            columns_to_remove |= set(filter(lambda x: re.match(arg, x), data_holder.data.columns))
+        data_holder.data = data_holder.data.drop(columns_to_remove)
 
 
 class SortColumns(Transformer):

@@ -15,12 +15,12 @@ from sharkadm.data import data_source
 from sharkadm.data.archive import delivery_note
 from sharkadm.data.archive import analyse_info
 from sharkadm.data.archive import sampling_info
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 
 logger = logging.getLogger(__name__)
 
 
-class DvTemplateDataHolder(DataHolder):
+class DvTemplateDataHolder(PandasDataHolder):
     _data_type: str | None = None
     _data_type_internal: str | None = None
     _data_format: str | None = None

@@ -3,7 +3,7 @@
 from sharkadm import adm_config_paths
 from sharkadm import adm_logger
 from sharkadm.data.archive import ArchiveDataHolder
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 from sharkadm.utils import yaml_data
 from .base import Transformer
 
@@ -22,14 +22,14 @@ class AddDeliveryNoteInfo(Transformer):
     def get_transformer_description() -> str:
         return f'Adds info from delivery_note'
 
-    def _transform(self, data_holder: DataHolder | ArchiveDataHolder) -> None:
+    def _transform(self, data_holder: PandasDataHolder | ArchiveDataHolder) -> None:
         if not hasattr(data_holder, 'delivery_note'):
             adm_logger.log_transformation(f'No delivery note found for data holder {data_holder}', level=adm_logger.WARNING)
             return
         self._add_delivery_note_info(data_holder)
         self._add_status(data_holder)
 
-    def _add_delivery_note_info(self, data_holder: DataHolder | ArchiveDataHolder):
+    def _add_delivery_note_info(self, data_holder: PandasDataHolder | ArchiveDataHolder):
         for key in data_holder.delivery_note.fields:
             if key in data_holder.data and any(data_holder.data[key]):
                 adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.', level=adm_logger.DEBUG)
@@ -38,7 +38,7 @@ class AddDeliveryNoteInfo(Transformer):
             data_holder.data[key] = str(data_holder.delivery_note[key])
             # data_holder.data.loc[:, key] = data_holder.delivery_note[key]
 
-    def _add_status(self, data_holder: DataHolder | ArchiveDataHolder):
+    def _add_status(self, data_holder: PandasDataHolder | ArchiveDataHolder):
         if not hasattr(data_holder, 'delivery_note'):
             adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING,
                                     item=data_holder.dataset_name)

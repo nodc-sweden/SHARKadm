@@ -1,4 +1,7 @@
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsTransformer, \
+    PolarsDataHolderProtocol
+
+import polars as pl
 
 
 class AddVisitKey(Transformer):
@@ -6,7 +9,7 @@ class AddVisitKey(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds visit key column'
+        return 'Adds visit key column'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         boolean = data_holder.data['datetime'] != ''
@@ -14,3 +17,22 @@ class AddVisitKey(Transformer):
             data_holder.data.loc[boolean, 'platform_code'], '_'
             ).str.cat(data_holder.data.loc[boolean, 'reported_station_name'], '_')
 
+
+class PolarsAddVisitKey(PolarsTransformer):
+    valid_data_types = ["physicalchemical"]
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds visit key column"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("datetime").is_not_null()).then(
+                pl.concat_str(
+                    pl.col("datetime").dt.strftime("%Y%m%d_%H%M"),
+                    pl.col("platform_code"),
+                    pl.col("reported_station_name"),
+                    separator="_"
+                ).alias("visit_key")
+            )
+        )

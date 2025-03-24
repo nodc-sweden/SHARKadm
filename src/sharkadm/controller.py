@@ -1,7 +1,8 @@
 import logging
 
 import pandas as pd
-from typing import Any, TYPE_CHECKING
+import pandas as pl
+from typing import Any, TYPE_CHECKING, Self
 
 from sharkadm import exporters
 from sharkadm import transformers
@@ -9,7 +10,7 @@ from sharkadm import validators
 
 from sharkadm import event
 
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder, DataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.transformers import Transformer
 from sharkadm.multi_transformers import MultiTransformer
@@ -21,13 +22,11 @@ from sharkadm import adm_logger
 logger = logging.getLogger(__name__)
 
 
-class SHARKadmController:
+class BaseSHARKadmController:
     """Class to hold data from a specific data type"""
 
     def __init__(self) -> None:
-
         self._data_holder: DataHolder | None = None
-
         self._transformers: list[Transformer | MultiTransformer] = []
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
@@ -111,18 +110,8 @@ class SHARKadmController:
         return self._data_holder.dataset_name
 
     @property
-    def data(self) -> pd.DataFrame:
-        return self._data_holder.data
-
-    @property
     def data_holder(self) -> DataHolder:
         return self._data_holder
-
-    def set_data_holder(self, data_holder: DataHolder) -> 'SHARKadmController':
-        self._data_holder = data_holder
-        adm_logger.dataset_name = data_holder.dataset_name
-        self.transform(transformers.AddRowNumber())
-        return self
 
     def set_transformers(self, *args: Transformer | MultiTransformer) -> None:
         """Add one or more Transformers to the data holder"""
@@ -231,6 +220,39 @@ class SHARKadmController:
         self.transform_all()
         self.validate_after_all()
         self.export_all()
+
+
+class SHARKadmController(BaseSHARKadmController):
+    def __init__(self):
+        super().__init__()
+        self._data_holder: PandasDataHolder | None = None
+
+
+    @property
+    def data(self) -> pd.DataFrame:
+        return self._data_holder.data
+
+    def set_data_holder(self, data_holder: DataHolder) -> Self:
+        self._data_holder = data_holder
+        adm_logger.dataset_name = data_holder.dataset_name
+        self.transform(transformers.AddRowNumber())
+        return self
+
+
+class SHARKadmPolarsController(BaseSHARKadmController):
+    def __init__(self):
+        super().__init__()
+        self._data_holder: PolarsDataHolder | None = None
+
+    @property
+    def data(self) -> pl.DataFrame:
+        return self._data_holder.data
+
+    def set_data_holder(self, data_holder: DataHolder) -> Self:
+        self._data_holder = data_holder
+        adm_logger.dataset_name = data_holder.dataset_name
+        self.transform(transformers.PolarsAddRowNumber())
+        return self
 
 
 def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:

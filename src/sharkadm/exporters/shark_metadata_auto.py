@@ -1,7 +1,7 @@
 import datetime
 import pathlib
 
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 from .base import Exporter, FileExporter
 from sharkadm import utils, adm_logger
 
@@ -19,7 +19,7 @@ class SHARKMetadataAuto(FileExporter):
             export_file_name = 'export_metadata_auto.txt'
         self._export_file_name = export_file_name
 
-        self._data_holder: DataHolder | None = None
+        self._data_holder: PandasDataHolder | None = None
 
     @property
     def export_file_path(self):
@@ -30,7 +30,7 @@ class SHARKMetadataAuto(FileExporter):
         return 'Creates the shark_metadata_auto file'
 
     @property
-    def data_holder(self) -> DataHolder:
+    def data_holder(self) -> PandasDataHolder:
         return self._data_holder
 
     @property
@@ -81,7 +81,7 @@ class SHARKMetadataAuto(FileExporter):
     def max_latitude(self) -> str:
         return self.data_holder.max_latitude
 
-    def set_data_holder(self, data_holder: DataHolder) -> None:
+    def set_data_holder(self, data_holder: PandasDataHolder) -> None:
         self._data_holder = data_holder
 
     def create_file(self,
@@ -111,7 +111,7 @@ class SHARKMetadataAuto(FileExporter):
         with open(self.export_file_path, 'w') as fid:
             fid.write('\n'.join(lines))
 
-    def _export(self, data_holder: DataHolder) -> None:
+    def _export(self, data_holder: PandasDataHolder) -> None:
         self.set_data_holder(data_holder=data_holder)
         self.create_file()
 

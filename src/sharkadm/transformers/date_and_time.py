@@ -1,7 +1,10 @@
 import datetime
 
+import polars as pl
+
 from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsTransformer, \
+    PolarsDataHolderProtocol
 
 DATETIME_FORMATS = [
     '%Y-%m-%d %H:%M:%S',
@@ -123,6 +126,27 @@ class AddSampleTime(Transformer):
         else:
             data_holder.data['sample_time'] = data_holder.data['visit_time']
 
+class PolarsAddSampleTime(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adding time format sample_time"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if "sample_time" in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col("sample_time").alias("reported_sample_time")
+            )
+            if "visit_time" in data_holder.data:
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(pl.col("sample_time").str.strip_chars() == "")
+                    .then(pl.col("visit_time"))
+                    .alias("sample_time")
+                )
+        else:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col("visit_time").alias("sample_time")
+            )
+
 
 class AddSampleDate(Transformer):
 
@@ -138,6 +162,28 @@ class AddSampleDate(Transformer):
                 data_holder.data.loc[has_no_sample_date, 'sample_date'] = data_holder.data.loc[has_no_sample_date, 'visit_date']
         else:
             data_holder.data['sample_date'] = data_holder.data['visit_date']
+
+
+class PolarsAddSampleDate(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adding sample_date if missing"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if "sample_date" in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col("sample_date").alias("reported_sample_date")
+            )
+            if "visit_date" in data_holder.data:
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(pl.col("sample_date").str.strip_chars() == "")
+                    .then(pl.col("visit_date"))
+                    .alias("sample_date")
+                )
+        else:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col("visit_date").alias("sample_date")
+            )
 
 
 class AddDatetime(Transformer):
@@ -170,6 +216,49 @@ class AddDatetime(Transformer):
             except ValueError:
                 continue
         return ''
+
+
+class PolarsAddDatetime(PolarsTransformer):
+    def __init__(
+        self,
+        date_source_column: str = "sample_date",
+        time_source_column: str = "sample_time",
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.date_source_column = date_source_column
+        self.time_source_column = time_source_column
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds column datetime. Time is taken from sample_date"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.date_source_column).alias("datetime_str")
+        )
+        if self.time_source_column in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(
+                pl.concat_str(
+                    [
+                        pl.col("datetime_str").str.slice(0, 10),
+                        pl.col(self.time_source_column)
+                    ],
+                    separator=" ",
+                ).alias("datetime_str")
+            )
+        data_holder.data = data_holder.data.with_columns(
+            pl.col("datetime_str").str.to_datetime("%Y-%m-%d %H:%M").alias("datetime")
+        )
+
+    @staticmethod
+    def to_datetime(x: str) -> datetime.datetime | str:
+        for form in DATETIME_FORMATS:
+            try:
+                return datetime.datetime.strptime(x.strip(), form)
+            except ValueError:
+                continue
+        return ""
 
 
 class AddMonth(Transformer):
