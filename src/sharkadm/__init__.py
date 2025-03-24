@@ -8,14 +8,12 @@ from sharkadm.utils import get_nodc_config_directory, TEMP_DIRECTORY
 def update_nodc_config_directory_from_svn() -> None:
     config_dir = get_nodc_config_directory()
     if not config_dir:
-        # adm_logger.log_workflow('No config directory found', level=adm_logger.CRITICAL)
         return
     path = TEMP_DIRECTORY / 'update_nodc_config_with_svn.bat'
     lines = [f'cd {config_dir}', 'svn update']
     with open(path, 'w') as fid:
         fid.write('\n'.join(lines))
-    subprocess.run(str(path))
-    # adm_logger.log_workflow(f'NODC_CONFIG directory {config_dir} updated', level=adm_logger.DEBUG)
+    ans = subprocess.run(str(path))
 
 try:
     update_nodc_config_directory_from_svn()
