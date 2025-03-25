@@ -48,6 +48,7 @@ def get_config_path(name: str = None) -> pathlib.Path:
 
 class DataHolderProtocol(Protocol):
     data_type = None
+    data_type_internal = None
     header_mapper = None
 
 
@@ -74,7 +75,7 @@ def get_import_matrix_mapper(data_type: str, import_column: str, directory: str 
 def get_header_mapper_from_data_holder(data_holder: DataHolderProtocol, import_column: str) -> ImportMatrixMapper | None:
     if import_column == 'original':
         return data_holder.header_mapper
-    return get_import_matrix_mapper(data_holder.data_type, import_column)
+    return get_import_matrix_mapper(data_holder.data_type_internal, import_column)
 
 
 def get_custom_id_handler(config_directory: str | pathlib.Path = None):

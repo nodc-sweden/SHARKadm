@@ -13,7 +13,7 @@ class MapperParameterColumn(Transformer):
         return f'Maps parameter column using import matrix'
 
     def _transform(self, data_holder: archive.ArchiveDataHolder) -> None:
-        import_matrix = config.get_import_matrix_config(data_type=data_holder.data_type)
+        import_matrix = config.get_import_matrix_config(data_type=data_holder.data_type_internal)
         if not import_matrix:
             import_matrix = config.get_import_matrix_config(data_type=data_holder.delivery_note.data_format)
         import_column = self._kwargs.get('import_column')
