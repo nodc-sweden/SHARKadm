@@ -234,6 +234,7 @@ class DvTemplateDataHolder(DataHolder):
     def _set_data_source(self, data_source: data_source.DataFile) -> None:
         """Sets a single data source to self._data"""
         self._data_type = data_source.data_type
+        self._data_type_internal = data_source.data_type.replace(' ', '').lower()
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
