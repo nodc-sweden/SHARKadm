@@ -1,6 +1,7 @@
 import pandas as pd
-import numpy as np
-from .base import Transformer, DataHolderProtocol
+import polars as pl
+from .base import Transformer, DataHolderProtocol, PolarsTransformer, \
+    PolarsDataHolderProtocol
 from sharkadm import adm_logger
 
 
@@ -12,7 +13,7 @@ class MoveLessThanFlagRowFormat(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Moves flag < in value column to quality_flag column'
+        return 'Moves flag < in value column to quality_flag column'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         boolean = data_holder.data['value'].str.startswith('<')
@@ -39,7 +40,7 @@ class MoveLessThanFlagColumnFormat(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Moves flag < in value column to Q_-column'
+        return 'Moves flag < in value column to Q_-column'
 
     def _get_q_col(self, col: str) -> str:
         return f'{self._q_prefix}{col}'
@@ -76,7 +77,7 @@ class RemoveNonDataLines(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Removes SLA and ZOO lines in data'
+        return 'Removes SLA and ZOO lines in data'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         sla_bool = data_holder.data['sample_id'].str.contains('-SLA_')
@@ -85,3 +86,17 @@ class RemoveNonDataLines(Transformer):
         data_holder.data = data_holder.data[~remove_bool]
 
 
+class PolarsRemoveNonDataLines(PolarsTransformer):
+    valid_data_holders = ['LimsDataHolder']
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return 'Removes SLA and ZOO lines in data'
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.filter(
+            ~pl.col("sample_id").str.contains_any(["-SLA_", "-ZOO_"])
+        )

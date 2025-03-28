@@ -1,5 +1,5 @@
 from .base import Transformer
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 
 
 class AddDatasetName(Transformer):
@@ -9,7 +9,7 @@ class AddDatasetName(Transformer):
     def get_transformer_description() -> str:
         return f'Adds dataset_name column'
 
-    def _transform(self, data_holder: DataHolder) -> None:
+    def _transform(self, data_holder: PandasDataHolder) -> None:
         data_holder.data[self.datatype_column_name] = data_holder.zip_archive_base
 
 
@@ -20,7 +20,7 @@ class AddDatasetFileName(Transformer):
     def get_transformer_description() -> str:
         return f'Adds dataset_name column'
 
-    def _transform(self, data_holder: DataHolder) -> None:
+    def _transform(self, data_holder: PandasDataHolder) -> None:
         data_holder.data[self.datatype_column_name] = data_holder.zip_archive_name + '.zip'
 
 

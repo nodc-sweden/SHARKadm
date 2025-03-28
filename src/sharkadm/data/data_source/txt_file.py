@@ -15,7 +15,7 @@ class CsvRowFormatDataFilePolars(DataFilePolars):
 
     def _load_file(self) -> None:
         self._data = pl.read_csv(
-            self._path, encoding=self._encoding, separator=self._delimiter, infer_schema=False
+            self._path, encoding=self._encoding, separator=self._delimiter, infer_schema=False, missing_utf8_is_empty_string=True,
     )
 
 

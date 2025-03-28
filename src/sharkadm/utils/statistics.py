@@ -1,9 +1,9 @@
 from typing import Any
 
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 
 
-def get_data_holder_statistics(data_holder: DataHolder) -> dict[str, Any]:
+def get_data_holder_statistics(data_holder: PandasDataHolder) -> dict[str, Any]:
     info = dict()
     if 'datetime' in data_holder.columns:
         info['start_datetime'] = min(data_holder.data['datetime'])

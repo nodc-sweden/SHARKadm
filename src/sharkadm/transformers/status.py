@@ -3,7 +3,7 @@
 from sharkadm import adm_config_paths
 from sharkadm import adm_logger
 from sharkadm.data.archive import ArchiveDataHolder
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 from sharkadm.utils import yaml_data
 from .base import Transformer
 

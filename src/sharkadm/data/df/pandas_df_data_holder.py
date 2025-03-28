@@ -4,7 +4,7 @@ import pathlib
 import pandas as pd
 from typing import Protocol
 
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 from sharkadm.data import data_source
 from sharkadm.data.archive import sampling_info, analyse_info
 from sharkadm import adm_logger
@@ -18,7 +18,7 @@ class HeaderMapper(Protocol):
         ...
 
 
-class PandasDataFrameDataHolder(DataHolder):
+class PandasDataFrameDataHolder(PandasDataHolder):
     _data_type: str = ''
     _data_structure: str = ''
 
@@ -78,7 +78,4 @@ class PandasDataFrameDataHolder(DataHolder):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
-
-
-
 

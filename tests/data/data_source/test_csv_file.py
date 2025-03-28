@@ -28,6 +28,29 @@ def test_csv_files_can_be_parsed_to_polars(tmp_path, given_delimiter):
     assert all(dtype == pl.String for dtype in data.dtypes)
 
 
+def test_empty_values_are_parsed_as_empty_strings(tmp_path):
+    # Given a csv file with empty values
+    given_csv_data = [
+        {"id": 1, "parameter": "arbitrary_number"},
+        {"id": 2, "value": 2.48},
+        {"parameter": "arbitrary_number", "value": 3.14},
+    ]
+    given_data_path = tmp_path / "data.txt"
+    csv_file_from_dict(given_csv_data, given_data_path)
+
+    # When loading the file
+    data_file = CsvRowFormatDataFilePolars(given_data_path)
+
+    # Then the data is loaded in a polars data frame
+    data = data_file.get_data()
+    assert not data.is_empty()
+
+    # And all individual items are strings (i.e. not None/Null)
+    for row in data.iter_rows():
+        assert row
+        assert all(isinstance(item, str) for item in row)
+
+
 @pytest.mark.parametrize(
     "given_column_names, expected_column_names",
     (

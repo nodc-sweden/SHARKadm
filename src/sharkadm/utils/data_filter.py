@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sharkadm import adm_logger
 
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 
 
 class DataFilter(ABC):
@@ -14,14 +14,14 @@ class DataFilter(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def get_filter_mask(self, data_holder: DataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None:
         ...
 
 
 class DataFilterRestrictDepth(DataFilter):
     col_to_check = 'location_wb'
 
-    def get_filter_mask(self, data_holder: DataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None:
         col = 'location_wb'
         if col not in data_holder.data:
             adm_logger.log_workflow(f'Could not filter data. Missing column {col}', level=adm_logger.ERROR)

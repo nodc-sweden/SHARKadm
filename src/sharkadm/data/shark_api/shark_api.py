@@ -10,7 +10,7 @@ import requests
 
 from sharkadm import utils
 from sharkadm.data import data_source
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class HeaderMapper(Protocol):
         ...
 
 
-class SHARKapiDataHolder(DataHolder):
+class SHARKapiDataHolder(PandasDataHolder):
     _data_type = ''
 
     query = {

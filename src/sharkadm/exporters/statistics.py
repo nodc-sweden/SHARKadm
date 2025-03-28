@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 from sharkadm.utils import statistics
 from .base import Exporter, FileExporter
 from ..utils.paths import get_next_incremented_file_path
@@ -13,7 +13,7 @@ class PrintStatistics(Exporter):
     def get_exporter_description() -> str:
         return 'Print statistics on screen'
 
-    def _export(self, data_holder: DataHolder) -> None:
+    def _export(self, data_holder: PandasDataHolder) -> None:
         mark_len = 100
         print('=' * mark_len)
         print(f'Statistics for: {data_holder.dataset_name}')
@@ -37,7 +37,7 @@ class WriteStatisticsToFile(FileExporter):
     def get_exporter_description() -> str:
         return 'Writes statistics to file'
 
-    def _export(self, data_holder: DataHolder) -> None:
+    def _export(self, data_holder: PandasDataHolder) -> None:
         if not self._export_file_name:
             self._export_file_name = f'statistics_{data_holder.dataset_name}.txt'
         stats = statistics.get_data_holder_statistics(data_holder=data_holder)

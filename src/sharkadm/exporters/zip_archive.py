@@ -3,7 +3,7 @@ import logging
 import shutil
 import os
 import pathlib
-from sharkadm.data import DataHolder
+from sharkadm.data import PandasDataHolder
 from sharkadm import exporters
 from sharkadm import utils
 
@@ -23,7 +23,7 @@ class ZipArchive(FileExporter):
                          export_file_name,
                          **kwargs)
 
-        self._data_holder: DataHolder | None = None
+        self._data_holder: PandasDataHolder | None = None
         self._metadata_auto: exporters.SHARKMetadataAuto | None = None
 
     @staticmethod
@@ -49,7 +49,7 @@ class ZipArchive(FileExporter):
             except Exception as e:
                 logging.debug(f'Failed to delete {path}. Reason: {e}')
 
-    def _export(self, data_holder: DataHolder) -> None:
+    def _export(self, data_holder: PandasDataHolder) -> None:
         self._data_holder = data_holder
         self._load_metadata_auto_object()
         self._reset_temp_target_directory()

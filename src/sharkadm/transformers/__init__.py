@@ -58,7 +58,7 @@ from .laboratory import AddSwedishAnalyticalLaboratory
 from .laboratory import AddSwedishSamplingLaboratory
 from .lims import MoveLessThanFlagColumnFormat
 from .lims import MoveLessThanFlagRowFormat
-from .lims import RemoveNonDataLines
+from .lims import RemoveNonDataLines, PolarsRemoveNonDataLines
 from .location import AddLocationCounty
 from .location import AddLocationHelcomOsparArea
 from .location import AddLocationMunicipality
@@ -93,11 +93,11 @@ from .remove import RemoveRowsAtDepthRestriction
 from .remove import RemoveRowsForParameters
 from .remove import RemoveValuesInColumns
 from .remove import SetMaxLengthOfValuesInColumns
-from .replace_comma_with_dot import ReplaceCommaWithDot
+from .replace_comma_with_dot import ReplaceCommaWithDot, PolarsReplaceCommaWithDot
 # from .reported_parameter import SaveIncomingColumnsAsReported
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
-from .row import AddRowNumber
+from .row import AddRowNumber, PolarsAddRowNumber
 from .sampler_area import AddCalculatedSamplerArea
 from .sampling_info import AddSamplingInfo
 from .scientific_name import SetScientificNameFromReportedScientificName
@@ -115,7 +115,7 @@ from .status import SetStatusDataHost
 from .status import SetStatusDeliverer
 from .strip import StripAllValues
 from .visit import AddVisitKey
-from .wide_to_long import WideToLong
+from .wide_to_long import WideToLong, PolarsWideToLong
 from .worms import AddReportedAphiaId
 from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
