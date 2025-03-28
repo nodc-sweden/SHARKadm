@@ -45,6 +45,16 @@ class DataHolder(ABC):
         ...
 
     @property
+    def data(self) -> pd.DataFrame:
+        return self._data
+
+    @data.setter
+    def data(self, df: pd.DataFrame | pl.DataFrame) -> None:
+        if not isinstance(df, (pd.DataFrame, pl.DataFrame)):
+            raise 'Data must be of type pd.DataFrame'
+        self._data = df
+
+    @property
     def data_structure(self) -> str:
         return self._data_structure
 

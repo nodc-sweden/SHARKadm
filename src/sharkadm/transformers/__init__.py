@@ -124,6 +124,24 @@ from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from .worms import SetAphiaIdFromReportedAphiaId
 from ..utils.inspect_kwargs import get_kwargs_for_class
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+from .dataframe import ConvertFromPandasToPolars
+from .dataframe import ConvertFromPolarsToPandas
+
+from .strip import StripAllValuesPolars
+from .replace_comma_with_dot import ReplaceCommaWithDotPolars
+
+from .date_and_time import AddReportedDatesPolars
+from .date_and_time import AddSampleDatePolars
+from .date_and_time import AddVisitDateFromObservationDatePolars
+from .date_and_time import FixDateFormatPolars
+from .date_and_time import FixTimeFormatPolars
+from .date_and_time import AddSampleTimePolars
+from .date_and_time import AddDatetimePolars
+from .date_and_time import AddMonthPolars
 
 
 @functools.cache
