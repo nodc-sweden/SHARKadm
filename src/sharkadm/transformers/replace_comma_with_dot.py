@@ -30,7 +30,7 @@ class ReplaceCommaWithDot(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Replacing comma with dot in given columns'
+        return "Replacing comma with dot in given columns"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):
@@ -83,12 +83,42 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
             strings=data_holder.data.columns, match_strings=self.apply_on_columns
         )
 
-    # def _transform(self, data_holder: DataHolderProtocol) -> None:
-    #     for col in self._get_matching_cols(data_holder):
-    #         data_holder.data = data_holder.data.with_columns(_temp=pl.col(col).str.replace(',', '.'))
-    #         for (old, new), df in data_holder.data.group_by([col, '_temp']):
-    #             if old == new:
-    #                 continue
-    #             adm_logger.log_transformation(f'Replacing comma with dot for value {old} in column {col} ({len(df)} places)',
-    #                                           level=adm_logger.INFO)
+
+class ReplaceCommaWithDotPolars(Transformer):
+    apply_on_columns = [
+        '.*latitude.*',
+        '.*longitude.*',
+        'water_depth_m',
+        '.*DIVIDE.*',
+        '.*MULTIPLY.*',
+        '.*COPY_VARIABLE.*',
+        'sampled_volume.*',
+        'sampler_area.*',
+        '.*wind.*',
+        '.*pressure.*',
+        '.*temperature.*',
+    ]
+
+    def __init__(self, apply_on_columns: list[str] = None) -> None:
+        super().__init__()
+        if apply_on_columns:
+            self.apply_on_columns = apply_on_columns
+
+        self._handled_cols = dict()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Replacing comma with dot in given columns'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for col in self._get_matching_cols(data_holder):
+            data_holder.data = data_holder.data.with_columns(_temp=pl.col(col).str.replace(',', '.'))
+            for (old, new), df in data_holder.data.group_by([col, '_temp']):
+                if old == new:
+                    continue
+                adm_logger.log_transformation(f'Replacing comma with dot for value {old} in column {col} ({len(df)} places)',
+                                              level=adm_logger.INFO)
+
+    def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
+        return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
 
