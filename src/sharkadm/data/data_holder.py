@@ -3,6 +3,7 @@ import logging
 from abc import ABC, abstractmethod
 
 import pandas as pd
+import polars as pl
 
 from sharkadm import adm_logger
 from sharkadm.data.data_source.base import DataFile, DataSource
@@ -61,8 +62,8 @@ class DataHolder(ABC):
         return self._data
 
     @data.setter
-    def data(self, df: pd.DataFrame) -> None:
-        if type(df) != pd.DataFrame:
+    def data(self, df: pd.DataFrame | pl.DataFrame) -> None:
+        if not isinstance(df, (pd.DataFrame, pl.DataFrame)):
             raise 'Data must be of type pd.DataFrame'
         self._data = df
 
