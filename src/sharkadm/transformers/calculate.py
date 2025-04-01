@@ -185,7 +185,6 @@ except ModuleNotFoundError as e:
             # private String calculatedCarbon = "";
 
 
-
 class CalculateAbundance(Transformer):
     count_col = 'COPY_VARIABLE.# counted.ind/analysed sample fraction'
     coef_col = 'coefficient'
@@ -204,6 +203,42 @@ class CalculateAbundance(Transformer):
             return
         boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
         data_holder.data.loc[boolean, 'calculated_value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
+        self._cleanup(data_holder)
+
+    def _cleanup(self, data_holder: DataHolderProtocol):
+        abundance_boolean = data_holder.data['parameter'] == self.parameter
+        data_holder.data.loc[abundance_boolean, 'original_reported_value'] = data_holder.data.loc[abundance_boolean, 'reported_value']
+        data_holder.data.loc[abundance_boolean, 'original_reported_unit'] = data_holder.data.loc[abundance_boolean, 'reported_unit']
+        data_holder.data.loc[abundance_boolean, 'original_reported_parameter'] = data_holder.data.loc[abundance_boolean, 'reported_parameter']
+        data_holder.data.loc[abundance_boolean, 'original_calculated_value'] = data_holder.data.loc[abundance_boolean, 'calculated_value']
+
+        df = data_holder.data.loc[abundance_boolean]
+        reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
+        calculated = df['calculated_value'].astype(float)
+        max_boolean = calculated > (reported * 2)
+        min_boolean = calculated < (reported * 0.5)
+        boolean = max_boolean | min_boolean
+        red_df = df[boolean]
+        for i, row in red_df.iterrows():
+            adm_logger.log_transformation(
+                f"Calculated abundance differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                level=adm_logger.INFO)
+
+        data_holder.data['value'] = data_holder.data['original_reported_value']
+        data_holder.data['reported_value'] = ''
+        data_holder.data['reported_parameter'] = ''
+        data_holder.data['reported_unit'] = ''
+
+        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
+            red_df.index, 'original_reported_value']
+        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
+            red_df.index, 'original_reported_parameter']
+        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
+            red_df.index, 'original_reported_unit']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
+
+        data_holder.data.fillna('', inplace=True)
 
 
 class CalculateBiovolume(Transformer):
@@ -219,45 +254,138 @@ class CalculateBiovolume(Transformer):
         return f'Calculating {CalculateBiovolume.parameter}. Setting value to column {CalculateBiovolume.col_to_set}'
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_must_exist not in data_holder.data:
-            adm_logger.log_transformation(f'Could not calculate {CalculateBiovolume.parameter}. Missing {self.col_must_exist} column',
-                                          level=adm_logger.ERROR)
+        if 'custom_occurrence_id' not in data_holder.data:
+            adm_logger.log_transformation(
+                f'Could not calculate {CalculateBiovolume.parameter}. Missing custom_occurrence_id column',
+                level=adm_logger.ERROR)
             return
-        for (aphia_id, size_class), df in data_holder.data.groupby([self.aphia_id_col, self.size_class_col]):
+        # series_to_add = []
+        for (aphia_id, size_class, occurrence_id), df in data_holder.data.groupby(['bvol_aphia_id', 'bvol_size_class', 'custom_occurrence_id']):
             if not aphia_id:
                 adm_logger.log_transformation(
-                    f'Could not calculate {CalculateBiovolume.parameter}. Missing aphia_id',
+                    f'Could not calculate {CalculateBiovolume.parameter}. Missing bvol_aphia_id',
                     level=adm_logger.WARNING)
                 continue
             if not size_class:
                 adm_logger.log_transformation(
-                    f'Could not calculate {CalculateBiovolume.parameter}. Missing size_class',
+                    f'Could not calculate {CalculateBiovolume.parameter}. Missing bvol_size_class',
                     level=adm_logger.WARNING)
                 continue
-
             cell_volume = self._get_bvol_cell_volume(aphia_id, size_class)
+            # if cell_volume:
+            #     adm_logger.log_transformation(
+            #         f'Using cell volume from nomp for aphia_id="{aphia_id}" and size_class="{size_class}"',
+            #         level=adm_logger.DEBUG)
             if not cell_volume:
                 cell_volume = self._get_reported_cell_volume(df, aphia_id, size_class)
+                if cell_volume:
+                    adm_logger.log_transformation(f'Using reported cell volume for aphia_id="{aphia_id}" and size_class="{size_class}"', level=adm_logger.DEBUG)
             if not cell_volume:
                 adm_logger.log_transformation(
                     f'Could not calculate {CalculateBiovolume.parameter}. No cell volume in nomp or in data for aphia_id="{aphia_id}" and size_class="{size_class}"',
                     level=adm_logger.WARNING)
                 continue
 
+            abundance = list(df.loc[df['parameter'] == 'Abundance']['value'])[0]
+            index_list = list(df.loc[df['parameter'] == self.parameter].index)
+            bio_volume = float(abundance) * float(cell_volume)
+            if index_list:
+                index_to_set = index_list[0]
+                data_holder.data.at[index_to_set, self.col_to_set] = bio_volume
+            else:
+                series = df.loc[df['parameter'] == 'Abundance'].squeeze(axis=0)
+                series['parameter'] = self.parameter
+                series[self.col_to_set] = bio_volume
+                series['unit'] = 'mm3/l'
+                # series_to_add.append(series)
+                data_holder.data = pd.concat([data_holder.data, series.to_frame().T])
+        # if series_to_add:
+        # This is slower...
+        #     data_holder.data = pd.concat([data_holder.data] + series_to_add, axis=1)
+        self._cleanup(data_holder)
+
+    def _cleanup(self, data_holder: DataHolderProtocol):
+        data_holder.data.reset_index(drop=True)
+        biovolume_boolean = data_holder.data['parameter'] == self.parameter
+        data_holder.data.loc[biovolume_boolean, 'original_reported_value'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_value']
+        data_holder.data.loc[biovolume_boolean, 'original_reported_unit'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_unit']
+        data_holder.data.loc[biovolume_boolean, 'original_reported_parameter'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_parameter']
+        data_holder.data.loc[biovolume_boolean, 'original_calculated_value'] = data_holder.data.loc[
+            biovolume_boolean, 'calculated_value']
+
+        df = data_holder.data.loc[biovolume_boolean]
+        reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
+        calculated = df['calculated_value'].astype(float)
+        max_boolean = calculated > (reported * 2)
+        min_boolean = calculated < (reported * 0.5)
+        boolean = max_boolean | min_boolean
+        red_df = df[boolean]
+        for i, row in red_df.iterrows():
+            adm_logger.log_transformation(
+                f"Calculated biovolume differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                level=adm_logger.INFO)
+
+        data_holder.data['value'] = data_holder.data['original_reported_value']
+        data_holder.data['reported_value'] = ''
+        data_holder.data['reported_parameter'] = ''
+        data_holder.data['reported_unit'] = ''
+
+        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
+            red_df.index, 'original_reported_value']
+        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
+            red_df.index, 'original_reported_parameter']
+        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
+            red_df.index, 'original_reported_unit']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[
+            red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
+
+        data_holder.data.fillna('', inplace=True)
+
+    # def old__transform(self, data_holder: DataHolderProtocol) -> None:
+    #     if self.col_must_exist not in data_holder.data:
+    #         adm_logger.log_transformation(f'Could not calculate {CalculateBiovolume.parameter}. Missing {self.col_must_exist} column',
+    #                                       level=adm_logger.ERROR)
+    #         return
+    #     for (aphia_id, size_class), df in data_holder.data.groupby([self.aphia_id_col, self.size_class_col]):
+    #         if not aphia_id:
+    #             adm_logger.log_transformation(
+    #                 f'Could not calculate {CalculateBiovolume.parameter}. Missing aphia_id',
+    #                 level=adm_logger.WARNING)
+    #             continue
+    #         if not size_class:
+    #             adm_logger.log_transformation(
+    #                 f'Could not calculate {CalculateBiovolume.parameter}. Missing size_class',
+    #                 level=adm_logger.WARNING)
+    #             continue
+    #
+    #         cell_volume = self._get_bvol_cell_volume(aphia_id, size_class)
+    #         if not cell_volume:
+    #             cell_volume = self._get_reported_cell_volume(df, aphia_id, size_class)
+    #         if not cell_volume:
+    #             adm_logger.log_transformation(
+    #                 f'Could not calculate {CalculateBiovolume.parameter}. No cell volume in nomp or in data for aphia_id="{aphia_id}" and size_class="{size_class}"',
+    #                 level=adm_logger.WARNING)
+    #             continue
 
     def _get_bvol_cell_volume(self, aphia_id: int | str, size_class: int | str) -> float | None:
         info = _nomp.get_info(AphiaID=str(aphia_id), SizeClassNo=str(size_class))
         use_volume = None
         if not info:
-            adm_logger.log_transformation(
-                f'Could not calculate {CalculateBiovolume.parameter} with aphia_id="{aphia_id}" and size_class="{size_class}"',
-                level=adm_logger.WARNING)
+            pass
+            # adm_logger.log_transformation(
+            #     f'Could not calculate {CalculateBiovolume.parameter} with aphia_id="{aphia_id}" and size_class="{size_class}"',
+            #     level=adm_logger.WARNING)
         else:
             volume = info.get('Calculated_volume_µm3')  # This is in um^3
             if volume is None:
-                adm_logger.log_transformation(
-                    f'Could not calculate {CalculateBiovolume.parameter}. No Calculated_volume_µm3 found in nomp list for aphia_id="{aphia_id}" and size_class="{size_class}"',
-                    level=adm_logger.WARNING)
+                pass
+                # adm_logger.log_transformation(
+                #     f'Could not calculate {CalculateBiovolume.parameter}. No Calculated_volume_µm3 found in nomp list for aphia_id="{aphia_id}" and size_class="{size_class}"',
+                #     level=adm_logger.WARNING)
             else:
                 use_volume = volume.replace(',', '.')
         if not use_volume:
@@ -267,19 +395,131 @@ class CalculateBiovolume(Transformer):
     def _get_reported_cell_volume(self, df: pd.DataFrame, aphia_id: int, size_class: int) -> float | None:
         values = set(df[self.reported_cell_volume_col])
         if len(values) != 1:
-            adm_logger.log_transformation(
-                f'Could not calculate {CalculateBiovolume.parameter}. {self.reported_cell_volume_col} has several values for aphia_id="{aphia_id}" and size_class="{size_class}"',
-                level=adm_logger.WARNING)
+            pass
+            # adm_logger.log_transformation(
+            #     f'Could not calculate {CalculateBiovolume.parameter}. {self.reported_cell_volume_col} has several values for aphia_id="{aphia_id}" and size_class="{size_class}"',
+            #     level=adm_logger.WARNING)
             return
         return float(values.pop()) * 10e-9
 
 
+class CalculateCarbon(Transformer):
+    size_class_col = 'size_class'
+    aphia_id_col = 'aphia_id'
+    reported_cell_volume_col = 'reported_cell_volume_um3'
+    col_must_exist = 'reported_value'
+    parameter = 'Carbon concentration'
+    col_to_set = 'calculated_value'
 
-        boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
-        data_holder.data.loc[boolean, 'calculated_value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Calculating {CalculateCarbon.parameter}. Setting value to column {CalculateCarbon.col_to_set}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if 'custom_occurrence_id' not in data_holder.data:
+            adm_logger.log_transformation(
+                f'Could not calculate {CalculateCarbon.parameter}. Missing custom_occurrence_id column',
+                level=adm_logger.ERROR)
+            return
+        for (aphia_id, size_class, occurrence_id), df in data_holder.data.groupby(['bvol_aphia_id', 'bvol_size_class', 'custom_occurrence_id']):
+            if not aphia_id:
+                adm_logger.log_transformation(
+                    f'Could not calculate {CalculateCarbon.parameter}. Missing aphia_id',
+                    level=adm_logger.WARNING)
+                continue
+            if not size_class:
+                adm_logger.log_transformation(
+                    f'Could not calculate {CalculateCarbon.parameter}. Missing size_class',
+                    level=adm_logger.WARNING)
+                continue
+            carbon = self._get_carbon_per_unit_volume(aphia_id, size_class)
+            if not carbon:
+                adm_logger.log_transformation(
+                    f'Could not calculate {CalculateCarbon.parameter}. No carbon per unit volume info in nomp for aphia_id="{aphia_id}" and size_class="{size_class}"',
+                    level=adm_logger.WARNING)
+                continue
+
+            abundance = list(df.loc[df['parameter'] == 'Abundance']['value'])[0]
+            index_list = list(df.loc[df['parameter'] == self.parameter].index)
+            carbon_concentration = float(abundance) * float(carbon)
+            if index_list:
+                index_to_set = index_list[0]
+                data_holder.data.at[index_to_set, self.col_to_set] = carbon_concentration
+            else:
+                series = df.loc[df['parameter'] == 'Abundance'].squeeze(axis=0)
+                series['parameter'] = self.parameter
+                series[self.col_to_set] = carbon_concentration
+                series['unit'] = 'mm3/l'
+                data_holder.data = pd.concat([data_holder.data, series.to_frame().T])
+
+            # abundance = list(df.loc[df['parameter'] == 'Abundance']['value'])[0]
+            # index_to_set = list(df.loc[df['parameter'] == self.parameter].index)[0]
+            # carbon_concentration = abundance * carbon
+            # data_holder.data.at[index_to_set, self.col_to_set] = carbon_concentration
+        self._cleanup(data_holder)
+
+    def _cleanup(self, data_holder: DataHolderProtocol):
+        data_holder.data.reset_index(drop=True)
+        biovolume_boolean = data_holder.data['parameter'] == self.parameter
+        data_holder.data.loc[biovolume_boolean, 'original_reported_value'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_value']
+        data_holder.data.loc[biovolume_boolean, 'original_reported_unit'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_unit']
+        data_holder.data.loc[biovolume_boolean, 'original_reported_parameter'] = data_holder.data.loc[
+            biovolume_boolean, 'reported_parameter']
+        data_holder.data.loc[biovolume_boolean, 'original_calculated_value'] = data_holder.data.loc[
+            biovolume_boolean, 'calculated_value']
+
+        df = data_holder.data.loc[biovolume_boolean]
+        reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
+        calculated = df['calculated_value'].astype(float)
+        max_boolean = calculated > (reported * 2)
+        min_boolean = calculated < (reported * 0.5)
+        boolean = max_boolean | min_boolean
+        red_df = df[boolean]
+        for i, row in red_df.iterrows():
+            adm_logger.log_transformation(
+                f"Calculated carbon concentration differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                level=adm_logger.INFO)
+
+        data_holder.data['value'] = data_holder.data['original_reported_value']
+        data_holder.data['reported_value'] = ''
+        data_holder.data['reported_parameter'] = ''
+        data_holder.data['reported_unit'] = ''
+
+        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
+            red_df.index, 'original_reported_value']
+        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
+            red_df.index, 'original_reported_parameter']
+        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
+            red_df.index, 'original_reported_unit']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[
+            red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
+
+        data_holder.data.fillna('', inplace=True)
+
+    def _get_carbon_per_unit_volume(self, aphia_id: int | str, size_class: int | str) -> float | None:
+        info = _nomp.get_info(AphiaID=str(aphia_id), SizeClassNo=str(size_class))
+        use_volume = None
+        if not info:
+            adm_logger.log_transformation(
+                f'Could not calculate {CalculateCarbon.parameter} with aphia_id="{aphia_id}" and size_class="{size_class}"',
+                level=adm_logger.WARNING)
+        else:
+            volume = info.get('Calculated_Carbon_pg/counting_unit')
+            if volume is None:
+                adm_logger.log_transformation(
+                    f'Could not calculate {CalculateCarbon.parameter}. No Calculated_Carbon_pg/counting_unit found in nomp list for aphia_id="{aphia_id}" and size_class="{size_class}"',
+                    level=adm_logger.WARNING)
+            else:
+                use_volume = volume.replace(',', '.')
+        if not use_volume:
+            return
+        return float(use_volume) / 1_000_000
 
 
-class CleanupCalculations(Transformer):
+class old_CleanupCalculations(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:

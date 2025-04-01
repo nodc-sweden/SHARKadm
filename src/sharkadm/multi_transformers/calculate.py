@@ -5,7 +5,8 @@ from sharkadm import transformers
 class Calculate(MultiTransformer):
     _transformers = [
         transformers.CalculateAbundance,
-        transformers.CleanupCalculations,
+        transformers.CalculateBiovolume,
+        transformers.CalculateCarbon,
     ]
 
     @staticmethod

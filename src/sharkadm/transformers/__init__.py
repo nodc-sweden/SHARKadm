@@ -14,7 +14,8 @@ from .bvol import AddBvolRefList
 from .bvol import AddBvolScientificNameAndSizeClass
 from .bvol import AddBvolScientificNameOriginal
 from .calculate import CalculateAbundance
-from .calculate import CleanupCalculations
+from .calculate import CalculateBiovolume
+from .calculate import CalculateCarbon
 # from .calculate import CalculatePhytoplankton
 # from .calculate import CalculateZooplankton
 # from .calculate import CopyCalculated
