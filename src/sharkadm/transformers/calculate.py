@@ -203,42 +203,24 @@ class CalculateAbundance(Transformer):
             return
         boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '') & (data_holder.data['parameter'] == self.parameter)
         data_holder.data.loc[boolean, 'calculated_value'] = (data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
-        self._cleanup(data_holder)
+        self._check_calculated_value(data_holder)
 
-    def _cleanup(self, data_holder: DataHolderProtocol):
+    def _check_calculated_value(self, data_holder: DataHolderProtocol):
         abundance_boolean = data_holder.data['parameter'] == self.parameter
-        data_holder.data.loc[abundance_boolean, 'original_reported_value'] = data_holder.data.loc[abundance_boolean, 'reported_value']
-        data_holder.data.loc[abundance_boolean, 'original_reported_unit'] = data_holder.data.loc[abundance_boolean, 'reported_unit']
-        data_holder.data.loc[abundance_boolean, 'original_reported_parameter'] = data_holder.data.loc[abundance_boolean, 'reported_parameter']
-        data_holder.data.loc[abundance_boolean, 'original_calculated_value'] = data_holder.data.loc[abundance_boolean, 'calculated_value']
-
         df = data_holder.data.loc[abundance_boolean]
         reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
-        calculated = df['calculated_value'].astype(float)
+        calculated = df['calculated_value']
         max_boolean = calculated > (reported * 2)
         min_boolean = calculated < (reported * 0.5)
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
             adm_logger.log_transformation(
-                f"Calculated abundance differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                f"Calculated {self.parameter.lower()} differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['calculated_value']} (row number {row['row_number']})",
                 level=adm_logger.INFO)
 
-        data_holder.data['value'] = data_holder.data['original_reported_value']
-        data_holder.data['reported_value'] = ''
-        data_holder.data['reported_parameter'] = ''
-        data_holder.data['reported_unit'] = ''
-
-        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
-            red_df.index, 'original_reported_value']
-        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
-            red_df.index, 'original_reported_parameter']
-        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
-            red_df.index, 'original_reported_unit']
-        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'calculated_value']
         data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
-
-        data_holder.data.fillna('', inplace=True)
 
 
 class CalculateBiovolume(Transformer):
@@ -302,74 +284,24 @@ class CalculateBiovolume(Transformer):
         # if series_to_add:
         # This is slower...
         #     data_holder.data = pd.concat([data_holder.data] + series_to_add, axis=1)
-        self._cleanup(data_holder)
+        self._check_calculated_value(data_holder)
 
-    def _cleanup(self, data_holder: DataHolderProtocol):
-        data_holder.data.reset_index(drop=True)
-        biovolume_boolean = data_holder.data['parameter'] == self.parameter
-        data_holder.data.loc[biovolume_boolean, 'original_reported_value'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_value']
-        data_holder.data.loc[biovolume_boolean, 'original_reported_unit'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_unit']
-        data_holder.data.loc[biovolume_boolean, 'original_reported_parameter'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_parameter']
-        data_holder.data.loc[biovolume_boolean, 'original_calculated_value'] = data_holder.data.loc[
-            biovolume_boolean, 'calculated_value']
-
-        df = data_holder.data.loc[biovolume_boolean]
+    def _check_calculated_value(self, data_holder: DataHolderProtocol):
+        abundance_boolean = data_holder.data['parameter'] == self.parameter
+        df = data_holder.data.loc[abundance_boolean]
         reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
-        calculated = df['calculated_value'].astype(float)
+        calculated = df['calculated_value']
         max_boolean = calculated > (reported * 2)
         min_boolean = calculated < (reported * 0.5)
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
             adm_logger.log_transformation(
-                f"Calculated biovolume differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                f"Calculated {self.parameter.lower()} differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['calculated_value']} (row number {row['row_number']})",
                 level=adm_logger.INFO)
 
-        data_holder.data['value'] = data_holder.data['original_reported_value']
-        data_holder.data['reported_value'] = ''
-        data_holder.data['reported_parameter'] = ''
-        data_holder.data['reported_unit'] = ''
-
-        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
-            red_df.index, 'original_reported_value']
-        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
-            red_df.index, 'original_reported_parameter']
-        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
-            red_df.index, 'original_reported_unit']
-        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[
-            red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'calculated_value']
         data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
-
-        data_holder.data.fillna('', inplace=True)
-
-    # def old__transform(self, data_holder: DataHolderProtocol) -> None:
-    #     if self.col_must_exist not in data_holder.data:
-    #         adm_logger.log_transformation(f'Could not calculate {CalculateBiovolume.parameter}. Missing {self.col_must_exist} column',
-    #                                       level=adm_logger.ERROR)
-    #         return
-    #     for (aphia_id, size_class), df in data_holder.data.groupby([self.aphia_id_col, self.size_class_col]):
-    #         if not aphia_id:
-    #             adm_logger.log_transformation(
-    #                 f'Could not calculate {CalculateBiovolume.parameter}. Missing aphia_id',
-    #                 level=adm_logger.WARNING)
-    #             continue
-    #         if not size_class:
-    #             adm_logger.log_transformation(
-    #                 f'Could not calculate {CalculateBiovolume.parameter}. Missing size_class',
-    #                 level=adm_logger.WARNING)
-    #             continue
-    #
-    #         cell_volume = self._get_bvol_cell_volume(aphia_id, size_class)
-    #         if not cell_volume:
-    #             cell_volume = self._get_reported_cell_volume(df, aphia_id, size_class)
-    #         if not cell_volume:
-    #             adm_logger.log_transformation(
-    #                 f'Could not calculate {CalculateBiovolume.parameter}. No cell volume in nomp or in data for aphia_id="{aphia_id}" and size_class="{size_class}"',
-    #                 level=adm_logger.WARNING)
-    #             continue
 
     def _get_bvol_cell_volume(self, aphia_id: int | str, size_class: int | str) -> float | None:
         info = _nomp.get_info(AphiaID=str(aphia_id), SizeClassNo=str(size_class))
@@ -456,48 +388,24 @@ class CalculateCarbon(Transformer):
             # index_to_set = list(df.loc[df['parameter'] == self.parameter].index)[0]
             # carbon_concentration = abundance * carbon
             # data_holder.data.at[index_to_set, self.col_to_set] = carbon_concentration
-        self._cleanup(data_holder)
+            self._check_calculated_value(data_holder)
 
-    def _cleanup(self, data_holder: DataHolderProtocol):
-        data_holder.data.reset_index(drop=True)
-        biovolume_boolean = data_holder.data['parameter'] == self.parameter
-        data_holder.data.loc[biovolume_boolean, 'original_reported_value'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_value']
-        data_holder.data.loc[biovolume_boolean, 'original_reported_unit'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_unit']
-        data_holder.data.loc[biovolume_boolean, 'original_reported_parameter'] = data_holder.data.loc[
-            biovolume_boolean, 'reported_parameter']
-        data_holder.data.loc[biovolume_boolean, 'original_calculated_value'] = data_holder.data.loc[
-            biovolume_boolean, 'calculated_value']
-
-        df = data_holder.data.loc[biovolume_boolean]
+    def _check_calculated_value(self, data_holder: DataHolderProtocol):
+        abundance_boolean = data_holder.data['parameter'] == self.parameter
+        df = data_holder.data.loc[abundance_boolean]
         reported = df['reported_value'].apply(lambda x: np.nan if x == '' else float(x))
-        calculated = df['calculated_value'].astype(float)
+        calculated = df['calculated_value']
         max_boolean = calculated > (reported * 2)
         min_boolean = calculated < (reported * 0.5)
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
             adm_logger.log_transformation(
-                f"Calculated carbon concentration differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['value']} (row number {row['row_number']})",
+                f"Calculated {self.parameter.lower()} differs to much from reported value. Setting calculated value {row['reported_value']} -> {row['calculated_value']} (row number {row['row_number']})",
                 level=adm_logger.INFO)
 
-        data_holder.data['value'] = data_holder.data['original_reported_value']
-        data_holder.data['reported_value'] = ''
-        data_holder.data['reported_parameter'] = ''
-        data_holder.data['reported_unit'] = ''
-
-        data_holder.data.loc[red_df.index, 'reported_value'] = data_holder.data.loc[
-            red_df.index, 'original_reported_value']
-        data_holder.data.loc[red_df.index, 'reported_parameter'] = data_holder.data.loc[
-            red_df.index, 'original_reported_parameter']
-        data_holder.data.loc[red_df.index, 'reported_unit'] = data_holder.data.loc[
-            red_df.index, 'original_reported_unit']
-        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[
-            red_df.index, 'original_calculated_value']
+        data_holder.data.loc[red_df.index, 'value'] = data_holder.data.loc[red_df.index, 'calculated_value']
         data_holder.data.loc[red_df.index, 'calc_by_dc'] = 'Y'
-
-        data_holder.data.fillna('', inplace=True)
 
     def _get_carbon_per_unit_volume(self, aphia_id: int | str, size_class: int | str) -> float | None:
         info = _nomp.get_info(AphiaID=str(aphia_id), SizeClassNo=str(size_class))

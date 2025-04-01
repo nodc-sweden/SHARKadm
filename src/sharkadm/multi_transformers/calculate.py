@@ -7,6 +7,8 @@ class Calculate(MultiTransformer):
         transformers.CalculateAbundance,
         transformers.CalculateBiovolume,
         transformers.CalculateCarbon,
+        transformers.ReplaceNanWithEmptyString,
+        transformers.RemoveReportedValueIfNotCalculated,
     ]
 
     @staticmethod
