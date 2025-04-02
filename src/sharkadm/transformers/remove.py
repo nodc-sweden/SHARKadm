@@ -7,6 +7,20 @@ from sharkadm import adm_logger
 from ..utils.data_filter import DataFilterRestrictDepth
 
 
+class RemoveReportedValueIfNotCalculated(Transformer):
+    col_to_set = 'reported_value'
+    check_col = 'calc_by_dc'
+    check_val = 'Y'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Remove values in {RemoveReportedValueIfNotCalculated.col_to_set} column if {RemoveReportedValueIfNotCalculated.check_col} is not {RemoveReportedValueIfNotCalculated.check_val}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        boolean = data_holder.data[self.col_to_set] != self.check_val
+        data_holder.data.loc[boolean, self.col_to_set] = ''
+
+
 class RemoveValuesInColumns(Transformer):
 
     def __init__(self, *columns: str, replace_value: int | float | str = '', **kwargs) -> None:
