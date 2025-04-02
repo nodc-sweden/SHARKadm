@@ -380,3 +380,234 @@ class AddVisitDateFromObservationDate(Transformer):
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
         adm_logger.log_transformation(f'Column {self.col_to_set} set from source column {self.source_col}', level=adm_logger.INFO)
 
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+class FixDateFormatPolars(Transformer):
+    dates_to_check = [
+        'sample_date',
+        'visit_date',
+        'analysis_date',
+        'observation_date'
+    ]
+
+    from_format = '%Y%m%d'
+    to_format = '%Y-%m-%d'
+
+    mapping = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Changes date format from {FixDateFormat.from_format} to {FixDateFormat.to_format}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for col in self.dates_to_check:
+            if col not in data_holder.data:
+                continue
+
+            boolean = data_holder.data[col].str.find(pattern=r'^\d{8}$').is_not_null()
+            if boolean.any():
+                data_holder.data = data_holder.data.with_columns(
+                    pl.col(col).str.to_date('%Y%m%d').dt.strftime('%Y-%m-%d').alias(col))
+                adm_logger.log_transformation(
+                    f'Converting date format from %Y%m%d to %Y-%m-%d in column {col} ({boolean.sum()} places)',
+                    level=adm_logger.INFO)
+
+            boolean = data_holder.data[col].str.find(pattern=r'^\d{4}-\d{2}-\d{2}$').is_null()
+            if not boolean.any():
+                continue
+
+            unique_values = set(data_holder.data.filter(boolean)[col])
+            adm_logger.log_transformation(
+                f'Could not convert the following dates in column {col}: {", ".join(sorted(unique_values))}', level=adm_logger.ERROR)
+
+
+class FixTimeFormatPolars(Transformer):
+    time_cols = [
+        'sample_time',
+        'visit_time',
+        'sample_endtime'
+    ]
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        cols_str = ', '.join(FixTimeFormatPolars.time_cols)
+        return f'Reformat time values in columns: {cols_str}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for col in self.time_cols:
+            if col not in data_holder.data:
+                continue
+
+            boolean = data_holder.data[col].str.find(pattern=r'^\d{2}:\d{2}:\d{2}$').is_null()
+            if not boolean.any():
+                adm_logger.log_transformation(f'All values in column {col} correct format HH:MM:SS',
+                                              level=adm_logger.DEBUG)
+                continue
+
+            boolean = data_holder.data[col].str.find(pattern=r'^\d{2}:\d{2}$').is_null()
+            if not boolean.any():
+                adm_logger.log_transformation(f'All values in column {col} correct format HH:MM',
+                                              level=adm_logger.DEBUG)
+                continue
+
+            t_boolean = data_holder.data[col].str.find(pattern=r'^\d{2}:\d{2}:\d{2}$').is_null()
+            m_boolean = data_holder.data[col].str.find(pattern=r'^\d{2}:\d{2}$').is_null()
+            boolean = t_boolean | m_boolean
+
+            unique_values = set(data_holder.data.filter(boolean)[col])
+            for value in unique_values:
+                if '.' in value:
+                    new_value = value.replace('.', ':')
+                    if self._is_valid_value(new_value):
+                        self._set_new_value(data_holder, col, value, new_value)
+                    else:
+                        adm_logger.log_transformation(f'Cant handle time format {value} in column {col}', level=adm_logger.ERROR)
+
+                elif len(value) == 4:
+                    new_value = f'{value[:2]}:{value[2:]}'
+                    if self._is_valid_value(new_value):
+                        self._set_new_value(data_holder, col, value, new_value)
+                    else:
+                        adm_logger.log_transformation(f'Cant handle time format {value} in column {col}',
+                                                      level=adm_logger.ERROR)
+
+    def _set_new_value(self, data_holder: DataHolderProtocol, col: str, current_value: str, new_value: str):
+        b = data_holder.data[col] == current_value
+        adm_logger.log_transformation(f'Converting date {current_value} to {new_value} in column {col} ({b.sum()} places)', level=adm_logger.INFO)
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(col) == current_value).then(pl.lit(new_value)).otherwise(pl.col(col))
+        )
+
+    def _is_valid_value(self, value: str) -> bool | None:
+        for pat in [r'^\d{2}:\d{2}:\d{2}$', r'^\d{2}:\d{2}$']:
+            if re.search(pat, value):
+                return True
+
+
+class AddReportedDatesPolars(Transformer):
+    source_columns = ['visit_date', 'sample_date']
+    reported_col_prefix = 'reported'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        rep_cols = [f'{AddReportedDates.reported_col_prefix}_{item}' for item in AddReportedDates.source_columns]
+        return f'Copies columns {AddReportedDates.source_columns} to columns {rep_cols}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for source_col in self.source_columns:
+            if source_col not in data_holder.data.columns:
+                adm_logger.log_transformation(f'Missing column: {source_col}', level=adm_logger.WARNING)
+                continue
+            target_col = f'{self.reported_col_prefix}_{source_col}'
+            if target_col in data_holder.data.columns:
+                adm_logger.log_transformation(f'Column already present. Will do nothing: {target_col}', level=adm_logger.DEBUG)
+                continue
+
+            data_holder.data = data_holder.data.with_columns([
+                pl.col(source_col).alias(target_col)
+            ])
+            adm_logger.log_transformation(f'Column {target_col} set from source column {source_col}',
+                                          level=adm_logger.DEBUG)
+
+
+class AddVisitDateFromObservationDatePolars(Transformer):
+    valid_data_types = ['HarbourPorpoise']
+    valid_data_holders = ['ZipArchiveDataHolder']
+    source_col = 'observation_date'
+    col_to_set = 'visit_date'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Sets {AddVisitDateFromObservationDate.col_to_set} from {AddVisitDateFromObservationDate.source_col}'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.source_col not in data_holder.data:
+            adm_logger.log_transformation(f'Source column {self.source_col} not found', level=adm_logger.DEBUG)
+            return
+        data_holder.data = data_holder.data.with_columns(pl.col(self.source_col).alias(self.col_to_set))
+        adm_logger.log_transformation(f'Column {self.col_to_set} set from source column {self.source_col}', level=adm_logger.DEBUG)
+
+
+class AddSampleDatePolars(Transformer):
+    source_col = 'visit_date'
+    col_to_set = 'sample_date'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adding {AddSampleDatePolars.col_to_set} from {AddSampleDatePolars.source_col} if missing'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(pl.col(self.col_to_set).alias(f'reported_{self.col_to_set}'))
+            if self.source_col in data_holder.data:
+                has_no_sample_date = data_holder.data[self.col_to_set].str.strip_chars() == ''
+                data_holder.data = data_holder.data.with_columns(pl.when(has_no_sample_date).then(pl.col(self.source_col)).otherwise(pl.col(self.col_to_set)).alias(self.col_to_set))
+        else:
+            data_holder.data = data_holder.data.with_columns(pl.col(self.source_col).alias(self.col_to_set))
+
+
+class AddSampleTimePolars(Transformer):
+    source_col = 'visit_time'
+    col_to_set = 'sample_time'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adding {AddSampleTimePolars.col_to_set} from {AddSampleTimePolars.source_col} if missing'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(pl.col(self.col_to_set).alias(f'reported_{self.col_to_set}'))
+            if self.source_col in data_holder.data:
+                has_no_sample_date = data_holder.data[self.col_to_set].str.strip_chars() == ''
+                data_holder.data = data_holder.data.with_columns(pl.when(has_no_sample_date).then(pl.col(self.source_col)).otherwise(pl.col(self.col_to_set)).alias(self.col_to_set))
+        else:
+            data_holder.data = data_holder.data.with_columns(pl.col(self.source_col).alias(self.col_to_set))
+
+
+class AddDatetimePolars(Transformer):
+    date_source_column: str = 'sample_date',
+    time_source_column: str = 'sample_time',
+
+    def __init__(self,
+                 date_source_column: str = None,
+                 time_source_column: str = None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.date_source_column = date_source_column or self.date_source_column
+        self.time_source_column = time_source_column or self.time_source_column
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (f'Adds column datetime. Date and time is taken '
+                f'from {AddDatetimePolars.date_source_column} and {AddDatetimePolars.time_source_column}, '
+                f'if no other columns are given')
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(datetime_str=pl.col(self.date_source_column))
+        if self.time_source_column in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(pl.concat_str([
+                pl.col('datetime_str').str.slice(0, 10),
+                pl.col(self.time_source_column),
+            ], separator=' ').alias('datetime_str'))
+        data_holder.data = data_holder.data.with_columns(datetime=pl.col('datetime_str').str.to_datetime())
+
+
+class AddMonthPolars(Transformer):
+    month_columns = [
+        'sample_month',
+        'visit_month'
+    ]
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds month column to data. Month is taken from the datetime column and will overwrite old values'
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if 'datetime' not in data_holder.data.columns:
+            adm_logger.log_transformation(f'Missing column: datetime', level=adm_logger.WARNING)
+            return
+        for col in self.month_columns:
+            data_holder.data = data_holder.data.with_columns(pl.col('datetime').dt.month().cast(str).alias(col))
+

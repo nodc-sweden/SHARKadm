@@ -33,8 +33,6 @@ object_mapping = dict((cls._data_format, cls) for cls in all_subclasses(ArchiveD
 def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / 'processed_data/delivery_note.txt')
-    print(f'{object_mapping=}')
-    print(f'{d_note.data_format=}')
     d_holder = object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
