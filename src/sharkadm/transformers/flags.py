@@ -1,5 +1,8 @@
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsTransformer, \
+    PolarsDataHolderProtocol
 from sharkadm import adm_logger
+
+import polars as pl
 
 
 class ConvertFlagsToSDN(Transformer):
@@ -32,3 +35,29 @@ class ConvertFlagsToSDN(Transformer):
         # Missing value
         boolean = data_holder.data['value'] == ''
         data_holder.data.loc[boolean, self.flag_col] = '9'
+
+
+class PolarsConvertFlagsToSDN(PolarsTransformer):
+    valid_data_types = ['physicalchemical']
+    flag_col = 'quality_flag'
+    mapping = {
+        '': '1',
+        'BLANK': '1',
+        'A': '1',
+        'E': '2',
+        'S': '3',
+        'B': '4',
+        '<': '6',
+        '>': '7',
+        'R': '8',
+        'M': '9',
+    }
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f"Converts values in internal column {ConvertFlagsToSDN.flag_col} to SeaDataNet schema"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.flag_col).replace(self.mapping, default="9").alias(self.flag_col)
+        )

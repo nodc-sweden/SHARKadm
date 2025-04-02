@@ -6,7 +6,7 @@ from typing import Type
 
 from sharkadm import utils, sharkadm_exceptions
 from .archive import get_archive_data_holder, directory_is_archive
-from .data_holder import DataHolder
+from .data_holder import PandasDataHolder, DataHolder
 from .df import PandasDataFrameDataHolder
 from .dv_template import DvTemplateDataHolder
 from .dv_template import get_dv_template_data_holder
@@ -21,15 +21,15 @@ logger = logging.getLogger(__name__)
 @functools.cache
 def get_data_holder_list() -> list[str]:
     """Returns a sorted list of name of all available data_holders"""
-    return sorted(utils.get_all_class_children_names(DataHolder))
+    return sorted(utils.get_all_class_children_names(PandasDataHolder))
 
 
-def get_data_holders() -> dict[str, Type[DataHolder]]:
+def get_data_holders() -> dict[str, Type[PandasDataHolder]]:
     """Returns a dictionary with data_holders"""
-    return utils.get_all_class_children(DataHolder)
+    return utils.get_all_class_children(PandasDataHolder)
 
 
-def get_data_holder_object(trans_name: str, **kwargs) -> DataHolder:
+def get_data_holder_object(trans_name: str, **kwargs) -> PandasDataHolder:
     """Returns DataHolder object that matches the given data_holder names"""
     all_trans = get_data_holders()
     tran = all_trans[trans_name]
@@ -82,7 +82,7 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
         fid.write(get_data_holders_description_text())
 
 
-def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs) -> DataHolder:
+def get_data_holder(path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs) -> PandasDataHolder:
     if path:
         path = pathlib.Path(path)
         if not path.exists() and path.suffix:

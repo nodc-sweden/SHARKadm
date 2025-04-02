@@ -3,10 +3,10 @@ import logging
 from abc import ABC, abstractmethod
 
 import pandas as pd
+import polars as pl
 
 from sharkadm import adm_logger
-from sharkadm.data.data_source.base import DataFile, DataSource
-from sharkadm.data import data_source
+from sharkadm.data.data_source import DataFile, DataSource
 from sharkadm import config
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,6 @@ class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the add_data_source method"""
 
     def __init__(self, *args, **kwargs):
-        self._data = pd.DataFrame()
         self._data_sources: dict[str, DataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
@@ -26,20 +25,9 @@ class DataHolder(ABC):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
 
+    @abstractmethod
     def __add__(self, other):
-        if self.data_type != other.data_type:
-            adm_logger.log_workflow(f'Not allowed to merge data_sources of different data_types: {self.data_type} and {other.data_type}')
-            return
-        if self.dataset_name == other.dataset_name:
-            adm_logger.log_workflow(f'Not allowed to merge to instances of the same dataset: {self.dataset_name}')
-            return
-        concat_data = pd.concat([self.data, other.data], axis=0)
-        concat_data.fillna('', inplace=True)
-        concat_data.reset_index(inplace=True)
-        cdh = ConcatDataHolder()
-        cdh.data = concat_data
-        cdh.data_type = self.data_type
-        return cdh
+        ...
 
     @property
     def workflow_message(self) -> str:
@@ -57,16 +45,6 @@ class DataHolder(ABC):
         ...
 
     @property
-    def data(self) -> pd.DataFrame:
-        return self._data
-
-    @data.setter
-    def data(self, df: pd.DataFrame) -> None:
-        if type(df) != pd.DataFrame:
-            raise 'Data must be of type pd.DataFrame'
-        self._data = df
-
-    @property
     def data_structure(self) -> str:
         return self._data_structure
 
@@ -76,11 +54,6 @@ class DataHolder(ABC):
         if data_structure_lower not in config.DATA_STRUCTURES:
             raise ValueError(f'Invalid data structure: {data_structure}')
         self._data_structure = data_structure_lower
-
-    # @property
-    # @abstractmethod
-    # def data(self) -> pd.DataFrame:
-    #     ...
 
     @property
     @abstractmethod
@@ -102,8 +75,9 @@ class DataHolder(ABC):
         return self._number_metadata_rows
 
     @property
+    @abstractmethod
     def columns(self) -> list[str]:
-        return sorted(self.data.columns)
+        ...
 
     @property
     def mapped_columns(self) -> dict[str, str]:
@@ -142,12 +116,9 @@ class DataHolder(ABC):
         return self._qf_column_prefix
 
     @property
+    @abstractmethod
     def year_span(self) -> list[str]:
-        years = list(set(self.data['visit_year']))
-        if len(years) == 1:
-            return [years[0], years[0]]
-        sorted_years = sorted(years)
-        return [sorted_years[0], sorted_years[-1]]
+        ...
 
     @property
     def zip_archive_base(self) -> str:
@@ -180,26 +151,133 @@ class DataHolder(ABC):
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
 
+    def _add_data_source(self, data_source: DataSource) -> None:
+        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
+        self._check_data_source(data_source)
+        self._data_sources[str(data_source)] = data_source
+
+    def _check_data_source(self, data_source: DataSource) -> None:
+        # Can be overwritten in child classes
+        return
+
+
+class PandasDataHolder(DataHolder, ABC):
+    def __init__(self, *args, **kwargs):
+        self._data = pd.DataFrame()
+        super().__init__(*args, **kwargs)
+
+    def __add__(self, other):
+        if self.data_type != other.data_type:
+            adm_logger.log_workflow(
+                f"Not allowed to merge data_sources of different data_types: "
+                f"{self.data_type} and {other.data_type}"
+            )
+            return
+        if self.dataset_name == other.dataset_name:
+            adm_logger.log_workflow(
+                f"Not allowed to merge to instances of the same dataset: "
+                f"{self.dataset_name}"
+            )
+            return
+        concat_data = pd.concat([self.data, other.data], axis=0)
+        concat_data.fillna('', inplace=True)
+        concat_data.reset_index(inplace=True)
+        cdh = ConcatDataHolder()
+        cdh.data = concat_data
+        cdh.data_type = self.data_type
+        return cdh
+
+    @property
+    def data(self) -> pd.DataFrame:
+        return self._data
+
+
+    @data.setter
+    def data(self, df: pd.DataFrame) -> None:
+        if type(df) is not pd.DataFrame:
+            raise TypeError("Data must be of type pandas.DataFrame")
+        self._data = df
+
+    def columns(self) -> list[str]:
+        return sorted(self.data.columns)
+
+    def year_span(self) -> list[str]:
+        years = list(set(self.data['visit_year']))
+        if len(years) == 1:
+            return [years[0], years[0]]
+        sorted_years = sorted(years)
+        return [sorted_years[0], sorted_years[-1]]
+
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataSource) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataSource) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna('')
         data.reset_index(inplace=True, drop=True)
         return data
 
-    def _set_data_source(self, data_source: data_source.DataSource) -> None:
+    def _set_data_source(self, data_source: DataSource) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
-    def _add_data_source(self, data_source: data_source.DataSource) -> None:
-        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
-        self._check_data_source(data_source)
-        self._data_sources[str(data_source)] = data_source
 
-    def _check_data_source(self, data_source: data_source.DataSource) -> None:
-        # Can be overwritten in child classes
-        return
+class PolarsDataHolder(DataHolder, ABC):
+    def __init__(self, *args, **kwargs):
+        self._data = pl.DataFrame()
+        super().__init__(*args, **kwargs)
+
+    def __add__(self, other):
+        if self.data_type != other.data_type:
+            adm_logger.log_workflow(
+                f"Not allowed to merge data_sources of different data_types: "
+                f"{self.data_type} and {other.data_type}"
+            )
+            return
+        if self.dataset_name == other.dataset_name:
+            adm_logger.log_workflow(
+                f"Not allowed to merge to instances of the same dataset: "
+                f"{self.dataset_name}"
+            )
+            return
+        concat_data = pd.concat([self.data, other.data], axis=0)
+        concat_data.fillna('', inplace=True)
+        concat_data.reset_index(inplace=True)
+        cdh = ConcatDataHolder()
+        cdh.data = concat_data
+        cdh.data_type = self.data_type
+        return cdh
+
+    @property
+    def data(self) -> pl.DataFrame:
+        return self._data
+
+    @data.setter
+    def data(self, df: pl.DataFrame) -> None:
+        if type(df) is not pl.DataFrame:
+            raise TypeError(f"Data must be of type polars.DataFrame (was '{type(df)}')")
+        self._data = df
+
+    def columns(self) -> list[str]:
+        return sorted(self.data.columns)
+
+    def year_span(self) -> list[str]:
+        years = list(set(self.data['visit_year']))
+        if len(years) == 1:
+            return [years[0], years[0]]
+        sorted_years = sorted(years)
+        return [sorted_years[0], sorted_years[-1]]
+
+    @staticmethod
+    def _get_data_from_data_source(data_source: DataSource) -> pd.DataFrame:
+        data = data_source.get_data()
+        data = data.fillna('')
+        data.reset_index(inplace=True, drop=True)
+        return data
+
+    def _set_data_source(self, data_source: DataSource) -> None:
+        """Sets a single data source to self._data"""
+        self._add_data_source(data_source)
+        self._data = self._get_data_from_data_source(data_source)
 
 
 class old_DataHolder(ABC):
@@ -353,28 +431,28 @@ class old_DataHolder(ABC):
         return self.header_mapper.get_external_name(internal_name)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna('')
         data.reset_index(inplace=True, drop=True)
         return data
 
-    def _set_data_source(self, data_source: data_source.DataFile) -> None:
+    def _set_data_source(self, data_source: DataFile) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
-    def _add_data_source(self, data_source: data_source.DataFile) -> None:
+    def _add_data_source(self, data_source: DataFile) -> None:
         """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
-    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+    def _check_data_source(self, data_source: DataFile) -> None:
         # Can be overwritten in child classes
         return
 
 
-class ConcatDataHolder(DataHolder):
+class ConcatDataHolder(PandasDataHolder):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

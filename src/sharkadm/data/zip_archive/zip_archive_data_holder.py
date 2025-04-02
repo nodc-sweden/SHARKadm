@@ -14,14 +14,14 @@ from sharkadm.config.import_matrix import ImportMatrixMapper
 from sharkadm.data import data_source
 from sharkadm.data.archive import delivery_note, analyse_info
 from sharkadm.data.archive import sampling_info
-from sharkadm.data.data_holder import DataHolder
+from sharkadm.data.data_holder import PandasDataHolder
 from sharkadm import adm_logger
 from sharkadm import utils
 
 logger = logging.getLogger(__name__)
 
 
-class ZipArchiveDataHolder(DataHolder, ABC):
+class ZipArchiveDataHolder(PandasDataHolder, ABC):
     _data_type_internal: str | None = None
     _data_type: str | None = None
     _data_format: str | None = None

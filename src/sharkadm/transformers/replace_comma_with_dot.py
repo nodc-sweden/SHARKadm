@@ -1,7 +1,7 @@
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsTransformer
 from sharkadm import adm_logger
 from sharkadm.utils import matching_strings
-import re
+import polars as pl
 
 
 class ReplaceCommaWithDot(Transformer):
@@ -42,4 +42,43 @@ class ReplaceCommaWithDot(Transformer):
 
     def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
         return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
+
+
+
+class PolarsReplaceCommaWithDot(PolarsTransformer):
+    apply_on_columns = [
+        ".*latitude.*",
+        ".*longitude.*",
+        "water_depth_m",
+        ".*DIVIDE.*",
+        ".*MULTIPLY.*",
+        ".*COPY_VARIABLE.*",
+        "sampled_volume.*",
+        "sampler_area.*",
+        ".*wind.*",
+        ".*pressure.*",
+        ".*temperature.*",
+    ]
+
+    def __init__(self, apply_on_columns: list[str] = None) -> None:
+        super().__init__()
+        if apply_on_columns:
+            self.apply_on_columns = apply_on_columns
+
+        self._handled_cols = dict()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds position to all levels if not present"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for col in self._get_matching_cols(data_holder):
+            data_holder.data = data_holder.data.with_columns(
+                **{col: pl.col(col).str.replace(r",", r".")}
+            )
+
+    def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
+        return matching_strings.get_matching_strings(
+            strings=data_holder.data.columns, match_strings=self.apply_on_columns
+        )
 
