@@ -3,7 +3,8 @@ import datetime
 import polars as pl
 
 from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsTransformer, \
+    PolarsDataHolderProtocol
 
 DATETIME_FORMATS = [
     '%Y-%m-%d %H:%M:%S',
