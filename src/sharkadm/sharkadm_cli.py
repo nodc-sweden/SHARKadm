@@ -23,47 +23,49 @@ def _write_operations(directory: str, file_name: str, open_file: bool) -> None:
 
 @app.command()
 def list_validators(filter_string: str = None):
-    info_lines = ['', '='*100]
+    info_lines = ["", "=" * 100]
     if filter_string:
         info_lines.append(f'VALIDATORS filtered on "{filter_string}":')
     else:
-        info_lines.append('VALIDATORS (all)')
+        info_lines.append("VALIDATORS (all)")
     for name, obj in validators.get_validators().items():
         desc = obj.get_validator_description()
         if filter_string:
-            in_name = (filter_string.lower() in name.lower())
-            in_desc = (filter_string.lower() in desc.lower())
+            in_name = filter_string.lower() in name.lower()
+            in_desc = filter_string.lower() in desc.lower()
             if not (in_name or in_desc):
                 continue
-        info_lines.append(f'{name.ljust(60)}: {desc}')
-    info_lines.append('-' * 100)
-    print('\n'.join(info_lines))
+        info_lines.append(f"{name.ljust(60)}: {desc}")
+    info_lines.append("-" * 100)
+    print("\n".join(info_lines))
 
 
 @app.command()
 def list_transformers(filter_string: str = None):
-    info_lines = ['', '='*100]
+    info_lines = ["", "=" * 100]
     if filter_string:
         info_lines.append(f'TRANSFORMERS filtered on "{filter_string}":')
     else:
-        info_lines.append('TRANSFORMERS (all)')
+        info_lines.append("TRANSFORMERS (all)")
     for name, obj in transformers.get_transformers().items():
         desc = obj.get_transformer_description()
         if filter_string:
-            in_name = (filter_string.lower() in name.lower())
-            in_desc = (filter_string.lower() in desc.lower())
+            in_name = filter_string.lower() in name.lower()
+            in_desc = filter_string.lower() in desc.lower()
             if not (in_name or in_desc):
                 continue
-        info_lines.append(f'{name.ljust(60)}: {desc}')
-    info_lines.append('-' * 100)
-    print('\n'.join(info_lines))
+        info_lines.append(f"{name.ljust(60)}: {desc}")
+    info_lines.append("-" * 100)
+    print("\n".join(info_lines))
 
 
 @app.command()
-def operations(write: bool = False,
-               directory: str = typer.Option(None, '--directory', '--dir'),
-               file_name: str = typer.Option('sharkadm_operators.txt', '--file_name', '--name'),
-               open_file: bool = typer.Option(False, '--open_file', '--open')):
+def operations(
+    write: bool = False,
+    directory: str = typer.Option(None, "--directory", "--dir"),
+    file_name: str = typer.Option("sharkadm_operators.txt", "--file_name", "--name"),
+    open_file: bool = typer.Option(False, "--open_file", "--open"),
+):
     if write:
         _write_operations(directory, file_name, open_file)
 
@@ -77,12 +79,12 @@ def workflow(config_path: str, source: str):
     if source:
         wf.set_data_sources(source)
     wf.start_workflow()
-    print('Workflow DONE!')
+    print("Workflow DONE!")
 
 
 def main():
     app()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

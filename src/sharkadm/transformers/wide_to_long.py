@@ -14,18 +14,18 @@ from ..data.data_holder import PolarsDataHolder
 
 class WideToLong(Transformer):
     # valid_data_structures = ['column']
-    invalid_data_holders = ['ZoobenthosBedaArchiveDataHolder']
+    invalid_data_holders = ["ZoobenthosBedaArchiveDataHolder"]
 
-    def __init__(self,
-                 ignore_containing: str | list[str] | None = None,
-                 column_name_parameter: str = 'parameter',
-                 column_name_value: str = 'value',
-                 column_name_qf: str = 'quality_flag',
-                 column_name_unit: str = 'unit',
-                 keep_empty_rows: bool = False,
-                 **kwargs
-                 ):
-
+    def __init__(
+        self,
+        ignore_containing: str | list[str] | None = None,
+        column_name_parameter: str = "parameter",
+        column_name_value: str = "value",
+        column_name_qf: str = "quality_flag",
+        column_name_unit: str = "unit",
+        keep_empty_rows: bool = False,
+        **kwargs,
+    ):
         # ignore_containing can be regex
         super().__init__(**kwargs)
 
@@ -45,7 +45,7 @@ class WideToLong(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Transposes data from column data to row data'
+        return f"Transposes data from column data to row data"
 
     def _transform(self, data_holder: PandasDataHolder) -> None:
         self._qf_prefix = data_holder.qf_column_prefixes
@@ -53,18 +53,22 @@ class WideToLong(Transformer):
         self._data_columns = []
         self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
-            adm_logger.log_transformation(f'Could not transform to row format. Column {self._column_name_parameter} already in data', level=adm_logger.WARNING)
+            adm_logger.log_transformation(
+                f"Could not transform to row format. "
+                f"Column {self._column_name_parameter} already in data",
+                level=adm_logger.WARNING,
+            )
             return
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
         # self._cleanup(data_holder)
         self._add_reported_columns(data_holder)
-        data_holder.data_structure = 'row'
+        data_holder.data_structure = "row"
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
         for col in df.columns:
-            if col == 'quality_flag':
+            if col == "quality_flag":
                 continue
             # if 'COPY_VARIABLE' in col:
             #     continue
@@ -81,10 +85,10 @@ class WideToLong(Transformer):
     def _save_data_columns(self, df: pd.DataFrame) -> None:
         for original_col in df.columns:
             col = original_col
-            if 'COPY_VARIABLE' in original_col:
-                col = col.split('.')[1]
+            if "COPY_VARIABLE" in original_col:
+                col = col.split(".")[1]
             qcol = self._associated_qf_col(col, df)
-            if not qcol and 'COPY_VARIABLE' not in original_col:
+            if not qcol and "COPY_VARIABLE" not in original_col:
                 continue
             if self._ignore(col):
                 continue
@@ -100,15 +104,15 @@ class WideToLong(Transformer):
     def old_save_data_columns(self, df: pd.DataFrame) -> None:
         for original_col in df.columns:
             col = original_col
-            if 'COPY_VARIABLE' in original_col:
-                col = col.split('.')[1]
+            if "COPY_VARIABLE" in original_col:
+                col = col.split(".")[1]
             qcol = self._associated_qf_col(col, df)
-            print('')
-            print('******')
-            print(f'{col=}')
-            print(f'{qcol=}')
-            print('......')
-            if not qcol and 'COPY_VARIABLE' not in original_col:
+            print("")
+            print("******")
+            print(f"{col=}")
+            print(f"{qcol=}")
+            print("......")
+            if not qcol and "COPY_VARIABLE" not in original_col:
                 continue
             if self._ignore(col):
                 continue
@@ -129,10 +133,10 @@ class WideToLong(Transformer):
 
     def _associated_qf_col(self, col: str, df: pd.DataFrame) -> str:
         for prefix in self._qf_prefix:
-            qcol = f'{prefix}{col}'
+            qcol = f"{prefix}{col}"
             if qcol in df.columns:
                 return qcol
-        return ''
+        return ""
 
     def _get_transposed_data(self, df: pd.DataFrame) -> pd.DataFrame:
         data = []
@@ -140,13 +144,10 @@ class WideToLong(Transformer):
         for index, (i, row) in enumerate(df.iterrows()):
             meta = list(row[self._metadata_columns].values)
             if not index % 1000:
-                event.post_event('progress',
-                                 dict(
-                                     total=len_df,
-                                     current=index,
-                                     title='Transposing data'
-                                 )
-                                 )
+                event.post_event(
+                    "progress",
+                    dict(total=len_df, current=index, title="Transposing data"),
+                )
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
                 value = row[col]
@@ -155,8 +156,11 @@ class WideToLong(Transformer):
                 par = self._get_parameter_name_from_parameter(col)
                 qf = row.get(q_col)
                 if qf is None:
-                    # adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
-                    qf = ''
+                    # adm_logger.log_transformation(
+                    #     f'No quality_flag parameter ({q_col}) found for {par}',
+                    #     level=adm_logger.WARNING
+                    # )
+                    qf = ""
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
                 data.append(new_row)
@@ -169,46 +173,56 @@ class WideToLong(Transformer):
         # self.new_row = new_row
         # self.row = row
         # self.data = data
-        self.columns = self._metadata_columns + [self._column_name_parameter,
-                                                 self._column_name_value,
-                                                 self._column_name_qf,
-                                                 self._column_name_unit]
-        new_df = pd.DataFrame(data=data, columns=self._metadata_columns + [self._column_name_parameter,
-                                                                           self._column_name_value,
-                                                                           self._column_name_qf,
-                                                                           self._column_name_unit])
+        self.columns = self._metadata_columns + [
+            self._column_name_parameter,
+            self._column_name_value,
+            self._column_name_qf,
+            self._column_name_unit,
+        ]
+        new_df = pd.DataFrame(
+            data=data,
+            columns=self._metadata_columns
+            + [
+                self._column_name_parameter,
+                self._column_name_value,
+                self._column_name_qf,
+                self._column_name_unit,
+            ],
+        )
         return new_df
 
     def _cleanup(self, data_holder: PandasDataHolder):
-        keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
+        keep_columns = [
+            col for col in data_holder.data.columns if not col.startswith("COPY_VARIABLE")
+        ]
         data_holder.data = data_holder.data[keep_columns]
 
     def _add_reported_columns(self, data_holder: PandasDataHolder) -> None:
         cols_to_save = [
-            'parameter',
-            'value',
-            'quality_flag',
-            'unit',
+            "parameter",
+            "value",
+            "quality_flag",
+            "unit",
         ]
         for col in cols_to_save:
             if col not in data_holder.data:
                 continue
-            data_holder.data[f'reported_{col}'] = data_holder.data[col]
+            data_holder.data[f"reported_{col}"] = data_holder.data[col]
 
     @staticmethod
     def _get_unit_from_parameter(par: str) -> str:
-        if '.' in par:
-            return par.split('.')[-1]
-        if '[' in par:
-            return par.split('[')[-1].split(']')[0].strip()
-        return ''
+        if "." in par:
+            return par.split(".")[-1]
+        if "[" in par:
+            return par.split("[")[-1].split("]")[0].strip()
+        return ""
 
     @staticmethod
     def _get_parameter_name_from_parameter(par: str) -> str:
-        if '.' in par:
-            return par.split('.')[1]
-        if '[' in par:
-            return par.split('[')[0].strip()
+        if "." in par:
+            return par.split(".")[1]
+        if "[" in par:
+            return par.split("[")[0].strip()
         return par
 
     # def _old_remove_columns(self, data_holder: archive.ArchiveDataHolder) -> None:
@@ -217,12 +231,17 @@ class WideToLong(Transformer):
     #             data_holder.data.drop(col, axis=1, inplace=True)
     #
     # def _wide_to_long(self, data_holder: archive.ArchiveDataHolder) -> None:
-    #     data_holder.data = data_holder.data.melt(id_vars=[col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')],
-    #                                              var_name='parameter')
+    #     data_holder.data = data_holder.data.melt(
+    #         id_vars=[col for col in data_holder.data.columns
+    #         if not col.startswith('COPY_VARIABLE')],
+    #         var_name='parameter'
+    #     )
     #
     # def _cleanup(self, data_holder: archive.ArchiveDataHolder) -> None:
     #     data_holder.data['unit'] = data_holder.data['parameter'].apply(self._fix_unit)
-    #     data_holder.data['parameter'] = data_holder.data['parameter'].apply(self._fix_parameter)
+    #     data_holder.data['parameter'] = data_holder.data['parameter'].apply(
+    #         self._fix_parameter
+    #     )
     #
     # def _fix_unit(self, x) -> str:
     #     return x.split('.')[-1]
@@ -231,10 +250,9 @@ class WideToLong(Transformer):
     #     return x.split('.')[1]
 
 
-
 class PolarsWideToLong(PolarsTransformer):
     # valid_data_structures = ['column']
-    invalid_data_holders = ['ZoobenthosBedaArchiveDataHolder']
+    invalid_data_holders = ["ZoobenthosBedaArchiveDataHolder"]
 
     def __init__(
         self,
@@ -246,7 +264,6 @@ class PolarsWideToLong(PolarsTransformer):
         keep_empty_rows: bool = False,
         **kwargs,
     ):
-
         # ignore_containing can be regex
         super().__init__(**kwargs)
 
@@ -288,7 +305,7 @@ class PolarsWideToLong(PolarsTransformer):
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
         for col in df.columns:
-            if col == 'quality_flag':
+            if col == "quality_flag":
                 continue
             # if 'COPY_VARIABLE' in col:
             #     continue
@@ -305,10 +322,10 @@ class PolarsWideToLong(PolarsTransformer):
     def _save_data_columns(self, df: pd.DataFrame) -> None:
         for original_col in df.columns:
             col = original_col
-            if 'COPY_VARIABLE' in original_col:
-                col = col.split('.')[1]
+            if "COPY_VARIABLE" in original_col:
+                col = col.split(".")[1]
             qcol = self._associated_qf_col(col, df)
-            if not qcol and 'COPY_VARIABLE' not in original_col:
+            if not qcol and "COPY_VARIABLE" not in original_col:
                 continue
             if self._ignore(col):
                 continue
@@ -329,10 +346,10 @@ class PolarsWideToLong(PolarsTransformer):
 
     def _associated_qf_col(self, col: str, df: pd.DataFrame) -> str:
         for prefix in self._qf_prefix:
-            qcol = f'{prefix}{col}'
+            qcol = f"{prefix}{col}"
             if qcol in df.columns:
                 return qcol
-        return ''
+        return ""
 
     def _get_transposed_data(self, df: pl.DataFrame) -> pl.DataFrame:
         data = []
@@ -340,13 +357,10 @@ class PolarsWideToLong(PolarsTransformer):
         for index, row in enumerate(df.iter_rows(named=True)):
             meta = [row[column] for column in self._metadata_columns]
             if not index % 1000:
-                event.post_event('progress',
-                                 dict(
-                                     total=len_df,
-                                     current=index,
-                                     title='Transposing data'
-                                 )
-                                 )
+                event.post_event(
+                    "progress",
+                    dict(total=len_df, current=index, title="Transposing data"),
+                )
             for col in self._data_columns:
                 q_col = self._qf_col_mapping.get(col)
                 value = row[col]
@@ -355,56 +369,66 @@ class PolarsWideToLong(PolarsTransformer):
                 par = self._get_parameter_name_from_parameter(col)
                 qf = row.get(q_col)
                 if qf is None:
-                    # adm_logger.log_transformation(f'No quality_flag parameter ({q_col}) found for {par}', level=adm_logger.WARNING)
-                    qf = ''
+                    # adm_logger.log_transformation(
+                    #     f'No quality_flag parameter ({q_col}) found for {par}',
+                    #     level=adm_logger.WARNING
+                    # )
+                    qf = ""
                 unit = self._get_unit_from_parameter(col)
                 new_row = meta + [par, value, qf, unit]
                 data.append(new_row)
 
-        self.columns = self._metadata_columns + [self._column_name_parameter,
-                                                 self._column_name_value,
-                                                 self._column_name_qf,
-                                                 self._column_name_unit]
+        self.columns = self._metadata_columns + [
+            self._column_name_parameter,
+            self._column_name_value,
+            self._column_name_qf,
+            self._column_name_unit,
+        ]
         new_df = pl.DataFrame(
             data=data,
-            schema=self._metadata_columns + [
+            schema=self._metadata_columns
+            + [
                 self._column_name_parameter,
                 self._column_name_value,
                 self._column_name_qf,
-                self._column_name_unit
+                self._column_name_unit,
             ],
             orient="row",
         )
         return new_df
 
     def _cleanup(self, data_holder: PandasDataHolder):
-        keep_columns = [col for col in data_holder.data.columns if not col.startswith('COPY_VARIABLE')]
+        keep_columns = [
+            col for col in data_holder.data.columns if not col.startswith("COPY_VARIABLE")
+        ]
         data_holder.data = data_holder.data[keep_columns]
 
     def _add_reported_columns(self, data_holder: PandasDataHolder) -> None:
         cols_to_save = [
-            'parameter',
-            'value',
-            'quality_flag',
-            'unit',
+            "parameter",
+            "value",
+            "quality_flag",
+            "unit",
         ]
         for col in cols_to_save:
             if col not in data_holder.data:
                 continue
-            data_holder.data = data_holder.data.with_columns(data_holder.data[col].alias(f"reported_{col}"))
+            data_holder.data = data_holder.data.with_columns(
+                data_holder.data[col].alias(f"reported_{col}")
+            )
 
     @staticmethod
     def _get_unit_from_parameter(par: str) -> str:
-        if '.' in par:
-            return par.split('.')[-1]
-        if '[' in par:
-            return par.split('[')[-1].split(']')[0].strip()
-        return ''
+        if "." in par:
+            return par.split(".")[-1]
+        if "[" in par:
+            return par.split("[")[-1].split("]")[0].strip()
+        return ""
 
     @staticmethod
     def _get_parameter_name_from_parameter(par: str) -> str:
-        if '.' in par:
-            return par.split('.')[1]
-        if '[' in par:
-            return par.split('[')[0].strip()
+        if "." in par:
+            return par.split(".")[1]
+        if "[" in par:
+            return par.split("[")[0].strip()
         return par

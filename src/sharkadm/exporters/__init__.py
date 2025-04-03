@@ -59,9 +59,9 @@ def get_exporters_info() -> dict:
     result = dict()
     for name, exp in get_exporters().items():
         result[name] = dict()
-        result[name]['name'] = name
-        result[name]['description'] = exp.get_exporter_description()
-        result[name]['kwargs'] = get_kwargs_for_class(exp)
+        result[name]["name"] = name
+        result[name]["description"] = exp.get_exporter_description()
+        result[name]["kwargs"] = get_kwargs_for_class(exp)
         # result[name]['kwargs'] = dict()
         # for key, value in inspect.signature(exp.__init__).parameters.items():
         #     if key in ['self', 'kwargs']:
@@ -77,13 +77,13 @@ def get_exporters_description_text() -> str:
     info = get_exporters_description()
     line_length = 100
     lines = list()
-    lines.append('=' * line_length)
-    lines.append('Available exporters:')
-    lines.append('-' * line_length)
+    lines.append("=" * line_length)
+    lines.append("Available exporters:")
+    lines.append("-" * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(30)}{info[key]}')
-    lines.append('=' * line_length)
-    return '\n'.join(lines)
+        lines.append(f"{key.ljust(30)}{info[key]}")
+    lines.append("=" * line_length)
+    return "\n".join(lines)
 
 
 def print_exporters_description() -> None:
@@ -93,5 +93,5 @@ def print_exporters_description() -> None:
 
 def write_exporters_description_to_file(path: str | pathlib.Path) -> None:
     """Prints all exporters on screen"""
-    with open(path, 'w') as fid:
+    with open(path, "w") as fid:
         fid.write(get_exporters_description_text())

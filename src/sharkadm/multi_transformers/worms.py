@@ -11,7 +11,7 @@ class Worms(MultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        string_list = ['Performs all transformations related to Worms.']
+        string_list = ["Performs all transformations related to Worms."]
         for trans in Worms._transformers:
-            string_list.append(f'    {trans.get_transformer_description()}')
-        return '\n'.join(string_list)
+            string_list.append(f"    {trans.get_transformer_description()}")
+        return "\n".join(string_list)

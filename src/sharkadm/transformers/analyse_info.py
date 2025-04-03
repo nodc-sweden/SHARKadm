@@ -12,30 +12,35 @@ from typing import Protocol
 
 
 class AddAnalyseInfo(Transformer):
-    valid_data_holders = ['ArchiveDataHolder', 'LimsDataHolder', 'DvTemplateDataHolder']
+    valid_data_holders = ["ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder"]
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds analyse information to data'
+        return f"Adds analyse information to data"
 
     def _transform(self, data_holder: ArchiveDataHolder | LimsDataHolder) -> None:
-        if 'parameter' not in data_holder.columns:
-            adm_logger.log_transformation('Can not add analyse info. Data is not in row format.', level=adm_logger.ERROR)
+        if "parameter" not in data_holder.columns:
+            adm_logger.log_transformation(
+                "Can not add analyse info. Data is not in row format.",
+                level=adm_logger.ERROR,
+            )
             return
         pars = data_holder.analyse_info.parameters
-        for (par, dtime), df in data_holder.data.groupby(['parameter', 'datetime']):
+        for (par, dtime), df in data_holder.data.groupby(["parameter", "datetime"]):
             if not dtime:
                 continue
             if par not in pars:
-                adm_logger.log_transformation(f'No analyse info for parameter "{par}"', level=adm_logger.WARNING)
+                adm_logger.log_transformation(
+                    f'No analyse info for parameter "{par}"', level=adm_logger.WARNING
+                )
                 continue
             info = data_holder.analyse_info.get_info(par, dtime.date())
             for col in data_holder.analyse_info.columns:
-                if col in ['VALIDFR', 'VALIDTO']:
+                if col in ["VALIDFR", "VALIDTO"]:
                     continue
                 if col not in data_holder.data.columns:
-                    data_holder.data[col] = ''
-                data_holder.data.loc[df.index, col] = info.get(col, '')
+                    data_holder.data[col] = ""
+                data_holder.data.loc[df.index, col] = info.get(col, "")
 
 
 class PolarsAddAnalyseInfo(PolarsTransformer):
@@ -85,5 +90,3 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                     .when(column not in data_holder.analyse_info.columns)
                     .then(pl.lit("").alias(column))
                 )
-
-

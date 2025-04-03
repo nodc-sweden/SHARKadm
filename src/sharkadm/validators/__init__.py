@@ -45,7 +45,7 @@ def get_validators_description() -> dict[str, str]:
     """Returns a dictionary with validator name as key and the description as value"""
     result = dict()
     for name, val in get_validators().items():
-        if name.startswith('_'):
+        if name.startswith("_"):
             continue
         result[name] = val.get_validator_description()
     return result
@@ -55,9 +55,9 @@ def get_validators_info() -> dict:
     result = dict()
     for name, val in get_validators().items():
         result[name] = dict()
-        result[name]['name'] = name
-        result[name]['description'] = val.get_validator_description()
-        result[name]['kwargs'] = get_kwargs_for_class(val)
+        result[name]["name"] = name
+        result[name]["description"] = val.get_validator_description()
+        result[name]["kwargs"] = get_kwargs_for_class(val)
     return result
 
 
@@ -65,13 +65,13 @@ def get_validators_description_text() -> str:
     info = get_validators_description()
     line_length = 100
     lines = list()
-    lines.append('=' * line_length)
-    lines.append('Available validators:')
-    lines.append('-' * line_length)
+    lines.append("=" * line_length)
+    lines.append("Available validators:")
+    lines.append("-" * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(60)}{info[key]}')
-    lines.append('=' * line_length)
-    return '\n'.join(lines)
+        lines.append(f"{key.ljust(60)}{info[key]}")
+    lines.append("=" * line_length)
+    return "\n".join(lines)
 
 
 def print_validators_description() -> None:
@@ -81,5 +81,5 @@ def print_validators_description() -> None:
 
 def write_validators_description_to_file(path: str | pathlib.Path) -> None:
     """Prints all validators on screen"""
-    with open(path, 'w') as fid: 
+    with open(path, "w") as fid:
         fid.write(get_validators_description_text())

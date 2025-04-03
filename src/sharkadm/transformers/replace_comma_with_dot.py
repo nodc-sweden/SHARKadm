@@ -8,17 +8,17 @@ import polars as pl
 
 class ReplaceCommaWithDot(Transformer):
     apply_on_columns = [
-        '.*latitude.*',
-        '.*longitude.*',
-        'water_depth_m',
-        '.*DIVIDE.*',
-        '.*MULTIPLY.*',
-        '.*COPY_VARIABLE.*',
-        'sampled_volume.*',
-        'sampler_area.*',
-        '.*wind.*',
-        '.*pressure.*',
-        '.*temperature.*',
+        ".*latitude.*",
+        ".*longitude.*",
+        "water_depth_m",
+        ".*DIVIDE.*",
+        ".*MULTIPLY.*",
+        ".*COPY_VARIABLE.*",
+        "sampled_volume.*",
+        "sampler_area.*",
+        ".*wind.*",
+        ".*pressure.*",
+        ".*temperature.*",
     ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:
@@ -36,14 +36,19 @@ class ReplaceCommaWithDot(Transformer):
         for col in self._get_matching_cols(data_holder):
             for item, df in data_holder.data.groupby(col):
                 item = str(item)
-                if ',' not in item:
+                if "," not in item:
                     continue
-                new_item = item.replace(',', '.')
-                adm_logger.log_transformation(f'Replacing comma with dot for value {item} in column {col}', level=adm_logger.INFO)
+                new_item = item.replace(",", ".")
+                adm_logger.log_transformation(
+                    f"Replacing comma with dot for value {item} in column {col}",
+                    level=adm_logger.INFO,
+                )
                 data_holder.data.loc[df.index, col] = new_item
 
     def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
-        return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
+        return matching_strings.get_matching_strings(
+            strings=data_holder.data.columns, match_strings=self.apply_on_columns
+        )
 
 
 class PolarsReplaceCommaWithDot(PolarsTransformer):
@@ -58,8 +63,8 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
         "sampler_area.*",
         ".*wind.*",
         ".*pressure.*",
-        ".*temperature.*"]
-
+        ".*temperature.*",
+    ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:
         super().__init__()
@@ -70,7 +75,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Replacing comma with dot in given columns'
+        return f"Replacing comma with dot in given columns"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):
@@ -86,17 +91,17 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
 
 class ReplaceCommaWithDotPolars(Transformer):
     apply_on_columns = [
-        '.*latitude.*',
-        '.*longitude.*',
-        'water_depth_m',
-        '.*DIVIDE.*',
-        '.*MULTIPLY.*',
-        '.*COPY_VARIABLE.*',
-        'sampled_volume.*',
-        'sampler_area.*',
-        '.*wind.*',
-        '.*pressure.*',
-        '.*temperature.*',
+        ".*latitude.*",
+        ".*longitude.*",
+        "water_depth_m",
+        ".*DIVIDE.*",
+        ".*MULTIPLY.*",
+        ".*COPY_VARIABLE.*",
+        "sampled_volume.*",
+        "sampler_area.*",
+        ".*wind.*",
+        ".*pressure.*",
+        ".*temperature.*",
     ]
 
     def __init__(self, apply_on_columns: list[str] = None) -> None:
@@ -108,17 +113,23 @@ class ReplaceCommaWithDotPolars(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Replacing comma with dot in given columns'
+        return f"Replacing comma with dot in given columns"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):
-            data_holder.data = data_holder.data.with_columns(_temp=pl.col(col).str.replace(',', '.'))
-            for (old, new), df in data_holder.data.group_by([col, '_temp']):
+            data_holder.data = data_holder.data.with_columns(
+                _temp=pl.col(col).str.replace(",", ".")
+            )
+            for (old, new), df in data_holder.data.group_by([col, "_temp"]):
                 if old == new:
                     continue
-                adm_logger.log_transformation(f'Replacing comma with dot for value {old} in column {col} ({len(df)} places)',
-                                              level=adm_logger.INFO)
+                adm_logger.log_transformation(
+                    f"Replacing comma with dot for value {old} in column {col} "
+                    f"({len(df)} places)",
+                    level=adm_logger.INFO,
+                )
 
     def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
-        return matching_strings.get_matching_strings(strings=data_holder.data.columns, match_strings=self.apply_on_columns)
-
+        return matching_strings.get_matching_strings(
+            strings=data_holder.data.columns, match_strings=self.apply_on_columns
+        )

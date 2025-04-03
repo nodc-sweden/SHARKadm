@@ -27,4 +27,3 @@ def post_event(event: str, data=None):
     for prio in sorted(_gui_subscribers[event]):
         for func in _gui_subscribers[event][prio]:
             func(data)
-

@@ -2,23 +2,24 @@
 
 import subprocess
 
-from sharkadm.utils import get_nodc_config_directory, TEMP_DIRECTORY
+from sharkadm.utils import get_nodc_config_directory, TEMP_DIRECTORY, get_temp_directory
 
 
 def update_nodc_config_directory_from_svn() -> None:
     config_dir = get_nodc_config_directory()
     if not config_dir:
         return
-    path = TEMP_DIRECTORY / 'update_nodc_config_with_svn.bat'
-    lines = [f'cd {config_dir}', 'svn update']
-    with open(path, 'w') as fid:
-        fid.write('\n'.join(lines))
+    path = get_temp_directory() / "update_nodc_config_with_svn.bat"
+    lines = [f"cd {config_dir}", "svn update"]
+    with open(path, "w") as fid:
+        fid.write("\n".join(lines))
     ans = subprocess.run(str(path))
+
 
 try:
     update_nodc_config_directory_from_svn()
 except Exception as e:
-    print(f'Could not update nodc_config: {e}')
+    print(f"Could not update nodc_config: {e}")
     raise
 
 from sharkadm.sharkadm_logger import adm_logger
@@ -40,19 +41,23 @@ from sharkadm.dv_template_data import get_row_data_from_fyschem_dv_template
 from sharkadm import workflow
 
 
-def write_operations_description_to_file(path: str | pathlib.Path = '.') -> None:
+def write_operations_description_to_file(path: str | pathlib.Path = ".") -> None:
     """Writes a summary of validators, transformers and exporters to file"""
     path = pathlib.Path(path)
     if path.is_dir():
-        path = path / 'sharkadm_operations.txt'
-    with open(path, 'w') as fid:
-        fid.write('\n\n\n\n'.join([
-            get_validators_description_text(),
-            get_multi_validators_description_text(),
-            get_transformers_description_text(),
-            get_multi_transformers_description_text(),
-            get_exporters_description_text()
-        ]))
+        path = path / "sharkadm_operations.txt"
+    with open(path, "w") as fid:
+        fid.write(
+            "\n\n\n\n".join(
+                [
+                    get_validators_description_text(),
+                    get_multi_validators_description_text(),
+                    get_transformers_description_text(),
+                    get_multi_transformers_description_text(),
+                    get_exporters_description_text(),
+                ]
+            )
+        )
 
 
 def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
@@ -60,7 +65,3 @@ def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
     holder = get_data_holder(path)
     c.set_data_holder(holder)
     return c
-
-
-
-

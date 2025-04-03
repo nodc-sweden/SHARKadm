@@ -9,25 +9,26 @@ try:
     from nodc_codes import get_translate_codes_object
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
-    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. '
+        f"You need to install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
 
 
 class DataHolderProtocol(Protocol):
+    @property
+    def data(self) -> pd.DataFrame: ...
 
     @property
-    def data(self) -> pd.DataFrame:
-        ...
-
-    @property
-    def reporting_institute(self) -> str:
-        ...
+    def reporting_institute(self) -> str: ...
 
 
 class _ReportingInstitute(Transformer):
-    source_cols = ['']
-    col_to_set = ''
-    lookup_key = ''
-    lookup_field = 'LABO'
+    source_cols = [""]
+    col_to_set = ""
+    lookup_key = ""
+    lookup_field = "LABO"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,26 +36,33 @@ class _ReportingInstitute(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f''
+        return f""
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._set_from_data(data_holder=data_holder):
             return
         if not self._set_from_other(data_holder=data_holder):
             adm_logger.log_transformation(
-                f'None of the source columns {self.source_cols} found when trying to set {self.col_to_set}. And no other reporting institute found.',
-                level=adm_logger.WARNING)
+                f"None of the source columns {self.source_cols} found when trying to set "
+                f"{self.col_to_set}. And no other reporting institute found.",
+                level=adm_logger.WARNING,
+            )
 
     def _set_from_other(self, data_holder: DataHolderProtocol) -> bool:
-        if hasattr(data_holder, 'reporting_institute') and data_holder.reporting_institute:
-            info = _translate_codes.get_info(self.lookup_field, data_holder.reporting_institute)
-            adm_logger.log_transformation('Setting')
+        if (
+            hasattr(data_holder, "reporting_institute")
+            and data_holder.reporting_institute
+        ):
+            info = _translate_codes.get_info(
+                self.lookup_field, data_holder.reporting_institute
+            )
+            adm_logger.log_transformation("Setting")
             data_holder.data[self.col_to_set] = info[self.lookup_key]
             return True
         return False
 
     def _set_from_data(self, data_holder: DataHolderProtocol) -> bool:
-        source_col = ''
+        source_col = ""
         for col in self.source_cols:
             if col in data_holder.data.columns:
                 source_col = col
@@ -62,39 +70,40 @@ class _ReportingInstitute(Transformer):
         if not source_col:
             return False
         if self.col_to_set not in data_holder.data.columns:
-            data_holder.data[self.col_to_set] = ''
+            data_holder.data[self.col_to_set] = ""
         for code in set(data_holder.data[source_col]):
             names = []
-            for part in code.split(','):
+            for part in code.split(","):
                 part = part.strip()
                 info = _translate_codes.get_info(self.lookup_field, part)
                 if info:
                     names.append(info[self.lookup_key])
                 else:
-                    adm_logger.log_transformation(f'Could not find information for {source_col}: {part}',
-                                                  level=adm_logger.WARNING)
-                    names.append('?')
+                    adm_logger.log_transformation(
+                        f"Could not find information for {source_col}: {part}",
+                        level=adm_logger.WARNING,
+                    )
+                    names.append("?")
             index = data_holder.data[source_col] == code
-            data_holder.data.loc[index, self.col_to_set] = ', '.join(names)
+            data_holder.data.loc[index, self.col_to_set] = ", ".join(names)
         return True
 
 
 class AddSwedishReportingInstitute(_ReportingInstitute):
-    source_cols = ['reporting_institute_code', 'reporting_institute_name_en']
-    col_to_set = 'reporting_institute_name_sv'
-    lookup_key = 'swedish_name'
+    source_cols = ["reporting_institute_code", "reporting_institute_name_en"]
+    col_to_set = "reporting_institute_name_sv"
+    lookup_key = "swedish_name"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds reporting institute name in swedish'
+        return f"Adds reporting institute name in swedish"
 
 
 class AddEnglishReportingInstitute(_ReportingInstitute):
-    source_cols = ['reporting_institute_code', 'reporting_institute_name_sv']
-    col_to_set = 'reporting_institute_name_en'
-    lookup_key = 'english_name'
+    source_cols = ["reporting_institute_code", "reporting_institute_name_sv"]
+    col_to_set = "reporting_institute_name_en"
+    lookup_key = "english_name"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Adds reporting institute name in english'
-
+        return f"Adds reporting institute name in english"

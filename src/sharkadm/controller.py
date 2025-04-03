@@ -36,7 +36,7 @@ class BaseSHARKadmController:
         utils.clear_export_directory(7)
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}'
+        return f"{self.__class__.__name__}"
 
     def __add__(self, other):
         cdh = self.data_holder + other.data_holder
@@ -69,36 +69,39 @@ class BaseSHARKadmController:
         # return return_dict
 
     @classmethod
-    def get_transformer_list(cls,
-                             start_with: list[str] | None = None,
-                             sort_the_rest: bool = True,
-                             ) -> dict[str, dict]:
+    def get_transformer_list(
+        cls,
+        start_with: list[str] | None = None,
+        sort_the_rest: bool = True,
+    ) -> dict[str, dict]:
         return _get_fixed_list(
             start_with=_get_name_mapper(start_with or []),
             all_items=SHARKadmController.get_transformers(),
-            sort_the_rest=sort_the_rest
+            sort_the_rest=sort_the_rest,
         )
 
     @classmethod
-    def get_validator_list(cls,
-                           start_with: list[str] | None = None,
-                           sort_the_rest: bool = True,
-                           ) -> dict[str, dict]:
+    def get_validator_list(
+        cls,
+        start_with: list[str] | None = None,
+        sort_the_rest: bool = True,
+    ) -> dict[str, dict]:
         return _get_fixed_list(
             start_with=_get_name_mapper(start_with or []),
             all_items=SHARKadmController.get_validators(),
-            sort_the_rest=sort_the_rest
+            sort_the_rest=sort_the_rest,
         )
 
     @classmethod
-    def get_exporter_list(cls,
-                          start_with: list[str] | None = None,
-                          sort_the_rest: bool = True,
-                          ) -> dict[str, dict]:
+    def get_exporter_list(
+        cls,
+        start_with: list[str] | None = None,
+        sort_the_rest: bool = True,
+    ) -> dict[str, dict]:
         return _get_fixed_list(
             start_with=_get_name_mapper(start_with or []),
             all_items=SHARKadmController.get_exporters(),
-            sort_the_rest=sort_the_rest
+            sort_the_rest=sort_the_rest,
         )
 
     @property
@@ -122,15 +125,18 @@ class BaseSHARKadmController:
         tot_nr_operators = len(self._transformers)
         for i, trans in enumerate(self._transformers):
             trans.transform(self._data_holder)
-            event.post_event('progress',
-                             dict(
-                                 total=tot_nr_operators,
-                                 current=i,
-                                 title=f'Transforming...{trans.name}'
-                             )
-                             )
+            event.post_event(
+                "progress",
+                dict(
+                    total=tot_nr_operators,
+                    current=i,
+                    title=f"Transforming...{trans.name}",
+                ),
+            )
 
-    def transform(self, *transformers: Transformer | MultiTransformer) -> 'SHARKadmController':
+    def transform(
+        self, *transformers: Transformer | MultiTransformer
+    ) -> "SHARKadmController":
         for trans in transformers:
             trans.transform(self._data_holder)
         return self
@@ -144,15 +150,16 @@ class BaseSHARKadmController:
         tot_nr_operators = len(self._validators_before)
         for i, val in enumerate(self._validators_before):
             val.validate(self._data_holder)
-            event.post_event('progress',
-                                dict(
-                                     total=tot_nr_operators,
-                                     current=i,
-                                     title=f'Initial validation...{val.name}'
-                                 )
-                             )
+            event.post_event(
+                "progress",
+                dict(
+                    total=tot_nr_operators,
+                    current=i,
+                    title=f"Initial validation...{val.name}",
+                ),
+            )
 
-    def validate(self, *validators: Validator) -> 'SHARKadmController':
+    def validate(self, *validators: Validator) -> "SHARKadmController":
         for val in validators:
             val.validate(self._data_holder)
         return self
@@ -166,13 +173,14 @@ class BaseSHARKadmController:
         tot_nr_operators = len(self._validators_after)
         for i, val in enumerate(self._validators_after):
             val.validate(self._data_holder)
-            event.post_event('progress',
-                             dict(
-                                 total=tot_nr_operators,
-                                 current=i,
-                                 title=f'Final validation...{val.name}'
-                             )
-                             )
+            event.post_event(
+                "progress",
+                dict(
+                    total=tot_nr_operators,
+                    current=i,
+                    title=f"Final validation...{val.name}",
+                ),
+            )
 
     def set_exporters(self, *args: Exporter) -> None:
         """Add one or more Exporters to the data holder"""
@@ -183,13 +191,10 @@ class BaseSHARKadmController:
         tot_nr_operators = len(self._exporters)
         for i, exp in enumerate(self._exporters):
             exp.export(self._data_holder)
-            event.post_event('progress',
-                             dict(
-                                 total=tot_nr_operators,
-                                 current=i,
-                                 title=f'Exporting...{exp.name}'
-                             )
-                             )
+            event.post_event(
+                "progress",
+                dict(total=tot_nr_operators, current=i, title=f"Exporting...{exp.name}"),
+            )
 
     def export(self, *exporters: Exporter) -> Any:
         for exp in exporters:
@@ -200,20 +205,20 @@ class BaseSHARKadmController:
 
     def get_workflow_description(self):
         lines = []
-        lines.append(f'Data holder: {self.data_holder}')
-        lines.append('Validators before:')
+        lines.append(f"Data holder: {self.data_holder}")
+        lines.append("Validators before:")
         for oper in self._validators_before:
-            lines.append(f'  {oper.description} ({oper.name})')
-        lines.append('Transformers:')
+            lines.append(f"  {oper.description} ({oper.name})")
+        lines.append("Transformers:")
         for oper in self._transformers:
-            lines.append(f'  {oper.description} ({oper.name})')
-        lines.append('Validators after:')
+            lines.append(f"  {oper.description} ({oper.name})")
+        lines.append("Validators after:")
         for oper in self._validators_after:
-            lines.append(f'  {oper.description} ({oper.name})')
-        lines.append('Exporters:')
+            lines.append(f"  {oper.description} ({oper.name})")
+        lines.append("Exporters:")
         for oper in self._exporters:
-            lines.append(f'  {oper.description} ({oper.name})')
-        return '\n'.join(lines)
+            lines.append(f"  {oper.description} ({oper.name})")
+        return "\n".join(lines)
 
     def start_data_handling(self):
         self.validate_before_all()
@@ -226,7 +231,6 @@ class SHARKadmController(BaseSHARKadmController):
     def __init__(self):
         super().__init__()
         self._data_holder: PandasDataHolder | None = None
-
 
     @property
     def data(self) -> pd.DataFrame:
@@ -258,14 +262,15 @@ class SHARKadmPolarsController(BaseSHARKadmController):
 def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:
     return_dict = dict()
     for item in list_to_map:
-        return_dict[item['name']] = item
+        return_dict[item["name"]] = item
     return return_dict
 
 
-def _get_fixed_list(start_with: dict[str, dict] | None = None,
-                    all_items: dict[str, dict] | None = None,
-                    sort_the_rest: bool = True) -> dict[str, dict]:
-
+def _get_fixed_list(
+    start_with: dict[str, dict] | None = None,
+    all_items: dict[str, dict] | None = None,
+    sort_the_rest: bool = True,
+) -> dict[str, dict]:
     return_dict = dict()
     if start_with:
         for name, data in start_with.items():

@@ -11,4 +11,4 @@ def get_next_incremented_file_path(path: pathlib.Path):
 
 
 def _get_incremented_file_path(path, nr):
-    return path.parent / f'{path.stem}({nr}){path.suffix}'
+    return path.parent / f"{path.stem}({nr}){path.suffix}"

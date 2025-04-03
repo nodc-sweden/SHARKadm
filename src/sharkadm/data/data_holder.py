@@ -13,25 +13,28 @@ logger = logging.getLogger(__name__)
 
 
 class DataHolder(ABC):
-    """Class to hold data from a specific data type. Add data using the add_data_source method"""
+    """Class to hold data from a specific data type. Add data using the
+    add_data_source method"""
 
     def __init__(self, *args, **kwargs):
         self._data_sources: dict[str, DataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_structure = 'row'
+        self._data_structure = "row"
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
+        return (
+            f'{self.__class__.__name__} (data type = "{self.data_type}"): '
+            f"{self.dataset_name}"
+        )
 
     @abstractmethod
-    def __add__(self, other):
-        ...
+    def __add__(self, other): ...
 
     @property
     def workflow_message(self) -> str:
-        return f'Using DataHolder: {self.__class__.__name__}'
+        return f"Using DataHolder: {self.__class__.__name__}"
 
     @property
     def data_holder_name(self) -> str:
@@ -51,7 +54,7 @@ class DataHolder(ABC):
     @data.setter
     def data(self, df: pd.DataFrame | pl.DataFrame) -> None:
         if not isinstance(df, (pd.DataFrame, pl.DataFrame)):
-            raise 'Data must be of type pd.DataFrame'
+            raise "Data must be of type pd.DataFrame"
         self._data = df
 
     @property
@@ -62,23 +65,20 @@ class DataHolder(ABC):
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
         if data_structure_lower not in config.DATA_STRUCTURES:
-            raise ValueError(f'Invalid data structure: {data_structure}')
+            raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 
     @property
     @abstractmethod
-    def data_type(self) -> str:
-        ...
+    def data_type(self) -> str: ...
 
     @property
     @abstractmethod
-    def data_type_internal(self) -> str:
-        ...
+    def data_type_internal(self) -> str: ...
 
     @property
     @abstractmethod
-    def dataset_name(self) -> str:
-        ...
+    def dataset_name(self) -> str: ...
 
     @property
     def number_metadata_rows(self) -> int:
@@ -86,8 +86,7 @@ class DataHolder(ABC):
 
     @property
     @abstractmethod
-    def columns(self) -> list[str]:
-        ...
+    def columns(self) -> list[str]: ...
 
     @property
     def mapped_columns(self) -> dict[str, str]:
@@ -116,7 +115,7 @@ class DataHolder(ABC):
 
     @property
     def qf_column_prefixes(self) -> list[str]:
-        prefixes = ['QFLAG.']
+        prefixes = ["QFLAG."]
         if self._qf_column_prefix:
             prefixes.append(self._qf_column_prefix)
         return prefixes
@@ -127,42 +126,43 @@ class DataHolder(ABC):
 
     @property
     @abstractmethod
-    def year_span(self) -> list[str]:
-        ...
+    def year_span(self) -> list[str]: ...
 
     @property
     def zip_archive_base(self) -> str:
         if not self._data_sources:
             return self._get_created_zip_archive_base()
         source = list(self._data_sources.values())[0]
-        if not hasattr(source, 'path'):
+        if not hasattr(source, "path"):
             return self._get_created_zip_archive_base()
         if not source.path:
             return self._get_created_zip_archive_base()
         parts = source.path.parts
-        if 'processed_data' not in parts:
+        if "processed_data" not in parts:
             return self._get_created_zip_archive_base()
-        return parts[parts.index('processed_data')-1]
+        return parts[parts.index("processed_data") - 1]
 
     def _get_created_zip_archive_base(self) -> str:
-        parts = ['SHARK', self.data_type.replace(' ', '')]
+        parts = ["SHARK", self.data_type.replace(" ", "")]
         years = self.year_span
         parts.append(years[0])
         if years[0] != years[1]:
             parts.append(years[1])
-        if hasattr(self, 'delivery_note'):
+        if hasattr(self, "delivery_note"):
             parts.append(self.delivery_note.reporting_institute_code)
-        return '_'.join(parts)
+        return "_".join(parts)
 
     @property
     def zip_archive_name(self) -> str:
-        return f'{self.zip_archive_base}_version_{datetime.datetime.now().strftime("%Y-%m-%d")}'
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        return f"{self.zip_archive_base}_version_{today}"
 
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
 
     def _add_data_source(self, data_source: DataSource) -> None:
-        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
+        """Adds a data source to instance variable self._data_sources.
+        This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
@@ -190,7 +190,7 @@ class PandasDataHolder(DataHolder, ABC):
             )
             return
         concat_data = pd.concat([self.data, other.data], axis=0)
-        concat_data.fillna('', inplace=True)
+        concat_data.fillna("", inplace=True)
         concat_data.reset_index(inplace=True)
         cdh = ConcatDataHolder()
         cdh.data = concat_data
@@ -200,7 +200,6 @@ class PandasDataHolder(DataHolder, ABC):
     @property
     def data(self) -> pd.DataFrame:
         return self._data
-
 
     @data.setter
     def data(self, df: pd.DataFrame) -> None:
@@ -212,7 +211,7 @@ class PandasDataHolder(DataHolder, ABC):
         return sorted(self.data.columns)
 
     def year_span(self) -> list[str]:
-        years = list(set(self.data['visit_year']))
+        years = list(set(self.data["visit_year"]))
         if len(years) == 1:
             return [years[0], years[0]]
         sorted_years = sorted(years)
@@ -221,7 +220,7 @@ class PandasDataHolder(DataHolder, ABC):
     @staticmethod
     def _get_data_from_data_source(data_source: DataSource) -> pd.DataFrame:
         data = data_source.get_data()
-        data = data.fillna('')
+        data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
@@ -250,7 +249,7 @@ class PolarsDataHolder(DataHolder, ABC):
             )
             return
         concat_data = pd.concat([self.data, other.data], axis=0)
-        concat_data.fillna('', inplace=True)
+        concat_data.fillna("", inplace=True)
         concat_data.reset_index(inplace=True)
         cdh = ConcatDataHolder()
         cdh.data = concat_data
@@ -271,7 +270,7 @@ class PolarsDataHolder(DataHolder, ABC):
         return sorted(self.data.columns)
 
     def year_span(self) -> list[str]:
-        years = list(set(self.data['visit_year']))
+        years = list(set(self.data["visit_year"]))
         if len(years) == 1:
             return [years[0], years[0]]
         sorted_years = sorted(years)
@@ -280,7 +279,7 @@ class PolarsDataHolder(DataHolder, ABC):
     @staticmethod
     def _get_data_from_data_source(data_source: DataSource) -> pd.DataFrame:
         data = data_source.get_data()
-        data = data.fillna('')
+        data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
@@ -291,7 +290,8 @@ class PolarsDataHolder(DataHolder, ABC):
 
 
 class old_DataHolder(ABC):
-    """Class to hold data from a specific data type. Add data using the add_data_source method"""
+    """Class to hold data from a specific data type.
+    Add data using the add_data_source method"""
 
     def __init__(self, *args, **kwargs):
         self._data = pd.DataFrame()
@@ -299,20 +299,29 @@ class old_DataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_structure = 'row'
+        self._data_structure = "row"
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} (data type = "{self.data_type}"): {self.dataset_name}'
+        return (
+            f'{self.__class__.__name__} (data type = "{self.data_type}"): '
+            f"{self.dataset_name}"
+        )
 
     def __add__(self, other):
         if self.data_type != other.data_type:
-            adm_logger.log_workflow(f'Not allowed to merge data_sources of different data_types: {self.data_type} and {other.data_type}')
+            adm_logger.log_workflow(
+                f"Not allowed to merge data_sources of different data_types: "
+                f"{self.data_type} and {other.data_type}"
+            )
             return
         if self.dataset_name == other.dataset_name:
-            adm_logger.log_workflow(f'Not allowed to merge to instances of the same dataset: {self.dataset_name}')
+            adm_logger.log_workflow(
+                f"Not allowed to merge to instances of the same dataset: "
+                f"{self.dataset_name}"
+            )
             return
         concat_data = pd.concat([self.data, other.data], axis=0)
-        concat_data.fillna('', inplace=True)
+        concat_data.fillna("", inplace=True)
         concat_data.reset_index(inplace=True)
         cdh = ConcatDataHolder()
         cdh.data = concat_data
@@ -321,7 +330,7 @@ class old_DataHolder(ABC):
 
     @property
     def workflow_message(self) -> str:
-        return f'Using DataHolder: {self.__class__.__name__}'
+        return f"Using DataHolder: {self.__class__.__name__}"
 
     @property
     def data_holder_name(self) -> str:
@@ -341,7 +350,7 @@ class old_DataHolder(ABC):
     @data.setter
     def data(self, df: pd.DataFrame) -> None:
         if type(df) != pd.DataFrame:
-            raise 'Data must be of type pd.DataFrame'
+            raise "Data must be of type pd.DataFrame"
         self._data = df
 
     @property
@@ -352,7 +361,7 @@ class old_DataHolder(ABC):
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
         if data_structure_lower not in config.DATA_STRUCTURES:
-            raise ValueError(f'Invalid data structure: {data_structure}')
+            raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 
     # @property
@@ -362,13 +371,11 @@ class old_DataHolder(ABC):
 
     @property
     @abstractmethod
-    def data_type(self) -> str:
-        ...
+    def data_type(self) -> str: ...
 
     @property
     @abstractmethod
-    def dataset_name(self) -> str:
-        ...
+    def dataset_name(self) -> str: ...
 
     @property
     def number_metadata_rows(self) -> int:
@@ -405,7 +412,7 @@ class old_DataHolder(ABC):
 
     @property
     def qf_column_prefixes(self) -> list[str]:
-        prefixes = ['QFLAG.']
+        prefixes = ["QFLAG."]
         if self._qf_column_prefix:
             prefixes.append(self._qf_column_prefix)
         return prefixes
@@ -416,7 +423,7 @@ class old_DataHolder(ABC):
 
     @property
     def year_span(self) -> list[str]:
-        years = list(set(self.data['visit_year']))
+        years = list(set(self.data["visit_year"]))
         if len(years) == 1:
             return [years[0], years[0]]
         sorted_years = sorted(years)
@@ -424,18 +431,19 @@ class old_DataHolder(ABC):
 
     @property
     def zip_archive_base(self) -> str:
-        parts = ['SHARK', self.data_type.capitalize()]
+        parts = ["SHARK", self.data_type.capitalize()]
         years = self.year_span
         parts.append(years[0])
         if years[0] != years[1]:
             parts.append(years[1])
-        if hasattr(self, 'delivery_note'):
+        if hasattr(self, "delivery_note"):
             parts.append(self.delivery_note.reporting_institute_code)
-        return '_'.join(parts)
+        return "_".join(parts)
 
     @property
     def zip_archive_name(self) -> str:
-        return f'{self.zip_archive_base}_version_{datetime.datetime.now().strftime("%Y-%m-%d")}'
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        return f"{self.zip_archive_base}_version_{today}"
 
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
@@ -443,7 +451,7 @@ class old_DataHolder(ABC):
     @staticmethod
     def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
-        data = data.fillna('')
+        data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
@@ -453,7 +461,8 @@ class old_DataHolder(ABC):
         self._data = self._get_data_from_data_source(data_source)
 
     def _add_data_source(self, data_source: DataFile) -> None:
-        """Adds a data source to instance variable self._data_sources. This method is not adding to data itself."""
+        """Adds a data source to instance variable self._data_sources.
+        This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
@@ -463,14 +472,13 @@ class old_DataHolder(ABC):
 
 
 class ConcatDataHolder(PandasDataHolder):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._data_type = ''
+        self._data_type = ""
 
     @staticmethod
     def get_data_holder_description() -> str:
-        return 'This is a concatenated data holder'
+        return "This is a concatenated data holder"
 
     @property
     def data_type(self) -> str:
@@ -482,7 +490,7 @@ class ConcatDataHolder(PandasDataHolder):
 
     @property
     def dataset_name(self) -> str:
-        return '#'.join(self.data['dataset_name'].unique())
+        return "#".join(self.data["dataset_name"].unique())
 
     @property
     def number_metadata_rows(self) -> None:

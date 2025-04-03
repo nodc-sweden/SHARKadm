@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 class XlsxFormatDataFile(DataFile):
     def __init__(self, *args, **kwargs):
-        self._sheet_name = kwargs.pop('sheet_name')
-        self._skip_rows = kwargs.pop('skip_rows')
+        self._sheet_name = kwargs.pop("sheet_name")
+        self._skip_rows = kwargs.pop("skip_rows")
         super().__init__(*args, **kwargs)
 
     def _load_file(self) -> None:
@@ -23,6 +23,7 @@ class XlsxFormatDataFile(DataFile):
             skiprows=self._skip_rows,
             has_header=True,
         )
+
 
 class XlsxFormatDataFilePolars(DataFilePolars):
     def __init__(self, *args, sheet_name: str, skip_rows: int = 0, **kwargs):

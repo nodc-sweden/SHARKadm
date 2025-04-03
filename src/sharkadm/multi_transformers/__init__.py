@@ -45,10 +45,11 @@ def get_multi_transformer_object(name: str, **kwargs) -> MultiTransformer | None
 
 
 def get_multi_transformers_description() -> dict[str, str]:
-    """Returns a dictionary with multi transformer name as key and the description as value"""
+    """Returns a dictionary with multi transformer name as key and the description as
+    value"""
     result = dict()
     for name, tran in get_multi_transformers().items():
-        if name.startswith('_'):
+        if name.startswith("_"):
             continue
         result[name] = tran.get_transformer_description()
     return result
@@ -58,9 +59,9 @@ def get_multi_transformers_info() -> dict:
     result = dict()
     for name, tran in get_multi_transformers().items():
         result[name] = dict()
-        result[name]['name'] = name
-        result[name]['description'] = tran.get_transformer_description()
-        result[name]['kwargs'] = get_kwargs_for_class(tran)
+        result[name]["name"] = name
+        result[name]["description"] = tran.get_transformer_description()
+        result[name]["kwargs"] = get_kwargs_for_class(tran)
     return result
 
 
@@ -68,14 +69,14 @@ def get_multi_transformers_description_text() -> str:
     info = get_multi_transformers_description()
     line_length = 100
     lines = list()
-    lines.append('=' * line_length)
-    lines.append('Available multi transformers:')
-    lines.append('-' * line_length)
+    lines.append("=" * line_length)
+    lines.append("Available multi transformers:")
+    lines.append("-" * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(40)}{info[key]}')
-        lines.append('')
-    lines.append('=' * line_length)
-    return '\n'.join(lines)
+        lines.append(f"{key.ljust(40)}{info[key]}")
+        lines.append("")
+    lines.append("=" * line_length)
+    return "\n".join(lines)
 
 
 def print_multi_transformers_description() -> None:
@@ -85,5 +86,5 @@ def print_multi_transformers_description() -> None:
 
 def write_multi_transformers_description_to_file(path: str | pathlib.Path) -> None:
     """Prints all multi transformers on screen"""
-    with open(path, 'w') as fid:
+    with open(path, "w") as fid:
         fid.write(get_multi_transformers_description_text())

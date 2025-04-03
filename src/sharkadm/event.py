@@ -31,4 +31,3 @@ def post_event(event: str, data: dict | str) -> None:
     for prio in sorted(_subscribers[event]):
         for func in _subscribers[event][prio]:
             func(data)
-

@@ -4,18 +4,19 @@ from sharkadm import adm_logger
 
 class SortData(Transformer):
     sort_by_columns: list[str] = [
-        'sample_date',
-        'sample_time',
-        'station_name',
-        
-        'sample_min_depth_m',
-        'sample_max_depth_m',
-        'scientific_name',
-        'parameter',
+        "sample_date",
+        "sample_time",
+        "station_name",
+        "sample_min_depth_m",
+        "sample_max_depth_m",
+        "scientific_name",
+        "parameter",
     ]
     ascending: bool | list[bool] = True
 
-    def __init__(self, sort_by_columns: list[str] = None, ascending: bool | list[bool] = None) -> None:
+    def __init__(
+        self, sort_by_columns: list[str] = None, ascending: bool | list[bool] = None
+    ) -> None:
         super().__init__()
         if sort_by_columns:
             self.sort_by_columns = sort_by_columns
@@ -24,29 +25,40 @@ class SortData(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Sorts data by: sample_date -> sample_time -> sample_min_depth_m -> sample_max_depth_m'
+        return (
+            f"Sorts data by: sample_date -> sample_time -> sample_min_depth_m -> "
+            f"sample_max_depth_m"
+        )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        print('MISSING', f'{[col for col in self.sort_by_columns if col not in data_holder.data]}')
-        sort_by_columns = [col for col in self.sort_by_columns if col in data_holder.data.columns]
-        column_string = ', '.join(sort_by_columns)
-        adm_logger.log_transformation(f'Sorting data based on columns: {column_string}', level=adm_logger.DEBUG)
-        data_holder.data.sort_values(sort_by_columns, ascending=self.ascending, inplace=True)
+        print(
+            "MISSING",
+            f"{[col for col in self.sort_by_columns if col not in data_holder.data]}",
+        )
+        sort_by_columns = [
+            col for col in self.sort_by_columns if col in data_holder.data.columns
+        ]
+        column_string = ", ".join(sort_by_columns)
+        adm_logger.log_transformation(
+            f"Sorting data based on columns: {column_string}", level=adm_logger.DEBUG
+        )
+        data_holder.data.sort_values(
+            sort_by_columns, ascending=self.ascending, inplace=True
+        )
 
 
 class SortDataPlanktonImaging(SortData):
-    valid_data_types = ['plankton_imaging']
+    valid_data_types = ["plankton_imaging"]
 
     sort_by_columns = [
-        'image_verified_by',
-        'sample_date',
-        'sample_time',
-        'station_name',
-
-        'sample_min_depth_m',
-        'sample_max_depth_m',
-        'scientific_name',
-        'parameter',
+        "image_verified_by",
+        "sample_date",
+        "sample_time",
+        "station_name",
+        "sample_min_depth_m",
+        "sample_max_depth_m",
+        "scientific_name",
+        "parameter",
     ]
 
     ascending = [
@@ -54,7 +66,6 @@ class SortDataPlanktonImaging(SortData):
         True,
         True,
         True,
-
         True,
         True,
         False,

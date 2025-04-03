@@ -1,4 +1,3 @@
-
 import pathlib
 
 import pandas as pd
@@ -18,17 +17,27 @@ def get_row_data_from_lims_export(df: pd.DataFrame) -> pd.DataFrame:
     c.transform(transformers.WideToLong())
     c.transform(transformers.MoveLessThanFlagRowFormat())
     c.transform(transformers.ConvertFlagsToSDN())
-    c.transform(transformers.RemoveColumns('COPY_VARIABLE.*'))
-    c.transform(transformers.MapperParameterColumn(import_column='SHARKarchive'))
+    c.transform(transformers.RemoveColumns("COPY_VARIABLE.*"))
+    c.transform(transformers.MapperParameterColumn(import_column="SHARKarchive"))
     # name = path.name.replace(' ', '_')
     # if export_directory:
     #     export_directory = pathlib.Path(export_directory)
     #     if not export_directory.exists():
     #         raise NotADirectoryError(export_directory)
-    #     c.export(exporters.TxtAsIs(export_directory=export_directory, export_file_name=f'{name}_row_format.txt',
-    #                                header_as='SHARKarchive', open_file_with_excel=False))
+    #     c.export(
+    #         exporters.TxtAsIs(
+    #             export_directory=export_directory,
+    #             export_file_name=f'{name}_row_format.txt',
+    #             header_as='SHARKarchive',
+    #             open_file_with_excel=False
+    #         )
+    #     )
     #
     # if export_log:
-    #     sharkadm_logger.create_xlsx_report(sharkadm_logger.adm_logger, export_directory=export_directory, open_report=True)
+    #     sharkadm_logger.create_xlsx_report(
+    #         sharkadm_logger.adm_logger,
+    #         export_directory=export_directory,
+    #         open_report=True
+    #     )
 
     return c.data

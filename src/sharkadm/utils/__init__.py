@@ -8,17 +8,18 @@ import zipfile
 
 import sharkadm
 
-SHARKADM_DIRECTORY = pathlib.Path.home() / 'sharkadm'
+SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
 
 def get_nodc_config_directory() -> pathlib.Path | None:
-    CONFIG_ENV = 'NODC_CONFIG'
+    CONFIG_ENV = "NODC_CONFIG"
     if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
         return pathlib.Path(os.getenv(CONFIG_ENV))
 
 
 def has_admin_config() -> bool:
-    """Returns True if user has local environment variable for NODC_CONFIG. Else return False"""
+    """Returns True if user has local environment variable for NODC_CONFIG.
+    Else return False"""
     if get_nodc_config_directory():
         return True
     return False
@@ -37,21 +38,26 @@ def _remove_empty_directories(directory: pathlib.Path):
 
 def get_root_directory(*subfolders: str) -> pathlib.Path:
     if not SHARKADM_DIRECTORY.parent.exists():
-        raise NotADirectoryError(f'Cant create root directory under {SHARKADM_DIRECTORY.parent}. Directory does not '
-                                 f'exist!')
+        raise NotADirectoryError(
+            f"Cant create root directory under {SHARKADM_DIRECTORY.parent}."
+            f"Directory does not exist!"
+        )
     folder = pathlib.Path(SHARKADM_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
 
 
-TEMP_DIRECTORY = get_root_directory() / '_temp'
-CONFIG_DIRECTORY = get_root_directory() / 'config'
-EXPORT_DIRECTORY = get_root_directory() / 'exports'
+TEMP_DIRECTORY = get_root_directory() / "_temp"
+CONFIG_DIRECTORY = get_root_directory() / "config"
+EXPORT_DIRECTORY = get_root_directory() / "exports"
 
 
 def get_temp_directory(*subfolders: str) -> pathlib.Path:
     if not TEMP_DIRECTORY.parent.exists():
-        raise NotADirectoryError(f'Cant create temp directory under {TEMP_DIRECTORY.parent}. Directory does not exist!')
+        raise NotADirectoryError(
+            f"Cant create temp directory under {TEMP_DIRECTORY.parent}."
+            f"Directory does not exist!"
+        )
     folder = pathlib.Path(TEMP_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
@@ -74,8 +80,8 @@ def clear_temp_directory(days_old: int = 7):
 
 
 def clear_all_in_temp_directory():
-    if TEMP_DIRECTORY.name != '_temp':
-        print(f'I do not dare ro remove temp directory: {TEMP_DIRECTORY}')
+    if TEMP_DIRECTORY.name != "_temp":
+        print(f"I do not dare ro remove temp directory: {TEMP_DIRECTORY}")
         return
     for path in TEMP_DIRECTORY.iterdir():
         if path.is_dir():
@@ -101,8 +107,10 @@ def clear_export_directory(days_old: int = 7):
 
 def get_config_directory(*subfolders: str) -> pathlib.Path:
     if not CONFIG_DIRECTORY.parent.exists():
-        raise NotADirectoryError(f'Cant create config directory under {CONFIG_DIRECTORY.parent}. Directory does not '
-                                 f'exist!')
+        raise NotADirectoryError(
+            f"Cant create config directory under {CONFIG_DIRECTORY.parent}."
+            f"Directory does not exist!"
+        )
     folder = pathlib.Path(CONFIG_DIRECTORY, *subfolders)
     folder.mkdir(exist_ok=True, parents=True)
     return folder
@@ -110,10 +118,14 @@ def get_config_directory(*subfolders: str) -> pathlib.Path:
 
 def get_export_directory(*subdirectories: str, date_directory=True) -> pathlib.Path:
     if not EXPORT_DIRECTORY.parent.exists():
-        raise NotADirectoryError(f'Cant create export directory under {EXPORT_DIRECTORY.parent}. Directory does not '
-                                 f'exist!')
+        raise NotADirectoryError(
+            f"Cant create export directory under {EXPORT_DIRECTORY.parent}."
+            f"Directory does not exist!"
+        )
     if date_directory:
-        folder = pathlib.Path(EXPORT_DIRECTORY, datetime.datetime.now().strftime('%Y%m%d'), *subdirectories)
+        folder = pathlib.Path(
+            EXPORT_DIRECTORY, datetime.datetime.now().strftime("%Y%m%d"), *subdirectories
+        )
     else:
         folder = pathlib.Path(EXPORT_DIRECTORY, *subdirectories)
     folder.mkdir(exist_ok=True, parents=True)
@@ -121,12 +133,12 @@ def get_export_directory(*subdirectories: str, date_directory=True) -> pathlib.P
 
 
 def open_file_with_default_program(path: str | pathlib.Path) -> None:
-    if platform.system() == 'Darwin':       # macOS
-        subprocess.call(('open', str(path)))
-    elif platform.system() == 'Windows':    # Windows
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(("open", str(path)))
+    elif platform.system() == "Windows":  # Windows
         os.startfile(str(path))
-    else:                                   # linux variants
-        subprocess.call(('xdg-open', str(path)))
+    else:  # linux variants
+        subprocess.call(("xdg-open", str(path)))
 
 
 def open_file_with_excel(path: str | pathlib.Path) -> None:
@@ -137,16 +149,18 @@ def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
     try:
         string = '"C:/Program Files/WinMerge/WinMergeU.exe"'
         for arg in args:
-            string = string + f' {arg}'
+            string = string + f" {arg}"
         subprocess.call(string)
-        # subprocess.call((f'"C:/Program Files (x86)/WinMerge/WinMergeU.exe" {file1} {file2}'))
+        # subprocess.call(
+        #     (f'"C:/Program Files (x86)/WinMerge/WinMergeU.exe" {file1} {file2}')
+        # )
     except:
         pass
 
 
 def open_directory(*args: str | pathlib.Path) -> None:
     for arg in args:
-        print(f'{arg=}')
+        print(f"{arg=}")
         os.startfile(str(arg))
     try:
         for arg in args:
@@ -190,7 +204,7 @@ def get_all_class_children(cls):
 def unzip_file(path: pathlib.Path, export_directory: pathlib.Path, delete_old=False):
     sub_export_dir = export_directory / path.stem
     if sub_export_dir.exists() and not delete_old:
-        raise IsADirectoryError(f'Already exist: {sub_export_dir}')
-    with zipfile.ZipFile(path, 'r') as zip_ref:
+        raise IsADirectoryError(f"Already exist: {sub_export_dir}")
+    with zipfile.ZipFile(path, "r") as zip_ref:
         zip_ref.extractall(sub_export_dir)
     return sub_export_dir

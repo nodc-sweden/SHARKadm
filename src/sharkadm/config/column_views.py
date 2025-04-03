@@ -13,7 +13,7 @@ class ColumnViews:
             for r, line in enumerate(fid):
                 if not line.strip():
                     continue
-                split_line = [item.strip().lower() for item in line.split('\t')]
+                split_line = [item.strip().lower() for item in line.split("\t")]
                 if r == 0:
                     header = split_line
                     self._config = {key: [] for key in header}
@@ -25,4 +25,9 @@ class ColumnViews:
 
     def get_columns_for_view(self, view: str) -> list[str]:
         view = view.lower()
-        return self._config.get(view, self._config.get(f'sharkdata_{view}', self._config.get(f'sharkweb_{view}', [])))
+        return self._config.get(
+            view,
+            self._config.get(
+                f"sharkdata_{view}", self._config.get(f"sharkweb_{view}", [])
+            ),
+        )

@@ -12,7 +12,7 @@ class Operation(ft.UserControl):
     def __init__(self, **kwargs):
         super().__init__()
         self._data = kwargs
-        print(f'{self._data=}')
+        print(f"{self._data=}")
         self._settings_controls = {}
 
         self._description_wrap_length = 80
@@ -33,15 +33,17 @@ class Operation(ft.UserControl):
 
     @property
     def name(self) -> str:
-        return self._data['name']
+        return self._data["name"]
 
     @property
     def description(self) -> str:
-        return textwrap.fill(self._data.get('description') or '', self._description_wrap_length)
+        return textwrap.fill(
+            self._data.get("description") or "", self._description_wrap_length
+        )
 
     @property
     def settings(self) -> dict:
-        data = self._data.get('kwargs', {})
+        data = self._data.get("kwargs", {})
         for key, control in self._settings_controls.items():
             value = control.value
             if type(value) == pathlib.Path:
@@ -64,7 +66,7 @@ class Operation(ft.UserControl):
             self._on_select()
         else:
             self._on_deselect()
-        gui_event.post_event('change_operator_state', {})
+        gui_event.post_event("change_operator_state", {})
         self.update()
 
     def _on_select(self):
@@ -87,27 +89,29 @@ class Operation(ft.UserControl):
         self._main_container = ft.Container(
             bgcolor=self._main_inactive_bgcolor,
             padding=self._main_padding,
-            border_radius=self._main_border_radius
+            border_radius=self._main_border_radius,
         )
         self._switch_container = ft.Container(
             bgcolor=self._switch_inactive_bgcolor,
             padding=self._child_padding,
-            border_radius=self._child_border_radius
+            border_radius=self._child_border_radius,
         )
         self._text_container = ft.Container(
             bgcolor=self._text_inactive_bgcolor,
             padding=self._child_padding,
-            border_radius=self._child_border_radius
+            border_radius=self._child_border_radius,
         )
         self._switch = ft.Switch(label=self.name, on_change=self._on_change)
         self._text = ft.Text(self.description, expand=True)
 
         self._settings_icon_button = ft.IconButton(
-                    icon=ft.icons.SETTINGS,
-                    on_click=self._open_settings,
-                    # icon_color="blue400",
-                    icon_size=20,
-                    tooltip="Inställningar", visible=False)
+            icon=ft.icons.SETTINGS,
+            on_click=self._open_settings,
+            # icon_color="blue400",
+            icon_size=20,
+            tooltip="Inställningar",
+            visible=False,
+        )
         if self.settings:
             self._settings_icon_button.visible = True
 
@@ -116,15 +120,15 @@ class Operation(ft.UserControl):
     def _create_settings_dialog(self):
         self._settings_content = ft.Row()
         self._settings_dialog = ft.AlertDialog(
-                modal=True,
-                title=ft.Text("Inställningar"),
-                content=self._settings_content,
-                actions=[
-                    ft.TextButton("OK", on_click=self._close_settings),
-                ],
-                actions_alignment=ft.MainAxisAlignment.END,
-                on_dismiss=lambda e: print("Modal dialog dismissed!"),
-            )
+            modal=True,
+            title=ft.Text("Inställningar"),
+            content=self._settings_content,
+            actions=[
+                ft.TextButton("OK", on_click=self._close_settings),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            on_dismiss=lambda e: print("Modal dialog dismissed!"),
+        )
 
     def _get_layout(self):
         """Creates the layout and returns the root widget"""
@@ -172,38 +176,32 @@ class Operation(ft.UserControl):
         column = ft.Column(expand=True)
         self._settings_content.controls.append(column)
         for key, value in kwargs.items():
-            if key == 'export_directory':
+            if key == "export_directory":
                 self._settings_controls[key] = ft.Text()
-                pick_file_path = ft.FilePicker(on_result=lambda e, p=self._settings_controls[key]: self._on_pick_directory(e, p))
+                pick_file_path = ft.FilePicker(
+                    on_result=lambda e,
+                    p=self._settings_controls[key]: self._on_pick_directory(e, p)
+                )
                 self.page.overlay.append(pick_file_path)
                 self.page.update()
                 button = ft.ElevatedButton(
-                            "Välj en mapp att exportera till",
-                            icon=ft.icons.UPLOAD_FILE,
-                            on_click=lambda _: pick_file_path.get_directory_path(
-                            ),
-                        )
+                    "Välj en mapp att exportera till",
+                    icon=ft.icons.UPLOAD_FILE,
+                    on_click=lambda _: pick_file_path.get_directory_path(),
+                )
 
-                row = ft.Row([
-                    button,
-                    self._settings_controls[key]
-                ])
+                row = ft.Row([button, self._settings_controls[key]])
                 column.controls.append(row)
                 if not value:
                     value = utils.get_export_directory()
-            elif key == 'export_file_name':
+            elif key == "export_file_name":
                 self._settings_controls[key] = ft.TextField()
-                row = ft.Row([
-                    ft.Text('Ange ett filnamn'),
-                    self._settings_controls[key]
-                ])
+                row = ft.Row([ft.Text("Ange ett filnamn"), self._settings_controls[key]])
                 column.controls.append(row)
 
             elif type(value) == bool:
                 self._settings_controls[key] = ft.Switch(label=key)
-                row = ft.Row([
-                    self._settings_controls[key]
-                ])
+                row = ft.Row([self._settings_controls[key]])
                 column.controls.append(row)
             if key in self._settings_controls:
                 self._settings_controls[key].value = value
@@ -217,11 +215,7 @@ class Operation(ft.UserControl):
         self.set_border(None)
 
     def get_data(self) -> dict:
-        return dict(
-            name=self.name,
-            description=self.description,
-            kwargs=self.settings
-        )
+        return dict(name=self.name, description=self.description, kwargs=self.settings)
 
     def _set_data(self):
         self._switch.label = self.name
@@ -245,7 +239,7 @@ class Operation(ft.UserControl):
 
 
 class OperationList(ft.UserControl):
-    """Inspired by: https://www.youtube.com/watch?v=hHs-IFcBTK8 """
+    """Inspired by: https://www.youtube.com/watch?v=hHs-IFcBTK8"""
 
     def __init__(self, title: str):
         super().__init__()
@@ -264,7 +258,7 @@ class OperationList(ft.UserControl):
 
     def build(self):
         self._create_controls()
-        gui_event.subscribe('change_operator_state', self._on_change_operation_state)
+        gui_event.subscribe("change_operator_state", self._on_change_operation_state)
         return self._get_layout()
 
     @property
@@ -306,7 +300,7 @@ class OperationList(ft.UserControl):
                         data=self._title,
                         group=self._title,
                         content=oper,
-                    )
+                    ),
                 )
             )
 
@@ -331,12 +325,14 @@ class OperationList(ft.UserControl):
         for cont in self._list_column.controls:
             if cont.content.content.state:
                 active_order.append(cont.content.content.name)
-        gui_event.post_event('change_order',
-                             dict(
-                                 uid=self.uid,
-                                 order=self._data_order,
-                                 active_order=active_order,
-                             ))
+        gui_event.post_event(
+            "change_order",
+            dict(
+                uid=self.uid,
+                order=self._data_order,
+                active_order=active_order,
+            ),
+        )
 
     def _on_change_operation_state(self, data: dict) -> None:
         self._post_event_on_change_order()

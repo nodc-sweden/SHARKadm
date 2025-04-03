@@ -10,33 +10,29 @@ from sharkadm.transformers import Transformer
 
 
 class DataHolderProtocol(Protocol):
-
     @property
-    def data(self) -> pd.DataFrame:
-        ...
+    def data(self) -> pd.DataFrame: ...
 
     @data.setter
-    def data(self, df: pd.DataFrame) -> None:
-        ...
+    def data(self, df: pd.DataFrame) -> None: ...
 
     @property
     @abstractmethod
-    def data_type(self) -> str:
-        ...
+    def data_type(self) -> str: ...
 
     @property
     @abstractmethod
-    def dataset_name(self) -> str:
-        ...
+    def dataset_name(self) -> str: ...
 
     @property
     @abstractmethod
-    def data_structure(self) -> str:
-        ...
+    def data_structure(self) -> str: ...
 
 
 class MultiTransformer(Transformer):
-    """Abstract base class used as a blueprint for doing multiple changes in data in a DataHolder"""
+    """Abstract base class used as a blueprint for doing multiple changes in data
+    in a DataHolder"""
+
     valid_data_types: list[str] = []
     invalid_data_types: list[str] = []
 
@@ -52,7 +48,7 @@ class MultiTransformer(Transformer):
         self._kwargs = kwargs
 
     def __repr__(self) -> str:
-        return f'Multi transformer: {self.__class__.__name__}'
+        return f"Multi transformer: {self.__class__.__name__}"
 
     @property
     def name(self) -> str:
@@ -69,32 +65,47 @@ class MultiTransformer(Transformer):
         return self.get_transformer_description()
 
     def transform(self, data_holder: DataHolderProtocol) -> None:
-        if data_holder.data_type_internal not in config.get_valid_data_types(valid=self.valid_data_types,
-                                                                            invalid=self.invalid_data_types):
-            adm_logger.log_workflow(f'Invalid data_type {data_holder.data_type_internal} for multi transformer'
-                                    f' {self.__class__.__name__}', level=adm_logger.DEBUG)
+        if data_holder.data_type_internal not in config.get_valid_data_types(
+            valid=self.valid_data_types, invalid=self.invalid_data_types
+        ):
+            adm_logger.log_workflow(
+                f"Invalid data_type {data_holder.data_type_internal} "
+                f"for multi transformer {self.__class__.__name__}",
+                level=adm_logger.DEBUG,
+            )
             return
-        if data_holder.__class__.__name__ not in get_valid_data_holders(valid=self.valid_data_holders,
-                                                                       invalid=self.invalid_data_holders):
-            adm_logger.log_workflow(f'Invalid data_holder {data_holder.__class__.__name__} for multi transformer'
-                                    f' {self.__class__.__name__}')
+        if data_holder.__class__.__name__ not in get_valid_data_holders(
+            valid=self.valid_data_holders, invalid=self.invalid_data_holders
+        ):
+            adm_logger.log_workflow(
+                f"Invalid data_holder {data_holder.__class__.__name__} "
+                f"for multi transformer {self.__class__.__name__}"
+            )
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
-                valid=self.invalid_data_structures,
-                invalid=self.invalid_data_structures):
-            adm_logger.log_workflow(f'Invalid data_format {data_holder.data_structure} for multi transformer'
-                                    f' {self.__class__.__name__}', level=adm_logger.DEBUG)
+            valid=self.invalid_data_structures, invalid=self.invalid_data_structures
+        ):
+            adm_logger.log_workflow(
+                f"Invalid data_format {data_holder.data_structure} for multi transformer"
+                f" {self.__class__.__name__}",
+                level=adm_logger.DEBUG,
+            )
             return
 
-        adm_logger.log_workflow(f'Applying multi transformer: {self.__class__.__name__}', item=self.get_transformer_description(), level=adm_logger.DEBUG)
+        adm_logger.log_workflow(
+            f"Applying multi transformer: {self.__class__.__name__}",
+            item=self.get_transformer_description(),
+            level=adm_logger.DEBUG,
+        )
         t0 = time.time()
         for trans in self._transformers:
             trans().transform(data_holder=data_holder)
-        adm_logger.log_workflow(f'Multi transformer {self.__class__.__name__} executed in {time.time()-t0} seconds', level=adm_logger.DEBUG)
+        adm_logger.log_workflow(
+            f"Multi transformer {self.__class__.__name__} executed "
+            f"in {time.time() - t0} seconds",
+            level=adm_logger.DEBUG,
+        )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         # Dummy method must be present to implement MultiTransformers
         pass
-
-
-

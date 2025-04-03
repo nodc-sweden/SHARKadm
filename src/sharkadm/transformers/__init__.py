@@ -16,6 +16,7 @@ from .bvol import AddBvolScientificNameOriginal
 from .calculate import CalculateAbundance
 from .calculate import CalculateBiovolume
 from .calculate import CalculateCarbon
+
 # from .calculate import CalculatePhytoplankton
 # from .calculate import CalculateZooplankton
 # from .calculate import CopyCalculated
@@ -90,6 +91,7 @@ from .remove import RemoveDeepestDepthAtEachVisit
 from .remove import RemoveInterval
 from .remove import RemoveRowsAtDepthRestriction
 from .remove import RemoveReportedValueIfNotCalculated
+
 # from .remove import RemoveDeepestDepthAtEachVisitBacterioplankton
 # from .remove import RemoveDeepestDepthAtEachVisitPhysicalChemical
 from .remove import RemoveRowsForParameters
@@ -97,6 +99,7 @@ from .remove import RemoveValuesInColumns
 from .remove import SetMaxLengthOfValuesInColumns
 from .replace_comma_with_dot import ReplaceCommaWithDot, PolarsReplaceCommaWithDot
 from .replace import ReplaceNanWithEmptyString
+
 # from .reported_parameter import SaveIncomingColumnsAsReported
 from .reporting_institute import AddEnglishReportingInstitute
 from .reporting_institute import AddSwedishReportingInstitute
@@ -124,9 +127,9 @@ from .worms import AddWormsAphiaId
 from .worms import AddWormsScientificName
 from .worms import SetAphiaIdFromReportedAphiaId
 from ..utils.inspect_kwargs import get_kwargs_for_class
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
 
 from .dataframe import ConvertFromPandasToPolars
 from .dataframe import ConvertFromPolarsToPandas
@@ -161,7 +164,7 @@ def get_transformer_object(name: str, **kwargs) -> Transformer | None:
     tran = all_trans.get(name)
     if not tran:
         return
-    args = kwargs.pop('args', [])
+    args = kwargs.pop("args", [])
     return tran(*args, **kwargs)
 
 
@@ -169,7 +172,7 @@ def get_transformers_description() -> dict[str, str]:
     """Returns a dictionary with transformer name as key and the description as value"""
     result = dict()
     for name, tran in get_transformers().items():
-        if name.startswith('_'):
+        if name.startswith("_"):
             continue
         result[name] = tran.get_transformer_description()
     return result
@@ -179,9 +182,9 @@ def get_transformers_info() -> dict:
     result = dict()
     for name, tran in get_transformers().items():
         result[name] = dict()
-        result[name]['name'] = name
-        result[name]['description'] = tran.get_transformer_description()
-        result[name]['kwargs'] = get_kwargs_for_class(tran)
+        result[name]["name"] = name
+        result[name]["description"] = tran.get_transformer_description()
+        result[name]["kwargs"] = get_kwargs_for_class(tran)
     return result
 
 
@@ -189,13 +192,13 @@ def get_transformers_description_text() -> str:
     info = get_transformers_description()
     line_length = 100
     lines = list()
-    lines.append('=' * line_length)
-    lines.append('Available transformers:')
-    lines.append('-' * line_length)
+    lines.append("=" * line_length)
+    lines.append("Available transformers:")
+    lines.append("-" * line_length)
     for key in sorted(info):
-        lines.append(f'{key.ljust(40)}{info[key]}')
-    lines.append('=' * line_length)
-    return '\n'.join(lines)
+        lines.append(f"{key.ljust(40)}{info[key]}")
+    lines.append("=" * line_length)
+    return "\n".join(lines)
 
 
 def print_transformers_description() -> None:
@@ -205,27 +208,18 @@ def print_transformers_description() -> None:
 
 def write_transformers_description_to_file(path: str | pathlib.Path) -> None:
     """Prints all transformers on screen"""
-    with open(path, 'w') as fid:
+    with open(path, "w") as fid:
         fid.write(get_transformers_description_text())
 
 
 def get_physical_chemical_transformer_objects() -> list[Transformer]:
     return [
         AddDEPHqcColumn(),
-
         # AddSamplePosition(),
         # ChangeDateFormat(),
         AddColumnsForAutomaticQC(),
         AddCruiseId(),
         AddVisitKey(),
-
-
         # AddStatus(),
-
-
         WideToLong(),
-
     ]
-
-
-

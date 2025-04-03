@@ -13,21 +13,20 @@ logger = logging.getLogger(__name__)
 
 
 class HeaderMapper(Protocol):
-
-    def get_internal_name(self, external_par: str) -> str:
-        ...
+    def get_internal_name(self, external_par: str) -> str: ...
 
 
 class PandasDataFrameDataHolder(PandasDataHolder):
-    _data_type: str = ''
-    _data_structure: str = ''
+    _data_type: str = ""
+    _data_structure: str = ""
 
-    def __init__(self,
-                 df: pd.DataFrame,
-                 data_structure: str,
-                 data_type: str,
-                 header_mapper: HeaderMapper = None,
-                 ):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        data_structure: str,
+        data_type: str,
+        header_mapper: HeaderMapper = None,
+    ):
         super().__init__()
 
         self._header_mapper = header_mapper
@@ -48,12 +47,12 @@ class PandasDataFrameDataHolder(PandasDataHolder):
             d_source.map_header(self._header_mapper)
         self._set_data_source(d_source)
         # self._data = self._get_data_from_data_source(d_source)
-        self._dataset_name = 'Pandas dataframe'
+        self._dataset_name = "Pandas dataframe"
 
     @staticmethod
     def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
         data = data_source.get_data()
-        data = data.fillna('')
+        data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
@@ -78,4 +77,3 @@ class PandasDataFrameDataHolder(PandasDataHolder):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
-

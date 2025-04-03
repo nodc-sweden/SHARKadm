@@ -10,18 +10,15 @@ from typing import Protocol
 
 
 class ImportMapper(Protocol):
+    def get_internal_name(self, external_par: str) -> str: ...
 
-    def get_internal_name(self, external_par: str) -> str:
-        ...
-
-    def get_external_name(self, external_par: str) -> str:
-        ...
-
+    def get_external_name(self, external_par: str) -> str: ...
 
 
 class DataSourcePolars:
     def __init__(
-        self, data_type: str = None,
+        self,
+        data_type: str = None,
     ) -> None:
         self._data_type = data_type
         self._source = None
@@ -32,7 +29,9 @@ class DataSourcePolars:
         self._not_mapped_columns: list = []
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} with data type "{self.data_type}": {self.source}'
+        return (
+            f'{self.__class__.__name__} with data type "{self.data_type}": {self.source}'
+        )
 
     def _do_post_init_stuf(self):
         self._strip_column_names()
@@ -96,10 +95,10 @@ class DataSourcePolars:
 
 
 class DataSource:
-
-    def __init__(self,
-                 data_type: str = None,
-                 ) -> None:
+    def __init__(
+        self,
+        data_type: str = None,
+    ) -> None:
         self._data_type = data_type
         self._source = None
         self._data: pd.DataFrame = pd.DataFrame()
@@ -109,7 +108,9 @@ class DataSource:
         self._not_mapped_columns: list = []
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} with data type "{self.data_type}": {self.source}'
+        return (
+            f'{self.__class__.__name__} with data type "{self.data_type}": {self.source}'
+        )
 
     def _do_post_init_stuf(self):
         self._strip_column_names()
@@ -120,10 +121,12 @@ class DataSource:
         self._data.columns = [col.strip() for col in self._data.columns]
 
     def _remove_temp_tag(self):
-        self._data.columns = [col[5:] if col.startswith('TEMP.') else col for col in self._data.columns]
+        self._data.columns = [
+            col[5:] if col.startswith("TEMP.") else col for col in self._data.columns
+        ]
 
     def _add_source_to_data(self) -> None:
-        self._data['source'] = self.source
+        self._data["source"] = self.source
 
     def _save_original_header(self) -> None:
         self._original_header = list(self._data.columns)
@@ -156,20 +159,28 @@ class DataSource:
         self._header_mapper = mapper
         self._remove_temp_tag()
 
-    def old_add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
-        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
+    def old_add_concatenated_column(
+        self, new_column: str, columns_to_use: list[str]
+    ) -> None:
+        """Adds a concatenated column specified in new_column using the columns listed in
+        columns_to_use"""
         for col in columns_to_use:
             if new_column not in self._data.columns:
                 self._data[new_column] = self._data[col]
             else:
-                self._data[new_column] = self._data[new_column] + ' <-> ' + self._data[col]
+                self._data[new_column] = (
+                    self._data[new_column] + " <-> " + self._data[col]
+                )
 
     def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
-        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
-        if not all([True if col in self.data.columns else False for col in columns_to_use]):
-            print(f'{self.data.columns=}')
-            print(f'{columns_to_use=}')
-            print(f'Not adding column: {new_column}')
+        """Adds a concatenated column specified in new_column using the columns listed in
+        columns_to_use"""
+        if not all(
+            [True if col in self.data.columns else False for col in columns_to_use]
+        ):
+            print(f"{self.data.columns=}")
+            print(f"{columns_to_use=}")
+            print(f"Not adding column: {new_column}")
             return
         if new_column in self.data.columns:
             self.data.drop(new_column, axis=1, inplace=True)
@@ -177,7 +188,7 @@ class DataSource:
             if new_column not in self.data.columns:
                 self.data[new_column] = self.data[col]
             else:
-                self.data[new_column] = self.data[new_column] + ' <-> ' + self.data[col]
+                self.data[new_column] = self.data[new_column] + " <-> " + self.data[col]
 
     def remove_columns(self, *cols):
         columns = [col for col in self._data.columns if col not in cols]
@@ -201,11 +212,12 @@ class DataSource:
 
 
 class DataFilePolars(DataSourcePolars, ABC):
-    def __init__(self,
-                 path: str | pathlib.Path = None,
-                 data_type: str = None,
-                 encoding: str = 'cp1252',
-                 ) -> None:
+    def __init__(
+        self,
+        path: str | pathlib.Path = None,
+        data_type: str = None,
+        encoding: str = "cp1252",
+    ) -> None:
         super().__init__(data_type=data_type)
         self._path: pathlib.Path = pathlib.Path(path)
         self._source: str = str(self._path)
@@ -219,17 +231,16 @@ class DataFilePolars(DataSourcePolars, ABC):
         return self._path
 
     @abstractmethod
-    def _load_file(self) -> None:
-        ...
+    def _load_file(self) -> None: ...
 
 
 class DataFile(DataSource, ABC):
-
-    def __init__(self,
-                 path: str | pathlib.Path = None,
-                 data_type: str = None,
-                 encoding: str = 'cp1252',
-                 ) -> None:
+    def __init__(
+        self,
+        path: str | pathlib.Path = None,
+        data_type: str = None,
+        encoding: str = "cp1252",
+    ) -> None:
         super().__init__(data_type=data_type)
         self._path: pathlib.Path = pathlib.Path(path)
         self._source: str = str(self._path)
@@ -243,19 +254,13 @@ class DataFile(DataSource, ABC):
         return self._path
 
     @abstractmethod
-    def _load_file(self) -> None:
-        ...
+    def _load_file(self) -> None: ...
 
 
 class DataDataFrame(DataSource, ABC):
-
-    def __init__(self,
-                 df: pd.DataFrame,
-                 data_type: str = None,
-                 source: str = ''
-                 ) -> None:
+    def __init__(self, df: pd.DataFrame, data_type: str = None, source: str = "") -> None:
         super().__init__(data_type=data_type)
-        self._source: str = source or 'Given pandas dataframe'
+        self._source: str = source or "Given pandas dataframe"
         self._data: pd.DataFrame = df
         self._original_header: list = []
         self._header_mapper: ImportMapper | None = None
@@ -266,12 +271,12 @@ class DataDataFrame(DataSource, ABC):
 
 
 class old_DataFile(ABC):
-
-    def __init__(self,
-                 path: str | pathlib.Path = None,
-                 data_type: str = None,
-                 encoding: str = 'cp1252',
-                 ) -> None:
+    def __init__(
+        self,
+        path: str | pathlib.Path = None,
+        data_type: str = None,
+        encoding: str = "cp1252",
+    ) -> None:
         self._path: pathlib.Path = pathlib.Path(path)
         self._data_type = data_type
         self._encoding: str = encoding
@@ -287,24 +292,27 @@ class old_DataFile(ABC):
         self._save_original_header()
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} with data type "{self.data_type}": {self._path}'
+        return (
+            f'{self.__class__.__name__} with data type "{self.data_type}": {self._path}'
+        )
 
     @property
     def path(self) -> pathlib.Path:
         return self._path
 
     @abstractmethod
-    def _load_file(self) -> None:
-        ...
+    def _load_file(self) -> None: ...
 
     def _strip_column_names(self) -> None:
         self._data.columns = [col.strip() for col in self._data.columns]
 
     def _remove_temp_tag(self):
-        self._data.columns = [col[5:] if col.startswith('TEMP.') else col for col in self._data.columns]
+        self._data.columns = [
+            col[5:] if col.startswith("TEMP.") else col for col in self._data.columns
+        ]
 
     def _add_source_to_data(self) -> None:
-        self._data['source'] = self.source
+        self._data["source"] = self.source
 
     def _save_original_header(self) -> None:
         self._original_header = list(self._data.columns)
@@ -337,20 +345,28 @@ class old_DataFile(ABC):
         self._header_mapper = mapper
         self._remove_temp_tag()
 
-    def old_add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
-        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
+    def old_add_concatenated_column(
+        self, new_column: str, columns_to_use: list[str]
+    ) -> None:
+        """Adds a concatenated column specified in new_column using the columns listed in
+        columns_to_use"""
         for col in columns_to_use:
             if new_column not in self._data.columns:
                 self._data[new_column] = self._data[col]
             else:
-                self._data[new_column] = self._data[new_column] + ' <-> ' + self._data[col]
+                self._data[new_column] = (
+                    self._data[new_column] + " <-> " + self._data[col]
+                )
 
     def add_concatenated_column(self, new_column: str, columns_to_use: list[str]) -> None:
-        """Adds a concatenated column specified in new_column using the columns listed in columns_to_use"""
-        if not all([True if col in self.data.columns else False for col in columns_to_use]):
-            print(f'{self.data.columns=}')
-            print(f'{columns_to_use=}')
-            print(f'Not adding column: {new_column}')
+        """Adds a concatenated column specified in new_column using the columns listed in
+        columns_to_use"""
+        if not all(
+            [True if col in self.data.columns else False for col in columns_to_use]
+        ):
+            print(f"{self.data.columns=}")
+            print(f"{columns_to_use=}")
+            print(f"Not adding column: {new_column}")
             return
         if new_column in self.data.columns:
             self.data.drop(new_column, axis=1, inplace=True)
@@ -358,7 +374,7 @@ class old_DataFile(ABC):
             if new_column not in self.data.columns:
                 self.data[new_column] = self.data[col]
             else:
-                self.data[new_column] = self.data[new_column] + ' <-> ' + self.data[col]
+                self.data[new_column] = self.data[new_column] + " <-> " + self.data[col]
 
     def remove_columns(self, *cols):
         columns = [col for col in self._data.columns if col not in cols]
@@ -379,4 +395,3 @@ class old_DataFile(ABC):
 
     def get_data(self) -> pd.DataFrame:
         return self._data
-

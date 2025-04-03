@@ -7,7 +7,9 @@ from sharkadm.data.data_holder import PandasDataHolder
 from sharkadm.utils import yaml_data
 from .base import Transformer
 
-STATUS_CONFIG = yaml_data.load_yaml(adm_config_paths('delivery_note_status'), encoding='utf8')
+STATUS_CONFIG = yaml_data.load_yaml(
+    adm_config_paths("delivery_note_status"), encoding="utf8"
+)
 
 
 class SetStatusDataHost(Transformer):
@@ -16,10 +18,10 @@ class SetStatusDataHost(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Sets status columns as checked by data host'
+        return f"Sets status columns as checked by data host"
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
-        for col, value in STATUS_CONFIG['deliverer_and_datahost'].items():
+        for col, value in STATUS_CONFIG["deliverer_and_datahost"].items():
             data_holder.data[col] = value
 
 
@@ -29,9 +31,8 @@ class SetStatusDeliverer(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Sets status columns as checked by deliverer'
+        return f"Sets status columns as checked by deliverer"
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
-        for col, value in STATUS_CONFIG['deliverer'].items():
+        for col, value in STATUS_CONFIG["deliverer"].items():
             data_holder.data[col] = value
-

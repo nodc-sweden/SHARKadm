@@ -35,3 +35,8 @@ mypkg = ["."]
 
 [dependency-groups]
 dev = ["pytest>=8.2.2", "notebook>=7.3.2", "ruff>=0.11.2"]
+
+[tool.ruff]
+line-length = 90
+indent-width = 4
+target-version = "py311"

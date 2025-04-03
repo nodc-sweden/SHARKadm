@@ -3,16 +3,15 @@ import sys
 import yaml
 
 
-if getattr(sys, 'frozen', False):
+if getattr(sys, "frozen", False):
     THIS_DIR = pathlib.Path(sys.executable).parent
 else:
     THIS_DIR = pathlib.Path(__file__).parent
 
-SETTINGS_PATH = THIS_DIR / 'settings.yaml'
+SETTINGS_PATH = THIS_DIR / "settings.yaml"
 
 
 class Settings:
-
     def __init__(self):
         self._path = pathlib.Path(SETTINGS_PATH)
         self._data = dict()
@@ -22,7 +21,7 @@ class Settings:
     def _create_file(self):
         if self._path.exists():
             return
-        with open(self._path, 'w') as fid:
+        with open(self._path, "w") as fid:
             yaml.safe_dump(self._data, fid)
 
     def _load_settings(self):
@@ -30,7 +29,7 @@ class Settings:
             self._data = yaml.safe_load(fid)
 
     def _save_settings(self):
-        with open(self._path, 'w') as fid:
+        with open(self._path, "w") as fid:
             yaml.safe_dump(self._data, fid)
 
     def get(self, key):
