@@ -98,10 +98,10 @@ class RemoveRowsAtDepthRestriction(Transformer):
     valid_data_structures = ['row']
 
     def __init__(self,
-                 valid_data_types: list[str],
-                 data_filter: DataFilterRestrictDepth,
+                 valid_data_types: list[str] = None,
+                 data_filter: DataFilterRestrictDepth = None,
                  **kwargs) -> None:
-        self.valid_data_types = valid_data_types
+        self.valid_data_types = valid_data_types or []
         super().__init__(data_filter=data_filter, **kwargs)
 
     @staticmethod

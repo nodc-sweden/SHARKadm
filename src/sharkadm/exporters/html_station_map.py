@@ -18,9 +18,11 @@ class HtmlStationMap(FileExporter):
     """Creates a html station map"""
 
     def __init__(self,
+                 load_station_list: bool = False,
                  export_directory: str | pathlib.Path | None = None,
                  export_file_name: str | pathlib.Path | None = None,
                  **kwargs):
+        self._load_station_list = load_station_list
         super().__init__(export_directory,
                          export_file_name,
                          **kwargs)
@@ -40,14 +42,18 @@ class HtmlStationMap(FileExporter):
     def _export(self, data_holder: DataHolderProtocol) -> None:
         app = App()
 
-        # Read master list
-        app.read_list(
-            DEFAULT_STATION_FILE_PATH,
-            reader='shark_master',
-            list_name='master'
-        )
-
         list_name = 'sharkadm_data'
+        list_names = [list_name]
+        if self._load_station_list:
+            # Read master list
+            app.read_list(
+                DEFAULT_STATION_FILE_PATH,
+                reader='shark_master',
+                list_name='master'
+            )
+            list_names = ['master'] + list_names
+
+
         df = self._get_position_dataframe(data_holder.data)
         if df.empty:
             adm_logger.log_export(f'No data to plot html map', level=adm_logger.WARNING)
@@ -60,7 +66,7 @@ class HtmlStationMap(FileExporter):
             writer='map',
             # list_names=['master'],
             # list_names=['stnreg_import'],
-            list_names=['master', list_name],
+            list_names=list_names,
             new_stations_as_cluster=False,
             file_path=str(export_path)
         )
