@@ -1,10 +1,12 @@
 import logging
+import pathlib
 from typing import Any, Self
 
 import pandas as pd
 import pandas as pl
 
 from sharkadm import event, exporters, transformers, utils, validators
+from sharkadm.data import get_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.multi_transformers import MultiTransformer
@@ -275,3 +277,10 @@ def _get_fixed_list(
     for rest_name in rest_names:
         return_dict[rest_name] = all_items[rest_name]
     return return_dict
+
+
+def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
+    c = SHARKadmController()
+    holder = get_data_holder(path)
+    c.set_data_holder(holder)
+    return c
