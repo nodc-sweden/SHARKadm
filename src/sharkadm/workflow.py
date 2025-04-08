@@ -3,8 +3,6 @@ import pathlib
 import yaml
 
 from sharkadm import (
-    adm_config_paths,
-    adm_logger,
     exporters,
     multi_transformers,
     sharkadm_exceptions,

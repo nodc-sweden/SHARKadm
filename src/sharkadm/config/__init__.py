@@ -108,7 +108,12 @@ def get_data_type_mapper(path: str | pathlib.Path | None = None) -> DataTypeMapp
 def get_mapper_data_type_to_internal(
     path: str | pathlib.Path | None = None,
 ) -> DataTypeMapper:
+    if not any((path, adm_config_paths)):
+        return None
+
     path = path or adm_config_paths("mapper_data_type_to_internal")
+    if not path:
+        return None
     return DataTypeMapper(path)
 
 
@@ -140,14 +145,22 @@ def get_valid_data_structures(
         return [item for item in DATA_STRUCTURES if item not in invalid_lower]
 
 
-def get_adm_config_paths():
-    root = CONFIG_DIRECTORY / "sharkadm"
+def get_adm_config_paths(config_directory=None):
+    if not config_directory:
+        return None
+
+    root = config_directory / "sharkadm"
     return config_paths.ConfigPaths(root)
 
 
-def get_import_matrix_config_paths() -> dict[str, pathlib.Path]:
+def get_import_matrix_config_paths(
+    config_directory: pathlib.Path | None = None,
+) -> dict[str, pathlib.Path]:
     paths = {}
-    for path in CONFIG_DIRECTORY.iterdir():
+    if not config_directory:
+        return paths
+
+    for path in config_directory.iterdir():
         if "import_matrix" not in path.name:
             continue
         key = path.stem.split("_", 2)[-1]
@@ -155,7 +168,9 @@ def get_import_matrix_config_paths() -> dict[str, pathlib.Path]:
     return paths
 
 
-DEFAULT_COLUMN_VIEWS_PATH = CONFIG_DIRECTORY / "column_views.txt"
-adm_config_paths = get_adm_config_paths()
-import_matrix_paths = get_import_matrix_config_paths()
+DEFAULT_COLUMN_VIEWS_PATH = (
+    CONFIG_DIRECTORY / "column_views.txt" if CONFIG_DIRECTORY else None
+)
+adm_config_paths = get_adm_config_paths(CONFIG_DIRECTORY)
+import_matrix_paths = get_import_matrix_config_paths(CONFIG_DIRECTORY)
 mapper_data_type_to_internal = get_mapper_data_type_to_internal()
