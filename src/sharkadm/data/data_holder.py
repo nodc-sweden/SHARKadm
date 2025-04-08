@@ -262,8 +262,8 @@ class PolarsDataHolder(DataHolder, ABC):
 
     @data.setter
     def data(self, df: pl.DataFrame) -> None:
-        if type(df) is not pl.DataFrame:
-            raise TypeError(f"Data must be of type polars.DataFrame (was '{type(df)}')")
+        if type(df) not in [pl.DataFrame, pd.DataFrame]:
+            raise TypeError(f"Data must be of type polars.DataFrame or pandas.DataFrame (was '{type(df)}')")
         self._data = df
 
     def columns(self) -> list[str]:
