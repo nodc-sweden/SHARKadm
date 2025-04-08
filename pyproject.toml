@@ -14,24 +14,20 @@ dependencies = [
     "xlsxwriter>=3.2.0",
     "polars>=1.26.0",
     "fastexcel>=0.13.0",
+    "rich>=14.0.0",
+    "typer>=0.15.2",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
 
+
+[project.scripts]
+sharkadm-cli = "sharkadm.sharkadm_cli:main"
+
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-
-[tool.pdm]
-distribution = true
-
-[tool.setuptools.packages.find]
-where = ["src", "tests"]
-
-[tool.setuptools.package-data]
-mypkg = ["."]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = ["pytest>=8.2.2", "notebook>=7.3.2", "ruff>=0.11.2"]

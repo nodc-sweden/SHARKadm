@@ -3,7 +3,8 @@ import pathlib
 import rich
 import typer
 
-from sharkadm import transformers, utils, validators, write_operations_description_to_file
+from sharkadm import transformers, utils, validators
+from sharkadm.utils.operations_description import write_operations_description_to_file
 from sharkadm.workflow import SHARKadmWorkflow
 
 app = typer.Typer()
