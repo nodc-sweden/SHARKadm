@@ -1,9 +1,9 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Location(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddLocationCounty,
         transformers.AddLocationHelcomOsparArea,
         transformers.AddLocationMunicipality,
@@ -11,7 +11,7 @@ class Location(MultiTransformer):
         transformers.AddLocationSeaBasin,
         transformers.AddLocationTypeArea,
         transformers.AddLocationWaterDistrict,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

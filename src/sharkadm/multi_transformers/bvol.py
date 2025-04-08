@@ -1,14 +1,14 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Bvol(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddBvolScientificNameOriginal,
         transformers.AddBvolScientificNameAndSizeClass,
         transformers.AddBvolAphiaId,
         transformers.AddBvolRefList,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

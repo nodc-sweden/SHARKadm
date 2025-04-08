@@ -1,18 +1,18 @@
 import logging
 import pathlib
+from typing import Protocol
 
 import pandas as pd
 import polars as pl
-from typing import Protocol
 
+from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
-from sharkadm.data.data_source import (
+from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.txt_file import (
     CsvRowFormatDataFilePolars,
     TxtColumnFormatDataFile,
-    DataFile,
 )
-from sharkadm.data.archive import sampling_info, analyse_info
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class LimsDataHolder(PandasDataHolder):
 
     def __init__(
         self,
-        lims_root_directory: str | pathlib.Path = None,
+        lims_root_directory: str | pathlib.Path | None = None,
         header_mapper: HeaderMapper = None,
     ):
         super().__init__()
@@ -154,7 +154,7 @@ class PolarsLimsDataHolder(PolarsDataHolder):
 
     def __init__(
         self,
-        lims_root_directory: str | pathlib.Path = None,
+        lims_root_directory: str | pathlib.Path | None = None,
         header_mapper: HeaderMapper = None,
     ):
         super().__init__()

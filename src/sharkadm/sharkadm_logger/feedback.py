@@ -1,5 +1,6 @@
-from typing import Protocol
 import datetime
+from types import MappingProxyType
+from typing import Protocol
 
 from sharkadm.sharkadm_logger.base import SharkadmLoggerExporter
 from sharkadm.utils.paths import get_next_incremented_file_path
@@ -29,8 +30,8 @@ class Feedback:
 
 
 class FeedbackTxtExporter(SharkadmLoggerExporter):
-    level_mapper = dict(
-        error="Måste åtgärdas", warning="Bör åtgärdas", info="Se gärna över"
+    level_mapper = MappingProxyType(
+        {"error": "Måste åtgärdas", "warning": "Bör åtgärdas", "info": "Se gärna över"}
     )
 
     def _get_default_file_name(self):

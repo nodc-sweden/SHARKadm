@@ -1,5 +1,5 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 try:
     import nodc_dyntaxa
@@ -16,7 +16,7 @@ except ModuleNotFoundError as e:
 
 
 class AddReportedDyntaxaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     col_to_set = "reported_dyntaxa_id"
     source_col = "dyntaxa_id"
 
@@ -47,7 +47,7 @@ class AddReportedDyntaxaId(Transformer):
 
 
 class AddDyntaxaScientificName(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "dyntaxa_scientific_name"
 
@@ -105,7 +105,7 @@ class AddDyntaxaScientificName(Transformer):
 
 
 class AddDyntaxaTranslatedScientificNameDyntaxaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "dyntaxa_translated_scientific_name_dyntaxa_id"
 
@@ -137,7 +137,7 @@ class AddDyntaxaTranslatedScientificNameDyntaxaId(Transformer):
 
 
 class AddDyntaxaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "dyntaxa_scientific_name"
     col_to_set = "dyntaxa_id"
 
@@ -190,7 +190,7 @@ class AddDyntaxaId(Transformer):
 
 
 class AddReportedScientificNameDyntaxaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "reported_scientific_name_dyntaxa_id"
 
@@ -221,8 +221,8 @@ class AddReportedScientificNameDyntaxaId(Transformer):
 
 
 class AddTaxonRanks(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll", "bacterioplankton"]
-    ranks = [
+    invalid_data_types = ("physicalchemical", "chlorophyll", "bacterioplankton")
+    ranks = (
         "kingdom",
         "phylum",
         "class",
@@ -231,9 +231,10 @@ class AddTaxonRanks(Transformer):
         "genus",
         "species",
         "taxon_hierarchy",
-    ]
-    cols_to_set = [f"taxon_{rank}" for rank in ranks]
-    cols_to_set[-1] = "taxon_hierarchy"
+    )
+    cols_to_set = tuple(
+        f"taxon_{rank}" if "taxon" not in rank else rank for rank in ranks
+    )
     source_col = "dyntaxa_scientific_name"
 
     def __init__(self, **kwargs):
@@ -241,7 +242,7 @@ class AddTaxonRanks(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds taxon rank columns. Data from dyntaxa."
+        return "Adds taxon rank columns. Data from dyntaxa."
 
     def _add_columns(self, data_holder: DataHolderProtocol):
         for col in self.cols_to_set:

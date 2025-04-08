@@ -1,8 +1,8 @@
 import pandas as pd
-from sharkadm import adm_logger
 
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
 
+from .base import DataHolderProtocol, Transformer
 
 try:
     import nodc_dyntaxa
@@ -16,19 +16,19 @@ except ModuleNotFoundError as e:
 
 
 class AddRedList(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
 
     col_to_set = "red_listed"
-    source_cols = ["dyntaxa_id", "scientific_name", "reported_scientific_name"]
-    mapped = dict()
+    source_cols = ("dyntaxa_id", "scientific_name", "reported_scientific_name")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.mapped = {}
         self.red_list_obj = nodc_dyntaxa.get_red_list_object()
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds info if red listed. Red listed species are marked with Y"
+        return "Adds info if red listed. Red listed species are marked with Y"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:

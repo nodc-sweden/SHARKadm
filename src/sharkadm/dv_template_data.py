@@ -2,16 +2,13 @@ import pathlib
 
 import pandas as pd
 
-from sharkadm import controller
-from sharkadm import exporters
-from sharkadm import sharkadm_logger
-from sharkadm import transformers
+from sharkadm import controller, exporters, sharkadm_logger, transformers
 from sharkadm.data.dv_template import get_dv_template_data_holder
 
 
 def get_row_data_from_fyschem_dv_template(
     path: str | pathlib.Path,
-    export_directory: str | pathlib.Path = None,
+    export_directory: str | pathlib.Path | None = None,
     export_log: bool = False,
 ) -> pd.DataFrame:
     path = pathlib.Path(path)

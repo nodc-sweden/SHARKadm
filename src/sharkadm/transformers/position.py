@@ -1,35 +1,37 @@
 import pandas as pd
 
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import geography
-from .base import Transformer, DataHolderProtocol
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddSamplePositionDD(Transformer):
-    lat_info = dict(
-        nr_sweref_digits=7,
-        columns=[
-            "sample_reported_latitude",
-            "visit_reported_latitude",
-        ],  # In order of prioritization
-    )
-
-    lon_info = dict(
-        nr_sweref_digits=6,
-        columns=[
-            "sample_reported_longitude",
-            "visit_reported_longitude",
-        ],  # In order of prioritization
-    )
-
     lat_col_to_set = "sample_latitude_dd"
     lon_col_to_set = "sample_longitude_dd"
 
-    _cached_pos = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.lat_info = {
+            "nr_sweref_digits": 7,
+            "columns": (
+                "sample_reported_latitude",
+                "visit_reported_latitude",
+            ),  # In order of prioritization
+        }
+
+        self.lon_info = {
+            "nr_sweref_digits": 6,
+            "columns": (
+                "sample_reported_longitude",
+                "visit_reported_longitude",
+            ),  # In order of prioritization
+        }
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds sample position based on reported position"
+        return "Adds sample position based on reported position"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[[self.lat_col_to_set, self.lon_col_to_set]] = (
@@ -100,7 +102,7 @@ class AddSamplePositionSweref99tm(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds sample position in sweref99tm"
+        return "Adds sample position in sweref99tm"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.x_column_to_set] = ""
@@ -132,7 +134,7 @@ class AddSamplePositionDM(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds sample position in decimal minute"
+        return "Adds sample position in decimal minute"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.lat_column_to_set] = ""

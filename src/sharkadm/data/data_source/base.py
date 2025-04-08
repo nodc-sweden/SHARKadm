@@ -1,10 +1,9 @@
+import pathlib
 from abc import ABC, abstractmethod
+from typing import Protocol
 
 import pandas as pd
 import polars as pl
-import pathlib
-
-from typing import Protocol
 
 # from sharkadm.config.import_config import ImportMatrixMapper
 
@@ -18,7 +17,7 @@ class ImportMapper(Protocol):
 class DataSourcePolars:
     def __init__(
         self,
-        data_type: str = None,
+        data_type: str | None = None,
     ) -> None:
         self._data_type = data_type
         self._source = None
@@ -97,7 +96,7 @@ class DataSourcePolars:
 class DataSource:
     def __init__(
         self,
-        data_type: str = None,
+        data_type: str | None = None,
     ) -> None:
         self._data_type = data_type
         self._source = None
@@ -214,8 +213,8 @@ class DataSource:
 class DataFilePolars(DataSourcePolars, ABC):
     def __init__(
         self,
-        path: str | pathlib.Path = None,
-        data_type: str = None,
+        path: str | pathlib.Path | None = None,
+        data_type: str | None = None,
         encoding: str = "cp1252",
     ) -> None:
         super().__init__(data_type=data_type)
@@ -237,8 +236,8 @@ class DataFilePolars(DataSourcePolars, ABC):
 class DataFile(DataSource, ABC):
     def __init__(
         self,
-        path: str | pathlib.Path = None,
-        data_type: str = None,
+        path: str | pathlib.Path | None = None,
+        data_type: str | None = None,
         encoding: str = "cp1252",
     ) -> None:
         super().__init__(data_type=data_type)
@@ -258,7 +257,9 @@ class DataFile(DataSource, ABC):
 
 
 class DataDataFrame(DataSource, ABC):
-    def __init__(self, df: pd.DataFrame, data_type: str = None, source: str = "") -> None:
+    def __init__(
+        self, df: pd.DataFrame, data_type: str | None = None, source: str = ""
+    ) -> None:
         super().__init__(data_type=data_type)
         self._source: str = source or "Given pandas dataframe"
         self._data: pd.DataFrame = df
@@ -273,8 +274,8 @@ class DataDataFrame(DataSource, ABC):
 class old_DataFile(ABC):
     def __init__(
         self,
-        path: str | pathlib.Path = None,
-        data_type: str = None,
+        path: str | pathlib.Path | None = None,
+        data_type: str | None = None,
         encoding: str = "cp1252",
     ) -> None:
         self._path: pathlib.Path = pathlib.Path(path)

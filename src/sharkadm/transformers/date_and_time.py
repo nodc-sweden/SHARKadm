@@ -1,20 +1,21 @@
 import datetime
+import re
 
 import polars as pl
 
-from sharkadm import adm_logger
+from ..sharkadm_logger import adm_logger
 from .base import (
-    Transformer,
     DataHolderProtocol,
-    PolarsTransformer,
     PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
 )
 
-DATETIME_FORMATS = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"]
+DATETIME_FORMATS = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d")
 
 
 class FixTimeFormat(Transformer):
-    time_cols = ["sample_time", "visit_time", "sample_endtime"]
+    time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -72,12 +73,14 @@ class FixTimeFormat(Transformer):
 
 
 class FixDateFormat(Transformer):
-    dates_to_check = ["sample_date", "visit_date", "analysis_date", "observation_date"]
+    dates_to_check = ("sample_date", "visit_date", "analysis_date", "observation_date")
 
     from_format = "%Y%m%d"
     to_format = "%Y-%m-%d"
 
-    mapping = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mapping = {}
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -129,7 +132,7 @@ class FixDateFormat(Transformer):
 class AddSampleTime(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adding time format sample_time"
+        return "Adding time format sample_time"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "sample_time" in data_holder.data:
@@ -168,7 +171,7 @@ class PolarsAddSampleTime(PolarsTransformer):
 class AddSampleDate(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adding sample_date if missing"
+        return "Adding sample_date if missing"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "sample_date" in data_holder.data:
@@ -286,19 +289,19 @@ class PolarsAddDatetime(PolarsTransformer):
 
 
 class AddMonth(Transformer):
-    month_columns = ["sample_month", "visit_month"]
+    month_columns = ("sample_month", "visit_month")
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Adds month column to data. Month is taken from the datetime column "
-            f"and will overwrite old value"
+            "Adds month column to data. Month is taken from the datetime column "
+            "and will overwrite old value"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
             adm_logger.log_transformation(
-                f"Missing column: datetime", level=adm_logger.WARNING
+                "Missing column: datetime", level=adm_logger.WARNING
             )
             return
         for col in self.month_columns:
@@ -315,7 +318,7 @@ class AddMonth(Transformer):
 
 
 class AddReportedDates(Transformer):
-    source_columns = ["visit_date", "sample_date"]
+    source_columns = ("visit_date", "sample_date")
     reported_col_prefix = "reported"
 
     @staticmethod
@@ -346,7 +349,7 @@ class AddReportedDates(Transformer):
 class CreateFakeFullDates(Transformer):
     shark_comment_column = "shark_comment"
     mandatory_col_prefix = "reported"
-    source_columns = ["visit_date", "sample_date"]
+    source_columns = ("visit_date", "sample_date")
     date_format = "%Y-%m-%d"
 
     @staticmethod
@@ -428,8 +431,8 @@ class CreateFakeFullDates(Transformer):
 
 
 class AddVisitDateFromObservationDate(Transformer):
-    valid_data_types = ["HarbourPorpoise"]
-    valid_data_holders = ["ZipArchiveDataHolder"]
+    valid_data_types = ("HarbourPorpoise",)
+    valid_data_holders = ("ZipArchiveDataHolder",)
     source_col = "observation_date"
     col_to_set = "visit_date"
 
@@ -456,13 +459,15 @@ class AddVisitDateFromObservationDate(Transformer):
 ##########################################################################################
 ##########################################################################################
 ##########################################################################################
-class FixDateFormatPolars(Transformer):
-    dates_to_check = ["sample_date", "visit_date", "analysis_date", "observation_date"]
+class FixDateFormatPolars(PolarsTransformer):
+    dates_to_check = ("sample_date", "visit_date", "analysis_date", "observation_date")
 
     from_format = "%Y%m%d"
     to_format = "%Y-%m-%d"
 
-    mapping = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mapping = {}
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -502,7 +507,7 @@ class FixDateFormatPolars(Transformer):
 
 
 class FixTimeFormatPolars(Transformer):
-    time_cols = ["sample_time", "visit_time", "sample_endtime"]
+    time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -586,7 +591,7 @@ class FixTimeFormatPolars(Transformer):
 
 
 class AddReportedDatesPolars(Transformer):
-    source_columns = ["visit_date", "sample_date"]
+    source_columns = ("visit_date", "sample_date")
     reported_col_prefix = "reported"
 
     @staticmethod
@@ -622,8 +627,8 @@ class AddReportedDatesPolars(Transformer):
 
 
 class AddVisitDateFromObservationDatePolars(Transformer):
-    valid_data_types = ["HarbourPorpoise"]
-    valid_data_holders = ["ZipArchiveDataHolder"]
+    valid_data_types = ("HarbourPorpoise",)
+    valid_data_holders = ("ZipArchiveDataHolder",)
     source_col = "observation_date"
     col_to_set = "visit_date"
 
@@ -718,7 +723,10 @@ class AddDatetimePolars(Transformer):
     time_source_column: str = ("sample_time",)
 
     def __init__(
-        self, date_source_column: str = None, time_source_column: str = None, **kwargs
+        self,
+        date_source_column: str | None = None,
+        time_source_column: str | None = None,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.date_source_column = date_source_column or self.date_source_column
@@ -752,19 +760,19 @@ class AddDatetimePolars(Transformer):
 
 
 class AddMonthPolars(Transformer):
-    month_columns = ["sample_month", "visit_month"]
+    month_columns = ("sample_month", "visit_month")
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Adds month column to data. Month is taken from the datetime column "
-            f"and will overwrite old values"
+            "Adds month column to data. Month is taken from the datetime column "
+            "and will overwrite old values"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
             adm_logger.log_transformation(
-                f"Missing column: datetime", level=adm_logger.WARNING
+                "Missing column: datetime", level=adm_logger.WARNING
             )
             return
         for col in self.month_columns:

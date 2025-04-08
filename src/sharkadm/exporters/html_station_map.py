@@ -1,12 +1,12 @@
-import datetime
 import pathlib
 
-from sharkadm import utils, adm_logger
 import pandas as pd
 
+from sharkadm.sharkadm_logger import adm_logger
+
 try:
-    from nodc_station.main import App
     from nodc_station import DEFAULT_STATION_FILE_PATH
+    from nodc_station.main import App
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -16,7 +16,7 @@ except ModuleNotFoundError as e:
     )
 
 
-from .base import FileExporter, DataHolderProtocol
+from .base import DataHolderProtocol, FileExporter
 
 
 class HtmlStationMap(FileExporter):
@@ -53,7 +53,7 @@ class HtmlStationMap(FileExporter):
         list_name = "sharkadm_data"
         df = self._get_position_dataframe(data_holder.data)
         if df.empty:
-            adm_logger.log_export(f"No data to plot html map", level=adm_logger.WARNING)
+            adm_logger.log_export("No data to plot html map", level=adm_logger.WARNING)
             return
         app.add_list_data(df, list_name=list_name)
 

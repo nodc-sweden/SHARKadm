@@ -1,6 +1,8 @@
 import logging
 import pathlib
 
+from sharkadm.data.archive.shark_metadata import SharkMetadata
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,6 +31,7 @@ class ProfileMetadata:
         data = dict()
         data["path"] = path
         with open(path, encoding=encoding) as fid:
+            key = None
             for line in fid:
                 if not line.strip():
                     continue

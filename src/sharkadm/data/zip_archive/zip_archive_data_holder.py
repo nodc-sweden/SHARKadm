@@ -2,22 +2,18 @@ import logging
 import os
 import pathlib
 import shutil
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import pandas as pd
 
-from sharkadm import config
-from sharkadm.config import mapper_data_type_to_internal
-
-# from sharkadm.config import get_data_type_mapper
-from sharkadm.config.import_matrix import ImportMatrixConfig
-from sharkadm.config.import_matrix import ImportMatrixMapper
-from sharkadm.data import data_source
-from sharkadm.data.archive import delivery_note, analyse_info
-from sharkadm.data.archive import sampling_info
-from sharkadm.data.data_holder import PandasDataHolder
-from sharkadm import adm_logger
 from sharkadm import utils
+from sharkadm.config import mapper_data_type_to_internal
+from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
+from sharkadm.data.data_holder import PandasDataHolder
+from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.txt_file import TxtRowFormatDataFile
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +26,7 @@ class ZipArchiveDataHolder(PandasDataHolder, ABC):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, zip_archive_path: str | pathlib.Path = None, **kwargs):
+    def __init__(self, zip_archive_path: str | pathlib.Path | None = None, **kwargs):
         super().__init__()
         self._zip_archive_path = pathlib.Path(zip_archive_path)
 
@@ -202,25 +198,25 @@ class ZipArchiveDataHolder(PandasDataHolder, ABC):
     #         else:
     #             self._data[new_column] = self._data[new_column] + self._data[col]
 
-    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+    def _check_data_source(self, data_source: DataFile) -> None:
         if data_source.data_type.lower() != self.data_type.lower():
             msg = f"Data source {data_source} is not of type {self.data_type}"
             logger.error(msg)
             raise ValueError(msg)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
-    def _set_data_source(self, data_source: data_source.DataFile) -> None:
+    def _set_data_source(self, data_source: DataFile) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
-    def _add_data_source(self, data_source: data_source.DataFile) -> None:
+    def _add_data_source(self, data_source: DataFile) -> None:
         """Adds a data source to instance variable self._data_sources.
         This method is not adding to data itself."""
         # self._check_data_source(data_source)
@@ -232,7 +228,7 @@ class ZipArchiveDataHolder(PandasDataHolder, ABC):
                 f"Could not find any data file in delivery: {self.shark_data_path}"
             )
             return
-        d_source = data_source.TxtRowFormatDataFile(
+        d_source = TxtRowFormatDataFile(
             path=self.shark_data_path, data_type=self.delivery_note.data_type
         )
         self._set_data_source(d_source)

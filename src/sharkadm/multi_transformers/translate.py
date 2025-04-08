@@ -1,9 +1,9 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Translate(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddSwedishProjectName,
         transformers.AddSwedishSampleOrderer,
         transformers.AddSwedishSamplingLaboratory,
@@ -14,7 +14,7 @@ class Translate(MultiTransformer):
         transformers.AddEnglishSamplingLaboratory,
         transformers.AddEnglishAnalyticalLaboratory,
         transformers.AddEnglishReportingInstitute,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

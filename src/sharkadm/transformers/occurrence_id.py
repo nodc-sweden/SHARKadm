@@ -1,6 +1,7 @@
-from sharkadm import adm_logger
 from sharkadm import event
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 nodc_occurrence_id = None
 try:
@@ -16,20 +17,22 @@ except ModuleNotFoundError as e:
 
 
 class AddOccurrenceId(Transformer):
-    valid_data_types = ["zoobenthos", "plankton_imaging"]
+    valid_data_types = ("zoobenthos", "plankton_imaging")
 
-    col_to_set = ""  # Is set in self._transform
-    database = None
-    valid_matches = []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.col_to_set = ""  # Is set in self._transform
+        self.database = None
+        self.valid_matches = []
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds Occurrence Id to data"
+        return "Adds Occurrence Id to data"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if not nodc_occurrence_id:
             adm_logger.log_transformation(
-                f"Missing package nodc_occurrence_id to add occurrence_id",
+                "Missing package nodc_occurrence_id to add occurrence_id",
                 level=adm_logger.ERROR,
             )
             return

@@ -1,12 +1,14 @@
 import pathlib
+
 import pandas as pd
 
-from .base import Exporter, DataHolderProtocol
 from sharkadm import utils
+
+from .base import DataHolderProtocol, Exporter
 
 
 class StandardFormat(Exporter):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical",)
 
     def __init__(
         self,

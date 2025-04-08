@@ -1,14 +1,12 @@
-import pathlib
+import rich
 
-import typer
-from rich import print
-import pprint
-
-from sharkadm import transformers, exporters
-from sharkadm import utils
-from sharkadm import validators
-from sharkadm import write_operations_description_to_file
-
+from sharkadm import (
+    exporters,
+    transformers,
+    utils,
+    validators,
+    write_operations_description_to_file,
+)
 
 ROW_LENGTH = 79
 
@@ -19,26 +17,26 @@ class ExploreSHARKadm:
         self._print_main_menu()
 
     def _new_page(self):
-        print("\n" * 40)
+        rich.print("\n" * 40)
 
     def _print_main_menu(self):
-        print("=" * ROW_LENGTH)
-        print(f"{self._title:^{ROW_LENGTH}}")
-        print("=" * ROW_LENGTH)
-        print(f"{'W or 1'.ljust(40)}: Write all OPERATIONS to file")
-        print(f"{'V or 2 (filter)'.ljust(40)}: List VALIDATORS")
-        print(f"{'T or 3 (filter)'.ljust(40)}: List TRANSFORMERS")
-        print(f"{'E or 4 (filter)'.ljust(40)}: List EXPORTERS")
-        print(f"{'Q'.ljust(40)}: Quit")
-        print("-" * ROW_LENGTH)
-        print()
-        ans = input(f"Gör ett val:")
+        rich.print("=" * ROW_LENGTH)
+        rich.print(f"{self._title:^{ROW_LENGTH}}")
+        rich.print("=" * ROW_LENGTH)
+        rich.print(f"{'W or 1'.ljust(40)}: Write all OPERATIONS to file")
+        rich.print(f"{'V or 2 (filter)'.ljust(40)}: List VALIDATORS")
+        rich.print(f"{'T or 3 (filter)'.ljust(40)}: List TRANSFORMERS")
+        rich.print(f"{'E or 4 (filter)'.ljust(40)}: List EXPORTERS")
+        rich.print(f"{'Q'.ljust(40)}: Quit")
+        rich.print("-" * ROW_LENGTH)
+        rich.print()
+        ans = input("Gör ett val:")
         self._handle_main_menu_ans(ans)
 
     def _handle_main_menu_ans(self, ans: str):
         self._new_page()
         if not ans.strip():
-            print("Invalid option given...try again!")
+            rich.print("Invalid option given...try again!")
             self._print_main_menu()
             return
         filt = None
@@ -52,19 +50,19 @@ class ExploreSHARKadm:
             write_operations(open_file=True)
             self._print_main_menu()
         elif sel in ["V", "2"]:
-            print(f"{parts=}")
-            print(f"{filt=}")
+            rich.print(f"{parts=}")
+            rich.print(f"{filt=}")
             list_validators(filt)
         elif sel in ["T", "3"]:
-            print(f"{parts=}")
-            print(f"{filt=}")
+            rich.print(f"{parts=}")
+            rich.print(f"{filt=}")
             list_transformers(filt)
         elif sel in ["E", "4"]:
-            print(f"{parts=}")
-            print(f"{filt=}")
+            rich.print(f"{parts=}")
+            rich.print(f"{filt=}")
             list_exporters(filt)
         else:
-            print("Invalid option given...try again!")
+            rich.print("Invalid option given...try again!")
             self._print_main_menu()
             return
 
@@ -77,7 +75,7 @@ def write_operations(open_file: bool) -> None:
         utils.open_file_with_default_program(path)
 
 
-def list_validators(filter_string: str = None):
+def list_validators(filter_string: str | None = None):
     info_lines = ["", "=" * ROW_LENGTH]
     if filter_string:
         info_lines.append(f'VALIDATORS filtered on "{filter_string}":')
@@ -94,10 +92,10 @@ def list_validators(filter_string: str = None):
                 continue
         info_lines.append(f"{name.ljust(60)}: {desc}")
     info_lines.append("-" * ROW_LENGTH)
-    print("\n".join(info_lines))
+    rich.print("\n".join(info_lines))
 
 
-def list_transformers(filter_string: str = None):
+def list_transformers(filter_string: str | None = None):
     info_lines = ["", "=" * ROW_LENGTH]
     if filter_string:
         info_lines.append(f'TRANSFORMERS filtered on "{filter_string}":')
@@ -114,10 +112,10 @@ def list_transformers(filter_string: str = None):
                 continue
         info_lines.append(f"{name.ljust(60)}: {desc}")
     info_lines.append("-" * ROW_LENGTH)
-    print("\n".join(info_lines))
+    rich.print("\n".join(info_lines))
 
 
-def list_exporters(filter_string: str = None):
+def list_exporters(filter_string: str | None = None):
     info_lines = ["", "=" * ROW_LENGTH]
     if filter_string:
         info_lines.append(f'EXPORTERS filtered on "{filter_string}":')
@@ -134,7 +132,7 @@ def list_exporters(filter_string: str = None):
                 continue
         info_lines.append(f"{name.ljust(60)}: {desc}")
     info_lines.append("-" * ROW_LENGTH)
-    print("\n".join(info_lines))
+    rich.print("\n".join(info_lines))
 
 
 if __name__ == "__main__":

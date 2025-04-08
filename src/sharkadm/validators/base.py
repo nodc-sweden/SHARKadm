@@ -4,9 +4,9 @@ from typing import Protocol
 
 import pandas as pd
 
-from sharkadm import adm_logger
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class DataHolderProtocol(Protocol):
@@ -23,11 +23,11 @@ class Validator(ABC):
     """Abstract base class used as a blueprint to validate/tidy/check data
     in a DataHolder"""
 
-    valid_data_types = []
-    invalid_data_types = []
+    valid_data_types = ()
+    invalid_data_types = ()
 
-    valid_data_holders = []
-    invalid_data_holders = []
+    valid_data_holders = ()
+    invalid_data_holders = ()
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs

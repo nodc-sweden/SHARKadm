@@ -1,10 +1,12 @@
-from .base import Transformer, DataHolderProtocol
+from types import MappingProxyType
+
 from ..utils import matching_strings
+from .base import DataHolderProtocol, Transformer
 
 
 class FixYesNo(Transformer):
-    apply_on_columns = [".*accreditated"]
-    _mapping = {"y": "Y", "yes": "Y", "n": "N", "no": "N"}
+    apply_on_columns = (".*accreditated",)
+    _mapping = MappingProxyType({"y": "Y", "yes": "Y", "n": "N", "no": "N"})
 
     def __init__(self, apply_on_columns: list[str] | None = None, **kwargs):
         super().__init__(**kwargs)
@@ -13,7 +15,7 @@ class FixYesNo(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Fix boolean values to YES or No (Y or N?)"
+        return "Fix boolean values to YES or No (Y or N?)"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         use_columns = matching_strings.get_matching_strings(

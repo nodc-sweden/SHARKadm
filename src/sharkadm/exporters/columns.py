@@ -1,5 +1,6 @@
 from sharkadm.config import get_column_views_config
-from .base import FileExporter, DataHolderProtocol
+
+from .base import DataHolderProtocol, FileExporter
 
 
 class ExportColumnViewsColumnsNotInData(FileExporter):
@@ -9,7 +10,7 @@ class ExportColumnViewsColumnsNotInData(FileExporter):
 
     @staticmethod
     def get_exporter_description() -> str:
-        return f"Writes all columns in column_views that are not in data"
+        return "Writes all columns in column_views that are not in data"
 
     def _export(self, data_holder: DataHolderProtocol) -> None:
         if not self._export_file_name:

@@ -9,8 +9,7 @@ from typing import Protocol
 import openpyxl
 import pandas as pd
 
-from sharkadm import adm_logger
-
+from sharkadm.sharkadm_logger import adm_logger
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y-%m"]
 
@@ -56,18 +55,18 @@ class UncertString:
             float(self._string)
             self._value = self._string
             return
-        except:
+        except ValueError:
             pass
         if "%" in self._string:
             self._percent = int(self._string.split("%")[0].strip())
         else:
-            self._value = re.search("[0-9\.]+", self._string).group()
+            self._value = re.search(r"[0-9\.]+", self._string).group()
 
         if "-" in self._string:
-            range = re.search(
-                "[0-9\.-]+", self._string.replace(" ", "").split("%")[-1]
+            range_match = re.search(
+                r"[0-9\.-]+", self._string.replace(" ", "").split("%")[-1]
             ).group()
-            self._interval = [float(item.strip()) for item in range.split("-")]
+            self._interval = [float(item.strip()) for item in range_match.split("-")]
 
     def get(self, value: str | float | int):
         val = float(value)
@@ -284,7 +283,7 @@ class AnalyseInfo:
 
     @property
     def columns(self) -> list[str]:
-        return list(self.data[list(self._data)[0]][0])
+        return list(next(iter(self.data[next(iter(self._data))])))
 
 
 def _get_date(date_str: str) -> datetime.date | str:
@@ -297,7 +296,7 @@ def _get_date(date_str: str) -> datetime.date | str:
         except ValueError:
             pass
     adm_logger.log_workflow(
-        f"Invalid date or date format in analys_info",
+        "Invalid date or date format in analys_info",
         item=date_str,
         level=adm_logger.ERROR,
     )

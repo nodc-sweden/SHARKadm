@@ -1,5 +1,6 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 try:
     from nodc_station import get_station_object
@@ -16,12 +17,12 @@ class AddStationInfo(Transformer):
     source_lat_column = "sample_latitude_dd"
     source_lon_column = "sample_longitude_dd"
     reported_station_col = "reported_station_name"
-    columns_to_set = [
+    columns_to_set = (
         "station_name",
         "station_id",
         "sample_location_id",
         "station_viss_eu_id",
-    ]
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -31,7 +32,7 @@ class AddStationInfo(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds station information to all places"
+        return "Adds station information to all places"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         self._create_columns_if_missing(data_holder)
@@ -130,7 +131,7 @@ class AddStationInfo(Transformer):
 
 
 class CopyReportedStationNameToStationName(Transformer):
-    valid_data_types = ["plankton_imaging"]
+    valid_data_types = ("plankton_imaging",)
 
     source_column = "reported_station_name"
     col_to_set = "station_name"

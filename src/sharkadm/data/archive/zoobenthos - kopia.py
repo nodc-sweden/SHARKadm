@@ -3,9 +3,10 @@ import pathlib
 
 import pandas as pd
 
-from sharkadm.data import data_source
-from .archive_data_holder import ArchiveDataHolder
 from sharkadm import sharkadm_exceptions
+from sharkadm.data import data_source
+
+from .archive_data_holder import ArchiveDataHolder
 
 logger = logging.getLogger(__name__)
 

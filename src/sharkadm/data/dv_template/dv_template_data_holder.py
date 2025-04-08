@@ -6,17 +6,13 @@ import re
 import openpyxl
 import pandas as pd
 
-from sharkadm import adm_logger
 from sharkadm import config
-
-# from sharkadm.config import get_data_type_mapper
-from sharkadm.config.import_matrix import ImportMatrixConfig
-from sharkadm.config.import_matrix import ImportMatrixMapper
-from sharkadm.data import data_source
-from sharkadm.data.archive import delivery_note
-from sharkadm.data.archive import analyse_info
-from sharkadm.data.archive import sampling_info
+from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder
+from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.xlsx_file import XlsxFormatDataFile
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +24,7 @@ class DvTemplateDataHolder(PandasDataHolder):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, template_path: str | pathlib.Path = None):
+    def __init__(self, template_path: str | pathlib.Path | None = None):
         super().__init__()
         self._template_path = pathlib.Path(template_path)
         adm_logger.dataset_name = self._template_path.name
@@ -167,7 +163,7 @@ class DvTemplateDataHolder(PandasDataHolder):
         dn = pd.read_excel(self._template_path, sheet_name="Kolumnförklaring")
         key_col_name = dn.columns[3]
         dn["key_row"] = dn[key_col_name].apply(
-            lambda x: True if type(x) == str and x.isupper() else False
+            lambda x: True if isinstance(x, str) and x.isupper() else False
         )
 
         fdn = dn[dn["key_row"]]
@@ -184,7 +180,7 @@ class DvTemplateDataHolder(PandasDataHolder):
             )
         except re.error:
             adm_logger.log_workflow(
-                f"Could not find mandatory_nat_columns", level=adm_logger.WARNING
+                "Could not find mandatory_nat_columns", level=adm_logger.WARNING
             )
 
     def _map_mandatory_lists(self):
@@ -221,7 +217,7 @@ class DvTemplateDataHolder(PandasDataHolder):
             self._import_matrix_mapper = self._import_matrix.get_mapper(
                 self.delivery_note.import_matrix_key
             )
-        except KeyError as e:
+        except KeyError:
             msg = (
                 f"Could not get import matrix mapper for import_matrix_key: "
                 f"{self.delivery_note.import_matrix_key}"
@@ -239,7 +235,7 @@ class DvTemplateDataHolder(PandasDataHolder):
             else:
                 self._data[new_column] = self._data[new_column] + self._data[col]
 
-    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+    def _check_data_source(self, data_source: DataFile) -> None:
         # if (
         #     self._data_type_mapper.get(data_source.data_type) !=
         #     self._data_type_mapper.get(self.data_type)
@@ -250,7 +246,7 @@ class DvTemplateDataHolder(PandasDataHolder):
             raise ValueError(msg)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
@@ -267,14 +263,14 @@ class DvTemplateDataHolder(PandasDataHolder):
     #     self._data.fillna('', inplace=True)
     #     self._data.reset_index(inplace=True, drop=True)
 
-    def _set_data_source(self, data_source: data_source.DataFile) -> None:
+    def _set_data_source(self, data_source: DataFile) -> None:
         """Sets a single data source to self._data"""
         self._data_type = data_source.data_type
         self._data_type_internal = data_source.data_type.replace(" ", "").lower()
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
-    def _add_data_source(self, data_source: data_source.DataFile) -> None:
+    def _add_data_source(self, data_source: DataFile) -> None:
         """Adds a data source to instance variable self._data_sources.
         This method is not adding to data itself."""
         self._check_data_source(data_source)
@@ -295,7 +291,7 @@ class DvTemplateDataHolder(PandasDataHolder):
             if ws.cell(r, 1).value in ["Tabellhuvud:"]:
                 self._number_metadata_rows = r - 1
                 break
-        d_source = data_source.XlsxFormatDataFile(
+        d_source = XlsxFormatDataFile(
             path=self._template_path,
             data_type=self.delivery_note.data_type,
             sheet_name=sheet_name,

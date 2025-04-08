@@ -1,26 +1,19 @@
 import os
-
-from sharkadm import controller
-from sharkadm import transformers
-from sharkadm.data import archive
-from sharkadm import validators
-from sharkadm import exporters
-from sharkadm.data import lims
-from sharkadm import adm_logger
-from sharkadm.data import get_data_holder
 import pathlib
+import re
+
+import numpy as np
 import pandas as pd
-from sharkadm import adm_logger
+
+from sharkadm import (
+    adm_logger,
+    sharkadm_exceptions,
+    utils,
+)
+from sharkadm.data import get_data_holder
 from sharkadm.data.archive.delivery_note import DeliveryNote
 from sharkadm.data.archive.shark_metadata import SharkMetadata
-
-from sharkadm.data.archive import ZoobenthosArchiveDataHolder
-from sharkadm import sharkadm_exceptions
-import re
-from sharkadm import utils
 from sharkadm.utils import matching_strings
-from sharkadm import event
-import numpy as np
 
 
 class ArchiveController:
@@ -154,7 +147,6 @@ class ArchiveController:
 
         # temp_list = [item for item in info_set if item.lower().startswith('kom')]
         # print(f'{temp_list=}')
-        column_mapping = {}
         first_cols = [
             "archive_directory_name",
             "delivery_note_missing",
@@ -214,6 +206,7 @@ class ArchiveController:
                     data = dict()
                     data["path"] = delivery_note_path
                     with open(delivery_note_path, encoding=encoding) as fid:
+                        mapped_key = None
                         for line in fid:
                             if not line.strip():
                                 continue
@@ -399,7 +392,7 @@ class ArchiveController:
                 #     line['format'] = 'missing'
 
         cols = sorted(all_columns_set) or list(columns)
-        cols_to_use = ["archive", "format"] + cols
+        cols_to_use = ["archive", "format", *cols]
         self._create_dataframe(info, cols_to_use)
         nr = 4
         string = "-".join(
@@ -524,7 +517,7 @@ class ArchiveController:
 
     def open_directory(self):
         if self._save_path:
-            utils.open_directory(self._save_path.parent)
+            utils.open_file_or_directory(self._save_path.parent)
         return self
 
 

@@ -1,10 +1,11 @@
+import hashlib
+
 import pandas as pd
 
 from sharkadm import config
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
 
-import hashlib
-from sharkadm import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 
 class AddSharkId(Transformer):
@@ -26,7 +27,7 @@ class AddSharkId(Transformer):
             cols = self._filter_cols(cols)
             if not all([col in data_holder.data.columns for col in cols]):
                 adm_logger.log_transformation(
-                    f"Can not create shark_id. All columns are not in data",
+                    "Can not create shark_id. All columns are not in data",
                     item=", ".join(cols),
                     level=adm_logger.WARNING,
                 )

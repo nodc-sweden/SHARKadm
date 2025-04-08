@@ -1,8 +1,8 @@
+import datetime
+import json
 import pathlib
 
 import pandas as pd
-import json
-import datetime
 
 
 def get_meta_info():
@@ -78,7 +78,7 @@ class IfcbVisualizationCruises:
         self._directory = pathlib.Path(directory)
         self._append = append
 
-        self._cruise_file_path = self._directory / f"cruises.json"
+        self._cruise_file_path = self._directory / "cruises.json"
 
         self._create_cruises_file()
 
@@ -90,7 +90,7 @@ class IfcbVisualizationCruises:
                 cruise_col = col
                 break
         else:
-            raise KeyError(f"No column found for cruise number")
+            raise KeyError("No column found for cruise number")
 
         for cruise, df in self._data.groupby(cruise_col):
             cruise_data = dict(

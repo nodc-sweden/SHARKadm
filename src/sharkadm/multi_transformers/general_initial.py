@@ -1,9 +1,9 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class GeneralInitial(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddRowNumber,
         transformers.ReplaceCommaWithDot,
         transformers.FixTimeFormat,
@@ -14,7 +14,7 @@ class GeneralInitial(MultiTransformer):
         transformers.AddSamplePositionDM,
         transformers.AddSamplePositionSweref99tm,
         transformers.AddDatatype,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

@@ -1,5 +1,6 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddSampleIdPrefix(Transformer):
@@ -7,11 +8,11 @@ class AddSampleIdPrefix(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Sets sample_id_prefix from data source column"
+        return "Sets sample_id_prefix from data source column"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "source" not in data_holder.data.columns:
-            adm_logger.log_transformation(f"Missing key: source", level="error")
+            adm_logger.log_transformation("Missing key: source", level="error")
             return
         data_holder.data[self.key_to_add] = data_holder.data["source"].apply(
             self.extract_id

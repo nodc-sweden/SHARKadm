@@ -1,4 +1,5 @@
 from sharkadm import config
+
 from .shark_api import SHARKapiDataHolder
 
 

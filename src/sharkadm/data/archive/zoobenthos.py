@@ -1,11 +1,10 @@
 import logging
 import pathlib
 
-import pandas as pd
-
 from sharkadm.data import data_source
+
+from ..data_source.base import DataFile
 from .archive_data_holder import ArchiveDataHolder
-from sharkadm import sharkadm_exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +63,7 @@ class ZoobenthosArchiveDataHolder(ArchiveDataHolder):
         d_source = self._get_data_source(path)
         self._set_data_source(d_source)
 
-    def _get_data_source(self, path: pathlib.Path) -> data_source.DataFile:
+    def _get_data_source(self, path: pathlib.Path) -> DataFile:
         if path.suffix == ".skv":
             d_source = self._get_skv_data_source(path)
             self._date_files_type = "skv"

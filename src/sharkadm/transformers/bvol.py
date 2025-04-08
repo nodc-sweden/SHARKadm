@@ -1,7 +1,5 @@
-import functools
-
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 try:
     import nodc_bvol
@@ -19,7 +17,7 @@ except ModuleNotFoundError as e:
 
 
 class AddBvolScientificNameOriginal(Transformer):
-    valid_data_types = ["Phytoplankton", "IFCB"]
+    valid_data_types = ("Phytoplankton", "IFCB")
     source_col = "reported_scientific_name"
     col_to_set = "bvol_scientific_name_original"
 
@@ -53,7 +51,7 @@ class AddBvolScientificNameOriginal(Transformer):
 
 
 class AddBvolScientificNameAndSizeClass(Transformer):
-    valid_data_types = ["Phytoplankton", "IFCB"]
+    valid_data_types = ("Phytoplankton", "IFCB")
 
     source_name_col = "bvol_scientific_name_original"
     source_size_class_col = "size_class"
@@ -118,7 +116,7 @@ class AddBvolScientificNameAndSizeClass(Transformer):
 
 
 class AddBvolRefList(Transformer):
-    valid_data_types = ["Phytoplankton", "IFCB"]
+    valid_data_types = ("Phytoplankton", "IFCB")
 
     source_col = "bvol_scientific_name"
     col_to_set = "bvol_ref_list"
@@ -142,7 +140,7 @@ class AddBvolRefList(Transformer):
             lst = bvol_nomp.get_info(Species=name)
             if not lst:
                 continue
-            if type(lst) == list:
+            if isinstance(lst, list):
                 text = ", ".join(
                     sorted(set([item["List"] for item in lst if item["List"]]))
                 )
@@ -156,7 +154,7 @@ class AddBvolRefList(Transformer):
 
 
 class AddBvolAphiaId(Transformer):
-    valid_data_types = ["Phytoplankton", "IFCB"]
+    valid_data_types = ("Phytoplankton", "IFCB")
 
     source_col = "bvol_scientific_name"
     col_to_set = "bvol_aphia_id"
@@ -180,7 +178,7 @@ class AddBvolAphiaId(Transformer):
             lst = bvol_nomp.get_info(Species=name)
             if not lst:
                 continue
-            if type(lst) == list:
+            if isinstance(lst, list):
                 text = ", ".join(
                     sorted(set([item["AphiaID"] for item in lst if item["AphiaID"]]))
                 )

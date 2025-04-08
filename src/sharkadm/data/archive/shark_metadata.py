@@ -33,6 +33,7 @@ class SharkMetadata:
         data = dict()
         data["path"] = path
         with open(path, encoding=encoding) as fid:
+            key = None
             for line in fid:
                 if not line.strip():
                     continue

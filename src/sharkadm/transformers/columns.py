@@ -1,16 +1,12 @@
-import datetime
-
-import pandas as pd
 import re
 
-from .base import (
-    Transformer,
-    DataHolderProtocol,
-    PolarsDataHolderProtocol,
-    PolarsTransformer,
-)
-from sharkadm import adm_logger
 from sharkadm.config import get_column_views_config
+
+from .base import (
+    DataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 
 
 class AddColumnViewsColumns(Transformer):
@@ -21,8 +17,8 @@ class AddColumnViewsColumns(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Adds empty columns from column_views not already present in dataframe. "
-            f"NN data dded!"
+            "Adds empty columns from column_views not already present in dataframe. "
+            "NN data dded!"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -40,7 +36,7 @@ class AddColumnViewsColumns(Transformer):
 
 
 class AddDEPHqcColumn(Transformer):
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_holders = ("LimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

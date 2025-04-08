@@ -1,6 +1,7 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
 import pandas as pd
+
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 
 class AddSampleMinAndMaxDepth(Transformer):
@@ -35,7 +36,7 @@ class AddSectionStartAndEndDepth(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds section start and end depth"
+        return "Adds section start and end depth"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.min_depth_par] = data_holder.data.apply(
@@ -75,13 +76,13 @@ class AddSectionStartAndEndDepth(Transformer):
 
 
 class ReorderSampleMinAndMaxDepth(Transformer):
-    invalid_data_holders = ["EpibenthosMartransArchiveDataHolder"]
+    invalid_data_holders = ("EpibenthosMartransArchiveDataHolder",)
     min_depth_par = "sample_min_depth_m"
     max_depth_par = "sample_max_depth_m"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Reorders sample min and max depth if they are in wrong order."
+        return "Reorders sample min and max depth if they are in wrong order."
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         print(data_holder.data[[self.min_depth_par, self.max_depth_par]])

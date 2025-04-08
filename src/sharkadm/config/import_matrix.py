@@ -2,7 +2,7 @@ import functools
 import logging
 import pathlib
 
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ class ImportMatrixConfig:
     def __init__(
         self,
         path: str | pathlib.Path,
-        data_type: str = None,
+        data_type: str | None = None,
         encoding: str = "iso_8859_1",
     ) -> None:
         # data_type_mapper: DataTypeMapper = None) -> None:

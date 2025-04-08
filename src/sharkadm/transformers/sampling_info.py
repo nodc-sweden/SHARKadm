@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import pathlib
-import sys
 
-from .base import Transformer, DataHolderProtocol
 from sharkadm.data.archive import ArchiveDataHolder
-from sharkadm import adm_logger
-from sharkadm.utils import yaml_data
-from sharkadm.data.archive.sampling_info import SamplingInfo
+from sharkadm.sharkadm_logger import adm_logger
+
 from ..data import LimsDataHolder
+from .base import Transformer
 
 
 class AddSamplingInfo(Transformer):
-    valid_data_holders = ["ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder"]
+    valid_data_holders = ("ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder")
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds sampling information to data"
+        return "Adds sampling information to data"
 
     def _transform(self, data_holder: ArchiveDataHolder | LimsDataHolder) -> None:
         if "parameter" not in data_holder.columns:

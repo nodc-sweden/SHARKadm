@@ -7,7 +7,7 @@ def get_kwargs_for_class(cls: type):
         if key in ["self", "kwargs"]:
             continue
         val = value.default
-        if type(val) == type:
+        if isinstance(val, type):
             val = None
         kw[key] = val
     return kw

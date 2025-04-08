@@ -1,11 +1,13 @@
-from ..base import Transformer, DataHolderProtocol
-
 import qc_lib
-from sharkadm import adm_logger
+
+from sharkadm.sharkadm_logger import adm_logger
+
+from ..base import DataHolderProtocol, Transformer
 
 
 class QCRange(Transformer):
     QC0_index = 0
+    datatype_column_name = "REPLACE_WITH_VALUE"
 
     def __init__(self, columns: list[str], **kwargs):
         super().__init__(**kwargs)
@@ -13,7 +15,7 @@ class QCRange(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Flags data if out of range"
+        return "Flags data if out of range"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         header = list(data_holder.data.columns)
@@ -31,9 +33,9 @@ class QCRange(Transformer):
                 )
                 continue
         for key, vdata in data_holder.data.groupby("sharkadm_visit_id"):
-            lat = list(set(vdata["sample_latitude_dd"]))[0]
-            lon = list(set(vdata["sample_longitude_dd"]))[0]
-            date = list(set(vdata["visit_date"]))[0]
+            lat = next(iter(set(vdata["sample_latitude_dd"])))
+            lon = next(iter(set(vdata["sample_longitude_dd"])))
+            date = next(iter(set(vdata["visit_date"])))
             for col in self._columns:
                 ranges = qc_lib.Ranges()
                 low, high = ranges.get_ranges(par=col, lat=lat, lon=lon, date=date)

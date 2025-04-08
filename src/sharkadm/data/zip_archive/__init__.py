@@ -1,9 +1,7 @@
-import os
+import pathlib
 from typing import Union
 
-from sharkadm import config
 from .zip_archive_data_holder import ZipArchiveDataHolder
-import pathlib
 
 
 def get_zip_archive_data_holder(path: str | pathlib.Path) -> ZipArchiveDataHolder:

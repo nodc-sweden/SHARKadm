@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import polars as pl
 
-from sharkadm import adm_logger
-from sharkadm.data.data_source import DataFile, DataSource
 from sharkadm import config
+from sharkadm.data.data_source.base import DataFile, DataSource
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class DataHolder(ABC):
     def zip_archive_base(self) -> str:
         if not self._data_sources:
             return self._get_created_zip_archive_base()
-        source = list(self._data_sources.values())[0]
+        source = next(iter(self._data_sources.values()))
         if not hasattr(source, "path"):
             return self._get_created_zip_archive_base()
         if not source.path:
@@ -349,7 +349,7 @@ class old_DataHolder(ABC):
 
     @data.setter
     def data(self, df: pd.DataFrame) -> None:
-        if type(df) != pd.DataFrame:
+        if not isinstance(df, pd.DataFrame):
             raise "Data must be of type pd.DataFrame"
         self._data = df
 

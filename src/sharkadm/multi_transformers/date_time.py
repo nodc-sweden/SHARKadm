@@ -1,9 +1,9 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class DateTime(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddReportedDates,
         transformers.FixDateFormat,
         transformers.FixTimeFormat,
@@ -11,7 +11,7 @@ class DateTime(MultiTransformer):
         transformers.AddSampleTime,
         transformers.AddDatetime,
         transformers.AddMonth,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -22,7 +22,7 @@ class DateTime(MultiTransformer):
 
 
 class DateTimePolars(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddReportedDatesPolars,
         transformers.FixDateFormatPolars,
         transformers.FixTimeFormatPolars,
@@ -30,7 +30,7 @@ class DateTimePolars(MultiTransformer):
         transformers.AddSampleTimePolars,
         transformers.AddDatetimePolars,
         transformers.AddMonthPolars,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

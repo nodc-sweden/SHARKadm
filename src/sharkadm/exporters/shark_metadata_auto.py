@@ -2,8 +2,9 @@ import datetime
 import pathlib
 
 from sharkadm.data import PandasDataHolder
-from .base import Exporter, FileExporter
-from sharkadm import utils, adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import FileExporter
 
 
 class SHARKMetadataAuto(FileExporter):
@@ -89,12 +90,12 @@ class SHARKMetadataAuto(FileExporter):
 
     def create_file(
         self,
-        export_directory: pathlib.Path | str = None,
-        export_file_name: pathlib.Path | str = None,
+        export_directory: pathlib.Path | str | None = None,
+        export_file_name: pathlib.Path | str | None = None,
     ) -> None:
         if not self._data_holder:
             adm_logger.log_export(
-                f"No data_holder set to create shark_metadata_auto.txt",
+                "No data_holder set to create shark_metadata_auto.txt",
                 level=adm_logger.CRITICAL,
             )
             return

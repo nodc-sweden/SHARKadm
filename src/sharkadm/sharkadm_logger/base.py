@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sharkadm import utils
@@ -65,7 +65,7 @@ class SharkadmLoggerExporter(ABC):
                 f"for exporter {self.__class__.__name__}"
             )
             return
-        utils.open_directory(self.file_path.parent)
+        utils.open_file_or_directory(self.file_path.parent)
 
     def _open_file(self):
         if not self.kwargs.get(

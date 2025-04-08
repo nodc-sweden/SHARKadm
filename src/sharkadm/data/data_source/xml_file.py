@@ -13,7 +13,7 @@ class old_XmlDataFile(DataFile):
     def extract_data_from_element(element, data):
         for el in element:
             if not el.text.strip():
-                XmlDataFile.extract_data_from_element(el, data)
+                old_XmlDataFile.extract_data_from_element(el, data)
             else:
                 data[el.tag] = el.text
 
@@ -26,7 +26,7 @@ class old_XmlDataFile(DataFile):
         for element in root.find("undersokning"):
             if element.tag == "lokal":
                 line_data = und_data.copy()
-                XmlDataFile.extract_data_from_element(element, line_data)
+                old_XmlDataFile.extract_data_from_element(element, line_data)
                 rows.append(line_data)
                 # s = pd.Series(line_data)
             else:

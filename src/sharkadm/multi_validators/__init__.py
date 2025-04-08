@@ -3,10 +3,8 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
+from sharkadm.multi_validators.base import MultiValidator
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
-from .aphia_id import AphiaIdAfter
-
-from .base import MultiValidator
 
 
 @functools.cache

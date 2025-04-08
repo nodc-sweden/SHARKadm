@@ -2,8 +2,9 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.data import archive
-from .base import Transformer, PolarsTransformer
+
 from ..data.data_holder import PolarsDataHolder
+from .base import PolarsTransformer, Transformer
 
 
 class MapperParameterColumn(Transformer):

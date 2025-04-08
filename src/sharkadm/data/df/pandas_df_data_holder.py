@@ -1,13 +1,10 @@
 import logging
-import pathlib
-
-import pandas as pd
 from typing import Protocol
 
+import pandas as pd
+
 from sharkadm.data.data_holder import PandasDataHolder
-from sharkadm.data import data_source
-from sharkadm.data.archive import sampling_info, analyse_info
-from sharkadm import adm_logger
+from sharkadm.data.data_source.base import DataDataFrame, DataFile
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +39,7 @@ class PandasDataFrameDataHolder(PandasDataHolder):
         return """Holds data from a given pandas dataframe"""
 
     def _load_data(self, df: pd.DataFrame) -> None:
-        d_source = data_source.DataDataFrame(df, data_type=self.data_type)
+        d_source = DataDataFrame(df, data_type=self.data_type)
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
         self._set_data_source(d_source)
@@ -50,7 +47,7 @@ class PandasDataFrameDataHolder(PandasDataHolder):
         self._dataset_name = "Pandas dataframe"
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)

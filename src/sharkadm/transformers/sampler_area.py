@@ -1,5 +1,6 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddCalculatedSamplerArea(Transformer):

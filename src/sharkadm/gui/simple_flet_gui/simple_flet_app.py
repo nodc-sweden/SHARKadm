@@ -9,22 +9,15 @@ from typing import Callable
 # from sharkadm.gui.tooltip_texts import TooltipTexts, get_tooltip_widget
 # from sharkadm.gui.texts import Texts
 # from sharkadm.gui.colors import Colors
-
 import flet as ft
-from flet_core.constrained_control import ConstrainedControl
 import yaml
 
-from .widgets import operation
-from .widgets import config
-from . import gui_event
 from sharkadm import event
-
-from sharkadm import transformers
-from sharkadm import validators
-from sharkadm import exporters
 from sharkadm.controller import SHARKadmController
 from sharkadm.workflow import SHARKadmWorkflow
 
+from . import gui_event
+from .widgets import config, operation
 
 logger = logging.getLogger(__name__)
 
@@ -445,7 +438,6 @@ class SimpleFletApp:
     def _on_change_order(self, data: dict):
         order = data.get("active_order")
         uid = data.get("uid")
-        changed = []
         for lst in self._all_lists:
             if lst.uid == uid:
                 if order == self._get_order_from_config(lst.title):

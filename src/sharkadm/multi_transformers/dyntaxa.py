@@ -1,16 +1,16 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Dyntaxa(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddReportedDyntaxaId,
         transformers.AddReportedScientificNameDyntaxaId,
         transformers.AddDyntaxaScientificName,
         transformers.AddDyntaxaTranslatedScientificNameDyntaxaId,
         transformers.AddTaxonRanks,
         transformers.AddDyntaxaId,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

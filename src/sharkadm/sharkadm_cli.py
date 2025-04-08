@@ -1,12 +1,9 @@
 import pathlib
 
+import rich
 import typer
-from rich import print
 
-from sharkadm import transformers
-from sharkadm import utils
-from sharkadm import validators
-from sharkadm import write_operations_description_to_file
+from sharkadm import transformers, utils, validators, write_operations_description_to_file
 from sharkadm.workflow import SHARKadmWorkflow
 
 app = typer.Typer()
@@ -22,7 +19,7 @@ def _write_operations(directory: str, file_name: str, open_file: bool) -> None:
 
 
 @app.command()
-def list_validators(filter_string: str = None):
+def list_validators(filter_string: str | None = None):
     info_lines = ["", "=" * 100]
     if filter_string:
         info_lines.append(f'VALIDATORS filtered on "{filter_string}":')
@@ -37,11 +34,11 @@ def list_validators(filter_string: str = None):
                 continue
         info_lines.append(f"{name.ljust(60)}: {desc}")
     info_lines.append("-" * 100)
-    print("\n".join(info_lines))
+    rich.print("\n".join(info_lines))
 
 
 @app.command()
-def list_transformers(filter_string: str = None):
+def list_transformers(filter_string: str | None = None):
     info_lines = ["", "=" * 100]
     if filter_string:
         info_lines.append(f'TRANSFORMERS filtered on "{filter_string}":')
@@ -56,7 +53,7 @@ def list_transformers(filter_string: str = None):
                 continue
         info_lines.append(f"{name.ljust(60)}: {desc}")
     info_lines.append("-" * 100)
-    print("\n".join(info_lines))
+    rich.print("\n".join(info_lines))
 
 
 @app.command()
@@ -79,7 +76,7 @@ def workflow(config_path: str, source: str):
     if source:
         wf.set_data_sources(source)
     wf.start_workflow()
-    print("Workflow DONE!")
+    rich.print("Workflow DONE!")
 
 
 def main():

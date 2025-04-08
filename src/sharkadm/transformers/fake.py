@@ -1,12 +1,12 @@
-from .base import Transformer, DataHolderProtocol
+from .base import DataHolderProtocol, Transformer
 
 
 class FakeAddPressureFromDepth(Transformer):
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_holders = ("LimsDataHolder",)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds pressure = depth to lims data"
+        return "Adds pressure = depth to lims data"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data["PRES"] = data_holder.data["DEPH"]
@@ -14,7 +14,7 @@ class FakeAddPressureFromDepth(Transformer):
 
 
 class FakeAddCTDtagToColumns(Transformer):
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_holders = ("LimsDataHolder",)
 
     @staticmethod
     def get_transformer_description() -> str:

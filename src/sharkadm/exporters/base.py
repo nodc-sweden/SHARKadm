@@ -1,14 +1,13 @@
 import pathlib
 import time
 from abc import ABC, abstractmethod
-from typing import Any
-from typing import Protocol
+from typing import Any, Protocol
 
 import pandas as pd
 
-from sharkadm import adm_logger, config
-from sharkadm import utils
+from sharkadm import config, utils
 from sharkadm.data import is_valid_data_holder
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class DataHolderProtocol(Protocol):
@@ -32,11 +31,11 @@ class DataHolderProtocol(Protocol):
 class Exporter(ABC):
     """Abstract base class used as a blueprint for exporting stuff in a DataHolder"""
 
-    valid_data_types = []
-    invalid_data_types = []
+    valid_data_types = ()
+    invalid_data_types = ()
 
-    valid_data_holders = []
-    invalid_data_holders = []
+    valid_data_holders = ()
+    invalid_data_holders = ()
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -161,7 +160,7 @@ class FileExporter(Exporter, ABC):
 
     def open_directory(self):
         if self._kwargs.get("open_directory") and self.export_directory:
-            utils.open_directory(self.export_directory)
+            utils.open_file_or_directory(self.export_directory)
         return self
 
     @staticmethod

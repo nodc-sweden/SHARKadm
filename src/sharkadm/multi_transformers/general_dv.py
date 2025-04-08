@@ -1,12 +1,12 @@
-from .base import MultiTransformer
 from sharkadm import transformers
-from .dyntaxa import Dyntaxa
-from .location import Location
-from .translate import Translate
+from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.dyntaxa import Dyntaxa
+from sharkadm.multi_transformers.location import Location
+from sharkadm.multi_transformers.translate import Translate
 
 
 class GeneralDV(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.WideToLong,
         transformers.AddDeliveryNoteInfo,
         transformers.AddAnalyseInfo,
@@ -33,7 +33,7 @@ class GeneralDV(MultiTransformer):
         transformers.AddSharkId,
         # Temp
         transformers.SortColumns,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

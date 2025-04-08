@@ -1,12 +1,12 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class GeneralFinal(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.StripAllValues,
         transformers.SortData,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

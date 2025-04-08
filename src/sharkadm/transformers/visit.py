@@ -1,15 +1,15 @@
-from .base import (
-    Transformer,
-    DataHolderProtocol,
-    PolarsTransformer,
-    PolarsDataHolderProtocol,
-)
-
 import polars as pl
+
+from .base import (
+    DataHolderProtocol,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 
 
 class AddVisitKey(Transformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical",)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -26,7 +26,7 @@ class AddVisitKey(Transformer):
 
 
 class PolarsAddVisitKey(PolarsTransformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical",)
 
     @staticmethod
     def get_transformer_description() -> str:

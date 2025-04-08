@@ -34,14 +34,14 @@ class SHARKadmLogger:
     GENERAL = "general"
     FEEDBACK = "feedback"
 
-    _levels = [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+    _levels = (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 
-    _log_types = [VALIDATION, TRANSFORMATION, EXPORT, WORKFLOW]
+    _log_types = (VALIDATION, TRANSFORMATION, EXPORT, WORKFLOW)
 
-    _purposes = [
+    _purposes = (
         GENERAL,
         FEEDBACK,
-    ]
+    )
 
     def __init__(self):
         self.feedback = Feedback()
@@ -396,18 +396,17 @@ class old_SHARKadmLogger:
     GENERAL = "general"
     FEEDBACK = "feedback"
 
-    _levels = [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+    _levels = (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 
-    _log_types = [VALIDATION, TRANSFORMATION, EXPORT, WORKFLOW]
+    _log_types = (VALIDATION, TRANSFORMATION, EXPORT, WORKFLOW)
 
-    _purposes = [
+    _purposes = (
         GENERAL,
         FEEDBACK,
-    ]
-
-    _data = dict()
+    )
 
     def __init__(self):
+        self._data = {}
         self.feedback = Feedback()
         self._initiate_log()
 

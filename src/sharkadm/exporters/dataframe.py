@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from sharkadm import adm_logger
-from sharkadm.config import get_import_matrix_mapper, get_header_mapper_from_data_holder
-from .base import Exporter, DataHolderProtocol
+from sharkadm.config import get_header_mapper_from_data_holder
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Exporter
 
 
 class DataFrame(Exporter):
@@ -19,10 +20,10 @@ class DataFrame(Exporter):
     @staticmethod
     def get_exporter_description() -> str:
         return """
-        Returns a modified dataframe. Option to: 
-        map header via "header_as" 
-        convert certain columns to float via: "float_columns". If set to True, 
-            parameter column and position.columns are converted 
+        Returns a modified dataframe. Option to:
+        map header via "header_as"
+        convert certain columns to float via: "float_columns". If set to True,
+            parameter column and position.columns are converted
         """
 
     def _export(self, data_holder: DataHolderProtocol) -> pd.DataFrame | None:

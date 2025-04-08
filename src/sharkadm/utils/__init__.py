@@ -4,9 +4,8 @@ import pathlib
 import platform
 import shutil
 import subprocess
+import sys
 import zipfile
-
-import sharkadm
 
 SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
@@ -146,31 +145,22 @@ def open_file_with_excel(path: str | pathlib.Path) -> None:
 
 
 def open_files_in_winmerge(*args: str | pathlib.Path) -> None:
-    try:
-        string = '"C:/Program Files/WinMerge/WinMergeU.exe"'
-        for arg in args:
-            string = string + f" {arg}"
-        subprocess.call(string)
-        # subprocess.call(
-        #     (f'"C:/Program Files (x86)/WinMerge/WinMergeU.exe" {file1} {file2}')
-        # )
-    except:
-        pass
+    executable = '"C:/Program Files/WinMerge/WinMergeU.exe"'
+    subprocess.call([executable, *args])
 
 
-def open_directory(*args: str | pathlib.Path) -> None:
-    for arg in args:
-        print(f"{arg=}")
-        os.startfile(str(arg))
-    try:
-        for arg in args:
-            os.startfile(str(arg))
-    except:
-        pass
+def open_file_or_directory(file_name):
+    match sys.platform:
+        case "win32":
+            os.startfile(file_name)
+        case "darwin":
+            subprocess.call(["open", file_name])
+        case _:
+            subprocess.call(["xdg-open", file_name])
 
 
 def open_export_directory(*subdirectories: str) -> None:
-    open_directory(get_export_directory(*subdirectories))
+    open_file_or_directory(get_export_directory(*subdirectories))
 
 
 def get_all_class_children_list(cls):

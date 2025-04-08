@@ -1,5 +1,6 @@
 from sharkadm import config
 from sharkadm.data import archive
+
 from .base import Transformer
 
 
@@ -11,7 +12,7 @@ class ArchiveMapper(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Maps the data header using import matrix"
+        return "Maps the data header using import matrix"
 
     def _transform(self, data_holder: archive.ArchiveDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(

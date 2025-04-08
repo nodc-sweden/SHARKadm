@@ -1,5 +1,6 @@
-from .base import Transformer, DataHolderProtocol
 from sharkadm.data.archive import get_archive_data_holder_names
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddStaticDataHoldingCenterEnglish(Transformer):

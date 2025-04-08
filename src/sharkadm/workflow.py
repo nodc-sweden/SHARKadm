@@ -2,17 +2,19 @@ import pathlib
 
 import yaml
 
-from sharkadm import adm_logger, adm_config_paths
-from sharkadm import exporters
-from sharkadm import transformers
-from sharkadm import multi_transformers
-from sharkadm import utils
-from sharkadm import validators
+from sharkadm import (
+    exporters,
+    multi_transformers,
+    sharkadm_exceptions,
+    transformers,
+    utils,
+    validators,
+)
+from sharkadm.config import adm_config_paths
 from sharkadm.controller import SHARKadmController
 from sharkadm.data import get_data_holder
 from sharkadm.exporters.base import FileExporter
-from sharkadm.sharkadm_logger import get_exporter
-from sharkadm import sharkadm_exceptions
+from sharkadm.sharkadm_logger import adm_logger, get_exporter
 
 VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
 TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
@@ -28,7 +30,7 @@ class SHARKadmWorkflow:
         validators_after: list[dict[str, str | dict[str, str]]] | None = None,
         exporters: list[dict[str, str | dict[str, str]]] | None = None,
         workflow_config: dict[str, str] | None = None,
-        adm_logger_config: dict[str, str | list] = None,
+        adm_logger_config: dict[str, str | list] | None = None,
         **kwargs,
     ) -> None:
         self._controller = SHARKadmController()
@@ -173,7 +175,7 @@ class SHARKadmWorkflow:
 
     def save_config(
         self,
-        path: str | pathlib.Path = None,
+        path: str | pathlib.Path | None = None,
     ) -> None:
         if path:
             config_save_path = pathlib.Path(path)

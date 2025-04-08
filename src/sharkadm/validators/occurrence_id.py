@@ -1,7 +1,8 @@
-from .base import Validator, DataHolderProtocol
-
-from sharkadm import adm_logger
 import logging
+
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Validator
 
 logger = logging.getLogger(__name__)
 

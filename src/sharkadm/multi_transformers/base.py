@@ -1,11 +1,12 @@
-from abc import ABC, abstractmethod
-from typing import Protocol, Type
 import time
+from abc import abstractmethod
+from typing import Protocol, Type
 
 import pandas as pd
 
-from sharkadm import adm_logger, config
+from sharkadm import config
 from sharkadm.data import get_valid_data_holders
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import Transformer
 
 
@@ -33,16 +34,16 @@ class MultiTransformer(Transformer):
     """Abstract base class used as a blueprint for doing multiple changes in data
     in a DataHolder"""
 
-    valid_data_types: list[str] = []
-    invalid_data_types: list[str] = []
+    valid_data_types: tuple[str, ...] = ()
+    invalid_data_types: tuple[str, ...] = ()
 
-    valid_data_holders: list[str] = []
-    invalid_data_holders: list[str] = []
+    valid_data_holders: tuple[str, ...] = ()
+    invalid_data_holders: tuple[str, ...] = ()
 
-    valid_data_structures: list[str] = []
-    invalid_data_structures: list[str] = []
+    valid_data_structures: tuple[str, ...] = ()
+    invalid_data_structures: tuple[str, ...] = ()
 
-    _transformers: list[Type[Transformer]] = []
+    _transformers: tuple[Type[Transformer], ...] = ()
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import pathlib
-
-import flet as ft
 import textwrap
 
-from .. import gui_event
+import flet as ft
+
 from sharkadm import utils
+
+from .. import gui_event
 
 
 class Operation(ft.UserControl):
@@ -46,7 +47,7 @@ class Operation(ft.UserControl):
         data = self._data.get("kwargs", {})
         for key, control in self._settings_controls.items():
             value = control.value
-            if type(value) == pathlib.Path:
+            if isinstance(value, pathlib.Path):
                 value = str(value)
             data[key] = value
         return data
@@ -57,7 +58,7 @@ class Operation(ft.UserControl):
 
     @state.setter
     def state(self, st) -> None:
-        assert type(st) == bool
+        assert isinstance(st, bool)
         self._switch.value = st
         self._on_change()
 
@@ -199,7 +200,7 @@ class Operation(ft.UserControl):
                 row = ft.Row([ft.Text("Ange ett filnamn"), self._settings_controls[key]])
                 column.controls.append(row)
 
-            elif type(value) == bool:
+            elif isinstance(value, bool):
                 self._settings_controls[key] = ft.Switch(label=key)
                 row = ft.Row([self._settings_controls[key]])
                 column.controls.append(row)

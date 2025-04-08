@@ -1,13 +1,13 @@
-from .base import Transformer, DataHolderProtocol, PolarsTransformer
-from sharkadm import adm_logger
+import polars as pl
+
 from sharkadm.utils import matching_strings
 
-import re
-import polars as pl
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 
 class ReplaceCommaWithDot(Transformer):
-    apply_on_columns = [
+    apply_on_columns = (
         ".*latitude.*",
         ".*longitude.*",
         "water_depth_m",
@@ -19,9 +19,9 @@ class ReplaceCommaWithDot(Transformer):
         ".*wind.*",
         ".*pressure.*",
         ".*temperature.*",
-    ]
+    )
 
-    def __init__(self, apply_on_columns: list[str] = None) -> None:
+    def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
         super().__init__()
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
@@ -52,7 +52,7 @@ class ReplaceCommaWithDot(Transformer):
 
 
 class PolarsReplaceCommaWithDot(PolarsTransformer):
-    apply_on_columns = [
+    apply_on_columns = (
         ".*latitude.*",
         ".*longitude.*",
         "water_depth_m",
@@ -64,9 +64,9 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
         ".*wind.*",
         ".*pressure.*",
         ".*temperature.*",
-    ]
+    )
 
-    def __init__(self, apply_on_columns: list[str] = None) -> None:
+    def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
         super().__init__()
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
@@ -75,7 +75,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Replacing comma with dot in given columns"
+        return "Replacing comma with dot in given columns"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):
@@ -90,7 +90,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
 
 
 class ReplaceCommaWithDotPolars(Transformer):
-    apply_on_columns = [
+    apply_on_columns = (
         ".*latitude.*",
         ".*longitude.*",
         "water_depth_m",
@@ -102,9 +102,9 @@ class ReplaceCommaWithDotPolars(Transformer):
         ".*wind.*",
         ".*pressure.*",
         ".*temperature.*",
-    ]
+    )
 
-    def __init__(self, apply_on_columns: list[str] = None) -> None:
+    def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
         super().__init__()
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns
@@ -113,7 +113,7 @@ class ReplaceCommaWithDotPolars(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Replacing comma with dot in given columns"
+        return "Replacing comma with dot in given columns"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in self._get_matching_cols(data_holder):

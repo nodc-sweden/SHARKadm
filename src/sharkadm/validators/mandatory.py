@@ -1,7 +1,10 @@
-from .base import Validator  # , DataHolderProtocol
-from sharkadm import adm_logger
 from typing import Protocol
+
 import pandas as pd
+
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import Validator  # , DataHolderProtocol
 
 
 class DataHolderProtocol(Protocol):
@@ -19,7 +22,7 @@ class DataHolderProtocol(Protocol):
 
 
 class ValidateValuesInMandatoryNatColumns(Validator):
-    valid_data_holders = ["DvTemplateDataHolder"]
+    valid_data_holders = ("DvTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -48,7 +51,7 @@ class ValidateValuesInMandatoryNatColumns(Validator):
 
 
 class ValidateValuesInMandatoryRegColumns(Validator):
-    valid_data_holders = ["DvTemplateDataHolder"]
+    valid_data_holders = ("DvTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -75,7 +78,7 @@ class ValidateValuesInMandatoryRegColumns(Validator):
 
 
 class ValidateMandatoryNatColumnsExists(Validator):
-    valid_data_holders = ["DvTemplateDataHolder"]
+    valid_data_holders = ("DvTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -93,7 +96,7 @@ class ValidateMandatoryNatColumnsExists(Validator):
 
 
 class ValidateMandatoryRegColumnsExists(Validator):
-    valid_data_holders = ["DvTemplateDataHolder"]
+    valid_data_holders = ("DvTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:

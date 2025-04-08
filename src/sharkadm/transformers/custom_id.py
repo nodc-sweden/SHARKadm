@@ -1,8 +1,9 @@
-from sharkadm import config
-from .base import Transformer, DataHolderProtocol
-
 import hashlib
-from sharkadm import adm_logger
+
+from sharkadm import config
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddCustomId(Transformer):

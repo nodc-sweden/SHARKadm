@@ -1,13 +1,13 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Position(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddSamplePositionDD,
         transformers.AddSamplePositionDM,
         transformers.AddSamplePositionSweref99tm,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

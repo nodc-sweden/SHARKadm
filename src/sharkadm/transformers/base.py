@@ -1,14 +1,14 @@
-from abc import ABC, abstractmethod
-from typing import Protocol, TYPE_CHECKING
 import time
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Protocol
 
+import numpy as np
 import pandas as pd
 import polars as pl
-import numpy as np
 
-from sharkadm import adm_logger, config
-from sharkadm.data import get_valid_data_holders
+from sharkadm import config
 from sharkadm.data import is_valid_data_holder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter
 
 if TYPE_CHECKING:
@@ -66,14 +66,14 @@ class PolarsDataHolderProtocol(Protocol):
 class Transformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
-    valid_data_types = []
-    invalid_data_types = []
+    valid_data_types = ()
+    invalid_data_types = ()
 
-    valid_data_holders = []
-    invalid_data_holders = []
+    valid_data_holders = ()
+    invalid_data_holders = ()
 
-    valid_data_structures = []
-    invalid_data_structures = []
+    valid_data_structures = ()
+    invalid_data_structures = ()
 
     def __init__(self, data_filter: DataFilter = None, **kwargs):
         self._data_filter = data_filter
@@ -153,14 +153,14 @@ class Transformer(ABC):
 class PolarsTransformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
-    valid_data_types = []
-    invalid_data_types = []
+    valid_data_types = ()
+    invalid_data_types = ()
 
-    valid_data_holders = []
-    invalid_data_holders = []
+    valid_data_holders = ()
+    invalid_data_holders = ()
 
-    valid_data_structures = []
-    invalid_data_structures = []
+    valid_data_structures = ()
+    invalid_data_structures = ()
 
     def __init__(self, data_filter: DataFilter = None, **kwargs):
         self._data_filter = data_filter

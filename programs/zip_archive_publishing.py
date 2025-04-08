@@ -1,27 +1,19 @@
 import pathlib
 import shutil
+import sys
 import time
 
-import requests
-
-from sharkadm import controller
-from sharkadm import transformers
-from sharkadm.data import archive
-from sharkadm import validators
-from sharkadm import exporters
-from sharkadm.data import lims
-from sharkadm import adm_logger
-from sharkadm.data import get_zip_archive_data_holder
-from sharkadm import event
-
-from sharkadm import utils
 import flet as ft
-from mw_to_compare import create_compare_files
+import requests
 import yaml
 
-import warnings
-import pandas as pd
-import sys
+from sharkadm import (
+    controller,
+    exporters,
+    transformers,
+    utils,
+)
+from sharkadm.data import get_zip_archive_data_holder
 
 if getattr(sys, "frozen", False):
     ROOT_DIR = pathlib.Path(sys.executable).parent
@@ -275,11 +267,11 @@ class ZipArchivePublisherGUI:
                 self._open_dlg()
                 self._publisher.copy_archives_to_sharkdata()
         if self._option_trigger_import.value:
-            self._dialog_text.value = f"Triggar import..."
+            self._dialog_text.value = "Triggar import..."
             self._open_dlg()
             self._publisher.trigger_import()
             time.sleep(1)
-        self._dialog_text.value = f"Allt klart!"
+        self._dialog_text.value = "Allt klart!"
         self._open_dlg()
         self._export_saves()
         self._enable_buttons()

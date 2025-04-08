@@ -1,13 +1,14 @@
-from .base import MultiValidator
 from sharkadm import validators
+
+from .base import MultiValidator
 
 
 class AphiaIdAfter(MultiValidator):
-    _validators = [
+    _validators = (
         validators.ValidateReportedVsAphiaId,
         validators.ValidateReportedVsBvolAphiaId,
         validators.ValidateAphiaIdVsBvolAphiaId,
-    ]
+    )
 
     @staticmethod
     def get_validator_description() -> str:

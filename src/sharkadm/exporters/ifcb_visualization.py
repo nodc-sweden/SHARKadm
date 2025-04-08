@@ -2,7 +2,8 @@ import pathlib
 
 from sharkadm import utils
 from sharkadm.ifcb import create_ifcb_visualization_files
-from .base import FileExporter, DataHolderProtocol
+
+from .base import DataHolderProtocol, FileExporter
 
 
 class IfcbVisualizationFiles(FileExporter):

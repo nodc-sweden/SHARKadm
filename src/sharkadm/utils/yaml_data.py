@@ -1,5 +1,6 @@
-import yaml
 import pathlib
+
+import yaml
 
 
 def load_yaml(path: str | pathlib.Path, **kwargs):

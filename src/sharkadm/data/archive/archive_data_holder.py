@@ -6,16 +6,11 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
-
-# from sharkadm.config import get_data_type_mapper
-from sharkadm.config.import_matrix import ImportMatrixConfig
-from sharkadm.config.import_matrix import ImportMatrixMapper
-from sharkadm.data import data_source
-from sharkadm.data.archive import delivery_note, analyse_info
-from sharkadm.data.archive import sampling_info
+from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
-from sharkadm import adm_logger
-from sharkadm.data.data_source import DataFile
+from sharkadm.data.data_source.base import DataFile
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +22,9 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, archive_root_directory: str | pathlib.Path = None, **kwargs):
+    def __init__(
+        self, archive_root_directory: str | pathlib.Path | None = None, **kwargs
+    ):
         super().__init__()
         self._archive_root_directory = pathlib.Path(archive_root_directory)
 
@@ -112,7 +109,7 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
     def received_data_files(self) -> list[pathlib.Path]:
         paths = []
         if not self.received_data_directory.exists():
-            adm_logger.log_workflow(f'"Received" folder not found', level=adm_logger.INFO)
+            adm_logger.log_workflow('"Received" folder not found', level=adm_logger.INFO)
             return paths
         for path in self.received_data_directory.iterdir():
             if path.is_dir():
@@ -238,7 +235,7 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
             else:
                 self._data[new_column] = self._data[new_column] + self._data[col]
 
-    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+    def _check_data_source(self, data_source: DataFile) -> None:
         return
         # if (
         #     self._data_type_mapper.get(data_source.data_type) !=
@@ -263,7 +260,9 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, archive_root_directory: str | pathlib.Path = None, **kwargs):
+    def __init__(
+        self, archive_root_directory: str | pathlib.Path | None = None, **kwargs
+    ):
         super().__init__()
         self._archive_root_directory = pathlib.Path(archive_root_directory)
 
@@ -348,7 +347,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def received_data_files(self) -> list[pathlib.Path]:
         paths = []
         if not self.received_data_directory.exists():
-            adm_logger.log_workflow(f'"Received" folder not found', level=adm_logger.INFO)
+            adm_logger.log_workflow('"Received" folder not found', level=adm_logger.INFO)
             return paths
         for path in self.received_data_directory.iterdir():
             if path.is_dir():
@@ -474,7 +473,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
             else:
                 self._data[new_column] = self._data[new_column] + self._data[col]
 
-    def _check_data_source(self, data_source: data_source.DataFile) -> None:
+    def _check_data_source(self, data_source: DataFile) -> None:
         return
         # if (
         #     self._data_type_mapper.get(data_source.data_type) !=

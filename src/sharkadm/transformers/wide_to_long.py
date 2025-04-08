@@ -1,20 +1,18 @@
-from abc import abstractmethod
-
 import pandas as pd
 import polars as pl
+
+from sharkadm import event
+from sharkadm.data import PandasDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import matching_strings
 
-from sharkadm import adm_logger, event
-from .base import Transformer, DataHolderProtocol, PolarsTransformer
-from sharkadm import config
-from sharkadm.data import archive
-from sharkadm.data import PandasDataHolder
 from ..data.data_holder import PolarsDataHolder
+from .base import PolarsTransformer, Transformer
 
 
 class WideToLong(Transformer):
     # valid_data_structures = ['column']
-    invalid_data_holders = ["ZoobenthosBedaArchiveDataHolder"]
+    invalid_data_holders = ("ZoobenthosBedaArchiveDataHolder",)
 
     def __init__(
         self,
@@ -30,7 +28,7 @@ class WideToLong(Transformer):
         super().__init__(**kwargs)
 
         self._ignore_containing = ignore_containing or []
-        if type(self._ignore_containing) == str:
+        if isinstance(self._ignore_containing, str):
             self._ignore_containing = [self._ignore_containing]
 
         self._column_name_parameter = column_name_parameter
@@ -45,7 +43,7 @@ class WideToLong(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Transposes data from column data to row data"
+        return "Transposes data from column data to row data"
 
     def _transform(self, data_holder: PandasDataHolder) -> None:
         self._qf_prefix = data_holder.qf_column_prefixes
@@ -162,7 +160,7 @@ class WideToLong(Transformer):
                     # )
                     qf = ""
                 unit = self._get_unit_from_parameter(col)
-                new_row = meta + [par, value, qf, unit]
+                new_row = [*meta, par, value, qf, unit]
                 data.append(new_row)
 
         # self.meta = meta
@@ -173,7 +171,8 @@ class WideToLong(Transformer):
         # self.new_row = new_row
         # self.row = row
         # self.data = data
-        self.columns = self._metadata_columns + [
+        self.columns = [
+            *self._metadata_columns,
             self._column_name_parameter,
             self._column_name_value,
             self._column_name_qf,
@@ -181,8 +180,8 @@ class WideToLong(Transformer):
         ]
         new_df = pd.DataFrame(
             data=data,
-            columns=self._metadata_columns
-            + [
+            columns=[
+                *self._metadata_columns,
                 self._column_name_parameter,
                 self._column_name_value,
                 self._column_name_qf,
@@ -252,7 +251,7 @@ class WideToLong(Transformer):
 
 class PolarsWideToLong(PolarsTransformer):
     # valid_data_structures = ['column']
-    invalid_data_holders = ["ZoobenthosBedaArchiveDataHolder"]
+    invalid_data_holders = ("ZoobenthosBedaArchiveDataHolder",)
 
     def __init__(
         self,
@@ -268,7 +267,7 @@ class PolarsWideToLong(PolarsTransformer):
         super().__init__(**kwargs)
 
         self._ignore_containing = ignore_containing or []
-        if type(self._ignore_containing) == str:
+        if isinstance(self._ignore_containing, str):
             self._ignore_containing = [self._ignore_containing]
 
         self._column_name_parameter = column_name_parameter
@@ -375,10 +374,11 @@ class PolarsWideToLong(PolarsTransformer):
                     # )
                     qf = ""
                 unit = self._get_unit_from_parameter(col)
-                new_row = meta + [par, value, qf, unit]
+                new_row = [*meta, par, value, qf, unit]
                 data.append(new_row)
 
-        self.columns = self._metadata_columns + [
+        self.columns = [
+            *self._metadata_columns,
             self._column_name_parameter,
             self._column_name_value,
             self._column_name_qf,
@@ -386,8 +386,8 @@ class PolarsWideToLong(PolarsTransformer):
         ]
         new_df = pl.DataFrame(
             data=data,
-            schema=self._metadata_columns
-            + [
+            schema=[
+                *self._metadata_columns,
                 self._column_name_parameter,
                 self._column_name_value,
                 self._column_name_qf,

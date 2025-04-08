@@ -1,5 +1,6 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 try:
     import nodc_geography
@@ -13,10 +14,13 @@ except ModuleNotFoundError as e:
 
 
 class _AddLocationBase(Transformer):
-    _cashed_data = dict()
     x_pos_col = "sample_sweref99tm_x"
     y_pos_col = "sample_sweref99tm_y"
     col_to_set = ""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._cached_data = {}
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -44,7 +48,7 @@ class _AddLocationBase(Transformer):
         y_pos = row[self.y_pos_col]
         if not all([x_pos, y_pos]):
             return ""
-        return self._cashed_data.setdefault(
+        return self._cached_data.setdefault(
             (x_pos, y_pos, self.col_to_set),
             nodc_geography.get_shape_file_info_at_position(
                 x_pos=x_pos, y_pos=y_pos, variable=self.col_to_set
@@ -58,7 +62,7 @@ class AddLocationWaterDistrict(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_water_district from shape files"
+        return "Adds location_water_district from shape files"
 
 
 class AddLocationTypeArea(_AddLocationBase):
@@ -66,7 +70,7 @@ class AddLocationTypeArea(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_type_area from shape files"
+        return "Adds location_type_area from shape files"
 
 
 class AddLocationSeaBasin(_AddLocationBase):
@@ -74,7 +78,7 @@ class AddLocationSeaBasin(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_sea_basin from shape files"
+        return "Adds location_sea_basin from shape files"
 
 
 class AddLocationNation(_AddLocationBase):
@@ -82,7 +86,7 @@ class AddLocationNation(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_nation from shape files"
+        return "Adds location_nation from shape files"
 
 
 class AddLocationCounty(_AddLocationBase):
@@ -90,7 +94,7 @@ class AddLocationCounty(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_county from shape files"
+        return "Adds location_county from shape files"
 
 
 class AddLocationMunicipality(_AddLocationBase):
@@ -98,7 +102,7 @@ class AddLocationMunicipality(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_municipality from shape files"
+        return "Adds location_municipality from shape files"
 
 
 class AddLocationHelcomOsparArea(_AddLocationBase):
@@ -106,7 +110,7 @@ class AddLocationHelcomOsparArea(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_helcom_ospar_area from shape files"
+        return "Adds location_helcom_ospar_area from shape files"
 
 
 class AddLocationWB(_AddLocationBase):
@@ -114,7 +118,7 @@ class AddLocationWB(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_wb from shape files"
+        return "Adds location_wb from shape files"
 
 
 class AddLocationTYPNFS06(_AddLocationBase):
@@ -122,7 +126,7 @@ class AddLocationTYPNFS06(_AddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_typ_nfs06 from shape files"
+        return "Adds location_typ_nfs06 from shape files"
 
 
 class AddLocationWaterCategory(Transformer):
@@ -130,7 +134,7 @@ class AddLocationWaterCategory(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds location_water_category information"
+        return "Adds location_water_category information"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         col = "location_typ_nfs06"

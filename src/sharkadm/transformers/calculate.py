@@ -1,9 +1,9 @@
 import numpy as np
-
-from .base import Transformer, DataHolderProtocol
 import pandas as pd
-from sharkadm import adm_logger
 
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 try:
     from nodc_bvol import get_bvol_nomp_object
@@ -329,7 +329,7 @@ class CalculateBiovolume(Transformer):
                 )
                 continue
 
-            abundance = list(df.loc[df["parameter"] == "Abundance"]["value"])[0]
+            abundance = next(iter(df.loc[df["parameter"] == "Abundance"]["value"]))
             index_list = list(df.loc[df["parameter"] == self.parameter].index)
             bio_volume = float(abundance) * float(cell_volume)
             if index_list:
@@ -459,7 +459,7 @@ class CalculateCarbon(Transformer):
                 )
                 continue
 
-            abundance = list(df.loc[df["parameter"] == "Abundance"]["value"])[0]
+            abundance = next(iter(df.loc[df["parameter"] == "Abundance"]["value"]))
             index_list = list(df.loc[df["parameter"] == self.parameter].index)
             carbon_concentration = float(abundance) * float(carbon)
             if index_list:
@@ -531,8 +531,8 @@ class old_CleanupCalculations(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Compares reported and calculated values, setting value column "
-            f"and gives warnings if needed"
+            "Compares reported and calculated values, setting value column "
+            "and gives warnings if needed"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -546,7 +546,7 @@ class old_CleanupCalculations(Transformer):
 
         if "original_calculated_value" in data_holder.data:
             adm_logger.log_transformation(
-                f"CleanupCalculations already made. You dont want to do this again!",
+                "CleanupCalculations already made. You dont want to do this again!",
                 level=adm_logger.WARNING,
             )
             return
@@ -599,91 +599,3 @@ class old_CleanupCalculations(Transformer):
         # data_holder.data.loc[~abundance_boolean, 'reported_value'] = ''
 
         # calc_by_dc
-
-
-class old_CalculateZooplankton(Transformer):
-    occurrence_id_col = "custom_occurrence_id"
-    # col_to_set_abundance = 'CALCULATED_Abundance'
-    col_to_set_abundance = "Abundance"
-    col_to_set_abundance_unit = "ind/m2"
-
-    col_to_set_wet_weight_per_area = "Wet weight/area"
-    col_to_set_wet_weight_per_area_unit = "g wet weight/m2"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return (
-            f"Adding calculated columns: {old_CalculateZooplankton.col_to_set_abundance}"
-        )
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        series_to_add = []
-        for _id, df in data_holder.data.groupby(self.occurrence_id_col):
-            occ = ZooOccurrence(df)
-
-            counted = occ.counted
-            sampler_area_cm2 = occ.sampler_area_cm2
-
-            if not any([counted, sampler_area_cm2]):
-                adm_logger.log_transformation(
-                    f"Could not calculate anything. "
-                    f"Missing counted and sampler_area_cm2.",
-                    level=adm_logger.WARNING,
-                )
-                continue
-            elif not counted:
-                adm_logger.log_transformation(
-                    f"Could not calculate anything. Missing counted.",
-                    level=adm_logger.WARNING,
-                )
-                continue
-            elif not sampler_area_cm2:
-                adm_logger.log_transformation(
-                    f"Could not calculate anything. Missing sampler_area_cm2.",
-                    level=adm_logger.WARNING,
-                )
-                continue
-
-            #############################################################
-            series = df.loc[df.index[0]].squeeze()
-            calc_abundance = occ.counted / occ.sampler_area_cm2 * 10000.0
-            series["parameter"] = self.col_to_set_abundance
-            series["value"] = str(calc_abundance)
-            series["unit"] = self.col_to_set_abundance_unit
-            series["calc_by_dc"] = "Y"
-            series_to_add.append(series)
-            #############################################################
-            series = df.loc[df.index[0]].squeeze()
-            wet_weight = occ.wet_weight
-            if wet_weight:
-                calc_wet_weight = occ.counted / occ.wet_weight * 10000.0
-                series["parameter"] = self.col_to_set_wet_weight_per_area
-                series["value"] = str(calc_wet_weight)
-                series["unit"] = self.col_to_set_wet_weight_per_area_unit
-                series["calc_by_dc"] = "Y"
-                series_to_add.append(series)
-            #############################################################
-
-        if not series_to_add:
-            adm_logger.log_transformation("No calculations made", level=adm_logger.DEBUG)
-
-        adm_logger.log_transformation(
-            f"Adding {len(series_to_add)} calculated rows.", level=adm_logger.DEBUG
-        )
-        data_holder.data = pd.concat([data_holder.data, pd.DataFrame(series_to_add)])
-
-
-# class CopyCalculated(Transformer):
-#     source_cols = ['CALCULATED_Abundance']
-#     target_cols = ['Abundance']
-#
-#     @staticmethod
-#     def get_transformer_description() -> str:
-#         return (
-#             f'Copies columns {CopyCalculated.source_cols} '
-#             f'to {CopyCalculated.target_cols}'
-#         )
-#
-#     def _transform(self, data_holder: DataHolderProtocol) -> None:
-#         for scol, tcol in zip(self.source_cols, self.target_cols):
-#             data_holder.data[tcol] = data_holder.data[scol]

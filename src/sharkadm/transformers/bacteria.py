@@ -1,9 +1,9 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 
 class SetBacteriaAsReportedScientificName(Transformer):
-    valid_data_types = ["Bacterioplankton"]
+    valid_data_types = ("Bacterioplankton",)
     col_to_set = "scientific_name"
     value_to_set = "Bacteria"
 

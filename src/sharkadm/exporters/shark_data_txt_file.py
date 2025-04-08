@@ -1,9 +1,8 @@
 import pathlib
 
-from .base import FileExporter, DataHolderProtocol
-
 from sharkadm.config import get_column_views_config
-from sharkadm import utils
+
+from .base import DataHolderProtocol, FileExporter
 
 
 class SHARKdataTxt(FileExporter):
@@ -37,7 +36,7 @@ class SHARKdataTxt(FileExporter):
 
 
 class SHARKdataTxtAsGiven(FileExporter):
-    exclude_columns = ["source"]
+    exclude_columns = ("source",)
 
     def __init__(
         self,

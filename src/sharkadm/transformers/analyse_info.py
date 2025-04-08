@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
-import datetime
 
 import polars as pl
 
-from sharkadm import adm_logger
 from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
 from sharkadm.data.lims import LimsDataHolder, PolarsLimsDataHolder
-from sharkadm.transformers.base import Transformer, PolarsTransformer
-from typing import Protocol
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.transformers.base import PolarsTransformer, Transformer
 
 
 class AddAnalyseInfo(Transformer):
-    valid_data_holders = ["ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder"]
+    valid_data_holders = ("ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder")
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds analyse information to data"
+        return "Adds analyse information to data"
 
     def _transform(self, data_holder: ArchiveDataHolder | LimsDataHolder) -> None:
         if "parameter" not in data_holder.columns:
@@ -44,7 +42,7 @@ class AddAnalyseInfo(Transformer):
 
 
 class PolarsAddAnalyseInfo(PolarsTransformer):
-    valid_data_holders = ["ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder"]
+    valid_data_holders = ("ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder")
 
     @staticmethod
     def get_transformer_description() -> str:

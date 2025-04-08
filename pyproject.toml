@@ -40,3 +40,13 @@ dev = ["pytest>=8.2.2", "notebook>=7.3.2", "ruff>=0.11.2"]
 line-length = 90
 indent-width = 4
 target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "A",  # flake8-builtins
+    "F",  # pyflakes
+    "E", # pycodestyle: error
+    "W",  # pycodestyle: warning
+    "I001",  # isort: unsorted-imports
+    "RUF"  # Ruff-specific rules
+]

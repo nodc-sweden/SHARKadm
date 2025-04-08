@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from sharkadm.utils.paths import get_next_incremented_file_path
+
 from .base import SharkadmLoggerExporter
 
 if TYPE_CHECKING:
@@ -72,7 +73,7 @@ class XlsxExporter(SharkadmLoggerExporter):
         return item.lower().replace(" ", "")
 
     def _compress_list_items(self, lst: list[str] | str) -> list[str]:
-        if type(lst) == str:
+        if isinstance(lst, str):
             lst = [lst]
         return [self._compress_item(item) for item in lst]
 
@@ -90,8 +91,7 @@ class XlsxExporter(SharkadmLoggerExporter):
         sheet_name = self.file_path.stem.split("SHARK_")[-1][:30]
         df.to_excel(writer, sheet_name=sheet_name, startrow=1, header=False, index=False)
 
-        # Get the xlsxwriter workbook and worksheet objects.
-        workbook = writer.book
+        # Get the xlsxwriter worksheet object.
         worksheet = writer.sheets[sheet_name]
 
         # Get the dimensions of the dataframe.

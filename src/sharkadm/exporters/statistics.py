@@ -1,10 +1,10 @@
-import os
 import pathlib
 
 from sharkadm.data import PandasDataHolder
 from sharkadm.utils import statistics
-from .base import Exporter, FileExporter
+
 from ..utils.paths import get_next_incremented_file_path
+from .base import Exporter, FileExporter
 
 
 class PrintStatistics(Exporter):

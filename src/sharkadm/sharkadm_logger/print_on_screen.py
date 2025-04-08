@@ -1,9 +1,6 @@
-import datetime
 import logging
-import pathlib
 from typing import TYPE_CHECKING
 
-from sharkadm.utils.paths import get_next_incremented_file_path
 from .base import SharkadmLoggerExporter
 
 if TYPE_CHECKING:

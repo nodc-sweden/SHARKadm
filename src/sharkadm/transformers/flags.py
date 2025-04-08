@@ -1,29 +1,34 @@
-from .base import (
-    Transformer,
-    DataHolderProtocol,
-    PolarsTransformer,
-    PolarsDataHolderProtocol,
-)
-from sharkadm import adm_logger
+from types import MappingProxyType
 
 import polars as pl
 
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import (
+    DataHolderProtocol,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
+
 
 class ConvertFlagsToSDN(Transformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical",)
     flag_col = "quality_flag"
-    mapping = {
-        "": "1",
-        "BLANK": "1",
-        "A": "1",
-        "E": "2",
-        "S": "3",
-        "B": "4",
-        "<": "6",
-        ">": "7",
-        "R": "8",
-        "M": "9",
-    }
+    mapping = MappingProxyType(
+        {
+            "": "1",
+            "BLANK": "1",
+            "A": "1",
+            "E": "2",
+            "S": "3",
+            "B": "4",
+            "<": "6",
+            ">": "7",
+            "R": "8",
+            "M": "9",
+        }
+    )
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -48,20 +53,22 @@ class ConvertFlagsToSDN(Transformer):
 
 
 class PolarsConvertFlagsToSDN(PolarsTransformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical",)
     flag_col = "quality_flag"
-    mapping = {
-        "": "1",
-        "BLANK": "1",
-        "A": "1",
-        "E": "2",
-        "S": "3",
-        "B": "4",
-        "<": "6",
-        ">": "7",
-        "R": "8",
-        "M": "9",
-    }
+    mapping = MappingProxyType(
+        {
+            "": "1",
+            "BLANK": "1",
+            "A": "1",
+            "E": "2",
+            "S": "3",
+            "B": "4",
+            "<": "6",
+            ">": "7",
+            "R": "8",
+            "M": "9",
+        }
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

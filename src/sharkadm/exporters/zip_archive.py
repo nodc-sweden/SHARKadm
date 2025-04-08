@@ -1,15 +1,13 @@
-import datetime
 import logging
-import shutil
 import os
 import pathlib
-from sharkadm.data import PandasDataHolder
-from sharkadm import exporters
-from sharkadm import utils
+import shutil
 
-from .base import FileExporter, DataHolderProtocol
-from sharkadm import sharkadm_logger
-from sharkadm import adm_logger
+from sharkadm import exporters, sharkadm_logger, utils
+from sharkadm.data import PandasDataHolder
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import FileExporter
 
 
 class ZipArchive(FileExporter):
@@ -115,12 +113,10 @@ class ZipArchive(FileExporter):
         shutil.copy2(source_path, target_path)
 
     def _add_readme_en(self) -> None:
-        adm_logger.log_export(f"Add README.txt not implemented", level=adm_logger.DEBUG)
+        adm_logger.log_export("Add README.txt not implemented", level=adm_logger.DEBUG)
 
     def _add_readme_sv(self) -> None:
-        adm_logger.log_export(
-            f"Add README_sv.txt not implemented", level=adm_logger.DEBUG
-        )
+        adm_logger.log_export("Add README_sv.txt not implemented", level=adm_logger.DEBUG)
 
     def _create_shark_metadata_auto(self) -> None:
         print(f"{self._temp_target_directory=}")

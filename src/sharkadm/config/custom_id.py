@@ -94,7 +94,7 @@ class CustomIdsHandler:
             self._id_objects[config.data_type] = config.get_id_objects()
 
     def get_level_handler(
-        self, data_type: str = None, level: str = None
+        self, data_type: str | None = None, level: str | None = None
     ) -> CustomIdLevelHandler | None:
         # data_type_mapper: DataTypeMapper = None) -> SharkadmIdLevelHandler | None:
         # data_type = data_type_mapper.get(data_type)

@@ -1,15 +1,14 @@
-import functools
 import logging
 import os
 import pathlib
 from typing import Protocol
 
 from sharkadm import config_paths
-from .column_views import ColumnViews
-from .custom_id import CustomIdsHandler
-from .data_type_mapper import DataTypeMapper
-from .delivery_note_mapper import DeliveryNoteMapper
-from .import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.config.column_views import ColumnViews
+from sharkadm.config.custom_id import CustomIdsHandler
+from sharkadm.config.data_type_mapper import DataTypeMapper
+from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
+from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +34,7 @@ else:
             break
 
 
-def get_config_path(name: str = None) -> pathlib.Path:
+def get_config_path(name: str | None = None) -> pathlib.Path:
     if not CONFIG_DIRECTORY:
         raise NotADirectoryError(
             f"Config directory not found. Environment path {CONFIG_ENV} does not seem to "
@@ -55,7 +54,7 @@ class DataHolderProtocol(Protocol):
     header_mapper = None
 
 
-def get_column_views_config(path: str | pathlib.Path = None) -> ColumnViews:
+def get_column_views_config(path: str | pathlib.Path | None = None) -> ColumnViews:
     path = path or DEFAULT_COLUMN_VIEWS_PATH
     return ColumnViews(path)
 
@@ -70,7 +69,10 @@ def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
 
 
 def get_import_matrix_mapper(
-    data_type: str, import_column: str, directory: str | pathlib.Path = None, **kwargs
+    data_type: str,
+    import_column: str,
+    directory: str | pathlib.Path | None = None,
+    **kwargs,
 ) -> ImportMatrixMapper | None:
     config = get_import_matrix_config(data_type)
     if not config:
@@ -86,22 +88,26 @@ def get_header_mapper_from_data_holder(
     return get_import_matrix_mapper(data_holder.data_type_internal, import_column)
 
 
-def get_custom_id_handler(config_directory: str | pathlib.Path = None):
+def get_custom_id_handler(config_directory: str | pathlib.Path | None = None):
     config_directory = config_directory or adm_config_paths("ids")
     return CustomIdsHandler(config_directory)
 
 
-def get_delivery_note_mapper(path: str | pathlib.Path = None) -> DeliveryNoteMapper:
+def get_delivery_note_mapper(
+    path: str | pathlib.Path | None = None,
+) -> DeliveryNoteMapper:
     path = path or adm_config_paths("delivery_note_mapping")
     return DeliveryNoteMapper(path)
 
 
-def get_data_type_mapper(path: str | pathlib.Path = None) -> DataTypeMapper:
+def get_data_type_mapper(path: str | pathlib.Path | None = None) -> DataTypeMapper:
     path = path or adm_config_paths("data_type_mapping")
     return DataTypeMapper(path)
 
 
-def get_mapper_data_type_to_internal(path: str | pathlib.Path = None) -> DataTypeMapper:
+def get_mapper_data_type_to_internal(
+    path: str | pathlib.Path | None = None,
+) -> DataTypeMapper:
     path = path or adm_config_paths("mapper_data_type_to_internal")
     return DataTypeMapper(path)
 

@@ -1,11 +1,8 @@
-import pandas as pd
-
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from .base import DataHolderProtocol, Transformer
 
 
 class SetScientificNameFromReportedScientificName(Transformer):
-    valid_data_types = ["plankton_imaging"]
+    valid_data_types = ("plankton_imaging",)
     source_col = "reported_scientific_name"
     col_to_set = "scientific_name"
 
@@ -21,7 +18,7 @@ class SetScientificNameFromReportedScientificName(Transformer):
 
 
 class SetScientificNameFromDyntaxaScientificName(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "dyntaxa_scientific_name"
     col_to_set = "scientific_name"
 

@@ -1,6 +1,6 @@
-from .base import Validator, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
 
-from sharkadm import adm_logger
+from .base import DataHolderProtocol, Validator
 
 
 class _ValidateAphiaId(Validator):

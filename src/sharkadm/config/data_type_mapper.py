@@ -1,4 +1,5 @@
 import pathlib
+
 import yaml
 
 
@@ -13,7 +14,7 @@ class DataTypeMapper:
         with open(self._path) as fid:
             self._data = yaml.safe_load(fid)
 
-    def get(self, data_type: str, default: str = None) -> str:
+    def get(self, data_type: str, default: str | None = None) -> str:
         if default is None:
             default = data_type
         return self._data.get(data_type, default)

@@ -1,16 +1,15 @@
 import datetime
-import json
 import logging
 import shutil
-import uuid
-from typing import Protocol, List, Any, Type
+from typing import Any, Protocol, Type
 
 import pandas as pd
 import requests
 
 from sharkadm import utils
-from sharkadm.data import data_source
 from sharkadm.data.data_holder import PandasDataHolder
+from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.txt_file import TxtRowFormatDataFile
 
 logger = logging.getLogger(__name__)
 
@@ -22,38 +21,10 @@ class HeaderMapper(Protocol):
 class SHARKapiDataHolder(PandasDataHolder):
     _data_type = ""
 
-    query = {
-        "bounds": [],
-        "fromYear": None,
-        "toYear": None,
-        "months": [],
-        "dataTypes": [],
-        "parameters": [],
-        "checkStatus": "",
-        "qualityFlags": [],
-        "deliverers": [],
-        "orderers": [],
-        "projects": [],
-        "datasets": [],
-        "minSamplingDepth": "",
-        "maxSamplingDepth": "",
-        "redListedCategory": [],
-        "taxonName": [],
-        "stationName": [],
-        "vattenDistrikt": [],
-        "seaBasins": [],
-        "counties": [],
-        "municipalities": [],
-        "waterCategories": [],
-        "typOmraden": [],
-        "helcomOspar": [],
-        "seaAreas": [],
-    }
-
     def __init__(
         self,
         data_type: str,
-        year: int = None,
+        year: int | None = None,
         header_mapper: HeaderMapper = None,
         encoding: str = "utf8",
         **kwargs,
@@ -63,8 +34,34 @@ class SHARKapiDataHolder(PandasDataHolder):
         self._data_type = data_type
         self._encoding = encoding
 
-        self._query = {}
-        self.query.update(self.query)
+        self.query = {
+            "bounds": [],
+            "fromYear": None,
+            "toYear": None,
+            "months": [],
+            "dataTypes": [],
+            "parameters": [],
+            "checkStatus": "",
+            "qualityFlags": [],
+            "deliverers": [],
+            "orderers": [],
+            "projects": [],
+            "datasets": [],
+            "minSamplingDepth": "",
+            "maxSamplingDepth": "",
+            "redListedCategory": [],
+            "taxonName": [],
+            "stationName": [],
+            "vattenDistrikt": [],
+            "seaBasins": [],
+            "counties": [],
+            "municipalities": [],
+            "waterCategories": [],
+            "typOmraden": [],
+            "helcomOspar": [],
+            "seaAreas": [],
+        }
+
         self.query.update(kwargs)
         self.query["dataTypes"] = [data_type]
 
@@ -136,7 +133,7 @@ class SHARKapiDataHolder(PandasDataHolder):
         return all_data
 
     def _load_file(self) -> None:
-        d_source = data_source.TxtRowFormatDataFile(
+        d_source = TxtRowFormatDataFile(
             path=self._temp_file_path, data_type=self.data_type
         )
         if self._header_mapper:
@@ -144,7 +141,7 @@ class SHARKapiDataHolder(PandasDataHolder):
         self._data = self._get_data_from_data_source(d_source)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)

@@ -1,15 +1,17 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
 import numpy as np
+
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 
 class ManualSealPathology(Transformer):
-    valid_data_types = ["SealPathology"]
-    valid_data_holders = ["ZipArchiveDataHolder"]
+    valid_data_types = ("SealPathology",)
+    valid_data_holders = ("ZipArchiveDataHolder",)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Manual fixes for SealPathology"
+        return "Manual fixes for SealPathology"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         md5 = "364768f88de5f22c0e415150eddee722"
@@ -24,14 +26,14 @@ class ManualSealPathology(Transformer):
 
 
 class ManualHarbourPorpoise(Transformer):
-    valid_data_types = ["HarbourPorpoise"]
-    valid_data_holders = ["ZipArchiveDataHolder"]
+    valid_data_types = ("HarbourPorpoise",)
+    valid_data_holders = ("ZipArchiveDataHolder",)
     source_col = "observation_date"
     col_to_set = "visit_date"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Manual fixes for HarbourPorpoise"
+        return "Manual fixes for HarbourPorpoise"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:

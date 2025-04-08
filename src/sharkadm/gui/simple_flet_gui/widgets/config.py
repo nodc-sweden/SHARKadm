@@ -3,10 +3,10 @@
 import pathlib
 
 import flet as ft
-import textwrap
+
+from sharkadm import utils
 
 from .. import gui_event
-from sharkadm import utils
 
 
 class Configs(ft.UserControl):

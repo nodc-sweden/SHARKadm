@@ -1,26 +1,24 @@
+# ruff: noqa: F401
 import os
 import pathlib
 from typing import Union
 
-from sharkadm import sharkadm_exceptions
-from sharkadm import utils
-from .archive_data_holder import ArchiveDataHolder
-from .bacterioplankton import BacterioplanktonArchiveDataHolder
-from .chlorophyll import ChlorophyllArchiveDataHolder
-from .delivery_note import DeliveryNote
-
-# from .epibenthos import EpibenthosArchiveDataHolder
-from .epibenthos import EpibenthosMartransArchiveDataHolder
-
-# from .ifcb import IfcbArchiveDataHolder
-from .jellyfish import JellyfishArchiveDataHolder
-from .physicalchemical import PhysicalChemicalArchiveDataHolder
-from .phytoplankton import PhytoplanktonArchiveDataHolder
-from .zoobenthos import ZoobenthosArchiveDataHolder
-from .zoobenthos import ZoobenthosBedaArchiveDataHolder
-from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
-from .zooplankton import ZooplanktonArchiveDataHolder
-from .plankton_imaging import PlanktonImagingArchiveDataHolder
+from sharkadm import sharkadm_exceptions, utils
+from sharkadm.data.archive.archive_data_holder import ArchiveDataHolder
+from sharkadm.data.archive.bacterioplankton import BacterioplanktonArchiveDataHolder
+from sharkadm.data.archive.chlorophyll import ChlorophyllArchiveDataHolder
+from sharkadm.data.archive.delivery_note import DeliveryNote
+from sharkadm.data.archive.epibenthos import EpibenthosMartransArchiveDataHolder
+from sharkadm.data.archive.jellyfish import JellyfishArchiveDataHolder
+from sharkadm.data.archive.physicalchemical import PhysicalChemicalArchiveDataHolder
+from sharkadm.data.archive.phytoplankton import PhytoplanktonArchiveDataHolder
+from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHolder
+from sharkadm.data.archive.zoobenthos import (
+    ZoobenthosArchiveDataHolder,
+    ZoobenthosBedaArchiveDataHolder,
+    ZoobenthosBiomadArchiveDataHolder,
+)
+from sharkadm.data.archive.zooplankton import ZooplanktonArchiveDataHolder
 
 
 def all_subclasses(cls):

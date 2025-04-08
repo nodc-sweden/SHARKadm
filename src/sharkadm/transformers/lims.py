@@ -1,16 +1,17 @@
 import pandas as pd
 import polars as pl
+
+from ..sharkadm_logger import adm_logger
 from .base import (
-    Transformer,
     DataHolderProtocol,
-    PolarsTransformer,
     PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
 )
-from sharkadm import adm_logger
 
 
 class MoveLessThanFlagRowFormat(Transformer):
-    valid_data_structures = ["row"]
+    valid_data_structures = ("row",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -37,7 +38,7 @@ class MoveLessThanFlagRowFormat(Transformer):
 
 
 class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
-    valid_data_structures = ["row"]
+    valid_data_structures = ("row",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -68,8 +69,8 @@ class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
 
 
 class MoveLessThanFlagColumnFormat(Transformer):
-    valid_data_structures = ["column"]
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_structures = ("column",)
+    valid_data_holders = ("LimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,7 +112,7 @@ class MoveLessThanFlagColumnFormat(Transformer):
 
 
 class RemoveNonDataLines(Transformer):
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_holders = ("LimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -128,7 +129,7 @@ class RemoveNonDataLines(Transformer):
 
 
 class PolarsRemoveNonDataLines(PolarsTransformer):
-    valid_data_holders = ["LimsDataHolder"]
+    valid_data_holders = ("LimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

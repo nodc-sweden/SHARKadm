@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
+
 import pandas as pd
-import numpy as np
-from sharkadm import adm_logger
 
 from sharkadm.data import PandasDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class DataFilter(ABC):

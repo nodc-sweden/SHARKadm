@@ -1,13 +1,13 @@
-from .base import MultiTransformer
 from sharkadm import transformers
+from sharkadm.multi_transformers.base import MultiTransformer
 
 
 class Worms(MultiTransformer):
-    _transformers = [
+    _transformers = (
         transformers.AddReportedAphiaId,
         transformers.AddWormsScientificName,
         transformers.AddWormsAphiaId,
-    ]
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

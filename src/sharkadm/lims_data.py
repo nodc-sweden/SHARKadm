@@ -2,16 +2,13 @@ import pathlib
 
 import pandas as pd
 
-from sharkadm import controller
-from sharkadm import exporters
-from sharkadm import sharkadm_logger
-from sharkadm import transformers
+from sharkadm import controller, exporters, sharkadm_logger, transformers
 from sharkadm.data.lims import get_lims_data_holder
 
 
 def get_row_data_from_lims_export(
     path: str | pathlib.Path,
-    export_directory: str | pathlib.Path = None,
+    export_directory: str | pathlib.Path | None = None,
     export_log: bool = False,
 ) -> pd.DataFrame:
     path = pathlib.Path(path)

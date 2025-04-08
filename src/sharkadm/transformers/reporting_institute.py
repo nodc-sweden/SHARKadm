@@ -1,16 +1,16 @@
-from sharkadm import adm_logger
+from importlib.util import find_spec
+from typing import Protocol
+
+import pandas as pd
+
+from sharkadm.sharkadm_logger import adm_logger
+
 from ._codes import _translate_codes
 from .base import Transformer
 
-from typing import Protocol
-import pandas as pd
-
-try:
-    from nodc_codes import get_translate_codes_object
-except ModuleNotFoundError as e:
-    module_name = str(e).split("'")[-2]
+if not find_spec("nodc_codes"):
     adm_logger.log_workflow(
-        f'Could not import package "{module_name}" in module {__name__}. '
+        f"Could not import package 'nodc_codes' in module {__name__}. "
         f"You need to install this dependency if you want to use this module.",
         level=adm_logger.WARNING,
     )
@@ -25,7 +25,7 @@ class DataHolderProtocol(Protocol):
 
 
 class _ReportingInstitute(Transformer):
-    source_cols = [""]
+    source_cols = ("",)
     col_to_set = ""
     lookup_key = ""
     lookup_field = "LABO"
@@ -36,7 +36,7 @@ class _ReportingInstitute(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f""
+        return ""
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._set_from_data(data_holder=data_holder):
@@ -90,20 +90,20 @@ class _ReportingInstitute(Transformer):
 
 
 class AddSwedishReportingInstitute(_ReportingInstitute):
-    source_cols = ["reporting_institute_code", "reporting_institute_name_en"]
+    source_cols = ("reporting_institute_code", "reporting_institute_name_en")
     col_to_set = "reporting_institute_name_sv"
     lookup_key = "swedish_name"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds reporting institute name in swedish"
+        return "Adds reporting institute name in swedish"
 
 
 class AddEnglishReportingInstitute(_ReportingInstitute):
-    source_cols = ["reporting_institute_code", "reporting_institute_name_sv"]
+    source_cols = ("reporting_institute_code", "reporting_institute_name_sv")
     col_to_set = "reporting_institute_name_en"
     lookup_key = "english_name"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds reporting institute name in english"
+        return "Adds reporting institute name in english"

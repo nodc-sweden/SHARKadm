@@ -1,4 +1,4 @@
-from .base import Transformer, DataHolderProtocol
+from .base import DataHolderProtocol, Transformer
 
 
 class AddDatatype(Transformer):
@@ -6,14 +6,14 @@ class AddDatatype(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds delivery_datatype column"
+        return "Adds delivery_datatype column"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.datatype_column_name] = data_holder.data_type
 
 
 class AddDatatypePlanktonBarcoding(Transformer):
-    valid_data_types = ["plankton_barcoding"]
+    valid_data_types = ("plankton_barcoding",)
 
     datatype_column_name = "delivery_datatype"
     value_to_set = "Plankton Barcoding"

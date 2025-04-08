@@ -1,14 +1,15 @@
-from .base import Transformer, DataHolderProtocol
 import pandas as pd
+
+from .base import DataHolderProtocol, Transformer
 
 
 class LongToWide(Transformer):
-    valid_data_types = ["physicalchemical"]
-    valid_data_formats = ["row"]
+    valid_data_types = ("physicalchemical",)
+    valid_data_formats = ("row",)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds visit key column"
+        return "Adds visit key column"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         non_unique_columns = ["sample_orderer_name_en"]
@@ -17,8 +18,6 @@ class LongToWide(Transformer):
         meta_columns = [
             col for col in data_holder.data.columns if col not in not_meta_columns
         ]
-
-        import time
 
         #        t0 = time.time()
         merge_key = ["visit_date", "sample_time", "sample_depth_m"]

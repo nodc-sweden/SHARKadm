@@ -1,9 +1,10 @@
 import pathlib
 
-from .base import FileExporter, DataHolderProtocol
-from sharkadm import utils, adm_logger
+from sharkadm.config import get_header_mapper_from_data_holder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.paths import get_next_incremented_file_path
-from sharkadm.config import get_import_matrix_mapper, get_header_mapper_from_data_holder
+
+from .base import DataHolderProtocol, FileExporter
 
 
 class TxtAsIs(FileExporter):

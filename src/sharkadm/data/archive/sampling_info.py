@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import logging
 import pathlib
+from typing import Protocol
 
 import openpyxl
 import pandas as pd
-import logging
-from typing import Protocol
 
-from sharkadm import config
-from sharkadm import adm_logger
-from sharkadm import sharkadm_exceptions
+from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +154,7 @@ class SamplingInfo:
 
     @property
     def columns(self) -> list[str]:
-        return list(self.data[list(self._data)[0]][0])
+        return list(next(iter(self.data[next(iter(self._data))])))
 
 
 def _get_date(date_str: str) -> datetime.date | str:
@@ -169,7 +167,7 @@ def _get_date(date_str: str) -> datetime.date | str:
         except ValueError:
             pass
     adm_logger.log_workflow(
-        f"Invalid date or date format in sampling_info",
+        "Invalid date or date format in sampling_info",
         item=date_str,
         level=adm_logger.ERROR,
     )

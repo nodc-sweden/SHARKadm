@@ -1,5 +1,5 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from ..sharkadm_logger import adm_logger
+from .base import DataHolderProtocol, Transformer
 
 
 class Divide(Transformer):
@@ -7,7 +7,7 @@ class Divide(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Looks for the DIVIDE key word in all columns and divides accordingly."
+        return "Looks for the DIVIDE key word in all columns and divides accordingly."
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.data.columns:
@@ -59,7 +59,7 @@ class Multiply(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Looks for the MULTIPLY key word in all columns and divides accordingly."
+        return "Looks for the MULTIPLY key word in all columns and divides accordingly."
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.data.columns:

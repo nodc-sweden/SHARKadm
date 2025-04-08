@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import pathlib
-import pandas as pd
 import logging
-
-from sharkadm import config
-from sharkadm import adm_logger
-from sharkadm import sharkadm_exceptions
+import pathlib
 from typing import Protocol
+
+import pandas as pd
+
+from sharkadm import config, sharkadm_exceptions
+from sharkadm.sharkadm_logger import adm_logger
 
 try:
     import nodc_codes
@@ -88,6 +88,7 @@ class DeliveryNote:
         data = dict()
         data["path"] = path
         with open(path, encoding=encoding) as fid:
+            mapped_key = None
             for line in fid:
                 if not line.strip():
                     continue
@@ -126,7 +127,7 @@ class DeliveryNote:
 
         dn = pd.read_excel(path, sheet_name="Förklaring")
         dn["key_row"] = dn[dn.columns[0]].apply(
-            lambda x: True if type(x) == str and x.isupper() else False
+            lambda x: True if isinstance(x, str) and x.isupper() else False
         )
 
         fdn = dn[dn["key_row"]]
@@ -138,7 +139,7 @@ class DeliveryNote:
         for key, value in zip(fdn[col_mapping[0]], fdn[col_mapping[2]]):
             if str(value) == "nan":
                 value = ""
-            elif type(value) == datetime.datetime:
+            elif isinstance(value, datetime.datetime):
                 value = value.date()
             data[dn_mapper.get(key)] = str(value)
         data["data_format"] = data["FORMAT"]

@@ -1,11 +1,10 @@
-from ..base import Transformer, DataHolderProtocol
-import pandas as pd
+from ..base import DataHolderProtocol, Transformer
 
 
 class AddColumnsForAutomaticQC(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds columns for automatic qc (QC0_<PAR>)"
+        return "Adds columns for automatic qc (QC0_<PAR>)"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         new_data = {}
@@ -27,4 +26,4 @@ class AddColumnsForAutomaticQC(Transformer):
             if not col.startswith("Q_"):
                 new_column_order.append(col)
                 continue
-            index = list(data_holder.data.columns).index(col)
+            # index = list(data_holder.data.columns).index(col)

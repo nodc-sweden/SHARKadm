@@ -1,6 +1,6 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
 
+from .base import DataHolderProtocol, Transformer
 
 try:
     from nodc_codes import get_translate_codes_object
@@ -17,7 +17,7 @@ except ModuleNotFoundError as e:
 
 
 class _AddCodes(Transformer):
-    source_cols = [""]
+    source_cols = ("",)
     col_to_set = ""
     lookup_key = ""
     lookup_field = ""
@@ -28,7 +28,7 @@ class _AddCodes(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f""
+        return ""
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         source_col = ""

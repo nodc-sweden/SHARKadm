@@ -1,5 +1,6 @@
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 try:
     import nodc_worms
@@ -16,7 +17,7 @@ except ModuleNotFoundError as e:
 
 
 class AddReportedAphiaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "aphia_id"
     col_to_set = "reported_aphia_id"
 
@@ -46,7 +47,7 @@ class AddReportedAphiaId(Transformer):
 
 
 class AddWormsScientificName(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "dyntaxa_scientific_name"
     col_to_set = "worms_scientific_name"
 
@@ -75,7 +76,7 @@ class AddWormsScientificName(Transformer):
 
 
 class AddWormsAphiaId(Transformer):
-    invalid_data_types = ["physicalchemical", "chlorophyll"]
+    invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "worms_scientific_name"
     col_to_set = "aphia_id"
 
@@ -116,7 +117,7 @@ class AddWormsAphiaId(Transformer):
 
 
 class SetAphiaIdFromReportedAphiaId(Transformer):
-    valid_data_types = ["plankton_imaging"]
+    valid_data_types = ("plankton_imaging",)
     source_col = "reported_aphia_id"
     col_to_set = "aphia_id"
 

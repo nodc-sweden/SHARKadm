@@ -1,4 +1,4 @@
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class SHARKadmException(Exception):
@@ -36,4 +36,8 @@ class InvalidTransformer(SHARKadmException):
 
 
 class InvalidWorkflow(SHARKadmException):
+    pass
+
+
+class ConfigurationError(SHARKadmException):
     pass

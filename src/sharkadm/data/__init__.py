@@ -1,19 +1,19 @@
+# ruff: noqa: F401
+
 import functools
 import inspect
 import logging
 import pathlib
 from typing import Type
 
-from sharkadm import utils, sharkadm_exceptions
-from .archive import get_archive_data_holder, directory_is_archive
-from .data_holder import PandasDataHolder, DataHolder
-from .df import PandasDataFrameDataHolder
-from .dv_template import DvTemplateDataHolder
-from .dv_template import get_dv_template_data_holder
-from .lims import LimsDataHolder
-from .lims import get_lims_data_holder, directory_is_lims
-from .shark_api import get_shark_api_data_holder
-from .zip_archive import get_zip_archive_data_holder, path_is_zip_archive
+from sharkadm import sharkadm_exceptions, utils
+from sharkadm.data.archive import directory_is_archive, get_archive_data_holder
+from sharkadm.data.data_holder import DataHolder, PandasDataHolder
+from sharkadm.data.df import PandasDataFrameDataHolder
+from sharkadm.data.dv_template import DvTemplateDataHolder, get_dv_template_data_holder
+from sharkadm.data.lims import LimsDataHolder, directory_is_lims, get_lims_data_holder
+from sharkadm.data.shark_api import get_shark_api_data_holder
+from sharkadm.data.zip_archive import get_zip_archive_data_holder, path_is_zip_archive
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
 
 
 def get_data_holder(
-    path: str | pathlib.Path = None, sharkweb: bool = False, **kwargs
+    path: str | pathlib.Path | None = None, sharkweb: bool = False, **kwargs
 ) -> PandasDataHolder:
     if path:
         path = pathlib.Path(path)

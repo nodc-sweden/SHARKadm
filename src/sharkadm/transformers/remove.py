@@ -2,9 +2,10 @@ import re
 
 import numpy as np
 
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
 from ..utils.data_filter import DataFilterRestrictDepth
+from .base import DataHolderProtocol, Transformer
 
 
 class RemoveReportedValueIfNotCalculated(Transformer):
@@ -38,7 +39,7 @@ class RemoveValuesInColumns(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Removes all values in given columns. Option to set replace_value."
+        return "Removes all values in given columns. Option to set replace_value."
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         len_data = len(data_holder.data)
@@ -71,7 +72,7 @@ class RemoveValuesInColumns(Transformer):
 
 
 class RemoveRowsForParameters(Transformer):
-    valid_data_structures = ["row"]
+    valid_data_structures = ("row",)
 
     parameter_column = "parameter"
 
@@ -83,7 +84,7 @@ class RemoveRowsForParameters(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Removes entire row for given parameters"
+        return "Removes entire row for given parameters"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "parameter" not in data_holder.data:
@@ -111,8 +112,8 @@ class RemoveRowsForParameters(Transformer):
 
 
 class RemoveRowsAtDepthRestriction(Transformer):
-    valid_data_holders = ["ZipArchiveDataHolder"]
-    valid_data_structures = ["row"]
+    valid_data_holders = ("ZipArchiveDataHolder",)
+    valid_data_structures = ("row",)
 
     def __init__(
         self, valid_data_types: list[str], data_filter: DataFilterRestrictDepth, **kwargs
@@ -122,7 +123,7 @@ class RemoveRowsAtDepthRestriction(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Removes entire row for if in area of depth restriction"
+        return "Removes entire row for if in area of depth restriction"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         filter_bool = self._get_filter_mask(data_holder)
@@ -135,10 +136,10 @@ class RemoveRowsAtDepthRestriction(Transformer):
 
 
 class RemoveDeepestDepthAtEachVisit(Transformer):
-    valid_data_holders = ["ZipArchiveDataHolder"]
-    valid_data_types = []
+    valid_data_holders = ("ZipArchiveDataHolder",)
+    valid_data_types = ()
 
-    visit_id_columns = [
+    visit_id_columns = (
         "shark_sample_id_md5",
         "visit_data",
         "sample_date",
@@ -147,13 +148,13 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
         "sample_longitude_dd",
         "platform_code",
         "visit_id",
-    ]
+    )
 
     def __init__(
         self,
         valid_data_types: list[str],
         depth_column: str,
-        also_remove_from_columns: list[str] = None,
+        also_remove_from_columns: list[str] | None = None,
         replace_value: int | float | str = "",
         keep_single_depth_at_surface: bool = False,
         **kwargs,
@@ -167,7 +168,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Removes deepest depth at each visit in given datatype"
+        return "Removes deepest depth at each visit in given datatype"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._depth_column not in data_holder.data:
@@ -192,7 +193,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
                 continue
             if (
                 len(depths) == 1
-                and float(list(depths)[0]) <= 2
+                and float(next(iter(depths))) <= 2
                 and self._keep_single_depth_at_surface
             ):
                 continue
@@ -226,8 +227,8 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
 
 
 class RemoveInterval(Transformer):
-    valid_data_holders = ["ZipArchiveDataHolder"]
-    valid_data_types = []
+    valid_data_holders = ("ZipArchiveDataHolder",)
+    valid_data_types = ()
 
     min_col = "sample_min_depth_m"
     max_col = "sample_max_depth_m"
@@ -235,11 +236,11 @@ class RemoveInterval(Transformer):
     def __init__(
         self,
         valid_data_types: list[str],
-        keep_intervals: list[str] = None,
-        keep_if_min_depths_are: list[str] = None,
+        keep_intervals: list[str] | None = None,
+        keep_if_min_depths_are: list[str] | None = None,
         replace_value: int | float | str = "",
-        also_replace_in_columns: list[str] = None,
-        also_remove_from_columns: list[str] = None,
+        also_replace_in_columns: list[str] | None = None,
+        also_remove_from_columns: list[str] | None = None,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -428,7 +429,7 @@ class SetMaxLengthOfValuesInColumns(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Set max length och all values in given columns."
+        return "Set max length och all values in given columns."
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         len_data = len(data_holder.data)

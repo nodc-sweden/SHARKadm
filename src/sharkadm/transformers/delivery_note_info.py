@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
-
-from sharkadm import adm_config_paths
-from sharkadm import adm_logger
+from sharkadm.config import adm_config_paths
 from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.data_holder import PandasDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import yaml_data
+
 from .base import Transformer
 
 
 class AddDeliveryNoteInfo(Transformer):
-    physical_chemical_keys = ["PhysicalChemical".lower(), "Physical and Chemical".lower()]
+    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -19,7 +18,7 @@ class AddDeliveryNoteInfo(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds info from delivery_note"
+        return "Adds info from delivery_note"
 
     def _transform(self, data_holder: PandasDataHolder | ArchiveDataHolder) -> None:
         if not hasattr(data_holder, "delivery_note"):
@@ -58,8 +57,8 @@ class AddDeliveryNoteInfo(Transformer):
         checked_by = data_holder.delivery_note["data kontrollerad av"]
         if not checked_by:
             adm_logger.log_transformation(
-                f'Could not set "status" and "checked". Missing information in '
-                f"delivery_note: data kontrollerad av",
+                'Could not set "status" and "checked". Missing information in '
+                "delivery_note: data kontrollerad av",
                 level=adm_logger.WARNING,
             )
             return
@@ -79,7 +78,7 @@ class AddDeliveryNoteInfo(Transformer):
 
 
 class AddStatus(Transformer):
-    physical_chemical_keys = ["PhysicalChemical".lower(), "Physical and Chemical".lower()]
+    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -87,7 +86,7 @@ class AddStatus(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds status columns"
+        return "Adds status columns"
 
     def _transform(self, data_holder: ArchiveDataHolder) -> None:
         if not hasattr(data_holder, "delivery_note"):
@@ -100,8 +99,8 @@ class AddStatus(Transformer):
         checked_by = data_holder.delivery_note["data kontrollerad av"]
         if not checked_by:
             adm_logger.log_transformation(
-                f'Could not set "status" and "checked". '
-                f"Missing information in delivery_note: data kontrollerad av",
+                'Could not set "status" and "checked". '
+                "Missing information in delivery_note: data kontrollerad av",
                 level=adm_logger.WARNING,
             )
             return

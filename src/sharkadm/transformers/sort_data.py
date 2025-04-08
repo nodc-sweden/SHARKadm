@@ -1,9 +1,10 @@
-from .base import Transformer, DataHolderProtocol
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Transformer
 
 
 class SortData(Transformer):
-    sort_by_columns: list[str] = [
+    sort_by_columns: tuple[str] = (
         "sample_date",
         "sample_time",
         "station_name",
@@ -11,11 +12,13 @@ class SortData(Transformer):
         "sample_max_depth_m",
         "scientific_name",
         "parameter",
-    ]
-    ascending: bool | list[bool] = True
+    )
+    ascending: bool | tuple[bool] = True
 
     def __init__(
-        self, sort_by_columns: list[str] = None, ascending: bool | list[bool] = None
+        self,
+        sort_by_columns: tuple[str] | None = None,
+        ascending: bool | tuple[bool] | None = None,
     ) -> None:
         super().__init__()
         if sort_by_columns:
@@ -26,8 +29,8 @@ class SortData(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Sorts data by: sample_date -> sample_time -> sample_min_depth_m -> "
-            f"sample_max_depth_m"
+            "Sorts data by: sample_date -> sample_time -> sample_min_depth_m -> "
+            "sample_max_depth_m"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -48,9 +51,9 @@ class SortData(Transformer):
 
 
 class SortDataPlanktonImaging(SortData):
-    valid_data_types = ["plankton_imaging"]
+    valid_data_types = ("plankton_imaging",)
 
-    sort_by_columns = [
+    sort_by_columns = (
         "image_verified_by",
         "sample_date",
         "sample_time",
@@ -59,9 +62,9 @@ class SortDataPlanktonImaging(SortData):
         "sample_max_depth_m",
         "scientific_name",
         "parameter",
-    ]
+    )
 
-    ascending = [
+    ascending = (
         True,
         True,
         True,
@@ -70,4 +73,4 @@ class SortDataPlanktonImaging(SortData):
         True,
         False,
         True,
-    ]
+    )

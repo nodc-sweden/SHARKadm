@@ -1,5 +1,4 @@
 import yaml
-import pathlib
 
 
 def convert_import_matrix_to_yaml(input_path, output_path, **kwargs):

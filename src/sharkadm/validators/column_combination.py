@@ -1,25 +1,26 @@
 import logging
 
-from sharkadm import adm_logger
-from .base import Validator, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Validator
 
 logger = logging.getLogger(__name__)
 
 
 class AssertCombination(Validator):
-    valid_data_types = []
+    valid_data_types = ()
     _columns: list[str] = None
 
     def __init__(
         self,
         valid_combinations: list[str],
-        columns: list[str] = None,
-        valid_data_types: list[str] = None,
+        columns: list[str] | None = None,
+        valid_data_types: list[str] | None = None,
     ):
         super().__init__()
         self.columns = columns or self._columns or []
         self._valid_combinations = [item.replace(" ", "") for item in valid_combinations]
-        self.valid_data_types = valid_data_types or []
+        self.valid_data_types = valid_data_types or self.invalid_data_types
 
     @staticmethod
     def get_validator_description() -> str:
@@ -31,9 +32,9 @@ class AssertCombination(Validator):
             )
         else:
             return (
-                f"Asserts that given valid_combinations are the only valid "
-                f"valid_combinations of given column "
-                f'(seperate combination with "-")'
+                "Asserts that given valid_combinations are the only valid "
+                "valid_combinations of given column "
+                '(seperate combination with "-")'
             )
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
@@ -59,4 +60,4 @@ class AssertCombination(Validator):
 
 
 class AssertMinMaxDepthCombination(AssertCombination):
-    _columns = ["sample_min_depth_m", "sample_max_depth_m"]
+    _columns = ("sample_min_depth_m", "sample_max_depth_m")

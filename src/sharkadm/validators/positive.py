@@ -1,13 +1,14 @@
 import logging
 
-from sharkadm import adm_logger
-from .base import Validator, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Validator
 
 logger = logging.getLogger(__name__)
 
 
 class ValidatePositiveValues(Validator):
-    cols_to_validate = [
+    cols_to_validate = (
         "air_pressure_hpa",
         "wind_direction_code",
         "weather_observation_code",
@@ -16,7 +17,7 @@ class ValidatePositiveValues(Validator):
         "ice_observation_code",
         "wind_speed_ms",
         "water_depth_m",
-    ]
+    )
 
     @staticmethod
     def get_validator_description() -> str:

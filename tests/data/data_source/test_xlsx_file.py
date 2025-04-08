@@ -1,4 +1,3 @@
-import pytest
 import polars as pl
 
 from sharkadm.data.data_source.xlsx_file import XlsxFormatDataFilePolars

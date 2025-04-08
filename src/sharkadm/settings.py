@@ -1,7 +1,7 @@
 import pathlib
 import sys
-import yaml
 
+import yaml
 
 if getattr(sys, "frozen", False):
     THIS_DIR = pathlib.Path(sys.executable).parent
