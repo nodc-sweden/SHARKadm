@@ -1,11 +1,11 @@
-import functools
 import pathlib
 
 import yaml
 
 
 class LevelColumnInfoConfig:
-    """Holds the configuration for a single node_level (sample, variable etc.) """
+    """Holds the configuration for a single node_level (sample, variable etc.)"""
+
     def __init__(self, level: str) -> None:
         self._level = level
         self._data = {}
@@ -19,14 +19,13 @@ class LevelColumnInfoConfig:
         return sorted(self._data)
 
     def add_parameter(self, parameter: str, info: dict) -> None:
-        if info.get('node_level') != self.level:
+        if info.get("node_level") != self.level:
             return
         self._data[parameter] = info
 
 
 class ColumnInfoConfig:
-
-    def __init__(self, path: str | pathlib.Path, encoding='cp1252') -> None:
+    def __init__(self, path: str | pathlib.Path, encoding="cp1252") -> None:
         self._path = pathlib.Path(path)
         self._encoding = encoding
         self._data = {}
@@ -41,7 +40,7 @@ class ColumnInfoConfig:
 
     def _create_levels(self) -> None:
         for par, info in self._data.items():
-            node_level = info['node_level']
+            node_level = info["node_level"]
             level = self._levels.setdefault(node_level, LevelColumnInfoConfig(node_level))
             level.add_parameter(parameter=par, info=info)
 
@@ -55,7 +54,7 @@ class ColumnInfoConfig:
         """Returns a list of all levels"""
         levels = set()
         for info in self._data.values():
-            levels.add(info['node_level'])
+            levels.add(info["node_level"])
         return sorted([lev for lev in levels if lev])
 
     # @functools.cache
@@ -69,4 +68,3 @@ class ColumnInfoConfig:
     #
     # def get_level_config(self, node_level: str) -> LevelColumnInfoConfig:
     #     return self._levels.get(node_level)
-

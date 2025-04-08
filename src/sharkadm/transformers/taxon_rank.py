@@ -1,15 +1,10 @@
-from sharkadm import adm_logger
+from importlib.util import find_spec
 
-from .base import Transformer, DataHolderProtocol
+from sharkadm.sharkadm_logger import adm_logger
 
-try:
-    import nodc_dyntaxa
-except ModuleNotFoundError as e:
-    module_name = str(e).split("'")[-2]
-    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
-
-
-
-
-
-
+if find_spec("nodc_dyntaxa"):
+    adm_logger.log_workflow(
+        f"Could not import package 'nodc_dyntaxa' in module {__name__}. "
+        f"You need to install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )

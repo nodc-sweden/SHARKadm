@@ -1,38 +1,43 @@
+# ruff: noqa: F401
 import os
 import pathlib
 from typing import Union
 
-from sharkadm import sharkadm_exceptions
-from sharkadm import utils
-from .archive_data_holder import ArchiveDataHolder
-from .bacterioplankton import BacterioplanktonArchiveDataHolder
-from .chlorophyll import ChlorophyllArchiveDataHolder
-from .delivery_note import DeliveryNote
-# from .epibenthos import EpibenthosArchiveDataHolder
-from .epibenthos import EpibenthosMartransArchiveDataHolder
-# from .ifcb import IfcbArchiveDataHolder
-from .jellyfish import JellyfishArchiveDataHolder
-from .physicalchemical import PhysicalChemicalArchiveDataHolder
-from .phytoplankton import PhytoplanktonArchiveDataHolder
-from .zoobenthos import ZoobenthosArchiveDataHolder
-from .zoobenthos import ZoobenthosBedaArchiveDataHolder
-from .zoobenthos import ZoobenthosBiomadArchiveDataHolder
-from .zooplankton import ZooplanktonArchiveDataHolder
-from .plankton_imaging import PlanktonImagingArchiveDataHolder
+from sharkadm import sharkadm_exceptions, utils
+from sharkadm.data.archive.archive_data_holder import ArchiveDataHolder
+from sharkadm.data.archive.bacterioplankton import BacterioplanktonArchiveDataHolder
+from sharkadm.data.archive.chlorophyll import ChlorophyllArchiveDataHolder
+from sharkadm.data.archive.delivery_note import DeliveryNote
+from sharkadm.data.archive.epibenthos import EpibenthosMartransArchiveDataHolder
+from sharkadm.data.archive.jellyfish import JellyfishArchiveDataHolder
+from sharkadm.data.archive.physicalchemical import PhysicalChemicalArchiveDataHolder
+from sharkadm.data.archive.phytoplankton import PhytoplanktonArchiveDataHolder
+from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHolder
+from sharkadm.data.archive.zoobenthos import (
+    ZoobenthosArchiveDataHolder,
+    ZoobenthosBedaArchiveDataHolder,
+    ZoobenthosBiomadArchiveDataHolder,
+)
+from sharkadm.data.archive.zooplankton import ZooplanktonArchiveDataHolder
 
 
 def all_subclasses(cls):
     return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+    )
 
 
-object_mapping = dict((cls._data_format, cls) for cls in all_subclasses(ArchiveDataHolder))
-# object_mapping = dict((cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__())
+object_mapping = dict(
+    (cls._data_format, cls) for cls in all_subclasses(ArchiveDataHolder)
+)
+# object_mapping = dict(
+#     (cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__()
+# )
 
 
 def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
-    d_note = DeliveryNote.from_txt_file(path / 'processed_data/delivery_note.txt')
+    d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
     d_holder = object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
@@ -40,16 +45,15 @@ def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
 
 
 def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:
-    """Returns path to archive directory if it is recognised as an archive directory. Else returns False
-    directory"""
+    """Returns path to archive directory if it is recognised as an archive directory.
+    Else returns False."""
     directory = pathlib.Path(directory)
     for root, dirs, files in os.walk(directory, topdown=False):
         for name in files:
-            if name == 'delivery_note.txt':
+            if name == "delivery_note.txt":
                 return pathlib.Path(root, name).parent.parent
     return False
 
 
 def get_archive_data_holder_names() -> list[str]:
     return utils.get_all_class_children_names(ArchiveDataHolder)
-

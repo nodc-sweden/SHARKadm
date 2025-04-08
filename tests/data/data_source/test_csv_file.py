@@ -1,5 +1,5 @@
-import pytest
 import polars as pl
+import pytest
 
 from sharkadm.data.data_source.txt_file import CsvRowFormatDataFilePolars
 from tests.data.data_source.conftest import csv_file_from_dict

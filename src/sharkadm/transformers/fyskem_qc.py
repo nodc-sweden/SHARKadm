@@ -1,20 +1,16 @@
-import pandas as pd
-from sharkadm import adm_logger
-from .base import Transformer, DataHolderProtocol
+from sharkadm.transformers.base import DataHolderProtocol, Transformer
+from sharkadm.utils.installations import verify_installation
 
-try:
-    import fyskemqc
-except ModuleNotFoundError as e:
-    module_name = str(e).split("'")[-2]
-    adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
+verify_installation("fyskemqc")
 
 
 class RunFyskKemQualityControl(Transformer):
-    valid_data_types = ['PhysicalChemical']
+    valid_data_types = ("PhysicalChemical",)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Applies quality control on physical chemical data'
+        return "Applies quality control on physical chemical data"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        qc_object = fyskemqc.fyskemqc(data_holder.data)
+        # qc_object = fyskemqc.fyskemqc(data_holder.data)
+        ...

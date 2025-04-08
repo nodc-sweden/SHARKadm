@@ -2,7 +2,6 @@ import pathlib
 
 
 class ConfigPaths:
-
     def __init__(self, root_path: str | pathlib.Path) -> None:
         self._root_path = pathlib.Path(root_path)
         self._paths = dict()

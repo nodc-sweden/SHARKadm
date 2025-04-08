@@ -1,33 +1,29 @@
 import logging
-import pathlib
-
-import pandas as pd
 from typing import Protocol
 
+import pandas as pd
+
 from sharkadm.data.data_holder import PandasDataHolder
-from sharkadm.data import data_source
-from sharkadm.data.archive import sampling_info, analyse_info
-from sharkadm import adm_logger
+from sharkadm.data.data_source.base import DataDataFrame, DataFile
 
 logger = logging.getLogger(__name__)
 
 
 class HeaderMapper(Protocol):
-
-    def get_internal_name(self, external_par: str) -> str:
-        ...
+    def get_internal_name(self, external_par: str) -> str: ...
 
 
 class PandasDataFrameDataHolder(PandasDataHolder):
-    _data_type: str = ''
-    _data_structure: str = ''
+    _data_type: str = ""
+    _data_structure: str = ""
 
-    def __init__(self,
-                 df: pd.DataFrame,
-                 data_structure: str,
-                 data_type: str,
-                 header_mapper: HeaderMapper = None,
-                 ):
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        data_structure: str,
+        data_type: str,
+        header_mapper: HeaderMapper = None,
+    ):
         super().__init__()
 
         self._header_mapper = header_mapper
@@ -43,17 +39,17 @@ class PandasDataFrameDataHolder(PandasDataHolder):
         return """Holds data from a given pandas dataframe"""
 
     def _load_data(self, df: pd.DataFrame) -> None:
-        d_source = data_source.DataDataFrame(df, data_type=self.data_type)
+        d_source = DataDataFrame(df, data_type=self.data_type)
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
         self._set_data_source(d_source)
         # self._data = self._get_data_from_data_source(d_source)
-        self._dataset_name = 'Pandas dataframe'
+        self._dataset_name = "Pandas dataframe"
 
     @staticmethod
-    def _get_data_from_data_source(data_source: data_source.DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
         data = data_source.get_data()
-        data = data.fillna('')
+        data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
         return data
 
@@ -78,4 +74,3 @@ class PandasDataFrameDataHolder(PandasDataHolder):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
-

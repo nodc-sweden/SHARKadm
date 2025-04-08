@@ -1,15 +1,15 @@
-from .base import Validator, DataHolderProtocol
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
+
+from .base import DataHolderProtocol, Validator
 
 
 class ValidateYearNrDigits(Validator):
-
     @staticmethod
     def get_validator_description() -> str:
-        return 'Checks that year is a valid four digit number'
+        return "Checks that year is a valid four digit number"
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['visit_year'].apply(self.check)
+        data_holder.data["visit_year"].apply(self.check)
 
     @staticmethod
     def check(x):
