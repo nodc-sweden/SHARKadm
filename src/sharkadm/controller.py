@@ -130,7 +130,11 @@ class BaseSHARKadmController:
             )
 
     def transform(
-        self, *transformers: Transformer | MultiTransformer | PolarsTransformer | PolarsMultiTransformer
+        self,
+        *transformers: Transformer
+        | MultiTransformer
+        | PolarsTransformer
+        | PolarsMultiTransformer,
     ) -> Self:
         for trans in transformers:
             trans.transform(self._data_holder)

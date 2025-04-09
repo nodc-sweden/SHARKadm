@@ -37,36 +37,28 @@ from sharkadm.transformers.dataset_name import AddDatasetFileName, AddDatasetNam
 from sharkadm.transformers.datatype import AddDatatype, AddDatatypePlanktonBarcoding
 from sharkadm.transformers.date_and_time import (
     AddDatetime,
-    # AddDatetimePolars,
     PolarsAddDatetime,
     AddMonth,
-    # AddMonthPolars,
     PolarsAddMonth,
     AddReportedDates,
-    # AddReportedDatesPolars,
     PolarsAddReportedDates,
     AddSampleDate,
-    # AddSampleDatePolars,
     PolarsAddSampleDate,
     AddSampleTime,
-    # AddSampleTimePolars,
     PolarsAddSampleTime,
     AddVisitDateFromObservationDate,
-    # AddVisitDateFromObservationDatePolars,
     PolarsAddVisitDateFromObservationDate,
     CreateFakeFullDates,
     FixDateFormat,
-    # FixDateFormatPolars,
     PolarsFixDateFormat,
     FixTimeFormat,
-    # FixTimeFormatPolars,
     PolarsFixTimeFormat,
     PolarsAddMonth,
     PolarsAddDatetime,
     PolarsAddSampleDate,
     PolarsAddSampleDate,
     PolarsAddSampleTime,
-    PolarsFixTimeFormat
+    PolarsFixTimeFormat,
 )
 from sharkadm.transformers.delivery_note_info import AddDeliveryNoteInfo, AddStatus
 from sharkadm.transformers.depth import (

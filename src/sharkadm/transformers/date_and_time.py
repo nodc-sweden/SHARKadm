@@ -146,28 +146,6 @@ class AddSampleTime(Transformer):
             data_holder.data["sample_time"] = data_holder.data["visit_time"]
 
 
-class old_PolarsAddSampleTime(PolarsTransformer):
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adding time format sample_time"
-
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
-        if "sample_time" in data_holder.data:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col("sample_time").alias("reported_sample_time")
-            )
-            if "visit_time" in data_holder.data:
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(pl.col("sample_time").str.strip_chars() == "")
-                    .then(pl.col("visit_time"))
-                    .alias("sample_time")
-                )
-        else:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col("visit_time").alias("sample_time")
-            )
-
-
 class PolarsAddSampleTime(PolarsTransformer):
     source_col = "visit_time"
     col_to_set = "sample_time"
@@ -215,28 +193,6 @@ class AddSampleDate(Transformer):
                 )
         else:
             data_holder.data["sample_date"] = data_holder.data["visit_date"]
-
-
-class old_PolarsAddSampleDate(PolarsTransformer):
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adding sample_date if missing"
-
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
-        if "sample_date" in data_holder.data:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col("sample_date").alias("reported_sample_date")
-            )
-            if "visit_date" in data_holder.data:
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(pl.col("sample_date").str.strip_chars() == "")
-                    .then(pl.col("visit_date"))
-                    .alias("sample_date")
-                )
-        else:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col("visit_date").alias("sample_date")
-            )
 
 
 class PolarsAddSampleDate(PolarsTransformer):
@@ -307,40 +263,6 @@ class AddDatetime(Transformer):
             except ValueError:
                 continue
         return ""
-
-
-class old_PolarsAddDatetime(PolarsTransformer):
-    def __init__(
-        self,
-        date_source_column: str = "sample_date",
-        time_source_column: str = "sample_time",
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.date_source_column = date_source_column
-        self.time_source_column = time_source_column
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adds column datetime. Time is taken from sample_date"
-
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
-        data_holder.data = data_holder.data.with_columns(
-            pl.col(self.date_source_column).alias("datetime_str")
-        )
-        if self.time_source_column in data_holder.data.columns:
-            data_holder.data = data_holder.data.with_columns(
-                pl.concat_str(
-                    [
-                        pl.col("datetime_str").str.slice(0, 10),
-                        pl.col(self.time_source_column),
-                    ],
-                    separator=" ",
-                ).alias("datetime_str")
-            )
-        data_holder.data = data_holder.data.with_columns(
-            pl.col("datetime_str").str.to_datetime("%Y-%m-%d %H:%M").alias("datetime")
-        )
 
     @staticmethod
     def to_datetime(x: str) -> datetime.datetime | str:
