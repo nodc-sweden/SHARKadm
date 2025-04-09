@@ -122,7 +122,7 @@ def get_all_data_types() -> list[str]:
 
 
 def get_valid_data_types(
-    valid: list[str] | None = None, invalid: list[str] | None = None
+    valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
     if not any([valid, invalid]):
         return get_all_data_types()
@@ -134,7 +134,7 @@ def get_valid_data_types(
 
 
 def get_valid_data_structures(
-    valid: list[str] | None = None, invalid: list[str] | None = None
+    valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
     if not any([valid, invalid]):
         return DATA_STRUCTURES

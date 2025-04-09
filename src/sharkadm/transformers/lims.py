@@ -49,9 +49,11 @@ class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.when((pl.col("value").str.starts_with("<")) & (pl.col("quality_flag") == ''))
+            pl.when(
+                (pl.col("value").str.starts_with("<")) & (pl.col("quality_flag") == "")
+            )
             .then(pl.lit("<"))
-            .otherwise(pl.col('quality_flag'))
+            .otherwise(pl.col("quality_flag"))
             .alias("quality_flag")
         )
 
@@ -60,7 +62,7 @@ class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col("value").str.starts_with("<"))
             .then(pl.col("value").str.strip_prefix("<"))
-            .otherwise(pl.col('value'))
+            .otherwise(pl.col("value"))
             .alias("value")
         )
 

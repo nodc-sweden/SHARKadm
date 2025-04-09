@@ -7,7 +7,7 @@ from sharkadm import utils
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import Divide, Multiply
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
-from sharkadm.transformers.base import Transformer
+from sharkadm.transformers.base import Transformer, PolarsTransformer
 from sharkadm.transformers.boolean import FixYesNo
 from sharkadm.transformers.bvol import (
     AddBvolAphiaId,
@@ -37,25 +37,36 @@ from sharkadm.transformers.dataset_name import AddDatasetFileName, AddDatasetNam
 from sharkadm.transformers.datatype import AddDatatype, AddDatatypePlanktonBarcoding
 from sharkadm.transformers.date_and_time import (
     AddDatetime,
-    AddDatetimePolars,
+    # AddDatetimePolars,
+    PolarsAddDatetime,
     AddMonth,
-    AddMonthPolars,
+    # AddMonthPolars,
+    PolarsAddMonth,
     AddReportedDates,
-    AddReportedDatesPolars,
+    # AddReportedDatesPolars,
+    PolarsAddReportedDates,
     AddSampleDate,
-    AddSampleDatePolars,
+    # AddSampleDatePolars,
+    PolarsAddSampleDate,
     AddSampleTime,
-    AddSampleTimePolars,
+    # AddSampleTimePolars,
+    PolarsAddSampleTime,
     AddVisitDateFromObservationDate,
-    AddVisitDateFromObservationDatePolars,
+    # AddVisitDateFromObservationDatePolars,
+    PolarsAddVisitDateFromObservationDate,
     CreateFakeFullDates,
     FixDateFormat,
-    FixDateFormatPolars,
+    # FixDateFormatPolars,
+    PolarsFixDateFormat,
     FixTimeFormat,
-    FixTimeFormatPolars,
+    # FixTimeFormatPolars,
+    PolarsFixTimeFormat,
+    PolarsAddMonth,
     PolarsAddDatetime,
     PolarsAddSampleDate,
+    PolarsAddSampleDate,
     PolarsAddSampleTime,
+    PolarsFixTimeFormat
 )
 from sharkadm.transformers.delivery_note_info import AddDeliveryNoteInfo, AddStatus
 from sharkadm.transformers.depth import (

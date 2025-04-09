@@ -108,7 +108,7 @@ def get_data_holder(
 
 
 def get_valid_data_holders(
-    valid: list[str] | None = None, invalid: list[str] | None = None
+    valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
     if not any([valid, invalid]):
         return get_data_holder_list()

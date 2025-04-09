@@ -146,7 +146,7 @@ class AddSampleTime(Transformer):
             data_holder.data["sample_time"] = data_holder.data["visit_time"]
 
 
-class PolarsAddSampleTime(PolarsTransformer):
+class old_PolarsAddSampleTime(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return "Adding time format sample_time"
@@ -168,6 +168,38 @@ class PolarsAddSampleTime(PolarsTransformer):
             )
 
 
+class PolarsAddSampleTime(PolarsTransformer):
+    source_col = "visit_time"
+    col_to_set = "sample_time"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adding {PolarsAddSampleTime.col_to_set} "
+            f"from {PolarsAddSampleTime.source_col} if missing"
+        )
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.col_to_set).alias(f"reported_{self.col_to_set}")
+            )
+            if self.source_col in data_holder.data:
+                has_no_sample_date = (
+                    data_holder.data[self.col_to_set].str.strip_chars() == ""
+                )
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(has_no_sample_date)
+                    .then(pl.col(self.source_col))
+                    .otherwise(pl.col(self.col_to_set))
+                    .alias(self.col_to_set)
+                )
+        else:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.source_col).alias(self.col_to_set)
+            )
+
+
 class AddSampleDate(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
@@ -185,7 +217,7 @@ class AddSampleDate(Transformer):
             data_holder.data["sample_date"] = data_holder.data["visit_date"]
 
 
-class PolarsAddSampleDate(PolarsTransformer):
+class old_PolarsAddSampleDate(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return "Adding sample_date if missing"
@@ -204,6 +236,38 @@ class PolarsAddSampleDate(PolarsTransformer):
         else:
             data_holder.data = data_holder.data.with_columns(
                 pl.col("visit_date").alias("sample_date")
+            )
+
+
+class PolarsAddSampleDate(PolarsTransformer):
+    source_col = "visit_date"
+    col_to_set = "sample_date"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adding {PolarsAddSampleDate.col_to_set} "
+            f"from {PolarsAddSampleDate.source_col} if missing"
+        )
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.col_to_set).alias(f"reported_{self.col_to_set}")
+            )
+            if self.source_col in data_holder.data:
+                has_no_sample_date = (
+                    data_holder.data[self.col_to_set].str.strip_chars() == ""
+                )
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(has_no_sample_date)
+                    .then(pl.col(self.source_col))
+                    .otherwise(pl.col(self.col_to_set))
+                    .alias(self.col_to_set)
+                )
+        else:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.source_col).alias(self.col_to_set)
             )
 
 
@@ -245,7 +309,7 @@ class AddDatetime(Transformer):
         return ""
 
 
-class PolarsAddDatetime(PolarsTransformer):
+class old_PolarsAddDatetime(PolarsTransformer):
     def __init__(
         self,
         date_source_column: str = "sample_date",
@@ -286,6 +350,47 @@ class PolarsAddDatetime(PolarsTransformer):
             except ValueError:
                 continue
         return ""
+
+
+class PolarsAddDatetime(PolarsTransformer):
+    date_source_column: str = "sample_date"
+    time_source_column: str = "sample_time"
+
+    def __init__(
+        self,
+        date_source_column: str | None = None,
+        time_source_column: str | None = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.date_source_column = date_source_column or self.date_source_column
+        self.time_source_column = time_source_column or self.time_source_column
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds column datetime. Date and time is taken "
+            f"from {PolarsAddDatetime.date_source_column} "
+            f"and {PolarsAddDatetime.time_source_column}, if no other columns are given"
+        )
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            datetime_str=pl.col(self.date_source_column)
+        )
+        if self.time_source_column in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(
+                pl.concat_str(
+                    [
+                        pl.col("datetime_str").str.slice(0, 10),
+                        pl.col(self.time_source_column),
+                    ],
+                    separator=" ",
+                ).alias("datetime_str")
+            )
+        data_holder.data = data_holder.data.with_columns(
+            datetime=pl.col("datetime_str").str.to_datetime()
+        )
 
 
 class AddMonth(Transformer):
@@ -344,6 +449,42 @@ class AddReportedDates(Transformer):
                 )
                 continue
             data_holder.data[target_col] = data_holder.data[source_col]
+
+
+class PolarsAddReportedDates(Transformer):
+    source_columns = ("visit_date", "sample_date")
+    reported_col_prefix = "reported"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        rep_cols = [
+            f"{PolarsAddReportedDates.reported_col_prefix}_{item}"
+            for item in PolarsAddReportedDates.source_columns
+        ]
+        return f"Copies columns {PolarsAddReportedDates.source_columns} to columns {rep_cols}"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for source_col in self.source_columns:
+            if source_col not in data_holder.data.columns:
+                adm_logger.log_transformation(
+                    f"Missing column: {source_col}", level=adm_logger.WARNING
+                )
+                continue
+            target_col = f"{self.reported_col_prefix}_{source_col}"
+            if target_col in data_holder.data.columns:
+                adm_logger.log_transformation(
+                    f"Column already present. Will do nothing: {target_col}",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+
+            data_holder.data = data_holder.data.with_columns(
+                [pl.col(source_col).alias(target_col)]
+            )
+            adm_logger.log_transformation(
+                f"Column {target_col} set from source column {source_col}",
+                level=adm_logger.DEBUG,
+            )
 
 
 class CreateFakeFullDates(Transformer):
@@ -459,7 +600,7 @@ class AddVisitDateFromObservationDate(Transformer):
 ##########################################################################################
 ##########################################################################################
 ##########################################################################################
-class FixDateFormatPolars(PolarsTransformer):
+class PolarsFixDateFormat(PolarsTransformer):
     dates_to_check = ("sample_date", "visit_date", "analysis_date", "observation_date")
 
     from_format = "%Y%m%d"
@@ -472,8 +613,8 @@ class FixDateFormatPolars(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Changes date format from {FixDateFormat.from_format} "
-            f"to {FixDateFormat.to_format}"
+            f"Changes date format from {PolarsFixDateFormat.from_format} "
+            f"to {PolarsFixDateFormat.to_format}"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -506,12 +647,12 @@ class FixDateFormatPolars(PolarsTransformer):
             )
 
 
-class FixTimeFormatPolars(Transformer):
+class PolarsFixTimeFormat(Transformer):
     time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod
     def get_transformer_description() -> str:
-        cols_str = ", ".join(FixTimeFormatPolars.time_cols)
+        cols_str = ", ".join(PolarsFixTimeFormat.time_cols)
         return f"Reformat time values in columns: {cols_str}"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -590,43 +731,7 @@ class FixTimeFormatPolars(Transformer):
                 return True
 
 
-class AddReportedDatesPolars(Transformer):
-    source_columns = ("visit_date", "sample_date")
-    reported_col_prefix = "reported"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        rep_cols = [
-            f"{AddReportedDates.reported_col_prefix}_{item}"
-            for item in AddReportedDates.source_columns
-        ]
-        return f"Copies columns {AddReportedDates.source_columns} to columns {rep_cols}"
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for source_col in self.source_columns:
-            if source_col not in data_holder.data.columns:
-                adm_logger.log_transformation(
-                    f"Missing column: {source_col}", level=adm_logger.WARNING
-                )
-                continue
-            target_col = f"{self.reported_col_prefix}_{source_col}"
-            if target_col in data_holder.data.columns:
-                adm_logger.log_transformation(
-                    f"Column already present. Will do nothing: {target_col}",
-                    level=adm_logger.DEBUG,
-                )
-                continue
-
-            data_holder.data = data_holder.data.with_columns(
-                [pl.col(source_col).alias(target_col)]
-            )
-            adm_logger.log_transformation(
-                f"Column {target_col} set from source column {source_col}",
-                level=adm_logger.DEBUG,
-            )
-
-
-class AddVisitDateFromObservationDatePolars(Transformer):
+class PolarsAddVisitDateFromObservationDate(Transformer):
     valid_data_types = ("HarbourPorpoise",)
     valid_data_holders = ("ZipArchiveDataHolder",)
     source_col = "observation_date"
@@ -635,8 +740,8 @@ class AddVisitDateFromObservationDatePolars(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Sets {AddVisitDateFromObservationDate.col_to_set} "
-            f"from {AddVisitDateFromObservationDate.source_col}"
+            f"Sets {PolarsAddVisitDateFromObservationDate.col_to_set} "
+            f"from {PolarsAddVisitDateFromObservationDate.source_col}"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -654,112 +759,7 @@ class AddVisitDateFromObservationDatePolars(Transformer):
         )
 
 
-class AddSampleDatePolars(Transformer):
-    source_col = "visit_date"
-    col_to_set = "sample_date"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return (
-            f"Adding {AddSampleDatePolars.col_to_set} "
-            f"from {AddSampleDatePolars.source_col} if missing"
-        )
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_to_set in data_holder.data:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col(self.col_to_set).alias(f"reported_{self.col_to_set}")
-            )
-            if self.source_col in data_holder.data:
-                has_no_sample_date = (
-                    data_holder.data[self.col_to_set].str.strip_chars() == ""
-                )
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(has_no_sample_date)
-                    .then(pl.col(self.source_col))
-                    .otherwise(pl.col(self.col_to_set))
-                    .alias(self.col_to_set)
-                )
-        else:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col(self.source_col).alias(self.col_to_set)
-            )
-
-
-class AddSampleTimePolars(Transformer):
-    source_col = "visit_time"
-    col_to_set = "sample_time"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return (
-            f"Adding {AddSampleTimePolars.col_to_set} "
-            f"from {AddSampleTimePolars.source_col} if missing"
-        )
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_to_set in data_holder.data:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col(self.col_to_set).alias(f"reported_{self.col_to_set}")
-            )
-            if self.source_col in data_holder.data:
-                has_no_sample_date = (
-                    data_holder.data[self.col_to_set].str.strip_chars() == ""
-                )
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(has_no_sample_date)
-                    .then(pl.col(self.source_col))
-                    .otherwise(pl.col(self.col_to_set))
-                    .alias(self.col_to_set)
-                )
-        else:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col(self.source_col).alias(self.col_to_set)
-            )
-
-
-class AddDatetimePolars(Transformer):
-    date_source_column: str = ("sample_date",)
-    time_source_column: str = ("sample_time",)
-
-    def __init__(
-        self,
-        date_source_column: str | None = None,
-        time_source_column: str | None = None,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self.date_source_column = date_source_column or self.date_source_column
-        self.time_source_column = time_source_column or self.time_source_column
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return (
-            f"Adds column datetime. Date and time is taken "
-            f"from {AddDatetimePolars.date_source_column} "
-            f"and {AddDatetimePolars.time_source_column}, if no other columns are given"
-        )
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data = data_holder.data.with_columns(
-            datetime_str=pl.col(self.date_source_column)
-        )
-        if self.time_source_column in data_holder.data.columns:
-            data_holder.data = data_holder.data.with_columns(
-                pl.concat_str(
-                    [
-                        pl.col("datetime_str").str.slice(0, 10),
-                        pl.col(self.time_source_column),
-                    ],
-                    separator=" ",
-                ).alias("datetime_str")
-            )
-        data_holder.data = data_holder.data.with_columns(
-            datetime=pl.col("datetime_str").str.to_datetime()
-        )
-
-
-class AddMonthPolars(Transformer):
+class PolarsAddMonth(PolarsTransformer):
     month_columns = ("sample_month", "visit_month")
 
     @staticmethod
@@ -777,5 +777,5 @@ class AddMonthPolars(Transformer):
             return
         for col in self.month_columns:
             data_holder.data = data_holder.data.with_columns(
-                pl.col("datetime").dt.month().cast(str).alias(col)
+                pl.col("datetime").dt.month().cast(str).str.zfill(2).alias(col)
             )

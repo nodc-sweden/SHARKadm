@@ -23,14 +23,26 @@ class DateTime(MultiTransformer):
 
 class DateTimePolars(MultiTransformer):
     _transformers = (
-        transformers.AddReportedDatesPolars,
-        transformers.FixDateFormatPolars,
-        transformers.FixTimeFormatPolars,
-        transformers.AddSampleDatePolars,
-        transformers.AddSampleTimePolars,
-        transformers.AddDatetimePolars,
-        transformers.AddMonthPolars,
+        transformers.PolarsAddReportedDates,
+        transformers.PolarsAddReportedDates,
+        transformers.PolarsFixDateFormat,
+        transformers.PolarsFixTimeFormat,
+        transformers.PolarsAddSampleDate,
+        transformers.PolarsAddSampleTime,
+        transformers.PolarsAddDatetime,
+        transformers.PolarsAddMonth,
     )
+
+    # _transformers = (
+    #     transformers.AddReportedDatesPolars,
+    #     transformers.AddReportedDatesPolars,
+    #     transformers.FixDateFormatPolars,
+    #     transformers.FixTimeFormatPolars,
+    #     transformers.AddSampleDatePolars,
+    #     transformers.AddSampleTimePolars,
+    #     transformers.AddDatetimePolars,
+    #     transformers.AddMonthPolars,
+    # )
 
     @staticmethod
     def get_transformer_description() -> str:

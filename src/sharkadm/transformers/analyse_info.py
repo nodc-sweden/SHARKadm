@@ -79,16 +79,26 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                 if column not in ["VALIDFR", "VALIDTO"]
             ]
             data_holder.data = data_holder.data.with_columns(
-                [pl.lit('').alias(col) for col in analyse_info_columns if col not in data_holder.data]
+                [
+                    pl.lit("").alias(col)
+                    for col in analyse_info_columns
+                    if col not in data_holder.data
+                ]
             )
 
             for column in analyse_info_columns:
                 if info.get(column):
-                    print(f'{parameter=}   :   {dtime=}   :   {column=}  :  {info.get(column)=}')
+                    print(
+                        f"{parameter=}   :   {dtime=}   :   {column=}  :  {info.get(column)=}"
+                    )
                 data_holder.data = data_holder.data.with_columns(
-                    pl.when((pl.col("parameter") == parameter) & (pl.col("datetime") == dtime))
+                    pl.when(
+                        (pl.col("parameter") == parameter) & (pl.col("datetime") == dtime)
+                    )
                     .then(pl.lit(info.get(column, "")))
-                    .otherwise(pl.col(column)).alias(column))
+                    .otherwise(pl.col(column))
+                    .alias(column)
+                )
             # data_holder.data = data_holder.data.with_columns(cols_to_add)
 
             # for column in analyse_info_columns:

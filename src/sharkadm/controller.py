@@ -9,9 +9,9 @@ from sharkadm import event, exporters, transformers, utils, validators
 from sharkadm.data import get_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
-from sharkadm.multi_transformers import MultiTransformer
+from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer
+from sharkadm.transformers import Transformer, PolarsTransformer
 from sharkadm.validators import Validator
 
 logger = logging.getLogger(__name__)
@@ -130,8 +130,8 @@ class BaseSHARKadmController:
             )
 
     def transform(
-        self, *transformers: Transformer | MultiTransformer
-    ) -> "SHARKadmController":
+        self, *transformers: Transformer | MultiTransformer | PolarsTransformer | PolarsMultiTransformer
+    ) -> Self:
         for trans in transformers:
             trans.transform(self._data_holder)
         return self
