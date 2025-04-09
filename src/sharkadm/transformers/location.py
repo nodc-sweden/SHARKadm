@@ -1,6 +1,12 @@
+import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer
+from .base import (
+    DataHolderProtocol,
+    Transformer,
+    PolarsTransformer,
+    PolarsDataHolderProtocol,
+)
 
 try:
     import nodc_geography
@@ -57,6 +63,58 @@ class _AddLocationBase(Transformer):
         )
 
 
+class _PolarsAddLocationBase(PolarsTransformer):
+    x_pos_col = "sample_sweref99tm_x"
+    y_pos_col = "sample_sweref99tm_y"
+    col_to_set = ""
+    set_boolean = False
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._cached_data = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return ""
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.x_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.x_pos_col}. Cannot add column {self.col_to_set}",
+                level=adm_logger.ERROR,
+            )
+            return
+        if self.y_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.y_pos_col}. Cannot add column {self.col_to_set}",
+                level=adm_logger.ERROR,
+            )
+            return
+        if self.set_boolean:
+            data_holder.data = data_holder.data.with_columns(
+                pl.lit(False).alias(self.col_to_set)
+            )
+        else:
+            data_holder.data = data_holder.data.with_columns(
+                pl.lit("").alias(self.col_to_set)
+            )
+        for (x, y), df in data_holder.data.group_by([self.x_pos_col, self.y_pos_col]):
+            code = nodc_geography.get_shape_file_info_at_position(
+                x_pos=x, y_pos=y, variable=self.col_to_set
+            )
+            if self.set_boolean:
+                code = bool(code)
+                then = code
+            else:
+                then = pl.lit(code or "")
+            data_holder.data = data_holder.data.with_columns(
+                pl.when((pl.col(self.x_pos_col) == x) & (pl.col(self.y_pos_col) == y))
+                .then(then)
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set)
+            )
+
+
 class AddLocationWaterDistrict(_AddLocationBase):
     col_to_set = "location_water_district"
 
@@ -66,6 +124,14 @@ class AddLocationWaterDistrict(_AddLocationBase):
 
 
 class AddLocationTypeArea(_AddLocationBase):
+    col_to_set = "location_type_area"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_type_area from shape files"
+
+
+class PolarsAddLocationTypeArea(_PolarsAddLocationBase):
     col_to_set = "location_type_area"
 
     @staticmethod
@@ -169,3 +235,48 @@ class AddLocationWaterCategory(Transformer):
         data_holder.data.loc[wb_boolean & ~y_boolean & ~p_boolean, self.col_to_set] = (
             "Utsjövatten"
         )
+
+
+class PolarsAddLocationRA(_PolarsAddLocationBase):
+    col_to_set = "location_ra"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_ra from shape files"
+
+
+class PolarsAddLocationRB(_PolarsAddLocationBase):
+    col_to_set = "location_rb"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_ra from shape files"
+
+
+class PolarsAddLocationRC(_PolarsAddLocationBase):
+    col_to_set = "location_rc"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_ra from shape files"
+
+
+class PolarsAddLocationRG(_PolarsAddLocationBase):
+    col_to_set = "location_rg"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_ra from shape files"
+
+
+class PolarsAddLocationRH(_PolarsAddLocationBase):
+    col_to_set = "location_rh"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_ra from shape files"

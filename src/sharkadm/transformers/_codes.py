@@ -99,6 +99,7 @@ class _PolarsAddCodes(PolarsTransformer):
             if col in data_holder.data.columns:
                 source_col = col
                 break
+        print(f"{source_col=}")
         if not source_col:
             adm_logger.log_transformation(
                 f"None of the source columns {self.source_cols} found "
@@ -111,8 +112,8 @@ class _PolarsAddCodes(PolarsTransformer):
                 pl.lit("").alias(self.col_to_set)
             )
 
-        operations = []
-        for code, df in data_holder.data.groupby(source_col):
+        # operations = []
+        for (code,), df in data_holder.data.group_by(source_col):
             len_df = len(df)
             code = str(code)
             names = []
@@ -140,9 +141,15 @@ class _PolarsAddCodes(PolarsTransformer):
                             f"Could not find information for {source_col}: {part}",
                             level=adm_logger.WARNING,
                         )
-            op = pl.when(pl.col(source_col) == "code").then(pl.lit(", ".join(names)))
-            operations.append(op)
-        data_holder.data = data_holder.data.with_columns(operations)
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col(source_col) == code)
+                .then(pl.lit(", ".join(names)))
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set)
+            )
+            # op = pl.when(pl.col(source_col) == code).then(pl.lit(", ".join(names))).alias(self.col_to_set)
+        #     operations.append(op)
+        # data_holder.data = data_holder.data.with_columns(operations)
         # data_holder.data.loc[df.index, self.col_to_set] = ", ".join(names)
 
 

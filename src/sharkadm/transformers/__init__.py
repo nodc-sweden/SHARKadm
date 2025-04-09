@@ -96,10 +96,16 @@ from sharkadm.transformers.location import (
     AddLocationNation,
     AddLocationSeaBasin,
     AddLocationTypeArea,
+    PolarsAddLocationTypeArea,
     AddLocationTYPNFS06,
     AddLocationWaterCategory,
     AddLocationWaterDistrict,
     AddLocationWB,
+    PolarsAddLocationRA,
+    PolarsAddLocationRB,
+    PolarsAddLocationRC,
+    PolarsAddLocationRG,
+    PolarsAddLocationRH,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
@@ -109,16 +115,24 @@ from sharkadm.transformers.map_parameter_column import (
     PolarsMapperParameterColumn,
 )
 from sharkadm.transformers.occurrence_id import AddOccurrenceId
-from sharkadm.transformers.orderer import AddEnglishSampleOrderer, AddSwedishSampleOrderer
+from sharkadm.transformers.orderer import (
+    AddEnglishSampleOrderer,
+    AddSwedishSampleOrderer,
+    PolarsAddEnglishSampleOrderer,
+    PolarsAddSwedishSampleOrderer,
+)
 from sharkadm.transformers.parameter_unit_value import RemoveRowsWithNoParameterValue
 from sharkadm.transformers.position import (
     AddSamplePositionDD,
     AddSamplePositionDM,
     AddSamplePositionSweref99tm,
+    PolarsAddSamplePositionSweref99tm,
 )
 from sharkadm.transformers.project_code import (
     AddEnglishProjectName,
     AddSwedishProjectName,
+    PolarsAddEnglishProjectName,
+    PolarsAddSwedishProjectName,
 )
 from sharkadm.transformers.qc.columns import AddColumnsForAutomaticQC
 from sharkadm.transformers.red_list import AddRedList
