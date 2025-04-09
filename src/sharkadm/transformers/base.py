@@ -17,10 +17,10 @@ if TYPE_CHECKING:
 
 class DataHolderProtocol(Protocol):
     @property
-    def data(self) -> pd.DataFrame: ...
+    def data(self) -> pd.DataFrame | pl.DataFrame: ...
 
     @data.setter
-    def data(self, df: pd.DataFrame) -> None: ...
+    def data(self, df: pd.DataFrame | pl.DataFrame) -> None: ...
 
     @property
     @abstractmethod
@@ -138,7 +138,7 @@ class Transformer(ABC):
         )
 
     @abstractmethod
-    def _transform(self, data_holder: "PandasDataHolder") -> None: ...
+    def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
 
     def _get_filter_mask(self, data_holder: "PandasDataHolder") -> pd.Series | np.ndarray:
         if not self._data_filter:
