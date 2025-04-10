@@ -26,7 +26,7 @@ from sharkadm.transformers.columns import (
     PolarsRemoveColumns,
     RemoveColumns,
     SortColumns,
-    AddApprovedKeyColumn,
+    PolarsAddApprovedKeyColumn,
 )
 from sharkadm.transformers.cruise import AddCruiseId
 from sharkadm.transformers.custom_id import AddCustomId, AddSharkSampleMd5

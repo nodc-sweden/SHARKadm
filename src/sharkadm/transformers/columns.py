@@ -107,7 +107,7 @@ class SortColumns(Transformer):
         data_holder.data = data_holder.data[new_col_order]
 
 
-class AddApprovedKeyColumn(PolarsTransformer):
+class PolarsAddApprovedKeyColumn(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds a column with keys to match against approved data"
