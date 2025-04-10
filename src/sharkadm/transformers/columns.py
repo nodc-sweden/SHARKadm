@@ -1,6 +1,8 @@
 import re
+import polars as pl
 
 from sharkadm.config import get_column_views_config
+from sharkadm.utils import approved_data
 
 from .base import (
     DataHolderProtocol,
@@ -103,3 +105,14 @@ class SortColumns(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         new_col_order = sorted(data_holder.data.columns, key=self._key)
         data_holder.data = data_holder.data[new_col_order]
+
+
+class AddApprovedKeyColumn(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds a column with keys to match against approved data"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        data_holder.data = approved_data.add_concatenated_column(
+            data_holder.data, column_name="approved_key"
+        )

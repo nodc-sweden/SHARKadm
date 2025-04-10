@@ -1,15 +1,16 @@
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, Any
 
 import numpy as np
 import pandas as pd
 import polars as pl
+from polars import Expr
 
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils.data_filter import DataFilter
+from sharkadm.utils.data_filter import DataFilter, PolarsDataFilter
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
@@ -162,7 +163,7 @@ class PolarsTransformer(ABC):
     valid_data_structures = ()
     invalid_data_structures = ()
 
-    def __init__(self, data_filter: DataFilter = None, **kwargs):
+    def __init__(self, data_filter: PolarsDataFilter = None, **kwargs):
         self._data_filter = data_filter
         self._kwargs = kwargs
 
@@ -227,9 +228,9 @@ class PolarsTransformer(ABC):
     @abstractmethod
     def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
 
-    def _get_filter_mask(self, data_holder: "PolarsDataHolder") -> pl.Series | np.ndarray:
+    def _get_filter_mask(self, data_holder: "PolarsDataHolder") -> pl.Series:
         if not self._data_filter:
-            return np.ones(len(data_holder.data), dtype=bool)
+            return pl.Series()
         adm_logger.log_workflow(
             f"Using data filter {self._data_filter.name} on transformer {self.name}",
             level=adm_logger.WARNING,

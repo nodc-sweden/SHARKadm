@@ -26,6 +26,7 @@ from sharkadm.transformers.columns import (
     PolarsRemoveColumns,
     RemoveColumns,
     SortColumns,
+    AddApprovedKeyColumn,
 )
 from sharkadm.transformers.cruise import AddCruiseId
 from sharkadm.transformers.custom_id import AddCustomId, AddSharkSampleMd5
@@ -106,6 +107,8 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRC,
     PolarsAddLocationRG,
     PolarsAddLocationRH,
+    PolarsAddLocationRO,
+    PolarsAddLocationR,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
@@ -144,6 +147,8 @@ from sharkadm.transformers.remove import (
     RemoveRowsForParameters,
     RemoveValuesInColumns,
     SetMaxLengthOfValuesInColumns,
+    PolarsKeepMask,
+    PolarsRemoveMask,
 )
 from sharkadm.transformers.replace import ReplaceNanWithEmptyString
 from sharkadm.transformers.replace_comma_with_dot import (

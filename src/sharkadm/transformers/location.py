@@ -115,6 +115,65 @@ class _PolarsAddLocationBase(PolarsTransformer):
             )
 
 
+class test_PolarsAddLocations(PolarsTransformer):
+    x_pos_col = "sample_sweref99tm_x"
+    y_pos_col = "sample_sweref99tm_y"
+    cols_to_set: tuple[str, ...] = ()
+    set_boolean = False
+
+    def __init__(self, cols_to_set: tuple[str, ...], set_boolean: bool = False, **kwargs):
+        super().__init__(**kwargs)
+        self.cols_to_set = cols_to_set or self.cols_to_set
+        self.set_boolean = set_boolean or self.set_boolean
+        self._cached_data = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return ""
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.x_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.x_pos_col}. Cannot add columns {', '.join(self.cols_to_set)}",
+                level=adm_logger.ERROR,
+            )
+            return
+        if self.y_pos_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.y_pos_col}. Cannot add columns {', '.join(self.cols_to_set)}",
+                level=adm_logger.ERROR,
+            )
+            return
+
+        for (x, y), df in data_holder.data.group_by([self.x_pos_col, self.y_pos_col]):
+            operations = []
+            for col in self.cols_to_set:
+                if self.set_boolean:
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.lit(False).alias(col)
+                    )
+                else:
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.lit("").alias(col)
+                    )
+                code = nodc_geography.get_shape_file_info_at_position(
+                    x_pos=x, y_pos=y, variable=col
+                )
+
+                if self.set_boolean:
+                    code = bool(code)
+                    then = code
+                else:
+                    then = pl.lit(code or "")
+                operations.append(
+                    pl.when((pl.col(self.x_pos_col) == x) & (pl.col(self.y_pos_col) == y))
+                    .then(then)
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                )
+            data_holder.data = data_holder.data.with_columns(operations)
+
+
 class AddLocationWaterDistrict(_AddLocationBase):
     col_to_set = "location_water_district"
 
@@ -243,7 +302,7 @@ class PolarsAddLocationRA(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_ra from shape files"
+        return "Adds location_ra"
 
 
 class PolarsAddLocationRB(_PolarsAddLocationBase):
@@ -252,7 +311,7 @@ class PolarsAddLocationRB(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_ra from shape files"
+        return "Adds location_rb"
 
 
 class PolarsAddLocationRC(_PolarsAddLocationBase):
@@ -261,7 +320,7 @@ class PolarsAddLocationRC(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_ra from shape files"
+        return "Adds location_rc"
 
 
 class PolarsAddLocationRG(_PolarsAddLocationBase):
@@ -270,7 +329,7 @@ class PolarsAddLocationRG(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_ra from shape files"
+        return "Adds location_rg"
 
 
 class PolarsAddLocationRH(_PolarsAddLocationBase):
@@ -279,4 +338,32 @@ class PolarsAddLocationRH(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_ra from shape files"
+        return "Adds location_rh"
+
+
+class PolarsAddLocationRO(_PolarsAddLocationBase):
+    col_to_set = "location_ro"
+    set_boolean = True
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_rh"
+
+
+class PolarsAddLocationR(PolarsTransformer):
+    col_to_set = "location_r"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_r"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        exp = (
+            data_holder.data["location_ra"]
+            | data_holder.data["location_rb"]
+            | data_holder.data["location_rc"]
+            | data_holder.data["location_rg"]
+            | data_holder.data["location_rh"]
+            | data_holder.data["location_ro"]
+        )
+        data_holder.data = data_holder.data.with_columns(location_r=exp)

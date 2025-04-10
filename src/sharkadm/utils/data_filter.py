@@ -5,6 +5,7 @@ import polars as pl
 
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.utils import approved_data
 
 
 class DataFilter(ABC):
@@ -26,7 +27,9 @@ class PolarsDataFilter(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None: ...
+    def get_filter_mask(
+        self, data_holder: PolarsDataHolder
+    ) -> pl.expr.expr.Expr | None: ...
 
 
 class DataFilterRestrictDepth(DataFilter):
@@ -55,26 +58,30 @@ class DataFilterRestrictDepth(DataFilter):
         # return data_holder.data['location_wb'] != 'N'
 
 
-class PolarsDataFilterRestrictArea(DataFilter):
-    def get_filter_mask(
-        self, data_holder: PolarsDataHolder
-    ) -> pl.expr.whenthen.When | None:
-        col = "location_wb"
-        if col not in data_holder.data:
-            adm_logger.log_workflow(
-                f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
-            )
-            raise
-        col = "location_county"
-        if col not in data_holder.data:
-            adm_logger.log_workflow(
-                f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
-            )
-            raise
-
-        # boolean_wb = data_holder.data['location_wb'] != 'N'
-        boolean_wb = (data_holder.data["location_wb"] == "Y") | (
-            data_holder.data["location_wb"] == "P"
+class PolarsDataFilterRestrictArea(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        if "location_r" in data_holder.data:
+            return data_holder.data["location_r"]
+        return (
+            data_holder.data["location_ra"]
+            | data_holder.data["location_rb"]
+            | data_holder.data["location_rc"]
+            | data_holder.data["location_rg"]
+            | data_holder.data["location_rh"]
+            | data_holder.data["location_ro"]
         )
-        boolean_county = data_holder.data["location_county"] != ""
-        return boolean_wb | boolean_county
+
+
+class PolarsDataFilterApprovedData(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        if "approved_key" not in data_holder.data:
+            adm_logger.log_workflow(
+                "Could not create data filter mask. Missing column approved_key",
+                level=adm_logger.ERROR,
+            )
+            return pl.Series()
+        ap_data = approved_data.ApprovedData()
+        mapper = ap_data.mapper
+        return data_holder.data.select(
+            pl.col("approved_key").replace_strict(mapper, default=False)
+        )["approved_key"]

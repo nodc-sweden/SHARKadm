@@ -7,7 +7,10 @@ from sharkadm import utils
 from sharkadm.exporters.base import Exporter
 from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
 from sharkadm.exporters.dataframe import DataFrame
-from sharkadm.exporters.html_station_map import HtmlStationMap
+from sharkadm.exporters.html_station_map import (
+    HtmlStationMap,
+    PolarsHtmlStationMap,
+)
 from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles
 from sharkadm.exporters.print_on_screen import PrintDataFrame
 from sharkadm.exporters.shark_data_txt_file import SHARKdataTxt, SHARKdataTxtAsGiven
