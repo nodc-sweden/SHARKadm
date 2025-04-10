@@ -9,7 +9,7 @@ def add_concatenated_column(df: pl.DataFrame, column_name: str = "key") -> pl.Da
         pl.concat_str(
             [
                 pl.col("dataset_name"),
-                pl.col("sample_date"),
+                pl.col("sample_date").cast(str).str.replace_all("-", ""),
                 pl.col("reported_station_name"),
             ],
             separator=":",
