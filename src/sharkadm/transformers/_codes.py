@@ -99,7 +99,6 @@ class _PolarsAddCodes(PolarsTransformer):
             if col in data_holder.data.columns:
                 source_col = col
                 break
-        print(f"{source_col=}")
         if not source_col:
             adm_logger.log_transformation(
                 f"None of the source columns {self.source_cols} found "

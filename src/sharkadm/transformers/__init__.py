@@ -82,6 +82,10 @@ from sharkadm.transformers.laboratory import (
     AddEnglishSamplingLaboratory,
     AddSwedishAnalyticalLaboratory,
     AddSwedishSamplingLaboratory,
+    PolarsAddEnglishAnalyticalLaboratory,
+    PolarsAddEnglishSamplingLaboratory,
+    PolarsAddSwedishAnalyticalLaboratory,
+    PolarsAddSwedishSamplingLaboratory,
 )
 from sharkadm.transformers.lims import (
     MoveLessThanFlagColumnFormat,
@@ -159,6 +163,8 @@ from sharkadm.transformers.replace_comma_with_dot import (
 from sharkadm.transformers.reporting_institute import (
     AddEnglishReportingInstitute,
     AddSwedishReportingInstitute,
+    PolarsAddEnglishReportingInstitute,
+    PolarsAddSwedishReportingInstitute,
 )
 from sharkadm.transformers.row import AddRowNumber, PolarsAddRowNumber
 from sharkadm.transformers.sampler_area import AddCalculatedSamplerArea

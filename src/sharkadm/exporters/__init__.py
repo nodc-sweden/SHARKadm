@@ -13,7 +13,11 @@ from sharkadm.exporters.html_station_map import (
 )
 from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles
 from sharkadm.exporters.print_on_screen import PrintDataFrame
-from sharkadm.exporters.shark_data_txt_file import SHARKdataTxt, SHARKdataTxtAsGiven
+from sharkadm.exporters.shark_data_txt_file import (
+    SHARKdataTxt,
+    SHARKdataTxtAsGiven,
+    PolarsSHARKdataTxtAsGiven,
+)
 from sharkadm.exporters.shark_metadata_auto import SHARKMetadataAuto
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 from sharkadm.exporters.standard_format import StandardFormat

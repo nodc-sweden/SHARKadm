@@ -6,8 +6,12 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 
-from ..utils.data_filter import DataFilterRestrictDepth, PolarsDataFilterRestrictArea, PolarsDataFilterApprovedData, \
-    PolarsDataFilter
+from ..utils.data_filter import (
+    DataFilterRestrictDepth,
+    PolarsDataFilterRestrictArea,
+    PolarsDataFilterApprovedData,
+    PolarsDataFilter,
+)
 from .base import (
     DataHolderProtocol,
     Transformer,
@@ -188,6 +192,7 @@ class PolarsKeepMask(PolarsTransformer):
                 f"Could not run transformer {PolarsKeepMask.__class__.__name__}. Missing data_filter",
                 level=adm_logger.ERROR,
             )
+            return
         data_holder.data = data_holder.data.remove(~mask)
 
 
