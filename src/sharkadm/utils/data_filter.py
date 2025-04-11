@@ -58,7 +58,7 @@ class DataFilterRestrictDepth(DataFilter):
         # return data_holder.data['location_wb'] != 'N'
 
 
-class PolarsDataFilterRestrictArea(PolarsDataFilter):
+class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
     def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
         if "location_r" in data_holder.data:
             return data_holder.data["location_r"]
@@ -85,3 +85,34 @@ class PolarsDataFilterApprovedData(PolarsDataFilter):
         return data_holder.data.select(
             pl.col("approved_key").replace_strict(mapper, default=False)
         )["approved_key"]
+
+
+class PolarsDataFilterInside12nm(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+        col = "location_wb"
+        if col not in data_holder.data:
+            adm_logger.log_workflow(
+                f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
+            )
+            raise
+        col = "location_county"
+        if col not in data_holder.data:
+            adm_logger.log_workflow(
+                f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
+            )
+            raise
+
+        # boolean_wb = data_holder.data['location_wb'] != 'N'
+        boolean_wb = (data_holder.data["location_wb"] == "Y") | (
+            data_holder.data["location_wb"] == "P"
+        )
+        boolean_county = data_holder.data["location_county"] != ""
+        return boolean_wb | boolean_county
+
+
+class PolarsDataFilterApprovedAndOutside12nm(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+        approved_bool = PolarsDataFilterApprovedData().get_filter_mask(data_holder)
+        inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
+        outside12nm_bool = ~inside12nm_bool
+        return approved_bool | outside12nm_bool

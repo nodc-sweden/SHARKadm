@@ -367,3 +367,19 @@ class PolarsAddLocationR(PolarsTransformer):
             | data_holder.data["location_ro"]
         )
         data_holder.data = data_holder.data.with_columns(location_r=exp)
+
+
+class PolarsAddLocationWB(_PolarsAddLocationBase):
+    col_to_set = "location_wb"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_wb from shape files"
+
+
+class PolarsAddLocationCounty(_PolarsAddLocationBase):
+    col_to_set = "location_county"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_county from shape files"

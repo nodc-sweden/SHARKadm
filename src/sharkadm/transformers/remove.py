@@ -8,7 +8,7 @@ from ..data import PolarsDataHolder
 
 from ..utils.data_filter import (
     DataFilterRestrictDepth,
-    PolarsDataFilterRestrictArea,
+    PolarsDataFilterRestrictAreaR,
     PolarsDataFilterApprovedData,
     PolarsDataFilter,
 )

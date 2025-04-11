@@ -113,6 +113,8 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRH,
     PolarsAddLocationRO,
     PolarsAddLocationR,
+    PolarsAddLocationWB,
+    PolarsAddLocationCounty,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
@@ -179,7 +181,10 @@ from sharkadm.transformers.static_data_holding_center import (
     AddStaticDataHoldingCenterEnglish,
     AddStaticDataHoldingCenterSwedish,
 )
-from sharkadm.transformers.static_internet_access import AddStaticInternetAccessInfo
+from sharkadm.transformers.static_internet_access import (
+    AddStaticInternetAccessInfo,
+    PolarsAddStaticInternetAccessInfo,
+)
 from sharkadm.transformers.station import (
     AddStationInfo,
     CopyReportedStationNameToStationName,
