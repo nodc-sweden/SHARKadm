@@ -14,7 +14,7 @@ class ImportMapper(Protocol):
     def get_external_name(self, external_par: str) -> str: ...
 
 
-class DataSourcePolars:
+class PolarsDataSource:
     def __init__(
         self,
         data_type: str | None = None,
@@ -210,7 +210,7 @@ class DataSource:
         return self._data
 
 
-class DataFilePolars(DataSourcePolars, ABC):
+class PolarsDataFile(PolarsDataSource, ABC):
     def __init__(
         self,
         path: str | pathlib.Path | None = None,

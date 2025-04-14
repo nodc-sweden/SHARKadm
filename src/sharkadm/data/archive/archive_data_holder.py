@@ -9,7 +9,10 @@ from sharkadm import config
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
-from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.base import DataFile, PolarsDataFile
+from sharkadm.data.data_source.txt_file import (
+    CsvRowFormatPolarsDataFile,
+)
 from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
@@ -286,6 +289,31 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         self._load_data()
         self._load_delivery_note()  # Reload to map
 
+    def _load_data(self) -> None:
+        data_file_path = self.processed_data_directory / "data.txt"
+        if not data_file_path.exists():
+            logger.info(
+                f"No data file found in {self.processed_data_directory}. "
+                f"Looking for file with keyword 'data'..."
+            )
+            for path in self.processed_data_directory.iterdir():
+                if "data" in path.stem and path.suffix == ".txt":
+                    data_file_path = path
+                    logger.info(f"Will use data file: {path}")
+                    break
+        if not data_file_path:
+            logger.error(
+                f"Could not find any data file in delivery: {self.archive_root_directory}"
+            )
+            return
+
+        d_source = CsvRowFormatPolarsDataFile(
+            path=data_file_path, data_type=self.delivery_note.data_type
+        )
+        d_source.map_header(self.import_matrix_mapper)
+
+        self._set_data_source(d_source)
+
     @staticmethod
     def get_data_holder_description() -> str:
         return """Holds data from an archive"""
@@ -363,7 +391,6 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def processed_data_files(self) -> list[pathlib.Path]:
         paths = [self.delivery_note_path, self.sampling_info_path, self.analyse_info_path]
         for name, source in self._data_sources.items():
-            print(f"{source.path=}")
             paths.append(source.path)
         return paths
 
@@ -473,7 +500,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
             else:
                 self._data[new_column] = self._data[new_column] + self._data[col]
 
-    def _check_data_source(self, data_source: DataFile) -> None:
+    def _check_data_source(self, data_source: PolarsDataFile) -> None:
         return
         # if (
         #     self._data_type_mapper.get(data_source.data_type) !=
@@ -486,6 +513,3 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
             )
             logger.error(msg)
             raise ValueError(msg)
-
-    @abstractmethod
-    def _load_data(self): ...

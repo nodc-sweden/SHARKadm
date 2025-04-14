@@ -9,7 +9,7 @@ from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile
 from sharkadm.data.data_source.txt_file import (
-    CsvRowFormatDataFilePolars,
+    CsvRowFormatPolarsDataFile,
     TxtColumnFormatDataFile,
 )
 from sharkadm.sharkadm_logger import adm_logger
@@ -208,7 +208,7 @@ class PolarsLimsDataHolder(PolarsDataHolder):
         return self._analyse_info
 
     def _load_data(self) -> None:
-        data_source = CsvRowFormatDataFilePolars(
+        data_source = CsvRowFormatPolarsDataFile(
             path=self.data_file_path, data_type=self.data_type
         )
         if self._header_mapper:

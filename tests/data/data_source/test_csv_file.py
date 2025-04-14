@@ -1,7 +1,7 @@
 import polars as pl
 import pytest
 
-from sharkadm.data.data_source.txt_file import CsvRowFormatDataFilePolars
+from sharkadm.data.data_source.txt_file import CsvRowFormatPolarsDataFile
 from tests.data.data_source.conftest import csv_file_from_dict
 
 
@@ -17,7 +17,7 @@ def test_csv_files_can_be_parsed_to_polars(tmp_path, given_delimiter):
     csv_file_from_dict(given_csv_data, given_data_path, delimiter=given_delimiter)
 
     # When loading the file
-    data_file = CsvRowFormatDataFilePolars(given_data_path, delimiter=given_delimiter)
+    data_file = CsvRowFormatPolarsDataFile(given_data_path, delimiter=given_delimiter)
 
     # Then the data is loaded in a polars data frame
     data = data_file.get_data()
@@ -39,7 +39,7 @@ def test_empty_values_are_parsed_as_empty_strings(tmp_path):
     csv_file_from_dict(given_csv_data, given_data_path)
 
     # When loading the file
-    data_file = CsvRowFormatDataFilePolars(given_data_path)
+    data_file = CsvRowFormatPolarsDataFile(given_data_path)
 
     # Then the data is loaded in a polars data frame
     data = data_file.get_data()
@@ -74,7 +74,7 @@ def test_parsed_column_names_are_stripped(
     csv_file_from_dict(given_csv_data, given_data_path)
 
     # When loading the file
-    data_file = CsvRowFormatDataFilePolars(given_data_path)
+    data_file = CsvRowFormatPolarsDataFile(given_data_path)
 
     # Then the column names are as expected
     data = data_file.get_data()
@@ -100,7 +100,7 @@ def test_filename_is_added_as_source(tmp_path, given_filename):
     csv_file_from_dict(given_csv_data, given_data_path)
 
     # When loading the file
-    data_file = CsvRowFormatDataFilePolars(given_data_path)
+    data_file = CsvRowFormatPolarsDataFile(given_data_path)
 
     # Then data_file has stored the file path
     assert data_file.source == str(given_data_path)
@@ -128,7 +128,7 @@ def test_original_column_names_are_stored(tmp_path, given_columns):
     csv_file_from_dict(given_csv_data, given_data_path)
 
     # Given the file is loaded
-    data_file = CsvRowFormatDataFilePolars(given_data_path)
+    data_file = CsvRowFormatPolarsDataFile(given_data_path)
 
     # When adding columns
     data = data_file.get_data()

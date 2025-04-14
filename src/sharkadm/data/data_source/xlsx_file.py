@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import polars as pl
 
-from .base import DataFile, DataFilePolars
+from .base import DataFile, PolarsDataFile
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class XlsxFormatDataFile(DataFile):
         )
 
 
-class XlsxFormatDataFilePolars(DataFilePolars):
+class XlsxFormatPolarsDataFile(PolarsDataFile):
     def __init__(self, *args, sheet_name: str, skip_rows: int = 0, **kwargs):
         self._sheet_name = sheet_name
         self._skip_rows = skip_rows

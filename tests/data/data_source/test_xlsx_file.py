@@ -1,6 +1,6 @@
 import polars as pl
 
-from sharkadm.data.data_source.xlsx_file import XlsxFormatDataFilePolars
+from sharkadm.data.data_source.xlsx_file import XlsxFormatPolarsDataFile
 from tests.data.data_source.conftest import xlsx_file_from_dict
 
 
@@ -15,7 +15,7 @@ def test_xlsx_file_can_be_parsed_to_polars(tmp_path):
     xlsx_file_from_dict(given_xlsx_data, given_data_path)
 
     # When loading the file
-    data_file = XlsxFormatDataFilePolars(given_data_path, sheet_name="Sheet1")
+    data_file = XlsxFormatPolarsDataFile(given_data_path, sheet_name="Sheet1")
 
     # Then the data is loaded in a polars data frame
     data = data_file.get_data()

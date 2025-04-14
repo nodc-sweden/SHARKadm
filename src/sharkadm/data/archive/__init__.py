@@ -4,7 +4,10 @@ import pathlib
 from typing import Union
 
 from sharkadm import sharkadm_exceptions, utils
-from sharkadm.data.archive.archive_data_holder import ArchiveDataHolder
+from sharkadm.data.archive.archive_data_holder import (
+    ArchiveDataHolder,
+    PolarsArchiveDataHolder,
+)
 from sharkadm.data.archive.bacterioplankton import BacterioplanktonArchiveDataHolder
 from sharkadm.data.archive.chlorophyll import ChlorophyllArchiveDataHolder
 from sharkadm.data.archive.delivery_note import DeliveryNote
@@ -30,6 +33,9 @@ def all_subclasses(cls):
 object_mapping = dict(
     (cls._data_format, cls) for cls in all_subclasses(ArchiveDataHolder)
 )
+polars_object_mapping = dict(
+    (cls._data_format, cls) for cls in all_subclasses(PolarsArchiveDataHolder)
+)
 # object_mapping = dict(
 #     (cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__()
 # )
@@ -39,6 +45,15 @@ def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
     d_holder = object_mapping.get(d_note.data_format)
+    if not d_holder:
+        raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
+    return d_holder(path)
+
+
+def get_polars_archive_data_holder(path: str | pathlib.Path) -> PolarsArchiveDataHolder:
+    path = pathlib.Path(path)
+    d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
+    d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
     return d_holder(path)

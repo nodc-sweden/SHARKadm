@@ -55,7 +55,11 @@ from sharkadm.transformers.date_and_time import (
     PolarsFixDateFormat,
     PolarsFixTimeFormat,
 )
-from sharkadm.transformers.delivery_note_info import AddDeliveryNoteInfo, AddStatus
+from sharkadm.transformers.delivery_note_info import (
+    AddDeliveryNoteInfo,
+    AddStatus,
+    PolarsAddDeliveryNoteInfo,
+)
 from sharkadm.transformers.depth import (
     AddSampleMinAndMaxDepth,
     AddSectionStartAndEndDepth,

@@ -7,7 +7,11 @@ import pathlib
 from typing import Type
 
 from sharkadm import sharkadm_exceptions, utils
-from sharkadm.data.archive import directory_is_archive, get_archive_data_holder
+from sharkadm.data.archive import (
+    directory_is_archive,
+    get_archive_data_holder,
+    get_polars_archive_data_holder,
+)
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.data.df import PandasDataFrameDataHolder
 from sharkadm.data.dv_template import DvTemplateDataHolder, get_dv_template_data_holder
@@ -129,10 +133,10 @@ def get_polars_data_holder(
         #     return get_dv_template_data_holder(path)
         if path_is_zip_archive(path):
             return get_polars_zip_archive_data_holder(path)
-        # if path.is_dir():
-        #     archive_directory = directory_is_archive(path)
-        #     if archive_directory:
-        #         return get_archive_data_holder(archive_directory)
+        if path.is_dir():
+            archive_directory = directory_is_archive(path)
+            if archive_directory:
+                return get_polars_archive_data_holder(archive_directory)
         lims_directory = directory_is_lims(path)
         if lims_directory:
             return get_polars_lims_data_holder(lims_directory)

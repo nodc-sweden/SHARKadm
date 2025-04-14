@@ -3,12 +3,12 @@ import logging
 import pandas as pd
 import polars as pl
 
-from .base import DataFile, DataFilePolars
+from .base import DataFile, PolarsDataFile
 
 logger = logging.getLogger(__name__)
 
 
-class CsvRowFormatDataFilePolars(DataFilePolars):
+class CsvRowFormatPolarsDataFile(PolarsDataFile):
     def __init__(self, *args, delimiter: str = "\t", **kwargs):
         self._delimiter = delimiter
         super().__init__(*args, **kwargs)

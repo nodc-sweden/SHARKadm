@@ -11,9 +11,9 @@ from sharkadm.config import mapper_data_type_to_internal
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
-from sharkadm.data.data_source.base import DataFile, DataFilePolars
+from sharkadm.data.data_source.base import DataFile, PolarsDataFile
 from sharkadm.data.data_source.txt_file import (
-    CsvRowFormatDataFilePolars,
+    CsvRowFormatPolarsDataFile,
     TxtRowFormatDataFile,
 )
 from sharkadm.sharkadm_logger import adm_logger
@@ -439,25 +439,25 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             self.analyse_info_path
         )
 
-    def _check_data_source(self, data_source: DataFilePolars) -> None:
+    def _check_data_source(self, data_source: PolarsDataFile) -> None:
         if data_source.data_type.lower() != self.data_type.lower():
             msg = f"Data source {data_source} is not of type {self.data_type}"
             logger.error(msg)
             raise ValueError(msg)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataFilePolars) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pd.DataFrame:
         data = data_source.get_data()
         # data = data.fillna("")
         # data.reset_index(inplace=True, drop=True)
         return data
 
-    def _set_data_source(self, data_source: DataFilePolars) -> None:
+    def _set_data_source(self, data_source: PolarsDataFile) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 
-    def _add_data_source(self, data_source: DataFilePolars) -> None:
+    def _add_data_source(self, data_source: PolarsDataFile) -> None:
         """Adds a data source to instance variable self._data_sources.
         This method is not adding to data itself."""
         # self._check_data_source(data_source)
@@ -469,7 +469,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
                 f"Could not find any data file in delivery: {self.shark_data_path}"
             )
             return
-        d_source = CsvRowFormatDataFilePolars(
+        d_source = CsvRowFormatPolarsDataFile(
             path=self.shark_data_path, data_type=self.delivery_note.data_type
         )
         self._set_data_source(d_source)

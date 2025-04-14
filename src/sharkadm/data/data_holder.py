@@ -6,7 +6,12 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
-from sharkadm.data.data_source.base import DataFile, DataSource
+from sharkadm.data.data_source.base import (
+    DataFile,
+    DataSource,
+    PolarsDataFile,
+    PolarsDataSource,
+)
 from sharkadm.sharkadm_logger import adm_logger
 
 logger = logging.getLogger(__name__)
@@ -17,7 +22,7 @@ class DataHolder(ABC):
     add_data_source method"""
 
     def __init__(self, *args, **kwargs):
-        self._data_sources: dict[str, DataSource] = dict()
+        self._data_sources: dict[str, DataSource | PolarsDataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
@@ -160,13 +165,13 @@ class DataHolder(ABC):
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
 
-    def _add_data_source(self, data_source: DataSource) -> None:
+    def _add_data_source(self, data_source: DataSource | PolarsDataSource) -> None:
         """Adds a data source to instance variable self._data_sources.
         This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
-    def _check_data_source(self, data_source: DataSource) -> None:
+    def _check_data_source(self, data_source: DataSource | PolarsDataSource) -> None:
         # Can be overwritten in child classes
         return
 
@@ -280,13 +285,12 @@ class PolarsDataHolder(DataHolder, ABC):
         return [sorted_years[0], sorted_years[-1]]
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataSource) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pl.DataFrame:
         data = data_source.get_data()
-        data = data.fillna("")
-        data.reset_index(inplace=True, drop=True)
+        data = data.fill_nan("")
         return data
 
-    def _set_data_source(self, data_source: DataSource) -> None:
+    def _set_data_source(self, data_source: PolarsDataFile) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
