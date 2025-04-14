@@ -1,9 +1,10 @@
 import pathlib
+from typing import T
 
 from sharkadm.config import get_column_views_config
 
-from .base import DataHolderProtocol, FileExporter
 from ..transformers.base import PolarsDataHolderProtocol
+from .base import DataHolderProtocol, FileExporter
 
 
 class SHARKdataTxt(FileExporter):
@@ -43,7 +44,7 @@ class SHARKdataTxtAsGiven(FileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        exclude_columns: list[str] = None,
+        exclude_columns: tuple[str, ...] = T | None,
         **kwargs,
     ):
         super().__init__(export_directory, export_file_name, **kwargs)
@@ -80,7 +81,7 @@ class PolarsSHARKdataTxtAsGiven(FileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        exclude_columns: list[str] = None,
+        exclude_columns: tuple[str, ...] = T | None,
         **kwargs,
     ):
         super().__init__(export_directory, export_file_name, **kwargs)

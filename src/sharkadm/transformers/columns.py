@@ -1,5 +1,4 @@
 import re
-import polars as pl
 
 from sharkadm.config import get_column_views_config
 from sharkadm.utils import approved_data

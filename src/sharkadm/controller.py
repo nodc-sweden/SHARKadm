@@ -11,7 +11,7 @@ from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHo
 from sharkadm.exporters import Exporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer, PolarsTransformer
+from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
 
 logger = logging.getLogger(__name__)

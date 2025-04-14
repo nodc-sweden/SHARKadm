@@ -7,7 +7,7 @@ from sharkadm import utils
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import Divide, Multiply
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
-from sharkadm.transformers.base import Transformer, PolarsTransformer
+from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.transformers.boolean import FixYesNo
 from sharkadm.transformers.bvol import (
     AddBvolAphiaId,
@@ -23,10 +23,10 @@ from sharkadm.transformers.calculate import (
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,
     AddDEPHqcColumn,
+    PolarsAddApprovedKeyColumn,
     PolarsRemoveColumns,
     RemoveColumns,
     SortColumns,
-    PolarsAddApprovedKeyColumn,
 )
 from sharkadm.transformers.cruise import AddCruiseId
 from sharkadm.transformers.custom_id import AddCustomId, AddSharkSampleMd5
@@ -38,27 +38,21 @@ from sharkadm.transformers.dataset_name import AddDatasetFileName, AddDatasetNam
 from sharkadm.transformers.datatype import AddDatatype, AddDatatypePlanktonBarcoding
 from sharkadm.transformers.date_and_time import (
     AddDatetime,
-    PolarsAddDatetime,
     AddMonth,
-    PolarsAddMonth,
     AddReportedDates,
-    PolarsAddReportedDates,
     AddSampleDate,
-    PolarsAddSampleDate,
     AddSampleTime,
-    PolarsAddSampleTime,
     AddVisitDateFromObservationDate,
-    PolarsAddVisitDateFromObservationDate,
     CreateFakeFullDates,
     FixDateFormat,
-    PolarsFixDateFormat,
     FixTimeFormat,
-    PolarsFixTimeFormat,
-    PolarsAddMonth,
     PolarsAddDatetime,
-    PolarsAddSampleDate,
+    PolarsAddMonth,
+    PolarsAddReportedDates,
     PolarsAddSampleDate,
     PolarsAddSampleTime,
+    PolarsAddVisitDateFromObservationDate,
+    PolarsFixDateFormat,
     PolarsFixTimeFormat,
 )
 from sharkadm.transformers.delivery_note_info import AddDeliveryNoteInfo, AddStatus
@@ -101,20 +95,20 @@ from sharkadm.transformers.location import (
     AddLocationNation,
     AddLocationSeaBasin,
     AddLocationTypeArea,
-    PolarsAddLocationTypeArea,
     AddLocationTYPNFS06,
     AddLocationWaterCategory,
     AddLocationWaterDistrict,
     AddLocationWB,
+    PolarsAddLocationCounty,
+    PolarsAddLocationR,
     PolarsAddLocationRA,
     PolarsAddLocationRB,
     PolarsAddLocationRC,
     PolarsAddLocationRG,
     PolarsAddLocationRH,
     PolarsAddLocationRO,
-    PolarsAddLocationR,
+    PolarsAddLocationTypeArea,
     PolarsAddLocationWB,
-    PolarsAddLocationCounty,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
@@ -146,6 +140,8 @@ from sharkadm.transformers.project_code import (
 from sharkadm.transformers.qc.columns import AddColumnsForAutomaticQC
 from sharkadm.transformers.red_list import AddRedList
 from sharkadm.transformers.remove import (
+    PolarsKeepMask,
+    PolarsRemoveMask,
     RemoveDeepestDepthAtEachVisit,
     RemoveInterval,
     RemoveReportedValueIfNotCalculated,
@@ -153,8 +149,6 @@ from sharkadm.transformers.remove import (
     RemoveRowsForParameters,
     RemoveValuesInColumns,
     SetMaxLengthOfValuesInColumns,
-    PolarsKeepMask,
-    PolarsRemoveMask,
 )
 from sharkadm.transformers.replace import ReplaceNanWithEmptyString
 from sharkadm.transformers.replace_comma_with_dot import (

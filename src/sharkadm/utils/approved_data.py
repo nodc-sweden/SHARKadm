@@ -1,5 +1,4 @@
 import polars as pl
-import pathlib
 
 from sharkadm.config import CONFIG_DIRECTORY
 

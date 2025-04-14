@@ -2,7 +2,7 @@ import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer, PolarsTransformer
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 try:
     from nodc_codes import get_translate_codes_object
@@ -146,10 +146,6 @@ class _PolarsAddCodes(PolarsTransformer):
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
-            # op = pl.when(pl.col(source_col) == code).then(pl.lit(", ".join(names))).alias(self.col_to_set)
-        #     operations.append(op)
-        # data_holder.data = data_holder.data.with_columns(operations)
-        # data_holder.data.loc[df.index, self.col_to_set] = ", ".join(names)
 
 
 class _AddCodesLab(_AddCodes):

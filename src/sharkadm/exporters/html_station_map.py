@@ -4,7 +4,6 @@ import pandas as pd
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from ..data import PolarsDataHolder
 
 try:
     from nodc_station import DEFAULT_STATION_FILE_PATH
@@ -119,11 +118,11 @@ class PolarsHtmlStationMap(FileExporter):
             app.read_list(
                 DEFAULT_STATION_FILE_PATH, reader="shark_master", list_name="master"
             )
-            list_names = ["master"] + list_names
+            list_names = ["master", *list_names]
 
         df = self._get_position_dataframe(data_holder.data)
         if df.empty:
-            adm_logger.log_export(f"No data to plot html map", level=adm_logger.WARNING)
+            adm_logger.log_export("No data to plot html map", level=adm_logger.WARNING)
             return
         app.add_list_data(df, list_name=list_name)
 

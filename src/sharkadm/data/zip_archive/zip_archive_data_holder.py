@@ -5,7 +5,6 @@ import shutil
 from abc import ABC
 
 import pandas as pd
-import polars as pl
 
 from sharkadm import utils
 from sharkadm.config import mapper_data_type_to_internal
@@ -14,8 +13,8 @@ from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile, DataFilePolars
 from sharkadm.data.data_source.txt_file import (
-    TxtRowFormatDataFile,
     CsvRowFormatDataFilePolars,
+    TxtRowFormatDataFile,
 )
 from sharkadm.sharkadm_logger import adm_logger
 

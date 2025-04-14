@@ -7,7 +7,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ._codes import _translate_codes
-from .base import Transformer, PolarsTransformer, PolarsDataHolderProtocol
+from .base import PolarsDataHolderProtocol, PolarsTransformer, Transformer
 
 if not find_spec("nodc_codes"):
     adm_logger.log_workflow(

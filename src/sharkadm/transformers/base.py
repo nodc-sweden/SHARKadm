@@ -1,11 +1,10 @@
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol, Any
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 import pandas as pd
 import polars as pl
-from polars import Expr
 
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder

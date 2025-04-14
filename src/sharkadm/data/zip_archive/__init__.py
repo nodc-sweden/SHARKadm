@@ -1,7 +1,7 @@
 import pathlib
 from typing import Union
 
-from .zip_archive_data_holder import ZipArchiveDataHolder, PolarsZipArchiveDataHolder
+from .zip_archive_data_holder import PolarsZipArchiveDataHolder, ZipArchiveDataHolder
 
 
 def get_zip_archive_data_holder(path: str | pathlib.Path) -> ZipArchiveDataHolder:

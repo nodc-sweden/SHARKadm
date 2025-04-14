@@ -1,7 +1,8 @@
-from sharkadm.data.archive import get_archive_data_holder_names
 import polars as pl
 
-from .base import DataHolderProtocol, Transformer, PolarsDataHolderProtocol
+from sharkadm.data.archive import get_archive_data_holder_names
+
+from .base import DataHolderProtocol, PolarsDataHolderProtocol, Transformer
 
 
 class AddStaticInternetAccessInfo(Transformer):

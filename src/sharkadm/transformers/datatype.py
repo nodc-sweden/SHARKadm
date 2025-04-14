@@ -1,10 +1,11 @@
+import polars as pl
+
 from .base import (
     DataHolderProtocol,
-    Transformer,
-    PolarsTransformer,
     PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
 )
-import polars as pl
 
 
 class AddDatatype(Transformer):

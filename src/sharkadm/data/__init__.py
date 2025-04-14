@@ -19,9 +19,9 @@ from sharkadm.data.lims import (
 )
 from sharkadm.data.shark_api import get_shark_api_data_holder
 from sharkadm.data.zip_archive import (
+    get_polars_zip_archive_data_holder,
     get_zip_archive_data_holder,
     path_is_zip_archive,
-    get_polars_zip_archive_data_holder,
 )
 
 logger = logging.getLogger(__name__)

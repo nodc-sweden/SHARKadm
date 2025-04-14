@@ -1,11 +1,12 @@
 import polars as pl
+
 from sharkadm.sharkadm_logger import adm_logger
 
 from .base import (
     DataHolderProtocol,
-    Transformer,
-    PolarsTransformer,
     PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
 )
 
 try:
@@ -134,13 +135,15 @@ class test_PolarsAddLocations(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.x_pos_col not in data_holder.data.columns:
             adm_logger.log_transformation(
-                f"Missing column {self.x_pos_col}. Cannot add columns {', '.join(self.cols_to_set)}",
+                f"Missing column {self.x_pos_col}. "
+                f"Cannot add columns {', '.join(self.cols_to_set)}",
                 level=adm_logger.ERROR,
             )
             return
         if self.y_pos_col not in data_holder.data.columns:
             adm_logger.log_transformation(
-                f"Missing column {self.y_pos_col}. Cannot add columns {', '.join(self.cols_to_set)}",
+                f"Missing column {self.y_pos_col}. "
+                f"Cannot add columns {', '.join(self.cols_to_set)}",
                 level=adm_logger.ERROR,
             )
             return
