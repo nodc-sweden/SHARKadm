@@ -6,12 +6,12 @@ import pandas as pd
 import pandas as pl
 
 from sharkadm import event, exporters, transformers, utils, validators
-from sharkadm.data import get_data_holder
+from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer, PolarsTransformer
+from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
 
 logger = logging.getLogger(__name__)
@@ -286,5 +286,12 @@ def _get_fixed_list(
 def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
     c = SHARKadmController()
     holder = get_data_holder(path)
+    c.set_data_holder(holder)
+    return c
+
+
+def get_polars_controller_with_data(path: pathlib.Path | str) -> SHARKadmPolarsController:
+    c = SHARKadmPolarsController()
+    holder = get_polars_data_holder(path)
     c.set_data_holder(holder)
     return c

@@ -4,8 +4,16 @@ import numpy as np
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from ..utils.data_filter import DataFilterRestrictDepth
-from .base import DataHolderProtocol, Transformer
+from ..data import PolarsDataHolder
+from ..utils.data_filter import (
+    DataFilterRestrictDepth,
+    PolarsDataFilter,
+)
+from .base import (
+    DataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 
 
 class RemoveReportedValueIfNotCalculated(Transformer):
@@ -133,6 +141,57 @@ class RemoveRowsAtDepthRestriction(Transformer):
             f"Removing rows due to depth restrictions ({len(index)} rows)",
             level=adm_logger.WARNING,
         )
+
+
+class PolarsKeepMask(PolarsTransformer):
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter,
+        valid_data_types: tuple[str, ...] = (),
+        **kwargs,
+    ) -> None:
+        self.valid_data_types = valid_data_types or self.valid_data_types
+        super().__init__(data_filter=data_filter, **kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Keeps all rows that are valid in filter"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        mask = self._get_filter_mask(data_holder)
+        if mask.is_empty():
+            adm_logger.log_transformation(
+                f"Could not run transformer {PolarsKeepMask.__class__.__name__}. "
+                f"Missing data_filter",
+                level=adm_logger.ERROR,
+            )
+            return
+        data_holder.data = data_holder.data.remove(~mask)
+
+
+class PolarsRemoveMask(PolarsTransformer):
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter,
+        valid_data_types: tuple[str, ...] = (),
+        **kwargs,
+    ) -> None:
+        self.valid_data_types = valid_data_types or self.valid_data_types
+        super().__init__(data_filter=data_filter, **kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes all rows that are valid in filter"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        mask = self._get_filter_mask(data_holder)
+        if mask.is_empty():
+            adm_logger.log_transformation(
+                f"Could not run transformer {PolarsRemoveMask.__class__.__name__}. "
+                f"Missing data_filter",
+                level=adm_logger.ERROR,
+            )
+        data_holder.data = data_holder.data.remove(mask)
 
 
 class RemoveDeepestDepthAtEachVisit(Transformer):

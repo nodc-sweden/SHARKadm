@@ -1,9 +1,15 @@
 import pandas as pd
+import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import geography
 
-from .base import DataHolderProtocol, Transformer
+from .base import (
+    DataHolderProtocol,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 
 
 class AddSamplePositionDD(Transformer):
@@ -124,6 +130,49 @@ class AddSamplePositionSweref99tm(Transformer):
             # ) & (data_holder.data[self.lon_source_col] == lon)
             # data_holder.data.loc[boolean, self.x_column_to_set] = x
             # data_holder.data.loc[boolean, self.y_column_to_set] = y
+
+
+class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
+    lat_source_col = "sample_latitude_dd"
+    lon_source_col = "sample_longitude_dd"
+    y_column_to_set = "sample_sweref99tm_y"
+    x_column_to_set = "sample_sweref99tm_x"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds sample position in sweref99tm"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.x_column_to_set),
+            pl.lit("").alias(self.y_column_to_set),
+        )
+        for (lat, lon), df in data_holder.data.group_by(
+            [self.lat_source_col, self.lon_source_col]
+        ):
+            if not all([lat, lon]):
+                adm_logger.log_transformation(
+                    f"Missing position when trying to set {self.x_column_to_set} "
+                    f"and {self.y_column_to_set}"
+                )
+                continue
+            x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(
+                    (pl.col(self.lat_source_col) == lat)
+                    & (pl.col(self.lon_source_col) == lon)
+                )
+                .then(pl.lit(x))
+                .otherwise(pl.col(self.x_column_to_set))
+                .alias(self.x_column_to_set),
+                pl.when(
+                    (pl.col(self.lat_source_col) == lat)
+                    & (pl.col(self.lon_source_col) == lon)
+                )
+                .then(pl.lit(y))
+                .otherwise(pl.col(self.y_column_to_set))
+                .alias(self.y_column_to_set),
+            )
 
 
 class AddSamplePositionDM(Transformer):

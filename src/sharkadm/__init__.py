@@ -1,8 +1,7 @@
 import subprocess
 
-from sharkadm.sharkadm_exceptions import ConfigurationError
-from sharkadm.utils import get_nodc_config_directory
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.utils import get_nodc_config_directory
 
 
 def update_nodc_config_directory_from_svn() -> None:

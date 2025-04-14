@@ -6,7 +6,6 @@ import polars as pl
 from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
-    PolarsDataHolderProtocol,
     PolarsTransformer,
     Transformer,
 )
@@ -264,15 +263,6 @@ class AddDatetime(Transformer):
                 continue
         return ""
 
-    @staticmethod
-    def to_datetime(x: str) -> datetime.datetime | str:
-        for form in DATETIME_FORMATS:
-            try:
-                return datetime.datetime.strptime(x.strip(), form)
-            except ValueError:
-                continue
-        return ""
-
 
 class PolarsAddDatetime(PolarsTransformer):
     date_source_column: str = "sample_date"
@@ -383,7 +373,10 @@ class PolarsAddReportedDates(Transformer):
             f"{PolarsAddReportedDates.reported_col_prefix}_{item}"
             for item in PolarsAddReportedDates.source_columns
         ]
-        return f"Copies columns {PolarsAddReportedDates.source_columns} to columns {rep_cols}"
+        return (
+            f"Copies columns {PolarsAddReportedDates.source_columns} "
+            f"to columns {rep_cols}"
+        )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:

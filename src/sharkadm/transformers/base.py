@@ -9,7 +9,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils.data_filter import DataFilter
+from sharkadm.utils.data_filter import DataFilter, PolarsDataFilter
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
@@ -17,10 +17,10 @@ if TYPE_CHECKING:
 
 class DataHolderProtocol(Protocol):
     @property
-    def data(self) -> pd.DataFrame: ...
+    def data(self) -> pd.DataFrame | pl.DataFrame: ...
 
     @data.setter
-    def data(self, df: pd.DataFrame) -> None: ...
+    def data(self, df: pd.DataFrame | pl.DataFrame) -> None: ...
 
     @property
     @abstractmethod
@@ -138,7 +138,7 @@ class Transformer(ABC):
         )
 
     @abstractmethod
-    def _transform(self, data_holder: "PandasDataHolder") -> None: ...
+    def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
 
     def _get_filter_mask(self, data_holder: "PandasDataHolder") -> pd.Series | np.ndarray:
         if not self._data_filter:
@@ -162,7 +162,7 @@ class PolarsTransformer(ABC):
     valid_data_structures = ()
     invalid_data_structures = ()
 
-    def __init__(self, data_filter: DataFilter = None, **kwargs):
+    def __init__(self, data_filter: PolarsDataFilter = None, **kwargs):
         self._data_filter = data_filter
         self._kwargs = kwargs
 
@@ -227,9 +227,9 @@ class PolarsTransformer(ABC):
     @abstractmethod
     def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
 
-    def _get_filter_mask(self, data_holder: "PolarsDataHolder") -> pl.Series | np.ndarray:
+    def _get_filter_mask(self, data_holder: "PolarsDataHolder") -> pl.Series:
         if not self._data_filter:
-            return np.ones(len(data_holder.data), dtype=bool)
+            return pl.Series()
         adm_logger.log_workflow(
             f"Using data filter {self._data_filter.name} on transformer {self.name}",
             level=adm_logger.WARNING,
