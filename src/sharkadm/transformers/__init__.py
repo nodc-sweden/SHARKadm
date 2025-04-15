@@ -34,8 +34,18 @@ from sharkadm.transformers.dataframe import (
     ConvertFromPandasToPolars,
     ConvertFromPolarsToPandas,
 )
-from sharkadm.transformers.dataset_name import AddDatasetFileName, AddDatasetName
-from sharkadm.transformers.datatype import AddDatatype, AddDatatypePlanktonBarcoding
+from sharkadm.transformers.dataset_name import (
+    AddDatasetFileName,
+    AddDatasetName,
+    PolarsAddDatasetFileName,
+    PolarsAddDatasetName
+)
+from sharkadm.transformers.datatype import (
+    AddDatatype,
+    AddDatatypePlanktonBarcoding,
+    PolarsAddDatatype,
+    PolarsAddDatatypePlanktonBarcoding,
+)
 from sharkadm.transformers.date_and_time import (
     AddDatetime,
     AddMonth,
@@ -134,6 +144,9 @@ from sharkadm.transformers.position import (
     AddSamplePositionDM,
     AddSamplePositionSweref99tm,
     PolarsAddSamplePositionSweref99tm,
+    PolarsAddReportedPosition,
+    PolarsAddSamplePositionDD,
+    PolarsAddSamplePositionDM,
 )
 from sharkadm.transformers.project_code import (
     AddEnglishProjectName,
@@ -178,6 +191,8 @@ from sharkadm.transformers.sort_data import SortData, SortDataPlanktonImaging
 from sharkadm.transformers.static_data_holding_center import (
     AddStaticDataHoldingCenterEnglish,
     AddStaticDataHoldingCenterSwedish,
+    PolarsAddStaticDataHoldingCenterEnglish,
+    PolarsAddStaticDataHoldingCenterSwedish,
 )
 from sharkadm.transformers.static_internet_access import (
     AddStaticInternetAccessInfo,
