@@ -268,7 +268,8 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
         return "Adds sample position based on reported position"
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
-        for (lat, lon), df in data_holder.data.group_by([]):
+        for (lat, lon), df in data_holder.data.group_by([self.lat_source_col,
+                                                         self.lon_source_col]):
             new_lat, new_lon = self._get(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)

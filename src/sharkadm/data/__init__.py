@@ -42,6 +42,11 @@ def get_data_holders() -> dict[str, Type[PandasDataHolder]]:
     return utils.get_all_class_children(PandasDataHolder)
 
 
+def get_polars_data_holders() -> dict[str, Type[PolarsDataHolder]]:
+    """Returns a dictionary with data_holders"""
+    return utils.get_all_class_children(PolarsDataHolder)
+
+
 def get_data_holder_object(trans_name: str, **kwargs) -> PandasDataHolder:
     """Returns DataHolder object that matches the given data_holder names"""
     all_trans = get_data_holders()
@@ -170,6 +175,21 @@ def is_valid_data_holder(
     data_holder: Type[DataHolder],
     valid: list[str] | None = None,
     invalid: list[str] | None = None,
+) -> bool:
+    if not any([valid, invalid]):
+        return True
+    holders = get_data_holders()
+    if any([val for val in invalid if isinstance(data_holder, holders[val])]):
+        return False
+    if any([val for val in valid if isinstance(data_holder, holders[val])]):
+        return True
+    return True
+
+
+def is_valid_polars_data_holder(
+    data_holder: PolarsDataHolder,
+    valid: tuple[str, ...] | None = None,
+    invalid: tuple[str, ...] | None = None,
 ) -> bool:
     if not any([valid, invalid]):
         return True

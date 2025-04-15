@@ -14,6 +14,10 @@ from sharkadm.transformers.bvol import (
     AddBvolRefList,
     AddBvolScientificNameAndSizeClass,
     AddBvolScientificNameOriginal,
+    PolarsAddBvolScientificNameOriginal,
+    PolarsAddBvolScientificNameAndSizeClass,
+    PolarsAddBvolAphiaId,
+    PolarsAddBvolRefList,
 )
 from sharkadm.transformers.calculate import (
     CalculateAbundance,

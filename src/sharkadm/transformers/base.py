@@ -1,13 +1,13 @@
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, Type
 
 import numpy as np
 import pandas as pd
 import polars as pl
 
 from sharkadm import config
-from sharkadm.data import is_valid_data_holder
+from sharkadm.data import is_valid_data_holder, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter, PolarsDataFilter
 
@@ -153,14 +153,14 @@ class Transformer(ABC):
 class PolarsTransformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
-    valid_data_types = ()
-    invalid_data_types = ()
+    valid_data_types: tuple[str, ...] = ()
+    invalid_data_types: tuple[str, ...] = ()
 
-    valid_data_holders = ()
-    invalid_data_holders = ()
+    valid_data_holders: tuple[str, ...] = ()
+    invalid_data_holders: tuple[str, ...] = ()
 
-    valid_data_structures = ()
-    invalid_data_structures = ()
+    valid_data_structures: tuple[str, ...] = ()
+    invalid_data_structures: tuple[str, ...] = ()
 
     def __init__(self, data_filter: PolarsDataFilter = None, **kwargs):
         self._data_filter = data_filter
@@ -193,7 +193,7 @@ class PolarsTransformer(ABC):
                 level=adm_logger.DEBUG,
             )
             return
-        if not is_valid_data_holder(
+        if not is_valid_polars_data_holder(
             data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
         ):
             adm_logger.log_workflow(
