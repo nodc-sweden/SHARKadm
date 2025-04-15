@@ -116,3 +116,11 @@ class PolarsDataFilterApprovedAndOutside12nm(PolarsDataFilter):
         inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
         outside12nm_bool = ~inside12nm_bool
         return approved_bool | outside12nm_bool
+
+
+class PolarsDataFilterInside12nmAndNotRestricted(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+        restrict_boolean = PolarsDataFilterRestrictAreaR().get_filter_mask(data_holder)
+        not_restrict_boolean = ~restrict_boolean
+        inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
+        return inside12nm_bool & not_restrict_boolean
