@@ -7,7 +7,7 @@ from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
     PolarsTransformer,
-    Transformer,
+    Transformer, PolarsDataHolderProtocol,
 )
 
 DATETIME_FORMATS = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d")
@@ -286,7 +286,7 @@ class PolarsAddDatetime(PolarsTransformer):
             f"and {PolarsAddDatetime.time_source_column}, if no other columns are given"
         )
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         data_holder.data = data_holder.data.with_columns(
             datetime_str=pl.col(self.date_source_column)
         )

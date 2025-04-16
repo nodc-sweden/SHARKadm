@@ -8,7 +8,7 @@ from sharkadm.multi_transformers.base import MultiTransformer, PolarsMultiTransf
 from sharkadm.multi_transformers.bvol import Bvol, BvolPolars
 from sharkadm.multi_transformers.calculate import Calculate
 from sharkadm.multi_transformers.date_time import DateTime, DateTimePolars
-from sharkadm.multi_transformers.dyntaxa import Dyntaxa
+from sharkadm.multi_transformers.dyntaxa import Dyntaxa, DyntaxaPolars
 from sharkadm.multi_transformers.general_dv import GeneralDV
 from sharkadm.multi_transformers.general_final import GeneralFinal
 from sharkadm.multi_transformers.general_initial import GeneralInitial

@@ -271,6 +271,21 @@ class DataDataFrame(DataSource, ABC):
         self._do_post_init_stuf()
 
 
+class PolarsDataDataFrame(DataSource, ABC):
+    def __init__(
+        self, df: pl.DataFrame, data_type: str | None = None, source: str = ""
+    ) -> None:
+        super().__init__(data_type=data_type)
+        self._source: str = source or "Given polars dataframe"
+        self._data: pd.DataFrame = df
+        self._original_header: list = []
+        self._header_mapper: ImportMapper | None = None
+        self._mapped_columns: dict = dict()
+        self._not_mapped_columns: list = []
+
+        self._do_post_init_stuf()
+
+
 class old_DataFile(ABC):
     def __init__(
         self,

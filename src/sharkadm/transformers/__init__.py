@@ -86,6 +86,13 @@ from sharkadm.transformers.dyntaxa import (
     AddReportedDyntaxaId,
     AddReportedScientificNameDyntaxaId,
     AddTaxonRanks,
+    PolarsAddReportedDyntaxaId,
+    PolarsAddReportedScientificNameDyntaxaId,
+    PolarsAddDyntaxaScientificName,
+    PolarsAddDyntaxaTranslatedScientificNameDyntaxaId,
+    PolarsAddTaxonRanks,
+    PolarsAddDyntaxaId,
+
 )
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
@@ -208,7 +215,7 @@ from sharkadm.transformers.station import (
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
 from sharkadm.transformers.strip import StripAllValues, StripAllValuesPolars
-from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey
+from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey, PolarsAddPhysicalChemicalKey
 from sharkadm.transformers.wide_to_long import PolarsWideToLong, WideToLong
 from sharkadm.transformers.worms import (
     AddReportedAphiaId,

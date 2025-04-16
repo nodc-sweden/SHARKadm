@@ -162,6 +162,9 @@ class PolarsTransformer(ABC):
     valid_data_structures: tuple[str, ...] = ()
     invalid_data_structures: tuple[str, ...] = ()
 
+    source_col: str = ""
+    col_to_set: str = ""
+
     def __init__(self, data_filter: PolarsDataFilter = None, **kwargs):
         self._data_filter = data_filter
         self._kwargs = kwargs
@@ -235,3 +238,24 @@ class PolarsTransformer(ABC):
             level=adm_logger.WARNING,
         )
         return self._data_filter.get_filter_mask(data_holder)
+
+    def _add_empty_col_to_set(self, data_holder: "PolarsDataHolder") -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.col_to_set)
+        )
+
+    def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(col)
+        )
+
+    def _add_to_col_to_set(self,
+                           data_holder: "PolarsDataHolder",
+                           lookup_name,
+                           new_name: str) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(self.source_col) == lookup_name)
+            .then(pl.lit(new_name))
+            .otherwise(pl.col(self.col_to_set))
+            .alias(self.col_to_set)
+        )

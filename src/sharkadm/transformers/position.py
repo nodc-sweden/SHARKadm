@@ -273,13 +273,13 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
             new_lat, new_lon = self._get(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
-                .then(new_lat)
+                .then(pl.lit(new_lat))
                 .otherwise(pl.col(self.lat_source_col))
                 .alias(self.lat_col_to_set)
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lon_source_col) == lon)
-                .then(new_lon)
+                .then(pl.lit(new_lon))
                 .otherwise(pl.col(self.lon_source_col))
                 .alias(self.lon_col_to_set)
             )
@@ -365,13 +365,13 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
 
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
-                .then(lat)
+                .then(pl.lit(lat))
                 .otherwise(pl.col(self.lat_source_col))
                 .alias(self.lat_col_to_set)
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lon_source_col) == lon)
-                .then(lat)
+                .then(pl.lit(lon))
                 .otherwise(pl.col(self.lon_source_col))
                 .alias(self.lon_col_to_set)
             )

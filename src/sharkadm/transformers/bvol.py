@@ -213,7 +213,7 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
             pl.lit("").alias(self.col_to_set)
         )
 
-        for name, df in data_holder.data.group_by(self.source_col):
+        for (name, ), df in data_holder.data.group_by(self.source_col):
             new_name = translate_bvol_name.get(str(name))
             if new_name:
                 adm_logger.log_transformation(
@@ -226,10 +226,9 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
                     level=adm_logger.DEBUG,
                 )
                 new_name = name
-
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_col) == name)
-                .then(new_name)
+                .then(pl.lit(new_name))
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
@@ -286,7 +285,7 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_name_col) == name,
                         pl.col(self.source_size_class_col) == size)
-                .then(new_name)
+                .then(pl.lit(new_name))
                 .otherwise(pl.col(self.col_to_set_name))
                 .alias(self.col_to_set_name)
             )
@@ -299,13 +298,13 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_name_col) == name,
                         pl.col(self.source_size_class_col) == size)
-                .then(new_size_class)
+                .then(pl.lit(new_size_class))
                 .otherwise(pl.col(self.col_to_set_size))
                 .alias(self.col_to_set_size)
             )
 
     def _transform_without_size_class(self, data_holder: PolarsDataHolderProtocol) -> None:
-        for name, df in data_holder.data.group_by(self.source_name_col):
+        for (name, ), df in data_holder.data.group_by(self.source_name_col):
             info = translate_bvol_name_and_size.get(str(name))
             new_name = info.get("name") or name
             if new_name != name:
@@ -315,7 +314,7 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
                 )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_name_col) == name)
-                .then(new_name)
+                .then(pl.lit(new_name))
                 .otherwise(pl.col(self.col_to_set_name))
                 .alias(self.col_to_set_name)
             )
@@ -344,7 +343,7 @@ class PolarsAddBvolAphiaId(Transformer):
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.col_to_set)
         )
-        for name, df in data_holder.data.group_by(self.source_col):
+        for (name, ), df in data_holder.data.group_by(self.source_col):
             lst = bvol_nomp.get_info(Species=name)
             if not lst:
                 continue
@@ -360,7 +359,7 @@ class PolarsAddBvolAphiaId(Transformer):
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_col) == name)
-                .then(text)
+                .then(pl.lit(text))
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
@@ -389,7 +388,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.col_to_set)
         )
-        for name, df in data_holder.data.group_by(self.source_col):
+        for (name, ), df in data_holder.data.group_by(self.source_col):
             lst = bvol_nomp.get_info(Species=name)
             if not lst:
                 continue
@@ -405,7 +404,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_col) == name)
-                .then(text)
+                .then(pl.lit(text))
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
