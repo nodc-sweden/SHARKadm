@@ -2,12 +2,37 @@ import pathlib
 
 import pandas as pd
 import polars as pl
+import numpy as np
 
 from sharkadm.sharkadm_logger import adm_logger
+from ..data import PolarsDataHolder
 
 try:
     from nodc_station import DEFAULT_STATION_FILE_PATH
     from nodc_station.main import App
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. You need to '
+        f"install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
+
+folium = None
+try:
+    import folium
+    import geopandas as gpd
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. You need to '
+        f"install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
+
+nodc_geography = None
+try:
+    import nodc_geography
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -150,3 +175,109 @@ class PolarsHtmlStationMap(FileExporter):
         dframe["lat_dd"] = dframe["sample_latitude_dd"]
         dframe["lon_dd"] = dframe["sample_longitude_dd"]
         return dframe.reset_index(drop=True)
+
+
+class PolarsHtmlMap(FileExporter):
+    shape_layers: tuple[str, ...] = ()
+
+    def __init__(
+        self,
+        # load_station_list: bool = False,
+        export_directory: str | pathlib.Path | None = None,
+        export_file_name: str | pathlib.Path | None = None,
+        shape_layers: list[str | pathlib.Path] = None,
+        shape_files: list[str | pathlib.Path] = None,
+        **kwargs,
+    ):
+        # self._load_station_list = load_station_list
+        self._shape_layers = self.shape_layers or shape_layers or []
+        self._shape_files = shape_files or []
+        self._epsg = kwargs.get("epsg", "3006")
+        super().__init__(export_directory, export_file_name, **kwargs)
+
+    def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
+        if not self._export_file_name:
+            self._export_file_name = f"station_map_{data_holder.dataset_name}.html"
+        path = pathlib.Path(self._export_directory, self._export_file_name)
+        if path.suffix != ".html":
+            path = pathlib.Path(str(path) + ".html")
+        return path
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return "Creates a html map with markers. Option to add shape-files"
+
+    def _export(self, data_holder: PolarsDataHolder) -> None:
+        if not folium:
+            adm_logger.log_export(f"Could not export {self.__class__.__name__}. "
+                                  f"folium package not found!", level=adm_logger.WARNING)
+            return
+
+        lat_mid = np.mean([data_holder.data['sample_latitude_dd'].cast(float).max(),
+                           data_holder.data['sample_latitude_dd'].cast(float).min()])
+        lon_mid = np.mean([data_holder.data['sample_longitude_dd'].cast(float).max(),
+                           data_holder.data['sample_longitude_dd'].cast(float).min()])
+
+        m = folium.Map(location=(float(lat_mid), float(lon_mid)), zoom_start=6)
+        # folium.TileLayer("OpenStreetMap").add_to(m)
+        # folium.TileLayer(show=False).add_to(m)
+        self._add_shape_layers(m)
+        self._add_shape_files(m)
+        self._add_markers(m, data_holder)
+        folium.LayerControl().add_to(m)
+
+        export_path = self._get_path(data_holder)
+        m.save(export_path)
+
+    def _add_shape_layers(self, m: folium.Map) -> None:
+        if not self._shape_layers:
+            return
+        if not nodc_geography:
+            adm_logger.log_export(f"Could not add shape layers to {self.__class__.__name__}. "
+                                  f"Package nodc_qeography not found!", level=adm_logger.WARNING)
+            return
+        for layer in self._shape_layers:
+            shape = nodc_geography._get_shapefile_for_variable(layer)
+            if not shape:
+                adm_logger.log_export(
+                    f"No shape file found for layer {layer}", level=adm_logger.WARNING)
+                continue
+            fg = folium.FeatureGroup(name=layer, show=True)
+            folium.GeoJson(data=shape.gdf).add_to(fg)
+            fg.add_to(m)
+
+    def _add_shape_files(self, m: folium.Map) -> None:
+        if not self._shape_files:
+            return
+        for item in self._shape_files:
+            path = pathlib.Path(item)
+            gdf = gpd.read_file(path)
+            gdf.crs = self._epsg
+            fg = folium.FeatureGroup(name=path.stem, show=True)
+            folium.GeoJson(data=gdf).add_to(fg)
+            fg.add_to(m)
+
+    def _add_markers(self, m: folium.Map, data_holder: PolarsDataHolder) -> None:
+        fg = folium.FeatureGroup(name="Stations", show=True)
+        for (lat, lon, station), df in data_holder.data.group_by(["sample_latitude_dd",
+                                                                  "sample_longitude_dd",
+                                                                  "reported_station_name"]):
+            text = "\n".join([station, f"Latitude: {lat}", f"Longitude: {lon}"])
+            folium.Marker(
+                location=[float(lat), float(lon)],
+                tooltip=station,
+                popup=text,
+                # icon=folium.Icon(icon="cloud"),
+            ).add_to(fg)
+        fg.add_to(m)
+
+
+class PolarsHtmlMapR(PolarsHtmlMap):
+    shape_layers: tuple[str, ...] = (
+        "location_ra",
+        "location_rb",
+        "location_rc",
+        "location_rg",
+        "location_rh",
+        "location_ro",
+    )
