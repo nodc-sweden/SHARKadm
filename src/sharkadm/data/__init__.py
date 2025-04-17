@@ -21,6 +21,10 @@ from sharkadm.data.lims import (
     get_lims_data_holder,
     get_polars_lims_data_holder,
 )
+from sharkadm.data.profile import (
+    get_polars_profile_standard_format_data_holder,
+    path_has_or_is_standard_format_profile_data,
+)
 from sharkadm.data.shark_api import get_shark_api_data_holder
 from sharkadm.data.zip_archive import (
     get_polars_zip_archive_data_holder,
@@ -142,9 +146,13 @@ def get_polars_data_holder(
             archive_directory = directory_is_archive(path)
             if archive_directory:
                 return get_polars_archive_data_holder(archive_directory)
+            if path_has_or_is_standard_format_profile_data(path):
+                return get_polars_profile_standard_format_data_holder(path)
         lims_directory = directory_is_lims(path)
         if lims_directory:
             return get_polars_lims_data_holder(lims_directory)
+        if path_has_or_is_standard_format_profile_data(path):
+            return get_polars_profile_standard_format_data_holder(path)
     # if sharkweb:
     #     return get_shark_api_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f"Could not find dataholder for: {path}")

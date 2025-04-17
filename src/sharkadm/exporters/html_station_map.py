@@ -1,5 +1,6 @@
 import pathlib
 
+import geopandas
 import pandas as pd
 import polars as pl
 import numpy as np
@@ -22,6 +23,7 @@ folium = None
 try:
     import folium
     import geopandas as gpd
+    import shapely
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -187,12 +189,17 @@ class PolarsHtmlMap(FileExporter):
         export_file_name: str | pathlib.Path | None = None,
         shape_layers: list[str | pathlib.Path] = None,
         shape_files: list[str | pathlib.Path] = None,
+        highlight_stations_in_areas: bool = False,
         **kwargs,
     ):
         # self._load_station_list = load_station_list
         self._shape_layers = self.shape_layers or shape_layers or []
         self._shape_files = shape_files or []
+        self._highlight_stations_in_areas = highlight_stations_in_areas
         self._epsg = kwargs.get("epsg", "3006")
+        self._station_info = []
+        self._gdfs = []
+        self._points_in_areas = []
         super().__init__(export_directory, export_file_name, **kwargs)
 
     def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
@@ -223,7 +230,9 @@ class PolarsHtmlMap(FileExporter):
         # folium.TileLayer(show=False).add_to(m)
         self._add_shape_layers(m)
         self._add_shape_files(m)
-        self._add_markers(m, data_holder)
+        self._save_station_info(data_holder)
+        self._check_paints_in_areas()
+        self._add_markers(m)
         folium.LayerControl().add_to(m)
 
         export_path = self._get_path(data_holder)
@@ -245,6 +254,7 @@ class PolarsHtmlMap(FileExporter):
             fg = folium.FeatureGroup(name=layer, show=True)
             folium.GeoJson(data=shape.gdf).add_to(fg)
             fg.add_to(m)
+            self._gdfs.append(shape.gdf)
 
     def _add_shape_files(self, m: folium.Map) -> None:
         if not self._shape_files:
@@ -256,18 +266,52 @@ class PolarsHtmlMap(FileExporter):
             fg = folium.FeatureGroup(name=path.stem, show=True)
             folium.GeoJson(data=gdf).add_to(fg)
             fg.add_to(m)
+            self._gdfs.append(gdf)
 
-    def _add_markers(self, m: folium.Map, data_holder: PolarsDataHolder) -> None:
-        fg = folium.FeatureGroup(name="Stations", show=True)
-        for (lat, lon, station), df in data_holder.data.group_by(["sample_latitude_dd",
+    def _save_station_info(self, data_holder: PolarsDataHolder):
+        for (lat, lon, x, y, station), df in data_holder.data.group_by(["sample_latitude_dd",
                                                                   "sample_longitude_dd",
+                                                                  "sample_sweref99tm_x",
+                                                                  "sample_sweref99tm_y",
                                                                   "reported_station_name"]):
             text = "\n".join([station, f"Latitude: {lat}", f"Longitude: {lon}"])
+            self._station_info.append(
+                dict(
+                    lat=float(lat),
+                    lon=float(lon),
+                    x=float(x),
+                    y=float(y),
+                    station=station,
+                    text=text,
+                    in_areas=False
+                )
+            )
+
+    def _check_paints_in_areas(self):
+        if not self._highlight_stations_in_areas:
+            return
+        if not self._gdfs:
+            return
+        for info in self._station_info:
+            if not info.get('x'):
+                adm_logger.log_export(f'Could not highlight stations in areas. Missing column sample_sweref99tm_x', level=adm_logger.ERROR)
+                raise KeyError('sample_sweref99tm_x and sample_sweref99tm_y')
+            for gdf in self._gdfs:
+                if sum(gdf.contains(shapely.Point(info["x"], info["y"]))):
+                    info["in_areas"] = True
+                    break
+
+    def _add_markers(self, m: folium.Map) -> None:
+        fg = folium.FeatureGroup(name="Stations", show=True)
+        for info in self._station_info:
+            color = 'blue'
+            if info.get('in_areas'):
+                color='red'
             folium.Marker(
-                location=[float(lat), float(lon)],
-                tooltip=station,
-                popup=text,
-                # icon=folium.Icon(icon="cloud"),
+                location=[info["lat"], info["lon"]],
+                tooltip=info["station"],
+                popup=info["text"],
+                icon=folium.Icon(color=color),
             ).add_to(fg)
         fg.add_to(m)
 

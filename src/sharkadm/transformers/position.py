@@ -145,6 +145,8 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
         return "Adds sample position in sweref99tm"
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.x_column_to_set in data_holder.data:
+            return
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.x_column_to_set),
             pl.lit("").alias(self.y_column_to_set),
@@ -218,6 +220,7 @@ class PolarsAddReportedPosition(Transformer):
             .then(pl.col("sample_reported_latitude"))
             .otherwise(pl.col("visit_reported_latitude"))
             .alias("reported_latitude"),
+
             pl.when(pl.col("sample_reported_longitude") != "")
             .then(pl.col("sample_reported_longitude"))
             .otherwise(pl.col("visit_reported_longitude"))
@@ -236,6 +239,7 @@ class PolarsAddReportedPosition(Transformer):
                 continue
             cols_to_add.append(pl.lit("").alias(col))
         data_holder.data = data_holder.data.with_columns(cols_to_add)
+
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col("sample_reported_latitude") != "")
             .then(pl.col("sample_reported_latitude"))
@@ -268,6 +272,8 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
         return "Adds sample position based on reported position"
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.lat_col_to_set in data_holder.data:
+            return
         for (lat, lon), df in data_holder.data.group_by([self.lat_source_col,
                                                          self.lon_source_col]):
             new_lat, new_lon = self._get(str(lat), str(lon))
@@ -344,6 +350,8 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
         return "Adds sample position in decimal minute"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.lat_col_to_set in data_holder.data:
+            return
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.lat_col_to_set)
         )
@@ -360,18 +368,17 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
                     level=adm_logger.WARNING,
                 )
                 continue
-            lat = geography.decdeg_to_decmin(lat, with_space=True)
-            lon = geography.decdeg_to_decmin(lon, with_space=True)
-
+            new_lat = geography.decdeg_to_decmin(lat, with_space=True)
+            new_lon = geography.decdeg_to_decmin(lon, with_space=True)
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
-                .then(pl.lit(lat))
+                .then(pl.lit(new_lat))
                 .otherwise(pl.col(self.lat_source_col))
                 .alias(self.lat_col_to_set)
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lon_source_col) == lon)
-                .then(pl.lit(lon))
+                .then(pl.lit(new_lon))
                 .otherwise(pl.col(self.lon_source_col))
                 .alias(self.lon_col_to_set)
             )
