@@ -130,7 +130,6 @@ class AnalyseInfo:
         return f"Analyse info for parameters: \n{lst}"
 
     def get_info(self, par: str, date: datetime.date) -> dict:
-        info = {}
         for info in self.data.get(par, []):
             if (
                 info["VALIDFR"]
@@ -142,7 +141,7 @@ class AnalyseInfo:
                 return info
             if info["VALIDTO"] and (date <= info["VALIDTO"]):
                 return info
-        return info
+        return {}
 
     def get(self, par: str, col: str, date: datetime.date) -> str | None:
         info = self.get_info(par=par, date=date)

@@ -212,6 +212,7 @@ class PandasDataHolder(DataHolder, ABC):
             raise TypeError("Data must be of type pandas.DataFrame")
         self._data = df
 
+    @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
 
@@ -274,6 +275,7 @@ class PolarsDataHolder(DataHolder, ABC):
             )
         self._data = df
 
+    @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
 

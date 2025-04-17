@@ -7,10 +7,9 @@ from .base import DataHolderProtocol, Transformer
 
 
 class AddCustomId(Transformer):
-    _id_handler = config.get_custom_id_handler()
-
     def __init__(self, add_md5: bool = False):
         super().__init__()
+        self._id_handler = config.get_custom_id_handler()
         self._add_md5 = add_md5
 
     @staticmethod
@@ -49,7 +48,10 @@ class AddCustomId(Transformer):
 
 class AddSharkSampleMd5(Transformer):
     col_to_set = "shark_sample_md5"
-    _id_handler = config.get_custom_id_handler()
+
+    def __init__(self):
+        super().__init__()
+        self._id_handler = config.get_custom_id_handler()
 
     @staticmethod
     def get_transformer_description() -> str:
