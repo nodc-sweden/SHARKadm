@@ -1,3 +1,4 @@
+from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import DataHolderProtocol, Transformer, PolarsDataHolderProtocol, \
     PolarsTransformer
@@ -408,3 +409,62 @@ class PolarsAddBvolRefList(PolarsTransformer):
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
+
+
+class PolarsAddBvolInfo(PolarsTransformer):
+    valid_data_types = ("Phytoplankton",)
+    col_reported_scientific_name = "reported_scientific_name"
+    col_bvol_scientific_name_original = "bvol_scientific_name_original"
+
+    # source_col = "reported_scientific_name"
+    # col_to_set = "bvol_scientific_name_original"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        # UPPDATERA
+        return (
+            f"Adds {PolarsAddBvolScientificNameOriginal.col_to_set} "
+            f"from {PolarsAddBvolScientificNameOriginal.source_col}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_columns(data_holder)
+
+        for (reported_name, ), df in data_holder.data.group_by(self.col_reported_scientific_name):
+            bvol_scientific_name_original = translate_bvol_name.get(str(reported_name))
+            if bvol_scientific_name_original:
+                adm_logger.log_transformation(
+                    f"Translating {reported_name} -> {bvol_scientific_name_original} ({len(df)} places)",
+                    level=adm_logger.INFO,
+                )
+            else:
+                adm_logger.log_transformation(
+                    f"Adding {reported_name} to {self.col_to_set} ({len(df)} places)",
+                    level=adm_logger.DEBUG,
+                )
+                bvol_scientific_name_original = reported_name
+
+            self._add_to_col(data_holder, self.col_reported_scientific_name,
+                             self.col_bvol_scientific_name_original, reported_name,
+                             bvol_scientific_name_original)
+
+    def _add_empty_columns(self, data_holder: PolarsDataHolder):
+        self._add_empty_col(data_holder, self.col_bvol_scientific_name_original)
+
+    def _add_to_col(self,
+                    data_holder: PolarsDataHolder,
+                    source_col,
+                    col_to_set,
+                    lookup_name,
+                    new_name: str) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(source_col) == lookup_name)
+            .then(pl.lit(new_name))
+            .otherwise(pl.col(col_to_set))
+            .alias(col_to_set)
+        )
+
+

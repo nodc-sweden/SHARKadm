@@ -222,6 +222,10 @@ from sharkadm.transformers.worms import (
     AddWormsAphiaId,
     AddWormsScientificName,
     SetAphiaIdFromReportedAphiaId,
+    PolarsAddReportedAphiaId,
+    PolarsAddWormsScientificName,
+    PolarsAddWormsAphiaId,
+    PolarsSetAphiaIdFromReportedAphiaId,
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
