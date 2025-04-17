@@ -6,13 +6,13 @@ from sharkadm import config
 from .profile_data_holder import PolarsProfileStandardFormatDataHolder
 
 
-def get_polars_profile_standard_format_data_holder(path: str | pathlib.Path) \
+def get_polars_profile_standard_format_data_holder(path: str | pathlib.Path, **kwargs) \
         -> PolarsProfileStandardFormatDataHolder:
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(
         data_type="profile", import_column="PROFILE"
     )
-    return PolarsProfileStandardFormatDataHolder(path=path, header_mapper=mapper)
+    return PolarsProfileStandardFormatDataHolder(path=path, header_mapper=mapper, **kwargs)
 
 
 def path_has_or_is_standard_format_profile_data(path: str | pathlib.Path) -> Union[pathlib.Path, False]:

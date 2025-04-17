@@ -290,8 +290,8 @@ def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
     return c
 
 
-def get_polars_controller_with_data(path: pathlib.Path | str) -> SHARKadmPolarsController:
+def get_polars_controller_with_data(path: pathlib.Path | str, **kwargs) -> SHARKadmPolarsController:
     c = SHARKadmPolarsController()
-    holder = get_polars_data_holder(path)
+    holder = get_polars_data_holder(path, **kwargs)
     c.set_data_holder(holder)
     return c

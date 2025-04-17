@@ -25,12 +25,14 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
     _data_structure = "profile"
 
     def __init__(
-        self,
-        path: str | pathlib.Path | None = None,
-        header_mapper: HeaderMapper = None,
+            self,
+            path: str | pathlib.Path | None = None,
+            header_mapper: HeaderMapper = None,
+            **kwargs
     ):
         super().__init__()
         root_path = pathlib.Path(path)
+        self._kwargs = kwargs
 
         if not root_path.exists():
             raise FileNotFoundError(path)
@@ -79,15 +81,21 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
 
     def _load_data(self) -> None:
         dfs = []
+        columns = None
         for path in self._paths:
+            print(f'{path=}')
             data_source = StandardFormatPolarsDataFile(
-                path=path, data_type=self.data_type
+                path=path, data_type=self.data_type, **self._kwargs
             )
             if self._header_mapper:
                 data_source.map_header(self._header_mapper)
+            if not columns:
+                columns = set(data_source.data.columns)
+            columns.intersection_update(data_source.data.columns)
             dfs.append(data_source.data)
             self._data_sources[str(data_source)] = data_source
-        self._data = pl.concat(dfs)
+        dfs = [df.select(sorted(columns)) for df in dfs]
+        self._data = pl.concat(dfs, how="vertical_relaxed")
         self._data.fill_nan("")
 
     # def _load_sampling_info(self) -> None:

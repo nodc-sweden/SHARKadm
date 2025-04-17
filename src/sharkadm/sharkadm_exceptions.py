@@ -41,3 +41,7 @@ class InvalidWorkflow(SHARKadmException):
 
 class ConfigurationError(SHARKadmException):
     pass
+
+
+class ToManyDatatypesError(SHARKadmException):
+    pass

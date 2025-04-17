@@ -216,6 +216,7 @@ class PolarsDataFile(PolarsDataSource, ABC):
         path: str | pathlib.Path | None = None,
         data_type: str | None = None,
         encoding: str = "cp1252",
+        **kwargs
     ) -> None:
         super().__init__(data_type=data_type)
         self._path: pathlib.Path = pathlib.Path(path)
