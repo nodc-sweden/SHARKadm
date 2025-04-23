@@ -198,7 +198,7 @@ class BaseSHARKadmController:
     def export(self, *exporters: Exporter) -> Any:
         for exp in exporters:
             data = exp.export(self._data_holder)
-            if isinstance(data, pd.DataFrame):
+            if isinstance(data, (pd.DataFrame, pl.DataFrame)):
                 return data
         return self
 

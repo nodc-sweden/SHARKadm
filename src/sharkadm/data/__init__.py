@@ -13,7 +13,7 @@ from sharkadm.data.archive import (
     get_polars_archive_data_holder,
 )
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
-from sharkadm.data.df import PandasDataFrameDataHolder
+from sharkadm.data.df import PandasDataFrameDataHolder,PolarsDataFrameDataHolder
 from sharkadm.data.dv_template import DvTemplateDataHolder, get_dv_template_data_holder
 from sharkadm.data.lims import (
     LimsDataHolder,
@@ -24,6 +24,10 @@ from sharkadm.data.lims import (
 from sharkadm.data.profile import (
     get_polars_profile_standard_format_data_holder,
     path_has_or_is_standard_format_profile_data,
+)
+from sharkadm.data.odv import (
+    get_polars_odv_data_holder,
+    path_has_or_is_odv_data,
 )
 from sharkadm.data.shark import (
     get_shark_api_data_holder,
@@ -160,6 +164,8 @@ def get_polars_data_holder(
             return get_polars_lims_data_holder(lims_directory)
         if path_has_or_is_standard_format_profile_data(path):
             return get_polars_profile_standard_format_data_holder(path, **kwargs)
+        if path_has_or_is_odv_data(path):
+            return get_polars_odv_data_holder(path, **kwargs)
     # if sharkweb:
     #     return get_shark_api_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f"Could not find dataholder for: {path}")
