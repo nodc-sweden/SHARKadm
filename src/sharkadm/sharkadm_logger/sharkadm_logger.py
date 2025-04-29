@@ -173,18 +173,19 @@ class SHARKadmLogger:
         )
         self._log(**data)
 
-    def log_validation(
+    def log_validation_failed(
         self,
         msg: str,
         level: str = "warning",
         item: str | None = None,
         purpose: str = "",
+        column: str | None = None,
         row_number: str | int | None = None,
     ) -> None:
         cls = ""
         stack = inspect.stack()
         if stack[1][0].f_locals.get("self"):
-            cls = stack[1][0].f_locals["self"].__class__.__name__
+            cls = stack[1][0].f_locals["self"].__name__
         data = dict(
             log_type=self.VALIDATION,
             msg=msg,
@@ -192,7 +193,35 @@ class SHARKadmLogger:
             cls=cls,
             item=item,
             purpose=purpose,
+            column=column,
             row_number=row_number,
+            validation_success=False,
+        )
+        self._log(**data)
+
+    def log_validation_succeeded(
+        self,
+        msg: str,
+        level: str = "warning",
+        item: str | None = None,
+        purpose: str = "",
+        column: str | None = None,
+        row_number: str | int | None = None,
+    ) -> None:
+        cls = ""
+        stack = inspect.stack()
+        if stack[1][0].f_locals.get("self"):
+            cls = stack[1][0].f_locals["self"].__name__
+        data = dict(
+            log_type=self.VALIDATION,
+            msg=msg,
+            level=level,
+            cls=cls,
+            item=item,
+            purpose=purpose,
+            column=column,
+            row_number=row_number,
+            validation_success=True,
         )
         self._log(**data)
 
@@ -362,7 +391,7 @@ class SHARKadmLogger:
             # print(data.get('log_type'))
             if data.get("level") and data.get("level") not in levels:
                 continue
-            if data.get("purpose") and data.get("purpose") not in purposes:
+            if purposes and data.get("purpose") not in purposes:
                 continue
             if data.get("log_type") and data.get("log_type") not in log_types:
                 continue

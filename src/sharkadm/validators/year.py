@@ -10,9 +10,18 @@ class ValidateYearNrDigits(Validator):
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data["visit_year"].apply(self.check)
+        adm_logger.log_validation_succeeded(
+            "All years have valid formats.",
+            item="ValidateYearNrDigits",
+            level="error",
+        )
 
     @staticmethod
     def check(x):
         if len(x) == 4:
             return
-        adm_logger.log_validation(f'Year "{x}" is not of length 4')
+        adm_logger.log_validation_failed(
+            f"Year '{x}' is not of length 4.",
+            item="ValidateYearNrDigits",
+            level="info",
+        )

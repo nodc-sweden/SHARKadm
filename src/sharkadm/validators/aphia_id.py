@@ -13,21 +13,21 @@ class _ValidateAphiaId(Validator):
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.from_aphia_id_col not in data_holder.data:
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Could not validate aphia_id. Missing column {self.from_aphia_id_col}",
                 level=adm_logger.WARNING,
             )
             return
 
         if self.to_aphia_id_col not in data_holder.data:
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Could not validate aphia_id. Missing column {self.to_aphia_id_col}",
                 level=adm_logger.WARNING,
             )
             return
 
         if not any(data_holder.data[self.from_aphia_id_col]):
-            adm_logger.log_validation(f"No values in {self.from_aphia_id_col}")
+            adm_logger.log_validation_failed(f"No values in {self.from_aphia_id_col}")
             return
 
         for (reported, translated), df in data_holder.data.groupby(
@@ -36,20 +36,20 @@ class _ValidateAphiaId(Validator):
             if not (reported and translated):
                 continue
             if not reported:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing {self.from_aphia_id_col} for {self.to_aphia_id_col}: "
                     f"{translated} ({len(df)} places)",
                     level=adm_logger.INFO,
                 )
                 continue
             if not translated:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing {self.to_aphia_id_col} for {self.from_aphia_id_col}: "
                     f"{reported}({len(df)} places)",
                     level=adm_logger.INFO,
                 )
                 continue
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"{self.from_aphia_id_col} differs from {self.to_aphia_id_col}: "
                 f'"{reported}" ({self.from_aphia_id_col}) <-> '
                 f'"{translated}" ({self.to_aphia_id_col}) ({len(df)} places)',

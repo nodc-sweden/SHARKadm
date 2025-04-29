@@ -30,7 +30,7 @@ class ValidatePositiveValues(Validator):
         for col in self.cols_to_validate:
             if col not in data_holder.data:
                 continue
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Checking that all values are positive in column {col}",
                 level=adm_logger.DEBUG,
             )
@@ -38,7 +38,7 @@ class ValidatePositiveValues(Validator):
                 if not val:
                     continue
                 if float(val) < 0:
-                    adm_logger.log_validation(
+                    adm_logger.log_validation_failed(
                         f"Negative values found in colum {col} LINES: "
                         f"{sorted(df['row_number'])}",
                         level=adm_logger.WARNING,

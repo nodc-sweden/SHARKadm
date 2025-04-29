@@ -17,7 +17,7 @@ class CheckIfLatLonIsSwitched(Validator):
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.unique_column not in data_holder.data.columns:
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Could not check unique sample id. No column named {self.unique_column}",
                 level="error",
             )
@@ -28,4 +28,4 @@ class CheckIfLatLonIsSwitched(Validator):
             ]
         )
         for dup in duplicates:
-            adm_logger.log_validation(f"Duplicate in {self.unique_column} = {dup}")
+            adm_logger.log_validation_failed(f"Duplicate in {self.unique_column} = {dup}")

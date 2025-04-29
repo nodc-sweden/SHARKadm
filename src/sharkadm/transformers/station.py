@@ -108,6 +108,12 @@ class AddStationInfo(Transformer):
                     f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
                     level=adm_logger.WARNING,
                 )
+                adm_logger.log_validation_failed(
+                    f"Reported station name found in station list but it is outside "
+                    f"the accepted radius. Distance={info['calc_dist']}, "
+                    f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
+                    level=adm_logger.WARNING,
+                )
                 continue
 
             if reported_station != info["STATION_NAME"]:
@@ -120,6 +126,11 @@ class AddStationInfo(Transformer):
             data_holder.data.loc[boolean, "station_id"] = info["REG_ID_GROUP"]
             data_holder.data.loc[boolean, "sample_location_id"] = info["REG_ID"]
             data_holder.data.loc[boolean, "station_viss_eu_id"] = info["EU_CD"]
+            adm_logger.log_validation_succeeded(
+                f"Station '{info['STATION_NAME']}' ({info['REG_ID_GROUP']}) "
+                f"transformed without error.",
+                level=adm_logger.INFO,
+            )
 
     def _create_columns_if_missing(self, data_holder: DataHolderProtocol) -> None:
         for col in self.columns_to_set:
