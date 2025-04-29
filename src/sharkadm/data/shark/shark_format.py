@@ -45,6 +45,8 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._import_matrix = config.get_import_matrix_config(
             data_type=self.data_type_internal
         )
+        if not self._import_matrix:
+            return
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.data_format)
 
     def _load_data(self) -> None:
@@ -52,7 +54,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
             path=self._path,
             encoding=self._encoding
         )
-        for col in ['Datatyp', 'Data type', 'DTYPE', 'delivery_datatype']:
+        for col in ['Datatyp', 'Data type', 'DTYPE', 'delivery_datatype', 'data_type']:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])
                 if len(all_data_types) > 1:
@@ -60,19 +62,28 @@ class PolarsSharkDataHolder(PolarsDataHolder):
                 d_source._data_type = all_data_types.pop()
                 break
 
-        data_type_internal = d_source._data_type.lower()
+        if d_source._data_type:
+            data_type_internal = d_source._data_type.lower()
+        else:
+            data_type_internal = ""
+
+
         if 'physical' in data_type_internal:
             data_type_internal = "physicalchemical"
         elif 'imaging' in data_type_internal:
             data_type_internal = 'plankton_imaging'
         elif 'dropvideo' in data_type_internal:
             data_type_internal = 'epibenthos_dropvideo'
+        elif 'grey' in data_type_internal:
+            data_type_internal = 'greyseal'
+        elif 'ringed' in data_type_internal:
+            data_type_internal = 'ringedseal'
 
         self._data_type_internal = data_type_internal
 
         self._load_import_matrix()
-
-        d_source.map_header(self.import_matrix_mapper)
+        if self.import_matrix_mapper:
+            d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)
 

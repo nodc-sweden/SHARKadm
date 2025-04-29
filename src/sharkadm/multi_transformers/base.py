@@ -154,7 +154,7 @@ class PolarsMultiTransformer(Transformer):
         return self.get_transformer_description()
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
-        if data_holder.data_type_internal not in config.get_valid_data_types(
+        if data_holder.data_type_internal != 'unknown' and data_holder.data_type_internal not in config.get_valid_data_types(
             valid=self.valid_data_types, invalid=self.invalid_data_types
         ):
             adm_logger.log_workflow(

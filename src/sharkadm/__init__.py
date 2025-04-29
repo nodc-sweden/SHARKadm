@@ -16,4 +16,9 @@ def update_nodc_config_directory_from_svn() -> None:
         adm_logger.log_workflow("Could not update nodc_config.", level=adm_logger.WARNING)
 
 
-update_nodc_config_directory_from_svn()
+try:
+    update_nodc_config_directory_from_svn()
+except FileNotFoundError as e:
+    print(f'Could not find file: {e}')
+except Exception as e:
+    print(e)

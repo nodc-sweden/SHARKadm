@@ -190,6 +190,7 @@ class PolarsHtmlMap(FileExporter):
         shape_layers: list[str | pathlib.Path] = None,
         shape_files: list[str | pathlib.Path] = None,
         highlight_stations_in_areas: bool = False,
+        columns_to_show: list[str] = None,
         **kwargs,
     ):
         # self._load_station_list = load_station_list
@@ -200,6 +201,7 @@ class PolarsHtmlMap(FileExporter):
         self._station_info = []
         self._gdfs = []
         self._points_in_areas = []
+        self._columns_to_show = columns_to_show or []
         super().__init__(export_directory, export_file_name, **kwargs)
 
     def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
@@ -238,7 +240,7 @@ class PolarsHtmlMap(FileExporter):
         export_path = self._get_path(data_holder)
         m.save(export_path)
 
-    def _add_shape_layers(self, m: folium.Map) -> None:
+    def _add_shape_layers(self, m: "folium.Map") -> None:
         if not self._shape_layers:
             return
         if not nodc_geography:
@@ -256,7 +258,7 @@ class PolarsHtmlMap(FileExporter):
             fg.add_to(m)
             self._gdfs.append(shape.gdf)
 
-    def _add_shape_files(self, m: folium.Map) -> None:
+    def _add_shape_files(self, m: "folium.Map") -> None:
         if not self._shape_files:
             return
         for item in self._shape_files:
@@ -269,12 +271,17 @@ class PolarsHtmlMap(FileExporter):
             self._gdfs.append(gdf)
 
     def _save_station_info(self, data_holder: PolarsDataHolder):
+        cols_to_show = [col for col in self._columns_to_show if col in data_holder.data]
         for (lat, lon, x, y, station), df in data_holder.data.group_by(["sample_latitude_dd",
                                                                   "sample_longitude_dd",
                                                                   "sample_sweref99tm_x",
                                                                   "sample_sweref99tm_y",
                                                                   "reported_station_name"]):
-            text = "\n".join([station, f"Latitude: {lat}", f"Longitude: {lon}"])
+            items = [station, f"Latitude: {lat}", f"Longitude: {lon}"]
+            for col in cols_to_show:
+                items.append(f"{col}: {df.item(0, col)}")
+            text = "\n".join(items)
+
             self._station_info.append(
                 dict(
                     lat=float(lat),
@@ -301,7 +308,7 @@ class PolarsHtmlMap(FileExporter):
                     info["in_areas"] = True
                     break
 
-    def _add_markers(self, m: folium.Map) -> None:
+    def _add_markers(self, m: "folium.Map") -> None:
         fg = folium.FeatureGroup(name="Stations", show=True)
         for info in self._station_info:
             color = 'blue'

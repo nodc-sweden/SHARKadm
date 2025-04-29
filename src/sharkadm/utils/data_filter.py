@@ -68,8 +68,20 @@ class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
             | data_holder.data["location_rc"]
             | data_holder.data["location_rg"]
             | data_holder.data["location_rh"]
-            | data_holder.data["location_ro"]
+            # | data_holder.data["location_ro"]
         )
+
+
+class PolarsDataFilterRestrictAreaO(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        return data_holder.data["location_ro"]
+
+
+class PolarsDataFilterRestrictAreaRorO(PolarsDataFilter):
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        r = PolarsDataFilterRestrictAreaR().get_filter_mask(data_holder)
+        o = PolarsDataFilterRestrictAreaO().get_filter_mask(data_holder)
+        return r | o
 
 
 class PolarsDataFilterApprovedData(PolarsDataFilter):
@@ -88,7 +100,7 @@ class PolarsDataFilterApprovedData(PolarsDataFilter):
 
 
 class PolarsDataFilterInside12nm(PolarsDataFilter):
-    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         col = "location_wb"
         if col not in data_holder.data:
             adm_logger.log_workflow(
@@ -111,7 +123,7 @@ class PolarsDataFilterInside12nm(PolarsDataFilter):
 
 
 class PolarsDataFilterApprovedAndOutside12nm(PolarsDataFilter):
-    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         approved_bool = PolarsDataFilterApprovedData().get_filter_mask(data_holder)
         inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
         outside12nm_bool = ~inside12nm_bool
@@ -119,8 +131,23 @@ class PolarsDataFilterApprovedAndOutside12nm(PolarsDataFilter):
 
 
 class PolarsDataFilterInside12nmAndNotRestricted(PolarsDataFilter):
-    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         restrict_boolean = PolarsDataFilterRestrictAreaR().get_filter_mask(data_holder)
         not_restrict_boolean = ~restrict_boolean
         inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
         return inside12nm_bool & not_restrict_boolean
+
+
+class PolarsDataFilterDeepestDepthRowsForEachVisit(PolarsDataFilter):
+    visit_id_columns = (
+        "shark_sample_id_md5",
+        "visit_date",
+        "sample_date",
+        "sample_time",
+        "sample_latitude_dd",
+        "sample_longitude_dd",
+        "platform_code",
+        "visit_id",
+    )
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
+        pass

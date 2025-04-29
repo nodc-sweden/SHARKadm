@@ -214,7 +214,7 @@ def is_valid_polars_data_holder(
 ) -> bool:
     if not any([valid, invalid]):
         return True
-    holders = get_data_holders()
+    holders = get_polars_data_holders()
     if any([val for val in invalid if isinstance(data_holder, holders[val])]):
         return False
     if any([val for val in valid if isinstance(data_holder, holders[val])]):
