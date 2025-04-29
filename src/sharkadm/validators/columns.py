@@ -24,4 +24,4 @@ class ValidateColumnViewColumnsNotInDataset(Validator):
         for col in self._column_views.get_columns_for_view(data_holder.data_type):
             if col in data_holder.data.columns:
                 continue
-            adm_logger.log_validation(f"Column view column not in data: {col}")
+            adm_logger.log_validation_failed(f"Column view column not in data: {col}")

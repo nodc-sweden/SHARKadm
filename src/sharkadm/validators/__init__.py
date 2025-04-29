@@ -23,6 +23,9 @@ from sharkadm.validators.column_combination import (
 from sharkadm.validators.columns import (
     ValidateColumnViewColumnsNotInDataset as ValidateColumnViewColumnsNotInDataset,
 )
+from sharkadm.validators.common_values import (
+    ValidateCommonValuesByVisit as ValidateCommonValuesByVisit,
+)
 from sharkadm.validators.date_and_time import MissingTime as MissingTime
 from sharkadm.validators.mandatory import (
     ValidateValuesInMandatoryNatColumns as ValidateValuesInMandatoryNatColumns,
@@ -39,7 +42,6 @@ from sharkadm.validators.position import (
 from sharkadm.validators.positive import (
     ValidatePositiveValues as ValidatePositiveValues,
 )
-from sharkadm.validators.unique import ValidateUniqueSampleId as ValidateUniqueSampleId
 from sharkadm.validators.year import ValidateYearNrDigits as ValidateYearNrDigits
 
 
