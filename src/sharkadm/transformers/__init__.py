@@ -159,6 +159,7 @@ from sharkadm.transformers.position import (
     PolarsAddReportedPosition,
     PolarsAddSamplePositionDD,
     PolarsAddSamplePositionDM,
+    PolarsAddSamplePositionDDAsFloat,
 )
 from sharkadm.transformers.project_code import (
     AddEnglishProjectName,

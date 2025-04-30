@@ -583,6 +583,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
     abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
     reported_cell_volume_col = 'reported_cell_volume_um3'
     calculated_cell_volume_col = 'bvol_cell_volume_um3'
+    aphia_id_size_class_map_col = "aphia_id_and_size_class"
     # size_class_col = 'size_class'
     # aphia_id_col = 'aphia_id'
     # reported_cell_volume_col = 'reported_cell_volume_um3'
@@ -595,6 +596,18 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         return f'Calculating biovolume. Setting value to column {PolarsCalculateBiovolume.col_to_set}'
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.aphia_id_size_class_map_col not in data_holder.data:
+            data_holder.data = data_holder.data.with_columns(
+                pl.concat_str([
+                    pl.col("bvol_aphia_id"),
+                    pl.col("bvol_size_class"),
+                ], separator=":").alias(self.aphia_id_size_class_map_col)
+            )
+        volume_mapper = _nomp.get_calculated_volume_mapper()
+        data_holder.data = data_holder.data.with_columns(
+
+        )
+
         data_holder.data = data_holder.data.with_columns(
             pl.col(self.reported_cell_volume_col).alias('cell_volume')
         )

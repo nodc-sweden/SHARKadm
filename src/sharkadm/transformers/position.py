@@ -385,3 +385,27 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
                 .otherwise(pl.col(self.lon_source_col))
                 .alias(self.lon_col_to_set)
             )
+
+
+class PolarsAddSamplePositionDDAsFloat(PolarsTransformer):
+    lat_source_col = "sample_latitude_dd"
+    lon_source_col = "sample_longitude_dd"
+
+    lat_col_to_set = "sample_latitude_dd_float"
+    lon_col_to_set = "sample_longitude_dd_float"
+
+    def __init__(self, nr_decimals: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._nr_decimals = nr_decimals
+
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Creates position_dd columns with float values"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.lat_source_col).cast(float).round(self._nr_decimals).alias(self.lat_col_to_set),
+            pl.col(self.lon_source_col).cast(float).round(self._nr_decimals).alias(self.lon_col_to_set),
+
+        )
