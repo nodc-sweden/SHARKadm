@@ -23,6 +23,7 @@ from sharkadm.transformers.calculate import (
     CalculateAbundance,
     CalculateBiovolume,
     CalculateCarbon,
+    PolarsCalculateAbundance,
 )
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,

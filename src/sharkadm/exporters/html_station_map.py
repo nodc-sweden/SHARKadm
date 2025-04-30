@@ -277,7 +277,7 @@ class PolarsHtmlMap(FileExporter):
                                                                   "sample_sweref99tm_x",
                                                                   "sample_sweref99tm_y",
                                                                   "reported_station_name"]):
-            items = [station, f"Latitude: {lat}", f"Longitude: {lon}"]
+            items = [station, f"Latitude (DD): {lat}", f"Longitude (DD): {lon}"]
             for col in cols_to_show:
                 items.append(f"{col}: {df.item(0, col)}")
             text = "\n".join(items)

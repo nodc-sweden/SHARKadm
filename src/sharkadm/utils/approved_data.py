@@ -7,9 +7,12 @@ def add_concatenated_column(df: pl.DataFrame, column_name: str = "key") -> pl.Da
     return df.with_columns(
         pl.concat_str(
             [
-                pl.col("dataset_name"),
-                pl.col("sample_date").cast(str).str.replace_all("-", ""),
-                pl.col("reported_station_name"),
+                pl.col("delivery_datatype"),
+                pl.col("sample_latitude_dd"),
+                pl.col("sample_longitude_dd"),
+                # pl.col("dataset_name"),
+                # pl.col("sample_date").cast(str).str.replace_all("-", ""),
+                # pl.col("reported_station_name"),
             ],
             separator=":",
         ).alias(column_name)
