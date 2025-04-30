@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 import pandas as pd
 import polars as pl
-
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import approved_data
@@ -30,6 +31,50 @@ class PolarsDataFilter(ABC):
     def get_filter_mask(
         self, data_holder: PolarsDataHolder
     ) -> pl.expr.expr.Expr | None: ...
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}"
+
+    def __and__(self, other):
+        return PolarsCombinedDataFilter(self, _and=other)
+
+    def __or__(self, other):
+        return PolarsCombinedDataFilter(self, _or=other)
+
+
+class PolarsCombinedDataFilter:
+
+    def __init__(self, mask: Mask | CombinedMask,
+                 _and: Mask | CombinedMask = None,
+                 _or: Mask | CombinedMask = None):
+        self._mask = mask
+        self._and = _and
+        self._or = _or
+
+    def __repr__(self):
+        string = f"{self._mask}"
+        if self._and:
+            string = ' and '.join([string, f"{self._and}"])
+        elif self._or:
+            string = ' or '.join([string, f"{self._or}"])
+        return f"({string})"
+
+    def __and__(self, other):
+        return PolarsCombinedDataFilter(self, _and=other)
+
+    def __or__(self, other):
+        return PolarsCombinedDataFilter(self, _or=other)
+
+
+    def get_filter_mask(
+        self, data_holder: PolarsDataHolder
+    ) -> pl.expr.expr.Expr | None:
+        if self._and:
+            return self._mask.get_filter_mask(data_holder) & self._and.get_filter_mask(data_holder)
+        elif self._or:
+            return self._mask.get_filter_mask(data_holder) | self._or.get_filter_mask(data_holder)
+
+
 
 
 class DataFilterRestrictDepth(DataFilter):
@@ -99,6 +144,16 @@ class PolarsDataFilterApprovedData(PolarsDataFilter):
         )["approved_key"]
 
 
+class PolarsDataFilterYears(PolarsDataFilter):
+    def __init__(self, years: list[str | int]):
+        self._str_years = [str(y) for y in years]
+
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        return data_holder.data.with_columns(
+            ok_years=pl.col("visit_year").is_in(self._str_years)
+        ).select("ok_years")
+
+
 class PolarsDataFilterInside12nm(PolarsDataFilter):
     def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         col = "location_wb"
@@ -138,7 +193,7 @@ class PolarsDataFilterInside12nmAndNotRestricted(PolarsDataFilter):
         return inside12nm_bool & not_restrict_boolean
 
 
-class PolarsDataFilterDeepestDepthRowsForEachVisit(PolarsDataFilter):
+class working_PolarsDataFilterDeepestDepthRowsForEachVisit(PolarsDataFilter):
     visit_id_columns = (
         "shark_sample_id_md5",
         "visit_date",
@@ -149,5 +204,27 @@ class PolarsDataFilterDeepestDepthRowsForEachVisit(PolarsDataFilter):
         "platform_code",
         "visit_id",
     )
+
     def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         pass
+
+
+if __name__ == "__main__":
+    f1 = PolarsDataFilterYears([2020, 2021])
+    f2 = PolarsDataFilterInside12nm()
+    f3 = PolarsDataFilterApprovedData()
+    ff1 = f1 & f2
+    ff2 = f1 | f2
+    ff3 = f1 & f2 | f3
+    ff4 = f1 & (f2 | f3)
+    ff5 = (f1 | f2) & f3
+    ff6 = ff1 & ff3
+
+
+    print(f'{ff1=}')
+    print(f'{ff2=}')
+    print(f'{ff3=}')
+    print(f'{ff4=}')
+    print(f'{ff5=}')
+    print(f'{ff6=}')
+
