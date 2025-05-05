@@ -1,8 +1,9 @@
 import numpy as np
-
+import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer
+from .base import DataHolderProtocol, Transformer, PolarsTransformer
+from ..data import PolarsDataHolder
 
 
 class ManualSealPathology(Transformer):
@@ -67,3 +68,35 @@ class ManualHarbourPorpoise(Transformer):
                 f"in {len(np.where(boolean)[0])} places",
                 level=adm_logger.INFO,
             )
+
+
+class PolarsManualSealPathology(PolarsTransformer):
+    valid_data_types = ("SealPathology",)
+    valid_data_holders = ("PolarsZipArchiveDataHolder",)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Manual fixes for SealPathology"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        md5 = "364768f88de5f22c0e415150eddee722"
+        if md5 not in data_holder.data["shark_sample_id_md5"]:
+            return
+        adm_logger.log_transformation(f"Setting manual info for md5: {md5}", level=adm_logger.INFO)
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("shark_sample_id_md5") == md5)
+            .then(pl.lit("2018"))
+            .otherwise(pl.col("visit_year"))
+            .alias("visit_year"),
+
+            pl.when(pl.col("shark_sample_id_md5") == md5)
+            .then(pl.lit("01"))
+            .otherwise(pl.col("visit_month"))
+            .alias("visit_month"),
+
+            pl.when(pl.col("shark_sample_id_md5") == md5)
+            .then(pl.lit("2018-01-01"))
+            .otherwise(pl.col("sample_date"))
+            .alias("sample_date"),
+            )
+

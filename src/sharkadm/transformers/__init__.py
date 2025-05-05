@@ -137,7 +137,11 @@ from sharkadm.transformers.location import (
     PolarsAddLocationWB,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
-from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
+from sharkadm.transformers.manual import (
+    ManualHarbourPorpoise,
+    ManualSealPathology,
+    PolarsManualSealPathology
+)
 from sharkadm.transformers.map_header import ArchiveMapper
 from sharkadm.transformers.map_parameter_column import (
     MapperParameterColumn,
@@ -221,7 +225,8 @@ from sharkadm.transformers.station import (
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
 from sharkadm.transformers.strip import StripAllValues, StripAllValuesPolars
-from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey, PolarsAddPhysicalChemicalKey
+from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey, \
+    PolarsAddPhysicalChemicalKey
 from sharkadm.transformers.wide_to_long import PolarsWideToLong, WideToLong
 from sharkadm.transformers.worms import (
     AddReportedAphiaId,
