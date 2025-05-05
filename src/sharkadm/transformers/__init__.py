@@ -140,6 +140,7 @@ from sharkadm.transformers.manual import (
     ManualHarbourPorpoise,
     ManualSealPathology,
     PolarsManualSealPathology,
+    PolarsManualHarbourPorpoise,
 )
 from sharkadm.transformers.map_header import ArchiveMapper
 from sharkadm.transformers.map_parameter_column import (
