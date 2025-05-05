@@ -4,6 +4,8 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
+from sharkadm.transformers.add_lmqnt import AddLmqnt
+from sharkadm.transformers.add_uncertainty import AddUncertainty
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import Divide, Multiply
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
