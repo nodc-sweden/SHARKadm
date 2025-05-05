@@ -2,8 +2,12 @@ import polars as pl
 
 from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
-from .base import DataHolderProtocol, Transformer, PolarsDataHolderProtocol, \
-    PolarsTransformer
+from .base import (
+    DataHolderProtocol,
+    Transformer,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+)
 
 try:
     import nodc_dyntaxa
@@ -334,7 +338,7 @@ class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_empty_col_to_set(data_holder)
-        for (name, ), df in data_holder.data.group_by(self.source_col):
+        for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
             if not name.isdigit():
                 continue
@@ -434,7 +438,7 @@ class PolarsAddDyntaxaTranslatedScientificNameDyntaxaId(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_empty_col_to_set(data_holder)
-        for (name, ), df in data_holder.data.group_by(self.source_col):
+        for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
             _id = translate_dyntaxa.get_dyntaxa_id(name)
             if not _id:
@@ -482,7 +486,7 @@ class PolarsAddTaxonRanks(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_columns(data_holder=data_holder)
-        for (name, ), df in data_holder.data.group_by(self.source_col):
+        for (name,), df in data_holder.data.group_by(self.source_col):
             info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus="accepted")
             if not info:
                 adm_logger.log_transformation(
@@ -545,7 +549,7 @@ class PolarsAddDyntaxaId(PolarsTransformer):
             )
             self._add_empty_col_to_set(data_holder)
 
-        for (name, ), df in data_holder.data.group_by(self.source_col):
+        for (name,), df in data_holder.data.group_by(self.source_col):
             if not str(name).strip():
                 adm_logger.log_transformation(
                     f"Missing {self.source_col} when trying to add dyntaxa_id, "
@@ -566,4 +570,3 @@ class PolarsAddDyntaxaId(PolarsTransformer):
                 level=adm_logger.INFO,
             )
             self._add_to_col_to_set(data_holder, name, dyntaxa_id)
-

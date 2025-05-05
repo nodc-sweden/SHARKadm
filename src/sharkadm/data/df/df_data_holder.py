@@ -14,7 +14,6 @@ class HeaderMapper(Protocol):
     def get_internal_name(self, external_par: str) -> str: ...
 
 
-
 class PandasDataFrameDataHolder(PandasDataHolder):
     _data_type: str = ""
     _data_structure: str = ""

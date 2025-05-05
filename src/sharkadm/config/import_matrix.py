@@ -115,7 +115,7 @@ class ImportMatrixConfig:
                 if r == 0:
                     header = split_line
                     self._data = {key: {} for key in header[1:]}
-                    self._data['all'] = {}
+                    self._data["all"] = {}
                     continue
 
                 self._add_variable_to_level(split_line[0])

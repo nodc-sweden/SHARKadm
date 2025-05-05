@@ -218,14 +218,24 @@ class PolarsHtmlMap(FileExporter):
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
         if not folium:
-            adm_logger.log_export(f"Could not export {self.__class__.__name__}. "
-                                  f"folium package not found!", level=adm_logger.WARNING)
+            adm_logger.log_export(
+                f"Could not export {self.__class__.__name__}. folium package not found!",
+                level=adm_logger.WARNING,
+            )
             return
 
-        lat_mid = np.mean([data_holder.data['sample_latitude_dd'].cast(float).max(),
-                           data_holder.data['sample_latitude_dd'].cast(float).min()])
-        lon_mid = np.mean([data_holder.data['sample_longitude_dd'].cast(float).max(),
-                           data_holder.data['sample_longitude_dd'].cast(float).min()])
+        lat_mid = np.mean(
+            [
+                data_holder.data["sample_latitude_dd"].cast(float).max(),
+                data_holder.data["sample_latitude_dd"].cast(float).min(),
+            ]
+        )
+        lon_mid = np.mean(
+            [
+                data_holder.data["sample_longitude_dd"].cast(float).max(),
+                data_holder.data["sample_longitude_dd"].cast(float).min(),
+            ]
+        )
 
         m = folium.Map(location=(float(lat_mid), float(lon_mid)), zoom_start=6)
         # folium.TileLayer("OpenStreetMap").add_to(m)
@@ -244,14 +254,18 @@ class PolarsHtmlMap(FileExporter):
         if not self._shape_layers:
             return
         if not nodc_geography:
-            adm_logger.log_export(f"Could not add shape layers to {self.__class__.__name__}. "
-                                  f"Package nodc_qeography not found!", level=adm_logger.WARNING)
+            adm_logger.log_export(
+                f"Could not add shape layers to {self.__class__.__name__}. "
+                f"Package nodc_qeography not found!",
+                level=adm_logger.WARNING,
+            )
             return
         for layer in self._shape_layers:
             shape = nodc_geography._get_shapefile_for_variable(layer)
             if not shape:
                 adm_logger.log_export(
-                    f"No shape file found for layer {layer}", level=adm_logger.WARNING)
+                    f"No shape file found for layer {layer}", level=adm_logger.WARNING
+                )
                 continue
             fg = folium.FeatureGroup(name=layer, show=True)
             folium.GeoJson(data=shape.gdf).add_to(fg)
@@ -272,11 +286,15 @@ class PolarsHtmlMap(FileExporter):
 
     def _save_station_info(self, data_holder: PolarsDataHolder):
         cols_to_show = [col for col in self._columns_to_show if col in data_holder.data]
-        for (lat, lon, x, y, station), df in data_holder.data.group_by(["sample_latitude_dd",
-                                                                  "sample_longitude_dd",
-                                                                  "sample_sweref99tm_x",
-                                                                  "sample_sweref99tm_y",
-                                                                  "reported_station_name"]):
+        for (lat, lon, x, y, station), df in data_holder.data.group_by(
+            [
+                "sample_latitude_dd",
+                "sample_longitude_dd",
+                "sample_sweref99tm_x",
+                "sample_sweref99tm_y",
+                "reported_station_name",
+            ]
+        ):
             items = [station, f"Latitude (DD): {lat}", f"Longitude (DD): {lon}"]
             for col in cols_to_show:
                 items.append(f"{col}: {df.item(0, col)}")
@@ -290,7 +308,7 @@ class PolarsHtmlMap(FileExporter):
                     y=float(y),
                     station=station,
                     text=text,
-                    in_areas=False
+                    in_areas=False,
                 )
             )
 
@@ -300,9 +318,12 @@ class PolarsHtmlMap(FileExporter):
         if not self._gdfs:
             return
         for info in self._station_info:
-            if not info.get('x'):
-                adm_logger.log_export(f'Could not highlight stations in areas. Missing column sample_sweref99tm_x', level=adm_logger.ERROR)
-                raise KeyError('sample_sweref99tm_x and sample_sweref99tm_y')
+            if not info.get("x"):
+                adm_logger.log_export(
+                    f"Could not highlight stations in areas. Missing column sample_sweref99tm_x",
+                    level=adm_logger.ERROR,
+                )
+                raise KeyError("sample_sweref99tm_x and sample_sweref99tm_y")
             for gdf in self._gdfs:
                 if sum(gdf.contains(shapely.Point(info["x"], info["y"]))):
                     info["in_areas"] = True
@@ -311,9 +332,9 @@ class PolarsHtmlMap(FileExporter):
     def _add_markers(self, m: "folium.Map") -> None:
         fg = folium.FeatureGroup(name="Stations", show=True)
         for info in self._station_info:
-            color = 'blue'
-            if info.get('in_areas'):
-                color='red'
+            color = "blue"
+            if info.get("in_areas"):
+                color = "red"
             folium.Marker(
                 location=[info["lat"], info["lon"]],
                 tooltip=info["station"],

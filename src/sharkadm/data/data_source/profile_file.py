@@ -10,20 +10,20 @@ logger = logging.getLogger(__name__)
 
 class StandardFormatPolarsDataFile(PolarsDataFile):
     def __init__(self, *args, **kwargs):
-        self._separator = kwargs.get("separator",
-                                     kwargs.get("delimiter",
-                                                kwargs.get("sep", '\t')))
-        self._n_rows = kwargs.get("nr_rows",
-                       kwargs.get("n_rows",
-                       kwargs.get("read_nr_rows",
-                       kwargs.get("read_n_rows"))))
+        self._separator = kwargs.get(
+            "separator", kwargs.get("delimiter", kwargs.get("sep", "\t"))
+        )
+        self._n_rows = kwargs.get(
+            "nr_rows",
+            kwargs.get("n_rows", kwargs.get("read_nr_rows", kwargs.get("read_n_rows"))),
+        )
 
         super().__init__(*args, **kwargs)
 
     def _load_file(self) -> None:
         self._data = pl.read_csv(
             self._path,
-            comment_prefix='//',
+            comment_prefix="//",
             encoding=self._encoding,
             separator=self._separator,
             n_rows=self._n_rows,
@@ -41,7 +41,7 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
                     pl.col("DAY").str.zfill(2),
                 ],
                 separator="-",
-            ).alias('SDATE'),
+            ).alias("SDATE"),
             pl.concat_str(
                 [
                     pl.col("HOUR").str.zfill(2),
@@ -49,32 +49,29 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
                     # pl.col("SECOND").str.zfill(2),
                 ],
                 separator=":",
-            ).alias('STIME'),
+            ).alias("STIME"),
         )
 
 
 class OdvProfilePolarsDataFile(PolarsDataFile):
     def __init__(self, *args, **kwargs):
-        self._separator = kwargs.get("separator",
-                                     kwargs.get("delimiter",
-                                                kwargs.get("sep", '\t')))
-        self._n_rows = kwargs.get("nr_rows",
-                       kwargs.get("n_rows",
-                       kwargs.get("read_nr_rows",
-                       kwargs.get("read_n_rows"))))
+        self._separator = kwargs.get(
+            "separator", kwargs.get("delimiter", kwargs.get("sep", "\t"))
+        )
+        self._n_rows = kwargs.get(
+            "nr_rows",
+            kwargs.get("n_rows", kwargs.get("read_nr_rows", kwargs.get("read_n_rows"))),
+        )
 
         super().__init__(*args, **kwargs)
 
     def _load_file(self) -> None:
         self._data = pl.read_csv(
             self._path,
-            comment_prefix='//',
+            comment_prefix="//",
             encoding=self._encoding,
             separator=self._separator,
             n_rows=self._n_rows,
             infer_schema=False,
             missing_utf8_is_empty_string=True,
         )
-
-
-

@@ -187,8 +187,12 @@ class PolarsTransformer(ABC):
         return self.get_transformer_description()
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
-        if data_holder.data_type_internal != 'unknown' and data_holder.data_type_internal not in config.get_valid_data_types(
-            valid=self.valid_data_types, invalid=self.invalid_data_types
+        if (
+            data_holder.data_type_internal != "unknown"
+            and data_holder.data_type_internal
+            not in config.get_valid_data_types(
+                valid=self.valid_data_types, invalid=self.invalid_data_types
+            )
         ):
             adm_logger.log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} for transformer"
@@ -245,14 +249,11 @@ class PolarsTransformer(ABC):
         )
 
     def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
-        data_holder.data = data_holder.data.with_columns(
-            pl.lit("").alias(col)
-        )
+        data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
 
-    def _add_to_col_to_set(self,
-                           data_holder: "PolarsDataHolder",
-                           lookup_name,
-                           new_name: str) -> None:
+    def _add_to_col_to_set(
+        self, data_holder: "PolarsDataHolder", lookup_name, new_name: str
+    ) -> None:
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col(self.source_col) == lookup_name)
             .then(pl.lit(new_name))

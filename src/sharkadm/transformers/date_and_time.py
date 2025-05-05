@@ -7,7 +7,8 @@ from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
     PolarsTransformer,
-    Transformer, PolarsDataHolderProtocol,
+    Transformer,
+    PolarsDataHolderProtocol,
 )
 
 DATETIME_FORMATS = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d")

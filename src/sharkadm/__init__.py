@@ -19,6 +19,6 @@ def update_nodc_config_directory_from_svn() -> None:
 try:
     update_nodc_config_directory_from_svn()
 except FileNotFoundError as e:
-    print(f'Could not find file: {e}')
+    print(f"Could not find file: {e}")
 except Exception as e:
     print(e)

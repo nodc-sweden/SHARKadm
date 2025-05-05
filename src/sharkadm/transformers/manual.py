@@ -82,21 +82,20 @@ class PolarsManualSealPathology(PolarsTransformer):
         md5 = "364768f88de5f22c0e415150eddee722"
         if md5 not in data_holder.data["shark_sample_id_md5"]:
             return
-        adm_logger.log_transformation(f"Setting manual info for md5: {md5}", level=adm_logger.INFO)
+        adm_logger.log_transformation(
+            f"Setting manual info for md5: {md5}", level=adm_logger.INFO
+        )
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col("shark_sample_id_md5") == md5)
             .then(pl.lit("2018"))
             .otherwise(pl.col("visit_year"))
             .alias("visit_year"),
-
             pl.when(pl.col("shark_sample_id_md5") == md5)
             .then(pl.lit("01"))
             .otherwise(pl.col("visit_month"))
             .alias("visit_month"),
-
             pl.when(pl.col("shark_sample_id_md5") == md5)
             .then(pl.lit("2018-01-01"))
             .otherwise(pl.col("sample_date"))
             .alias("sample_date"),
-            )
-
+        )

@@ -27,7 +27,9 @@ class PositionPolars(PolarsMultiTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        string_list = ["Performs the following transformations needed to add position information:"]
+        string_list = [
+            "Performs the following transformations needed to add position information:"
+        ]
         for trans in PositionPolars._transformers:
             string_list.append(f"    {trans.get_transformer_description()}")
         return "\n".join(string_list)

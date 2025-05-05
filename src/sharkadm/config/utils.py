@@ -3,7 +3,7 @@ import pathlib
 
 
 def get_user_given_config_dir() -> pathlib.Path | None:
-    path = pathlib.Path(os.getcwd()) / 'config_directory.txt'
+    path = pathlib.Path(os.getcwd()) / "config_directory.txt"
     if not path.exists():
         return
     with open(path) as fid:

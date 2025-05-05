@@ -62,4 +62,4 @@ class PolarsAddPhysicalChemicalKey(PolarsTransformer):
                 pl.col("visit_id"),
                 separator="_",
             ).alias(self.col_to_set)
-            )
+        )

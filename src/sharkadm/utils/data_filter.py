@@ -51,9 +51,7 @@ class PolarsDataFilter(ABC):
         obj._invert = True
         return obj
 
-    def get_filter_mask(
-            self, data_holder: PolarsDataHolder
-    ) -> pl.expr.expr.Expr | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.expr.expr.Expr | None:
         mask = self._get_filter_mask(data_holder)
         if self._invert:
             return ~mask
@@ -61,10 +59,12 @@ class PolarsDataFilter(ABC):
 
 
 class PolarsCombinedDataFilter:
-
-    def __init__(self, mask: Mask | CombinedMask,
-                 _and: Mask | CombinedMask = None,
-                 _or: Mask | CombinedMask = None):
+    def __init__(
+        self,
+        mask: Mask | CombinedMask,
+        _and: Mask | CombinedMask = None,
+        _or: Mask | CombinedMask = None,
+    ):
         self._mask = mask
         self._and = _and
         self._or = _or
@@ -73,9 +73,9 @@ class PolarsCombinedDataFilter:
     def __repr__(self):
         string = f"{self._mask}"
         if self._and:
-            string = ' and '.join([string, f"{self._and}"])
+            string = " and ".join([string, f"{self._and}"])
         elif self._or:
-            string = ' or '.join([string, f"{self._or}"])
+            string = " or ".join([string, f"{self._or}"])
         return f"({string})"
 
     def __and__(self, other):
@@ -95,13 +95,15 @@ class PolarsCombinedDataFilter:
     def name(self) -> str:
         return str(self)
 
-    def get_filter_mask(
-        self, data_holder: PolarsDataHolder
-    ) -> pl.expr.expr.Expr | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.expr.expr.Expr | None:
         if self._and:
-            mask = self._mask.get_filter_mask(data_holder) & self._and.get_filter_mask(data_holder)
+            mask = self._mask.get_filter_mask(data_holder) & self._and.get_filter_mask(
+                data_holder
+            )
         elif self._or:
-            mask = self._mask.get_filter_mask(data_holder) | self._or.get_filter_mask(data_holder)
+            mask = self._mask.get_filter_mask(data_holder) | self._or.get_filter_mask(
+                data_holder
+            )
         else:
             mask = self._mask.get_filter_mask(data_holder)
 
@@ -151,7 +153,6 @@ class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
 
 
 class PolarsDataFilterLocation(PolarsDataFilter):
-
     def __init__(self, locations: list[str]):
         super().__init__()
         self._locations = locations
@@ -161,7 +162,6 @@ class PolarsDataFilterLocation(PolarsDataFilter):
         for col in self._locations[1:]:
             mask = mask | data_holder.data[col]
         return mask
-
 
 
 class PolarsDataFilterRestrictAreaO(PolarsDataFilter):
@@ -197,9 +197,13 @@ class PolarsDataFilterYears(PolarsDataFilter):
         self._str_years = [str(y) for y in years]
 
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        return data_holder.data.with_columns(
-            ok_years=pl.col("visit_year").is_in(self._str_years)
-        ).select("ok_years").to_series()
+        return (
+            data_holder.data.with_columns(
+                ok_years=pl.col("visit_year").is_in(self._str_years)
+            )
+            .select("ok_years")
+            .to_series()
+        )
 
 
 class PolarsDataFilterInside12nm(PolarsDataFilter):
@@ -264,5 +268,3 @@ if __name__ == "__main__":
     o_filter = PolarsDataFilterRestrictAreaO()
     inside_12nm_filter = PolarsDataFilterInside12nm()
     outside_12nm_filter = ~inside_12nm_filter
-
-

@@ -1,4 +1,3 @@
-
 import pathlib
 from typing import Protocol
 
@@ -25,10 +24,10 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
     _data_structure = "profile"
 
     def __init__(
-            self,
-            path: str | pathlib.Path | None = None,
-            header_mapper: HeaderMapper = None,
-            **kwargs
+        self,
+        path: str | pathlib.Path | None = None,
+        header_mapper: HeaderMapper = None,
+        **kwargs,
     ):
         super().__init__()
         root_path = pathlib.Path(path)
@@ -39,12 +38,16 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
         if root_path.is_file():
             self._paths = [root_path]
         else:
-            self._paths = [p for p in root_path.iterdir() if p.suffix == '.txt' and p.name.upper().startswith('SBE')]
+            self._paths = [
+                p
+                for p in root_path.iterdir()
+                if p.suffix == ".txt" and p.name.upper().startswith("SBE")
+            ]
 
         self._header_mapper = header_mapper
 
         self._data: pl.DataFrame = pl.DataFrame()
-        self._dataset_name = f'ProfileStandardFormat_{root_path.name}'
+        self._dataset_name = f"ProfileStandardFormat_{root_path.name}"
 
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
@@ -83,7 +86,7 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
         dfs = []
         columns = None
         for path in self._paths:
-            print(f'{path=}')
+            print(f"{path=}")
             data_source = StandardFormatPolarsDataFile(
                 path=path, data_type=self.data_type, **self._kwargs
             )

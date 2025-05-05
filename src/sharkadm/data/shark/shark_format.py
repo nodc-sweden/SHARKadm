@@ -13,19 +13,15 @@ from sharkadm import sharkadm_exceptions
 class PolarsSharkDataHolder(PolarsDataHolder):
     _data_type: str | None = None
     _data_type_internal: str | None = None
-    _data_format: str | None = 'all'
+    _data_format: str | None = "all"
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(
-            self,
-            path: str | pathlib.Path | None = None,
-            **kwargs
-    ):
+    def __init__(self, path: str | pathlib.Path | None = None, **kwargs):
         super().__init__()
         self._path = pathlib.Path(path)
-        self._encoding = kwargs.get('encoding', 'cp1252')
-        self._separator = kwargs.get('separator', kwargs.get('delimiter', '\t'))
+        self._encoding = kwargs.get("encoding", "cp1252")
+        self._separator = kwargs.get("separator", kwargs.get("delimiter", "\t"))
 
         self._data: pl.DataFrame = pl.DataFrame()
         self._dataset_name: str | None = None
@@ -50,11 +46,8 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._import_matrix_mapper = self._import_matrix.get_mapper(self.data_format)
 
     def _load_data(self) -> None:
-        d_source = CsvRowFormatPolarsDataFile(
-            path=self._path,
-            encoding=self._encoding
-        )
-        for col in ['Datatyp', 'Data type', 'DTYPE', 'delivery_datatype', 'data_type']:
+        d_source = CsvRowFormatPolarsDataFile(path=self._path, encoding=self._encoding)
+        for col in ["Datatyp", "Data type", "DTYPE", "delivery_datatype", "data_type"]:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])
                 if len(all_data_types) > 1:
@@ -67,17 +60,16 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         else:
             data_type_internal = ""
 
-
-        if 'physical' in data_type_internal:
+        if "physical" in data_type_internal:
             data_type_internal = "physicalchemical"
-        elif 'imaging' in data_type_internal:
-            data_type_internal = 'plankton_imaging'
-        elif 'dropvideo' in data_type_internal:
-            data_type_internal = 'epibenthos_dropvideo'
-        elif 'grey' in data_type_internal:
-            data_type_internal = 'greyseal'
-        elif 'ringed' in data_type_internal:
-            data_type_internal = 'ringedseal'
+        elif "imaging" in data_type_internal:
+            data_type_internal = "plankton_imaging"
+        elif "dropvideo" in data_type_internal:
+            data_type_internal = "epibenthos_dropvideo"
+        elif "grey" in data_type_internal:
+            data_type_internal = "greyseal"
+        elif "ringed" in data_type_internal:
+            data_type_internal = "ringedseal"
 
         self._data_type_internal = data_type_internal
 
@@ -92,7 +84,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         return """Holds data from shark export"""
 
     def _initiate(self) -> None:
-        self._dataset_name = f'SHARK_export_{self._path.stem}'
+        self._dataset_name = f"SHARK_export_{self._path.stem}"
 
     @property
     def name(self) -> str:
@@ -159,4 +151,3 @@ class PolarsSharkDataHolder(PolarsDataHolder):
     @property
     def max_latitude(self) -> str:
         return str(max(self.data["sample_latitude_dd"].cast(float)))
-

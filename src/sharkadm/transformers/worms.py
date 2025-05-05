@@ -186,7 +186,7 @@ class PolarsAddWormsScientificName(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_empty_col_to_set(data_holder)
-        for (name, ), df in data_holder.data.group_by(self.source_col):
+        for (name,), df in data_holder.data.group_by(self.source_col):
             new_name = translate_worms.get(str(name))
             if new_name:
                 adm_logger.log_transformation(
@@ -207,8 +207,10 @@ class PolarsAddWormsAphiaId(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Adds {PolarsAddWormsAphiaId.col_to_set} "
-                f"from {PolarsAddWormsAphiaId.source_col}")
+        return (
+            f"Adds {PolarsAddWormsAphiaId.col_to_set} "
+            f"from {PolarsAddWormsAphiaId.source_col}"
+        )
 
     @adm_logger.log_time
     def _transform(self, data_holder: PolarsDataHolder) -> None:
@@ -218,7 +220,7 @@ class PolarsAddWormsAphiaId(PolarsTransformer):
             )
             self._add_empty_col_to_set(data_holder)
 
-        for (source_name, ), df in data_holder.data.group_by(self.source_col):
+        for (source_name,), df in data_holder.data.group_by(self.source_col):
             try:
                 aphia_id = taxa_worms.get_aphia_id(str(source_name))
             except Exception as e:
@@ -257,4 +259,3 @@ class PolarsSetAphiaIdFromReportedAphiaId(PolarsTransformer):
         adm_logger.log_transformation(
             f"Setting {self.col_to_set} from {self.source_col}", level=adm_logger.DEBUG
         )
-

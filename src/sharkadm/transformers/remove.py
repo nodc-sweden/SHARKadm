@@ -14,7 +14,8 @@ from ..utils.data_filter import (
 from .base import (
     DataHolderProtocol,
     PolarsTransformer,
-    Transformer, PolarsDataHolderProtocol,
+    Transformer,
+    PolarsDataHolderProtocol,
 )
 
 
@@ -506,8 +507,8 @@ class SetMaxLengthOfValuesInColumns(Transformer):
 
 
 class PolarsRemoveProfiles(PolarsTransformer):
-    valid_data_types = ('profile', )
-    valid_data_holders = ('PolarsZipArchiveDataHolder', )
+    valid_data_types = ("profile",)
+    valid_data_holders = ("PolarsZipArchiveDataHolder",)
 
     def __init__(
         self,
@@ -530,8 +531,8 @@ class PolarsRemoveProfiles(PolarsTransformer):
             )
             return
         remove_df = data_holder.data.filter(mask)
-        file_names_to_remove = list(set(remove_df['profile_file_name_db']))
-        file_names_to_remove.append('metadata.txt')
+        file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
+        file_names_to_remove.append("metadata.txt")
         data_holder.remove_files_in_processed_directory(file_names_to_remove)
 
 
@@ -541,10 +542,7 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
     parameter_column = "parameter"
     value_column = "value"
 
-    def __init__(self,
-                 *parameters: str,
-                 replace_value: str = "",
-                 **kwargs) -> None:
+    def __init__(self, *parameters: str, replace_value: str = "", **kwargs) -> None:
         super().__init__(**kwargs)
         self._replace_value = replace_value
         self.apply_on_parameters = parameters
@@ -553,8 +551,10 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Removes or replaces value column in rows for given parameters. "
-                "Transformer also takes data filter. ")
+        return (
+            "Removes or replaces value column in rows for given parameters. "
+            "Transformer also takes data filter. "
+        )
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.parameter_column not in data_holder.data:
@@ -572,7 +572,8 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.when(mask)
                 .then(pl.lit(self._replace_value))
-                .otherwise(pl.col(self.value_column)).alias(self.value_column)
+                .otherwise(pl.col(self.value_column))
+                .alias(self.value_column)
             )
 
             nr_rows = len(data_holder.data.filter(mask))
@@ -597,9 +598,11 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Removes all values in given columns. "
-                "Column names can be perfect match or regular expresiones. "
-                "Option to set replace_value. Transformer also takes data filter. ")
+        return (
+            "Removes all values in given columns. "
+            "Column names can be perfect match or regular expresiones. "
+            "Option to set replace_value. Transformer also takes data filter. "
+        )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         filter_mask = self._get_filter_mask(data_holder)
@@ -617,8 +620,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
                 nr_rows = len(data_holder.data.filter(filter_mask))
             else:
                 data_holder.data = data_holder.data.with_columns(
-                    pl.lit(self._replace_value)
-                    .alias(col)
+                    pl.lit(self._replace_value).alias(col)
                 )
                 nr_rows = len(data_holder.data)
             if self._replace_value:

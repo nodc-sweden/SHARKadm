@@ -43,7 +43,7 @@ class ApprovedData:
         dfs = []
         directory = CONFIG_DIRECTORY / "sharkadm" / "approved_data"
         for path in directory.iterdir():
-            if path.suffix != '.csv':
+            if path.suffix != ".csv":
                 continue
             dfs.append(pl.read_csv(path))
         self._df = pl.concat(dfs)

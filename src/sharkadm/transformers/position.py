@@ -221,7 +221,6 @@ class PolarsAddReportedPosition(Transformer):
             .then(pl.col("sample_reported_latitude"))
             .otherwise(pl.col("visit_reported_latitude"))
             .alias("reported_latitude"),
-
             pl.when(pl.col("sample_reported_longitude") != "")
             .then(pl.col("sample_reported_longitude"))
             .otherwise(pl.col("visit_reported_longitude"))
@@ -277,8 +276,9 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
             return
         self._add_empty_col(data_holder, self.lat_col_to_set)
         self._add_empty_col(data_holder, self.lon_col_to_set)
-        for (lat, lon), df in data_holder.data.group_by([self.lat_source_col,
-                                                         self.lon_source_col]):
+        for (lat, lon), df in data_holder.data.group_by(
+            [self.lat_source_col, self.lon_source_col]
+        ):
             new_lat, new_lon = self._get(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
@@ -398,14 +398,18 @@ class PolarsAddSamplePositionDDAsFloat(PolarsTransformer):
         super().__init__(*args, **kwargs)
         self._nr_decimals = nr_decimals
 
-
     @staticmethod
     def get_transformer_description() -> str:
         return "Creates position_dd columns with float values"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.col(self.lat_source_col).cast(float).round(self._nr_decimals).alias(self.lat_col_to_set),
-            pl.col(self.lon_source_col).cast(float).round(self._nr_decimals).alias(self.lon_col_to_set),
-
+            pl.col(self.lat_source_col)
+            .cast(float)
+            .round(self._nr_decimals)
+            .alias(self.lat_col_to_set),
+            pl.col(self.lon_source_col)
+            .cast(float)
+            .round(self._nr_decimals)
+            .alias(self.lon_col_to_set),
         )

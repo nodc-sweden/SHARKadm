@@ -154,8 +154,12 @@ class PolarsMultiTransformer(Transformer):
         return self.get_transformer_description()
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
-        if data_holder.data_type_internal != 'unknown' and data_holder.data_type_internal not in config.get_valid_data_types(
-            valid=self.valid_data_types, invalid=self.invalid_data_types
+        if (
+            data_holder.data_type_internal != "unknown"
+            and data_holder.data_type_internal
+            not in config.get_valid_data_types(
+                valid=self.valid_data_types, invalid=self.invalid_data_types
+            )
         ):
             adm_logger.log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} "
@@ -196,7 +200,7 @@ class PolarsMultiTransformer(Transformer):
         )
         t0 = time.time()
         for trans in self._transformers:
-            print(f'{trans=}')
+            print(f"{trans=}")
             trans().transform(data_holder=data_holder)
         adm_logger.log_workflow(
             f"Multi transformer {self.__class__.__name__} executed "

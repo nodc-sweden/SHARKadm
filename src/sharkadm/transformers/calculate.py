@@ -414,39 +414,47 @@ class old_CleanupCalculations(Transformer):
 
 
 class ColCalculateAbundance(Transformer):
-    count_col = 'COPY_VARIABLE.# counted.ind/analysed sample fraction'
-    abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
-    coef_col = 'coefficient'
+    count_col = "COPY_VARIABLE.# counted.ind/analysed sample fraction"
+    abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
+    coef_col = "coefficient"
     # col_must_exist = 'reported_value'
     # parameter = 'Abundance'
     # col_to_set = 'calculated_value'
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Calculating {CalculateAbundance.parameter}. Setting value to column {CalculateAbundance.col_to_set}'
+        return f"Calculating {CalculateAbundance.parameter}. Setting value to column {CalculateAbundance.col_to_set}"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['reported_abundance'] = data_holder.data[self.abundance_col]
-        boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '')
-        data_holder.data.loc[boolean, 'calculated_abundance'] = (
-                    data_holder.data.loc[boolean, self.count_col].astype(float) * data_holder.data.loc[boolean, self.coef_col].astype(float)).round(1)
+        data_holder.data["reported_abundance"] = data_holder.data[self.abundance_col]
+        boolean = (data_holder.data[self.count_col] != "") & (
+            data_holder.data[self.coef_col] != ""
+        )
+        data_holder.data.loc[boolean, "calculated_abundance"] = (
+            data_holder.data.loc[boolean, self.count_col].astype(float)
+            * data_holder.data.loc[boolean, self.coef_col].astype(float)
+        ).round(1)
 
-        max_boolean = data_holder.data.loc[boolean, 'calculated_abundance'] > (
-                    data_holder.data.loc[boolean, self.abundance_col].astype(float) * 2)
-        min_boolean = data_holder.data.loc[boolean, 'calculated_abundance'] < (
-                    data_holder.data.loc[boolean, self.abundance_col].astype(float) * 0.5)
+        max_boolean = data_holder.data.loc[boolean, "calculated_abundance"] > (
+            data_holder.data.loc[boolean, self.abundance_col].astype(float) * 2
+        )
+        min_boolean = data_holder.data.loc[boolean, "calculated_abundance"] < (
+            data_holder.data.loc[boolean, self.abundance_col].astype(float) * 0.5
+        )
         out_of_range_boolean = max_boolean | min_boolean
         for i, row in data_holder.data[out_of_range_boolean].iterrows():
             # Log here
             pass
-        data_holder.data.loc[out_of_range_boolean, self.abundance_col] = data_holder.data.loc[out_of_range_boolean, 'calculated_abundance']
-        data_holder.data.loc[out_of_range_boolean, 'calc_by_dc_abundance'] = 'Y'
+        data_holder.data.loc[out_of_range_boolean, self.abundance_col] = (
+            data_holder.data.loc[out_of_range_boolean, "calculated_abundance"]
+        )
+        data_holder.data.loc[out_of_range_boolean, "calc_by_dc_abundance"] = "Y"
 
 
 class ColCalculateBiovolume(Transformer):
-    abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
-    reported_cell_volume_col = 'reported_cell_volume_um3'
-    calculated_cell_volume_col = 'bvol_cell_volume_um3'
+    abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
+    reported_cell_volume_col = "reported_cell_volume_um3"
+    calculated_cell_volume_col = "bvol_cell_volume_um3"
     # size_class_col = 'size_class'
     # aphia_id_col = 'aphia_id'
     # reported_cell_volume_col = 'reported_cell_volume_um3'
@@ -456,22 +464,29 @@ class ColCalculateBiovolume(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Calculating {CalculateBiovolume.parameter}. Setting value to column {CalculateBiovolume.col_to_set}'
+        return f"Calculating {CalculateBiovolume.parameter}. Setting value to column {CalculateBiovolume.col_to_set}"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['cell_volume'] = data_holder.data[self.reported_cell_volume_col]
-        bool_cell = data_holder.data[self.calculated_cell_volume_col] != ''
-        data_holder.data.loc[bool_cell, 'cell_volume'] = data_holder.data.loc[bool_cell, self.calculated_cell_volume_col]
+        data_holder.data["cell_volume"] = data_holder.data[self.reported_cell_volume_col]
+        bool_cell = data_holder.data[self.calculated_cell_volume_col] != ""
+        data_holder.data.loc[bool_cell, "cell_volume"] = data_holder.data.loc[
+            bool_cell, self.calculated_cell_volume_col
+        ]
 
-        data_holder.data['COPY_VARIABLE.Biovolume concentration.mm3/l'] = data_holder.data[self.abundance_col].astype(float) * data_holder.data['cell_volume'].astype(float)
-        data_holder.data['calculated_biovolume'] = data_holder.data['COPY_VARIABLE.Biovolume concentration.mm3/l']
-        data_holder.data['calc_by_dc_biovolume'] = 'Y'
+        data_holder.data["COPY_VARIABLE.Biovolume concentration.mm3/l"] = (
+            data_holder.data[self.abundance_col].astype(float)
+            * data_holder.data["cell_volume"].astype(float)
+        )
+        data_holder.data["calculated_biovolume"] = data_holder.data[
+            "COPY_VARIABLE.Biovolume concentration.mm3/l"
+        ]
+        data_holder.data["calc_by_dc_biovolume"] = "Y"
 
 
 class ColCalculateCarbon(Transformer):
-    abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
-    carbon_col = 'COPY_VARIABLE.Carbon concentration.ugC/l'
-    carbon_per_volume_col = 'bvol_carbon_per_volume'
+    abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
+    carbon_col = "COPY_VARIABLE.Carbon concentration.ugC/l"
+    carbon_per_volume_col = "bvol_carbon_per_volume"
 
     # size_class_col = 'size_class'
     # aphia_id_col = 'aphia_id'
@@ -482,87 +497,111 @@ class ColCalculateCarbon(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Calculating {CalculateCarbon.parameter}. Setting value to column {CalculateCarbon.col_to_set}'
+        return f"Calculating {CalculateCarbon.parameter}. Setting value to column {CalculateCarbon.col_to_set}"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data['reported_carbon'] = data_holder.data[self.carbon_col]
-        bool_carbon = data_holder.data[self.carbon_per_volume_col] != ''
+        data_holder.data["reported_carbon"] = data_holder.data[self.carbon_col]
+        bool_carbon = data_holder.data[self.carbon_per_volume_col] != ""
 
-        data_holder.data['calculated_carbon'] = data_holder.data.loc[bool_carbon, self.abundance_col].astype(float) * data_holder.data.loc[
-            bool_carbon, self.carbon_per_volume_col].astype(float)
-        max_boolean = data_holder.data.loc[bool_carbon, 'calculated_carbon'] > (data_holder.data.loc[bool_carbon, self.carbon_col].astype(float) * 2)
-        min_boolean = data_holder.data.loc[bool_carbon, 'calculated_carbon'] < (data_holder.data.loc[bool_carbon, self.carbon_col].astype(float) * 0.5)
+        data_holder.data["calculated_carbon"] = data_holder.data.loc[
+            bool_carbon, self.abundance_col
+        ].astype(float) * data_holder.data.loc[
+            bool_carbon, self.carbon_per_volume_col
+        ].astype(float)
+        max_boolean = data_holder.data.loc[bool_carbon, "calculated_carbon"] > (
+            data_holder.data.loc[bool_carbon, self.carbon_col].astype(float) * 2
+        )
+        min_boolean = data_holder.data.loc[bool_carbon, "calculated_carbon"] < (
+            data_holder.data.loc[bool_carbon, self.carbon_col].astype(float) * 0.5
+        )
         out_of_range_boolean = max_boolean | min_boolean
         for i, row in data_holder.data[out_of_range_boolean].iterrows():
             # Log here
             pass
-        data_holder.data.loc[out_of_range_boolean, self.abundance_col] = data_holder.data.loc[out_of_range_boolean, 'calculated_carbon']
-        data_holder.data.loc[out_of_range_boolean, 'calc_by_dc_carbon'] = 'Y'
-        data_holder.data['carbon_unit'] = 'ugC/l'
+        data_holder.data.loc[out_of_range_boolean, self.abundance_col] = (
+            data_holder.data.loc[out_of_range_boolean, "calculated_carbon"]
+        )
+        data_holder.data.loc[out_of_range_boolean, "calc_by_dc_carbon"] = "Y"
+        data_holder.data["carbon_unit"] = "ugC/l"
 
 
 class FixReportedValueAfterCalculations(Transformer):
-
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Setting reported_value after calculations'
+        return f"Setting reported_value after calculations"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if data_holder.data_structure != 'row':
+        if data_holder.data_structure != "row":
             adm_logger.log_transformation(
-                f'Could not fix reported value. Data is not in row format',
-                level=adm_logger.ERROR)
+                f"Could not fix reported value. Data is not in row format",
+                level=adm_logger.ERROR,
+            )
             return
-        data_holder.data['calc_by_dc'] = ''
-        data_holder.data['reported_value'] = ''
+        data_holder.data["calc_by_dc"] = ""
+        data_holder.data["reported_value"] = ""
 
         self._fix_abundance(data_holder)
         self._fix_carbon(data_holder)
 
     @staticmethod
     def _fix_abundance(data_holder: DataHolderProtocol) -> None:
-        boolean = (data_holder.data['parameter'] == 'Abundance') & (data_holder.data['calc_by_dc_abundance'] == 'Y')
-        data_holder.data.loc[boolean, 'calc_by_dc'] = 'Y'
-        data_holder.data.loc[boolean, 'reported_value'] = data_holder.data.loc[boolean, 'reported_abundance']
+        boolean = (data_holder.data["parameter"] == "Abundance") & (
+            data_holder.data["calc_by_dc_abundance"] == "Y"
+        )
+        data_holder.data.loc[boolean, "calc_by_dc"] = "Y"
+        data_holder.data.loc[boolean, "reported_value"] = data_holder.data.loc[
+            boolean, "reported_abundance"
+        ]
 
     @staticmethod
     def _fix_carbon(data_holder: DataHolderProtocol) -> None:
-        boolean = (data_holder.data['parameter'] == 'Carbon concentration') & (data_holder.data['calc_by_dc_carbon'] == 'Y')
-        data_holder.data.loc[boolean, 'calc_by_dc'] = 'Y'
-        data_holder.data.loc[boolean, 'reported_value'] = data_holder.data.loc[boolean, 'reported_carbon']
+        boolean = (data_holder.data["parameter"] == "Carbon concentration") & (
+            data_holder.data["calc_by_dc_carbon"] == "Y"
+        )
+        data_holder.data.loc[boolean, "calc_by_dc"] = "Y"
+        data_holder.data.loc[boolean, "reported_value"] = data_holder.data.loc[
+            boolean, "reported_carbon"
+        ]
 
 
 class PolarsCalculateAbundance(PolarsTransformer):
-    valid_data_structures = ('column', )
-    count_col = 'COPY_VARIABLE.# counted.ind/analysed sample fraction'
-    abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
-    coef_col = 'coefficient'
+    valid_data_structures = ("column",)
+    count_col = "COPY_VARIABLE.# counted.ind/analysed sample fraction"
+    abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
+    coef_col = "coefficient"
     col_to_set = "calculated_abundance"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Calculating abundance. Setting value to column {PolarsCalculateAbundance.col_to_set}'
+        return f"Calculating abundance. Setting value to column {PolarsCalculateAbundance.col_to_set}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.col(self.abundance_col).alias('reported_abundance')
+            pl.col(self.abundance_col).alias("reported_abundance")
         )
         self._add_empty_col_to_set(data_holder)
 
-        boolean = (data_holder.data[self.count_col] != '') & (data_holder.data[self.coef_col] != '')
+        boolean = (data_holder.data[self.count_col] != "") & (
+            data_holder.data[self.coef_col] != ""
+        )
 
         data_holder.data = data_holder.data.with_columns(
             pl.when(boolean)
-            .then(pl.col(self.count_col).cast(float) * pl.col(self.coef_col).cast(float).round(1))
+            .then(
+                pl.col(self.count_col).cast(float)
+                * pl.col(self.coef_col).cast(float).round(1)
+            )
             .otherwise(pl.col(self.col_to_set))
             .alias(self.col_to_set)
         )
 
         max_boolean = data_holder.data.filter(boolean)[self.col_to_set].cast(float) > (
-                data_holder.data.filter(boolean)[self.abundance_col].cast(float) * 2)
+            data_holder.data.filter(boolean)[self.abundance_col].cast(float) * 2
+        )
 
         min_boolean = data_holder.data.filter(boolean)[self.col_to_set].cast(float) < (
-                data_holder.data.filter(boolean)[self.abundance_col].cast(float) * 0.5)
+            data_holder.data.filter(boolean)[self.abundance_col].cast(float) * 0.5
+        )
 
         out_of_range_boolean = max_boolean | min_boolean
 
@@ -575,14 +614,14 @@ class PolarsCalculateAbundance(PolarsTransformer):
             .then(pl.lit("Y"))
             .otherwise(pl.lit(""))
             .alias("calc_by_dc_abundance"),
-            )
+        )
 
 
 class PolarsCalculateBiovolume(PolarsTransformer):
-    new_bvol_col = 'COPY_VARIABLE.Biovolume concentration.mm3/l'
-    abundance_col = 'COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l'
-    reported_cell_volume_col = 'reported_cell_volume_um3'
-    calculated_cell_volume_col = 'bvol_cell_volume_um3'
+    new_bvol_col = "COPY_VARIABLE.Biovolume concentration.mm3/l"
+    abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
+    reported_cell_volume_col = "reported_cell_volume_um3"
+    calculated_cell_volume_col = "bvol_cell_volume_um3"
     aphia_id_size_class_map_col = "aphia_id_and_size_class"
     # size_class_col = 'size_class'
     # aphia_id_col = 'aphia_id'
@@ -593,34 +632,42 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f'Calculating biovolume. Setting value to column {PolarsCalculateBiovolume.col_to_set}'
+        return f"Calculating biovolume. Setting value to column {PolarsCalculateBiovolume.col_to_set}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.aphia_id_size_class_map_col not in data_holder.data:
             data_holder.data = data_holder.data.with_columns(
-                pl.concat_str([
-                    pl.col("bvol_aphia_id"),
-                    pl.col("bvol_size_class"),
-                ], separator=":").alias(self.aphia_id_size_class_map_col)
+                pl.concat_str(
+                    [
+                        pl.col("bvol_aphia_id"),
+                        pl.col("bvol_size_class"),
+                    ],
+                    separator=":",
+                ).alias(self.aphia_id_size_class_map_col)
             )
         volume_mapper = _nomp.get_calculated_volume_mapper()
-        data_holder.data = data_holder.data.with_columns(
-
-        )
+        data_holder.data = data_holder.data.with_columns()
 
         data_holder.data = data_holder.data.with_columns(
-            pl.col(self.reported_cell_volume_col).alias('cell_volume')
+            pl.col(self.reported_cell_volume_col).alias("cell_volume")
         )
 
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col(self.calculated_cell_volume_col) != "")
             .then()
             .otherwise()
-            .alias('cell_volume')
+            .alias("cell_volume")
         )
-        bool_cell = data_holder.data[self.calculated_cell_volume_col] != ''
-        data_holder.data.loc[bool_cell, 'cell_volume'] = data_holder.data.loc[bool_cell, self.calculated_cell_volume_col]
+        bool_cell = data_holder.data[self.calculated_cell_volume_col] != ""
+        data_holder.data.loc[bool_cell, "cell_volume"] = data_holder.data.loc[
+            bool_cell, self.calculated_cell_volume_col
+        ]
 
-        data_holder.data['COPY_VARIABLE.Biovolume concentration.mm3/l'] = data_holder.data[self.abundance_col].astype(float) * data_holder.data['cell_volume'].astype(float)
-        data_holder.data['calculated_biovolume'] = data_holder.data['COPY_VARIABLE.Biovolume concentration.mm3/l']
-        data_holder.data['calc_by_dc_biovolume'] = 'Y'
+        data_holder.data["COPY_VARIABLE.Biovolume concentration.mm3/l"] = (
+            data_holder.data[self.abundance_col].astype(float)
+            * data_holder.data["cell_volume"].astype(float)
+        )
+        data_holder.data["calculated_biovolume"] = data_holder.data[
+            "COPY_VARIABLE.Biovolume concentration.mm3/l"
+        ]
+        data_holder.data["calc_by_dc_biovolume"] = "Y"

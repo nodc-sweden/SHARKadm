@@ -43,7 +43,7 @@ from sharkadm.transformers.dataset_name import (
     AddDatasetFileName,
     AddDatasetName,
     PolarsAddDatasetFileName,
-    PolarsAddDatasetName
+    PolarsAddDatasetName,
 )
 from sharkadm.transformers.datatype import (
     AddDatatype,
@@ -93,7 +93,6 @@ from sharkadm.transformers.dyntaxa import (
     PolarsAddDyntaxaTranslatedScientificNameDyntaxaId,
     PolarsAddTaxonRanks,
     PolarsAddDyntaxaId,
-
 )
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
@@ -140,7 +139,7 @@ from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import (
     ManualHarbourPorpoise,
     ManualSealPathology,
-    PolarsManualSealPathology
+    PolarsManualSealPathology,
 )
 from sharkadm.transformers.map_header import ArchiveMapper
 from sharkadm.transformers.map_parameter_column import (
@@ -179,7 +178,6 @@ from sharkadm.transformers.remove import (
     PolarsRemoveProfiles,
     PolarsRemoveValueInRowsForParameters,
     PolarsRemoveValueInColumns,
-
     RemoveDeepestDepthAtEachVisit,
     RemoveInterval,
     RemoveReportedValueIfNotCalculated,
@@ -225,8 +223,11 @@ from sharkadm.transformers.station import (
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
 from sharkadm.transformers.strip import StripAllValues, StripAllValuesPolars
-from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey, \
-    PolarsAddPhysicalChemicalKey
+from sharkadm.transformers.visit import (
+    AddVisitKey,
+    PolarsAddVisitKey,
+    PolarsAddPhysicalChemicalKey,
+)
 from sharkadm.transformers.wide_to_long import PolarsWideToLong, WideToLong
 from sharkadm.transformers.worms import (
     AddReportedAphiaId,

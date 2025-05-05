@@ -1,4 +1,3 @@
-
 import pathlib
 from typing import Protocol
 
@@ -25,10 +24,10 @@ class PolarsOdvDataHolder(PolarsDataHolder):
     _data_structure = "profile"
 
     def __init__(
-            self,
-            path: str | pathlib.Path | None = None,
-            header_mapper: HeaderMapper = None,
-            **kwargs
+        self,
+        path: str | pathlib.Path | None = None,
+        header_mapper: HeaderMapper = None,
+        **kwargs,
     ):
         super().__init__()
         root_path = pathlib.Path(path)
@@ -39,12 +38,12 @@ class PolarsOdvDataHolder(PolarsDataHolder):
         if root_path.is_file():
             self._paths = [root_path]
         else:
-            self._paths = [p for p in root_path.iterdir() if p.suffix == '.txt']
+            self._paths = [p for p in root_path.iterdir() if p.suffix == ".txt"]
 
         self._header_mapper = header_mapper
 
         self._data: pl.DataFrame = pl.DataFrame()
-        self._dataset_name = f'ODV_{root_path.name}'
+        self._dataset_name = f"ODV_{root_path.name}"
 
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
@@ -83,12 +82,12 @@ class PolarsOdvDataHolder(PolarsDataHolder):
         dfs = []
         columns = None
         for path in self._paths:
-            print(f'{path=}')
+            print(f"{path=}")
             data_source = OdvProfilePolarsDataFile(
                 path=path,
                 data_type=self.data_type,
                 # encoding=self._kwargs.pop('encoding', 'utf-8'),
-                **self._kwargs
+                **self._kwargs,
             )
             if self._header_mapper:
                 data_source.map_header(self._header_mapper)
@@ -104,8 +103,8 @@ class PolarsOdvDataHolder(PolarsDataHolder):
 
     def _add_date_and_time(self):
         self._data = self._data.with_columns(
-            pl.col('sample_iso_datetime').str.slice(0, 10).alias("SDATE"),
-            pl.col('sample_iso_datetime').str.slice(10, 8).alias("STIME"),
+            pl.col("sample_iso_datetime").str.slice(0, 10).alias("SDATE"),
+            pl.col("sample_iso_datetime").str.slice(10, 8).alias("STIME"),
         )
 
     # def _load_sampling_info(self) -> None:
