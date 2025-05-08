@@ -534,6 +534,7 @@ class PolarsRemoveProfiles(PolarsTransformer):
         file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
         file_names_to_remove.append("metadata.txt")
         data_holder.remove_files_in_processed_directory(file_names_to_remove)
+        data_holder.remove_received_data_directory()
 
 
 class PolarsRemoveValueInRowsForParameters(PolarsTransformer):

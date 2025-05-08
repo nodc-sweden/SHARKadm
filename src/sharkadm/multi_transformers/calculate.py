@@ -2,13 +2,13 @@ from sharkadm import transformers
 from sharkadm.multi_transformers.base import MultiTransformer
 
 
-class Calculate(MultiTransformer):
+class PolarsCalculate(MultiTransformer):
     _transformers = (
-        transformers.CalculateAbundance,
-        transformers.CalculateBiovolume,
-        transformers.CalculateCarbon,
-        transformers.ReplaceNanWithEmptyString,
-        transformers.RemoveReportedValueIfNotCalculated,
+        transformers.PolarsCalculateAbundance,
+        # transformers.CalculateBiovolume,
+        # transformers.CalculateCarbon,
+        # transformers.ReplaceNanWithEmptyString,
+        # transformers.RemoveReportedValueIfNotCalculated,
     )
 
     @staticmethod

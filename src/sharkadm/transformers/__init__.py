@@ -10,19 +10,19 @@ from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
 from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.transformers.boolean import FixYesNo
 from sharkadm.transformers.bvol import (
-    AddBvolAphiaId,
-    AddBvolRefList,
-    AddBvolScientificNameAndSizeClass,
-    AddBvolScientificNameOriginal,
+    # AddBvolAphiaId,
+    # AddBvolRefList,
+    # AddBvolScientificNameAndSizeClass,
+    # AddBvolScientificNameOriginal,
     PolarsAddBvolScientificNameOriginal,
     PolarsAddBvolScientificNameAndSizeClass,
     PolarsAddBvolAphiaId,
     PolarsAddBvolRefList,
 )
 from sharkadm.transformers.calculate import (
-    CalculateAbundance,
-    CalculateBiovolume,
-    CalculateCarbon,
+    # CalculateAbundance,
+    # CalculateBiovolume,
+    # CalculateCarbon,
     PolarsCalculateAbundance,
 )
 from sharkadm.transformers.columns import (

@@ -260,3 +260,7 @@ class PolarsTransformer(ABC):
             .otherwise(pl.col(self.col_to_set))
             .alias(self.col_to_set)
         )
+
+    def _remove_columns(self, data_holder: "PolarsDataHolder", *cols) -> None:
+        cols = [col for col in cols if col in data_holder.data.columns]
+        data_holder.data = data_holder.data.drop(cols)

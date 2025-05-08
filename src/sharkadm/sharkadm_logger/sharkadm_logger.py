@@ -374,6 +374,24 @@ class SHARKadmLogger:
     def subscribe(ev: str, func, prio: int = 50) -> None:
         event.subscribe(ev, func, prio)
 
+    def print_on_screen(self, *args, **kwargs):
+        def _print(data: dict):
+            if data['level'] not in levels:
+                return
+            if data['log_type'] not in log_types:
+                return
+            if data['purpose'] and data['purpose'] not in purposes:
+                return
+            print(data)
+
+        log_types = self._get_log_types(*args, log_types=kwargs.get("log_types"))
+        levels = self._get_levels(*args, levels=kwargs.get("levels"))
+        purposes = self._get_purposes(*args, purposes=kwargs.get("purposes"))
+        print(f"{log_types=}")
+        print(f"{levels=}")
+        print(f"{purposes=}")
+        self.subscribe('log', _print)
+
 
 class old_SHARKadmLogger:
     """Class to log events etc. in the SHARKadm data model"""
@@ -696,3 +714,5 @@ class old_SHARKadmLogger:
     @staticmethod
     def subscribe(ev: str, func, prio: int = 50) -> None:
         event.subscribe(ev, func, prio)
+
+
