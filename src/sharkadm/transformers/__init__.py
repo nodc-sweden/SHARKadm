@@ -36,8 +36,16 @@ from sharkadm.transformers.columns import (
     RemoveColumns,
     SortColumns,
 )
-from sharkadm.transformers.cruise import AddCruiseId
-from sharkadm.transformers.custom_id import AddCustomId, AddSharkSampleMd5
+from sharkadm.transformers.cruise import (
+    AddCruiseId,
+    PolarsAddCruiseId
+)
+from sharkadm.transformers.custom_id import (
+    AddCustomId,
+    AddSharkSampleMd5,
+    PolarsAddCustomId,
+    PolarsAddSharkSampleMd5,
+)
 from sharkadm.transformers.dataframe import (
     ConvertFromPandasToPolars,
     ConvertFromPolarsToPandas,
