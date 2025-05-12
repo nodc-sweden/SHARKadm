@@ -8,6 +8,8 @@ class Bvol(MultiTransformer):
         transformers.AddBvolScientificNameAndSizeClass,
         transformers.AddBvolAphiaId,
         transformers.AddBvolRefList,
+        transformers.AddBvolCalculatedVolume,
+        transformers.AddCarbonPerVolume,
     ]
 
     @staticmethod

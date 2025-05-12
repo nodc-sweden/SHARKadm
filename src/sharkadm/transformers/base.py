@@ -3,6 +3,7 @@ from typing import Protocol, TYPE_CHECKING
 import time
 
 import pandas as pd
+import polars as pl
 import numpy as np
 
 from sharkadm import adm_logger, config
@@ -12,6 +13,37 @@ from sharkadm.utils.data_filter import DataFilter
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import DataHolder
+
+
+class PolarsDataHolderProtocol(Protocol):
+
+    @property
+    def data(self) -> pl.DataFrame:
+        ...
+
+    @data.setter
+    def data(self, df: pl.DataFrame) -> None:
+        ...
+
+    @property
+    @abstractmethod
+    def data_type(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def data_type_internal(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def data_structure(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
+    def dataset_name(self) -> str:
+        ...
 
 
 class DataHolderProtocol(Protocol):

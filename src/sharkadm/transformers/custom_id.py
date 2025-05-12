@@ -58,6 +58,8 @@ class AddSharkSampleMd5(Transformer):
         building_blocks_col = f'{self.col_to_set}_building_blocks'
         data_holder.data[building_blocks_col] = data_holder.data.apply(lambda row: id_handler.get_id(row), axis=1)
         data_holder.data[self.col_to_set] = data_holder.data[building_blocks_col].apply(self.get_md5)
+        data_holder.data['shark_sample_id_md5'] = data_holder.data[self.col_to_set]
+
 
     @staticmethod
     def get_md5(x) -> str:

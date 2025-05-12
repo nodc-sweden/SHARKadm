@@ -2,7 +2,8 @@ import pandas as pd
 
 from sharkadm import adm_logger
 from sharkadm.utils import geography
-from .base import Transformer, DataHolderProtocol
+from .base import Transformer, DataHolderProtocol, PolarsDataHolderProtocol
+import polars as pl
 
 
 class AddSamplePositionDD(Transformer):
@@ -136,3 +137,110 @@ class AddSamplePositionDM(Transformer):
             data_holder.data.loc[df.index, self.lon_column_to_set] = lon
 
 
+class PolarsAddReportedPosition(Transformer):
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds reported position prioritized as follow: sample_reported_-pos, visit_reported_-pos'
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        self._add_columns_if_missing(data_holder)
+        # df.with_columns(pl.when(pl.col("foo") > 2).then(1).otherwise(-1).alias("val"))
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col('sample_reported_latitude') != '').then(pl.col('sample_reported_latitude')).otherwise(pl.col('visit_reported_latitude')).alias('reported_latitude'),
+            pl.when(pl.col('sample_reported_longitude') != '').then(pl.col('sample_reported_longitude')).otherwise(pl.col('visit_reported_longitude')).alias('reported_longitude'),
+
+        )
+
+    def _add_columns_if_missing(self, data_holder: PolarsDataHolderProtocol):
+        cols_to_add = []
+        for col in ['sample_reported_latitude', 'sample_reported_longitude', 'visit_reported_latitude', 'visit_reported_longitude']:
+            if col in data_holder.data:
+                continue
+            cols_to_add.append(pl.lit('').alias(col))
+        data_holder.data = data_holder.data.with_columns(cols_to_add)
+
+
+class PolarsAddSamplePositionDD(Transformer):
+    lat_info = dict(
+        nr_sweref_digits=7,
+        columns=[
+        'sample_reported_latitude',
+        'visit_reported_latitude'
+    ]  # In order of prioritization
+    )
+
+    lon_info = dict(
+        nr_sweref_digits=6,
+        columns=[
+            'sample_reported_longitude',
+            'visit_reported_longitude'
+        ]  # In order of prioritization
+    )
+
+    lat_col_to_set = 'sample_latitude_dd'
+    lon_col_to_set = 'sample_longitude_dd'
+
+    _cached_pos = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds sample position based on reported position'
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if 'reported_latitude' not in data_holder.data:
+            adm_logger.log_transformation('Could not add sample_latitude_dd. Missing column reported_latitude. '
+                                          'Consider running transformer PolarsAddReportedPosition before this one.', level=adm_logger.WARNING)
+            return
+
+        data_holder.data[[self.lat_col_to_set, self.lon_col_to_set]] = data_holder.data.apply(lambda row: self._get(row), axis=1, result_type='expand')
+
+    def _get(self, row: pd.Series) -> (str, str):
+        lat_col = ''
+        lon_col = ''
+        for lat_col in self.lat_info['columns']:
+            if lat_col in row and row[lat_col].strip():
+                break
+        for lon_col in self.lon_info['columns']:
+            if lon_col in row and row[lon_col].strip():
+                break
+
+        if not all([lat_col, lon_col]):
+            return '', ''
+
+        lat_value = row[lat_col].strip().replace(' ', '')  # .replace(',', '.')
+        lon_value = row[lon_col].strip().replace(' ', '')  # .replace(',', '.')
+
+        if not all([lat_value, lon_value]):
+            return '', ''
+
+        if self._is_sweref99tm(value=lat_value, info=self.lat_info) and self._is_sweref99tm(value=lon_value, info=self.lon_info):
+            return geography.sweref99tm_to_decdeg(lon_value, lat_value)
+        elif self._is_dd(lat_value) and self._is_dd(lon_value):
+            return lat_value, lon_value
+        elif self._is_dm_lat(lat_value) and self._is_dm_lon(lon_value):
+            return geography.decmin_to_decdeg(lat_value), geography.decmin_to_decdeg(lon_value)
+
+
+    def _is_sweref99tm(self, value: str, info: dict) -> bool:
+        if len(value.split('.')[0]) == info['nr_sweref_digits']:
+            return True
+        return False
+
+    def _is_dm_lat(self, value: str) -> bool:
+        parts = value.split('.')
+        if len(parts[0].zfill(4)) == 4:
+            return True
+        return False
+
+    def _is_dm_lon(self, value: str) -> bool:
+        parts = value.split('.')
+        if len(parts[0].zfill(5)) == 5:
+            return True
+        return False
+
+    def _is_dd(self, value: str) -> bool:
+        parts = value.split('.')
+        if len(parts[0].zfill(2)) == 2:
+            return True
+        return False

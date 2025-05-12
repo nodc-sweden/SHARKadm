@@ -13,12 +13,18 @@ from .bvol import AddBvolAphiaId
 from .bvol import AddBvolRefList
 from .bvol import AddBvolScientificNameAndSizeClass
 from .bvol import AddBvolScientificNameOriginal
+from .bvol import AddBvolCalculatedVolume
+from .bvol import AddCarbonPerVolume
+
 from .calculate import CalculateAbundance
 from .calculate import CalculateBiovolume
 from .calculate import CalculateCarbon
-# from .calculate import CalculatePhytoplankton
-# from .calculate import CalculateZooplankton
-# from .calculate import CopyCalculated
+
+from .calculate import ColCalculateAbundance
+from .calculate import ColCalculateBiovolume
+from .calculate import ColCalculateCarbon
+from .calculate import FixReportedValueAfterCalculations
+
 from .columns import AddColumnViewsColumns
 from .columns import AddDEPHqcColumn
 from .columns import RemoveColumns

@@ -8,6 +8,8 @@ try:
     bvol_nomp = nodc_bvol.get_bvol_nomp_object()
     translate_bvol_name = nodc_bvol.get_translate_bvol_name_object()
     translate_bvol_name_and_size = nodc_bvol.get_translate_bvol_name_size_object()
+    calculated_volume_mapper = bvol_nomp.get_calculated_volume_mapper()
+    carbon_per_volume_mapper = bvol_nomp.get_carbon_per_volume_mapper()
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(f'Could not import package "{module_name}" in module {__name__}. You need to install this dependency if you want to use this module.', level=adm_logger.WARNING)
@@ -150,6 +152,34 @@ class AddBvolAphiaId(Transformer):
             adm_logger.log_transformation(f'Setting {self.col_to_set} for {name}: {text} ({len(df)} places)',
                                           level=adm_logger.INFO)
             data_holder.data.loc[df.index, self.col_to_set] = text
+
+
+class AddBvolCalculatedVolume(Transformer):
+    col_to_set = 'bvol_cell_volume_um3'
+    aphia_id_col = 'bvol_aphia_id'
+    size_class_col = 'bvol_size_class'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddBvolCalculatedVolume.col_to_set} mapped from '
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for (aphia_id, size_class), df in data_holder.data.groupby([self.aphia_id_col, self.size_class_col]):
+            data_holder.data.loc[df.index, self.col_to_set] = calculated_volume_mapper.get((aphia_id, size_class), '')
+
+
+class AddCarbonPerVolume(Transformer):
+    col_to_set = 'bvol_carbon_per_volume'
+    aphia_id_col = 'bvol_aphia_id'
+    size_class_col = 'bvol_size_class'
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds {AddCarbonPerVolume.col_to_set} mapped from '
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        for (aphia_id, size_class), df in data_holder.data.groupby([self.aphia_id_col, self.size_class_col]):
+            data_holder.data.loc[df.index, self.col_to_set] = carbon_per_volume_mapper.get((aphia_id, size_class), '')
 
 
 # class AddBvolCalculatedVolume(Transformer):

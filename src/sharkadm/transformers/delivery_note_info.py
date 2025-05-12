@@ -6,6 +6,7 @@ from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.data_holder import DataHolder
 from sharkadm.utils import yaml_data
 from .base import Transformer
+import polars as pl
 
 
 class AddDeliveryNoteInfo(Transformer):
@@ -43,7 +44,7 @@ class AddDeliveryNoteInfo(Transformer):
             adm_logger.log_workflow('Could not add status. No delivery note found!', level=adm_logger.WARNING,
                                     item=data_holder.dataset_name)
             return
-        checked_by = data_holder.delivery_note['data kontrollerad av']
+        checked_by = data_holder.delivery_note['DATA KONTROLLERAD AV']
         if not checked_by:
             adm_logger.log_transformation(
                 f'Could not set "status" and "checked". Missing information in delivery_note: data kontrollerad av',
@@ -55,9 +56,9 @@ class AddDeliveryNoteInfo(Transformer):
         else:
             if checked_by == r'Leverantör':
                 data = self._status_config['deliverer']
-                raise
             elif checked_by == r'Leverantör och Datavärd':
                 data = self._status_config['deliverer_and_datahost']
+            print(f'{data=}')
         data_holder.data['check_status_sv'] = data['check_status_sv']
         data_holder.data['check_status_en'] = data['check_status_en']
         data_holder.data['data_checked_by_sv'] = data['data_checked_by_sv']
@@ -99,5 +100,63 @@ class AddStatus(Transformer):
         data_holder.data['check_status_en'] = data['check_status_en']
         data_holder.data['data_checked_by_sv'] = data['data_checked_by_sv']
         data_holder.data['data_checked_by_en'] = data['data_checked_by_en']
+
+
+class PolarsAddDeliveryNoteInfo(Transformer):
+    physical_chemical_keys = [
+        'PhysicalChemical'.lower(),
+        'Physical and Chemical'.lower()
+    ]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._status_config = yaml_data.load_yaml(adm_config_paths('delivery_note_status'), encoding='utf8')
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f'Adds status and other info from delivery_note'
+
+    def _transform(self, data_holder: DataHolder | ArchiveDataHolder) -> None:
+        if not hasattr(data_holder, 'delivery_note'):
+            adm_logger.log_transformation(f'No delivery note found for data holder {data_holder}', level=adm_logger.WARNING)
+            return
+        self._add_delivery_note_info(data_holder)
+        self._add_status(data_holder)
+
+    def _add_delivery_note_info(self, data_holder: DataHolder | ArchiveDataHolder):
+        cols_to_add = []
+        for key in data_holder.delivery_note.fields:
+            if key in data_holder.data and any(data_holder.data[key]):
+                adm_logger.log_transformation(f'Not setting info from delivery_note. {key} already a column with data.', level=adm_logger.DEBUG)
+                continue
+            adm_logger.log_transformation(f'Adding {key} info from delivery_note: {data_holder.delivery_note[key]}', level=adm_logger.DEBUG)
+            cols_to_add.append(pl.lit(str(data_holder.delivery_note[key])).alias(key))
+        data_holder.data = data_holder.data.with_columns(cols_to_add)
+
+    def _add_status(self, data_holder: DataHolder | ArchiveDataHolder):
+        if not hasattr(data_holder, 'delivery_note'):
+            adm_logger.log_workflow(f'Could not add status to {data_holder.dataset_name}. No delivery note found!', level=adm_logger.WARNING)
+            return
+        checked_by = data_holder.delivery_note['DATA KONTROLLERAD AV']
+        if not checked_by:
+            adm_logger.log_transformation(
+                f'Could not set "status" and "checked". Missing information in delivery_note: data kontrollerad av',
+                level=adm_logger.WARNING)
+            return
+        data = dict()
+        if data_holder.data_type.lower() in self.physical_chemical_keys:
+            data = self._status_config['default_physical_chemical']
+        else:
+            if checked_by == r'Leverantör':
+                data = self._status_config['deliverer']
+            elif checked_by == r'Leverantör och Datavärd':
+                data = self._status_config['deliverer_and_datahost']
+
+        data_holder.data = data_holder.data.with_columns(
+            check_status_sv=pl.lit(data['check_status_sv']),
+            check_status_en=pl.lit(data['check_status_en']),
+            data_checked_by_sv=pl.lit(data['data_checked_by_sv']),
+            data_checked_by_en=pl.lit(data['data_checked_by_en']),
+        )
 
 
