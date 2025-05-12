@@ -1,4 +1,0 @@
-# sharkdata_dataset_directory: "//winfs-utv/data/utv/shark_api/datasets"
-sharkdata_dataset_directory: "C:/mw/exports/fake_sharkdata_datasets"
-url_trigger_import: "https://sharkdata-utv.smhi.se/api/v1/import/runner"
-url_import_status: "https://sharkdata-utv.smhi.se/api/v1/import/runner/status"

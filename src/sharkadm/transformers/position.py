@@ -4,6 +4,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import geography
 
+from ..data import PolarsDataHolder
 from .base import (
     DataHolderProtocol,
     PolarsDataHolderProtocol,
@@ -143,6 +144,8 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
         return "Adds sample position in sweref99tm"
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.x_column_to_set in data_holder.data:
+            return
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.x_column_to_set),
             pl.lit("").alias(self.y_column_to_set),
@@ -201,3 +204,213 @@ class AddSamplePositionDM(Transformer):
             lon = geography.decdeg_to_decmin(lon, with_space=True)
             data_holder.data.loc[df.index, self.lat_column_to_set] = lat
             data_holder.data.loc[df.index, self.lon_column_to_set] = lon
+
+
+class PolarsAddReportedPosition(Transformer):
+    # TODO: Can also come in as latitude_deg, latitude_min
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            "Adds reported position prioritized as follow: sample_reported_-pos, "
+            "visit_reported_-pos"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        self._add_columns_if_missing(data_holder)
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("sample_reported_latitude") != "")
+            .then(pl.col("sample_reported_latitude"))
+            .otherwise(pl.col("visit_reported_latitude"))
+            .alias("reported_latitude"),
+            pl.when(pl.col("sample_reported_longitude") != "")
+            .then(pl.col("sample_reported_longitude"))
+            .otherwise(pl.col("visit_reported_longitude"))
+            .alias("reported_longitude"),
+        )
+
+    def _add_columns_if_missing(self, data_holder: PolarsDataHolderProtocol):
+        cols_to_add = []
+        for col in [
+            "sample_reported_latitude",
+            "sample_reported_longitude",
+            "visit_reported_latitude",
+            "visit_reported_longitude",
+        ]:
+            if col in data_holder.data:
+                continue
+            cols_to_add.append(pl.lit("").alias(col))
+        data_holder.data = data_holder.data.with_columns(cols_to_add)
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("sample_reported_latitude") != "")
+            .then(pl.col("sample_reported_latitude"))
+            .otherwise(pl.col("visit_reported_latitude"))
+            .alias("reported_latitude")
+        )
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("sample_reported_longitude") != "")
+            .then(pl.col("sample_reported_longitude"))
+            .otherwise(pl.col("visit_reported_longitude"))
+            .alias("reported_longitude")
+        )
+
+
+class PolarsAddSamplePositionDD(PolarsTransformer):
+    lat_col_to_set = "sample_latitude_dd"
+    lon_col_to_set = "sample_longitude_dd"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.lat_source_col = "reported_latitude"
+        self.lon_source_col = "reported_longitude"
+        self.lat_nr_sweref_digits = 7
+        self.lon_nr_sweref_digits = 6
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds sample position based on reported position"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.lat_col_to_set in data_holder.data:
+            return
+        self._add_empty_col(data_holder, self.lat_col_to_set)
+        self._add_empty_col(data_holder, self.lon_col_to_set)
+        for (lat, lon), df in data_holder.data.group_by(
+            [self.lat_source_col, self.lon_source_col]
+        ):
+            new_lat, new_lon = self._get(str(lat), str(lon))
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col(self.lat_source_col) == lat)
+                .then(pl.lit(new_lat))
+                .otherwise(pl.col(self.lat_col_to_set))
+                .alias(self.lat_col_to_set)
+            )
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col(self.lon_source_col) == lon)
+                .then(pl.lit(new_lon))
+                .otherwise(pl.col(self.lon_col_to_set))
+                .alias(self.lon_col_to_set)
+            )
+
+    def _get(self, lat: str, lon: str) -> (str, str):
+        lat = lat.replace(" ", "")  # .replace(',', '.')
+        lon = lon.replace(" ", "")  # .replace(',', '.')
+
+        if not all([lat, lon]):
+            return "", ""
+
+        if self._is_sweref99tm(
+            value=lat, nr_digits=self.lat_nr_sweref_digits
+        ) and self._is_sweref99tm(value=lon, nr_digits=self.lon_nr_sweref_digits):
+            return geography.sweref99tm_to_decdeg(lon, lat)
+        elif self._is_dd(lat) and self._is_dd(lon):
+            return lat, lon
+        elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
+            return geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon)
+        else:
+            adm_logger.log_transformation(
+                f"Unknown format of reported_latitude and/or "
+                f"reported_longitude when tying to to set "
+                f"{self.lat_source_col} and "
+                f"{self.lon_source_col}",
+                level=adm_logger.ERROR,
+            )
+            return "", ""
+
+    def _is_sweref99tm(self, value: str, nr_digits: int) -> bool:
+        if len(value.split(".")[0]) == nr_digits:
+            return True
+        return False
+
+    def _is_dm_lat(self, value: str) -> bool:
+        parts = value.split(".")
+        if len(parts[0].zfill(4)) == 4:
+            return True
+        return False
+
+    def _is_dm_lon(self, value: str) -> bool:
+        parts = value.split(".")
+        if len(parts[0].zfill(5)) == 5:
+            return True
+        return False
+
+    def _is_dd(self, value: str) -> bool:
+        parts = value.split(".")
+        if len(parts[0].zfill(2)) == 2:
+            return True
+        return False
+
+
+class PolarsAddSamplePositionDM(PolarsTransformer):
+    lat_source_col = "sample_latitude_dd"
+    lon_source_col = "sample_longitude_dd"
+    lat_col_to_set = "sample_latitude_dm"
+    lon_col_to_set = "sample_longitude_dm"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds sample position in decimal minute"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        if self.lat_col_to_set in data_holder.data:
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.lat_col_to_set)
+        )
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.lon_col_to_set)
+        )
+        for (lat, lon), df in data_holder.data.group_by(
+            [self.lat_source_col, self.lon_source_col]
+        ):
+            if not all([lat, lon]):
+                adm_logger.log_transformation(
+                    f"Missing position when trying to set {self.lat_col_to_set} "
+                    f"and {self.lon_col_to_set}",
+                    level=adm_logger.WARNING,
+                )
+                continue
+            new_lat = geography.decdeg_to_decmin(lat, with_space=True)
+            new_lon = geography.decdeg_to_decmin(lon, with_space=True)
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col(self.lat_source_col) == lat)
+                .then(pl.lit(new_lat))
+                .otherwise(pl.col(self.lat_source_col))
+                .alias(self.lat_col_to_set)
+            )
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col(self.lon_source_col) == lon)
+                .then(pl.lit(new_lon))
+                .otherwise(pl.col(self.lon_source_col))
+                .alias(self.lon_col_to_set)
+            )
+
+
+class PolarsAddSamplePositionDDAsFloat(PolarsTransformer):
+    lat_source_col = "sample_latitude_dd"
+    lon_source_col = "sample_longitude_dd"
+
+    lat_col_to_set = "sample_latitude_dd_float"
+    lon_col_to_set = "sample_longitude_dd_float"
+
+    def __init__(self, nr_decimals: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._nr_decimals = nr_decimals
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Creates position_dd columns with float values"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.lat_source_col)
+            .cast(float)
+            .round(self._nr_decimals)
+            .alias(self.lat_col_to_set),
+            pl.col(self.lon_source_col)
+            .cast(float)
+            .round(self._nr_decimals)
+            .alias(self.lon_col_to_set),
+        )

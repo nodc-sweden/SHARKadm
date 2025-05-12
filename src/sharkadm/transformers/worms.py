@@ -1,6 +1,9 @@
+import polars as pl
+
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer
+from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 try:
     import nodc_worms
@@ -130,6 +133,130 @@ class SetAphiaIdFromReportedAphiaId(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
+        adm_logger.log_transformation(
+            f"Setting {self.col_to_set} from {self.source_col}", level=adm_logger.DEBUG
+        )
+
+
+class PolarsAddReportedAphiaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "aphia_id"
+    col_to_set = "reported_aphia_id"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddReportedAphiaId.col_to_set} "
+            f"from {PolarsAddReportedAphiaId.source_col} if not given."
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.col_to_set in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Column {self.col_to_set} already in data. Will not add",
+                level=adm_logger.DEBUG,
+            )
+            return
+        if self.source_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"No source column {self.source_col}. "
+                f"Setting empty column {self.col_to_set}",
+                level=adm_logger.DEBUG,
+            )
+            self._add_empty_col_to_set(data_holder)
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.source_col).alias(self.col_to_set)
+        )
+
+
+class PolarsAddWormsScientificName(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "dyntaxa_scientific_name"
+    col_to_set = "worms_scientific_name"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddWormsScientificName.col_to_set} translated from nodc_worms. "
+            f"Source column is {PolarsAddWormsScientificName.source_col}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            new_name = translate_worms.get(str(name))
+            if new_name:
+                adm_logger.log_transformation(
+                    f"Translate worms: {name} -> {new_name} ({len(df)} places)"
+                )
+            else:
+                new_name = name
+            self._add_to_col_to_set(data_holder, name, new_name)
+
+
+class PolarsAddWormsAphiaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "worms_scientific_name"
+    col_to_set = "aphia_id"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddWormsAphiaId.col_to_set} "
+            f"from {PolarsAddWormsAphiaId.source_col}"
+        )
+
+    @adm_logger.log_time
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.col_to_set not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Adding column {self.col_to_set}", level=adm_logger.DEBUG
+            )
+            self._add_empty_col_to_set(data_holder)
+
+        for (source_name,), df in data_holder.data.group_by(self.source_col):
+            try:
+                aphia_id = taxa_worms.get_aphia_id(str(source_name))
+            except Exception as e:
+                adm_logger.log_transformation(
+                    f"Could not find aphia_id for species {source_name}: {e}",
+                    item=source_name,
+                    level=adm_logger.WARNING,
+                )
+                continue
+            if not aphia_id:
+                adm_logger.log_transformation(
+                    f"No aphia_id found for species {source_name}",
+                    item=source_name,
+                    level=adm_logger.WARNING,
+                )
+                continue
+            self._add_to_col_to_set(data_holder, source_name, aphia_id)
+
+
+class PolarsSetAphiaIdFromReportedAphiaId(PolarsTransformer):
+    valid_data_types = ("plankton_imaging",)
+    source_col = "reported_aphia_id"
+    col_to_set = "aphia_id"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Sets {PolarsSetAphiaIdFromReportedAphiaId.col_to_set} "
+            f"from {PolarsSetAphiaIdFromReportedAphiaId.source_col} if it is a digit."
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.source_col).alias(self.col_to_set)
+        )
         adm_logger.log_transformation(
             f"Setting {self.col_to_set} from {self.source_col}", level=adm_logger.DEBUG
         )

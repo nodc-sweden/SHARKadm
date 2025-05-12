@@ -475,12 +475,16 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         self._set_data_source(d_source)
 
     def remove_processed_data_directory(self) -> None:
-        directory = self.unzipped_archive_directory / "processed_data"
-        self._remove_directory(directory)
+        self._remove_directory(self.processed_data_directory)
 
     def remove_received_data_directory(self) -> None:
-        directory = self.unzipped_archive_directory / "received_data"
-        self._remove_directory(directory)
+        self._remove_directory(self.received_data_directory)
+
+    def remove_files_in_processed_directory(self, file_names: list[str]) -> None:
+        names = {name: True for name in file_names}
+        for path in self.processed_data_directory.iterdir():
+            if names.get(path.name):
+                os.remove(path)
 
     def remove_readme_files(self) -> None:
         for path in self.unzipped_archive_directory.iterdir():

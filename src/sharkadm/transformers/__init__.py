@@ -4,38 +4,61 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
+from sharkadm.transformers.add_lmqnt import AddLmqnt
+from sharkadm.transformers.add_uncertainty import AddUncertainty
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import Divide, Multiply
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
 from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.transformers.boolean import FixYesNo
 from sharkadm.transformers.bvol import (
-    AddBvolAphiaId,
-    AddBvolRefList,
-    AddBvolScientificNameAndSizeClass,
-    AddBvolScientificNameOriginal,
+    PolarsAddBvolAphiaId,
+    PolarsAddBvolRefList,
+    PolarsAddBvolScientificNameAndSizeClass,
+    # AddBvolAphiaId,
+    # AddBvolRefList,
+    # AddBvolScientificNameAndSizeClass,
+    # AddBvolScientificNameOriginal,
+    PolarsAddBvolScientificNameOriginal,
 )
 from sharkadm.transformers.calculate import (
-    CalculateAbundance,
-    CalculateBiovolume,
-    CalculateCarbon,
+    # CalculateAbundance,
+    # CalculateBiovolume,
+    # CalculateCarbon,
+    PolarsCalculateAbundance,
 )
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,
     AddDEPHqcColumn,
     PolarsAddApprovedKeyColumn,
+    PolarsAddColumnViewsColumns,
     PolarsRemoveColumns,
     RemoveColumns,
     SortColumns,
 )
-from sharkadm.transformers.cruise import AddCruiseId
-from sharkadm.transformers.custom_id import AddCustomId, AddSharkSampleMd5
+from sharkadm.transformers.cruise import AddCruiseId, PolarsAddCruiseId
+from sharkadm.transformers.custom_id import (
+    AddCustomId,
+    AddSharkSampleMd5,
+    PolarsAddCustomId,
+    PolarsAddSharkSampleMd5,
+)
 from sharkadm.transformers.dataframe import (
     ConvertFromPandasToPolars,
     ConvertFromPolarsToPandas,
 )
-from sharkadm.transformers.dataset_name import AddDatasetFileName, AddDatasetName
-from sharkadm.transformers.datatype import AddDatatype, AddDatatypePlanktonBarcoding
+from sharkadm.transformers.dataset_name import (
+    AddDatasetFileName,
+    AddDatasetName,
+    PolarsAddDatasetFileName,
+    PolarsAddDatasetName,
+)
+from sharkadm.transformers.datatype import (
+    AddDatatype,
+    AddDatatypePlanktonBarcoding,
+    PolarsAddDatatype,
+    PolarsAddDatatypePlanktonBarcoding,
+)
 from sharkadm.transformers.date_and_time import (
     AddDatetime,
     AddMonth,
@@ -72,6 +95,12 @@ from sharkadm.transformers.dyntaxa import (
     AddReportedDyntaxaId,
     AddReportedScientificNameDyntaxaId,
     AddTaxonRanks,
+    PolarsAddDyntaxaId,
+    PolarsAddDyntaxaScientificName,
+    PolarsAddDyntaxaTranslatedScientificNameDyntaxaId,
+    PolarsAddReportedDyntaxaId,
+    PolarsAddReportedScientificNameDyntaxaId,
+    PolarsAddTaxonRanks,
 )
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
@@ -115,7 +144,12 @@ from sharkadm.transformers.location import (
     PolarsAddLocationWB,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
-from sharkadm.transformers.manual import ManualHarbourPorpoise, ManualSealPathology
+from sharkadm.transformers.manual import (
+    ManualHarbourPorpoise,
+    ManualSealPathology,
+    PolarsManualHarbourPorpoise,
+    PolarsManualSealPathology,
+)
 from sharkadm.transformers.map_header import ArchiveMapper
 from sharkadm.transformers.map_parameter_column import (
     MapperParameterColumn,
@@ -133,6 +167,10 @@ from sharkadm.transformers.position import (
     AddSamplePositionDD,
     AddSamplePositionDM,
     AddSamplePositionSweref99tm,
+    PolarsAddReportedPosition,
+    PolarsAddSamplePositionDD,
+    PolarsAddSamplePositionDDAsFloat,
+    PolarsAddSamplePositionDM,
     PolarsAddSamplePositionSweref99tm,
 )
 from sharkadm.transformers.project_code import (
@@ -146,6 +184,9 @@ from sharkadm.transformers.red_list import AddRedList
 from sharkadm.transformers.remove import (
     PolarsKeepMask,
     PolarsRemoveMask,
+    PolarsRemoveProfiles,
+    PolarsRemoveValueInColumns,
+    PolarsRemoveValueInRowsForParameters,
     RemoveDeepestDepthAtEachVisit,
     RemoveInterval,
     RemoveReportedValueIfNotCalculated,
@@ -178,6 +219,8 @@ from sharkadm.transformers.sort_data import SortData, SortDataPlanktonImaging
 from sharkadm.transformers.static_data_holding_center import (
     AddStaticDataHoldingCenterEnglish,
     AddStaticDataHoldingCenterSwedish,
+    PolarsAddStaticDataHoldingCenterEnglish,
+    PolarsAddStaticDataHoldingCenterSwedish,
 )
 from sharkadm.transformers.static_internet_access import (
     AddStaticInternetAccessInfo,
@@ -189,12 +232,20 @@ from sharkadm.transformers.station import (
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
 from sharkadm.transformers.strip import StripAllValues, StripAllValuesPolars
-from sharkadm.transformers.visit import AddVisitKey, PolarsAddVisitKey
+from sharkadm.transformers.visit import (
+    AddVisitKey,
+    PolarsAddPhysicalChemicalKey,
+    PolarsAddVisitKey,
+)
 from sharkadm.transformers.wide_to_long import PolarsWideToLong, WideToLong
 from sharkadm.transformers.worms import (
     AddReportedAphiaId,
     AddWormsAphiaId,
     AddWormsScientificName,
+    PolarsAddReportedAphiaId,
+    PolarsAddWormsAphiaId,
+    PolarsAddWormsScientificName,
+    PolarsSetAphiaIdFromReportedAphiaId,
     SetAphiaIdFromReportedAphiaId,
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class

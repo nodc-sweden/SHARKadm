@@ -1,5 +1,13 @@
+import polars as pl
+
+from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
-from .base import DataHolderProtocol, Transformer
+from .base import (
+    DataHolderProtocol,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 
 try:
     import nodc_dyntaxa
@@ -75,9 +83,10 @@ class AddDyntaxaScientificName(Transformer):
                             f"{new_name_2} ({len(df)} places)",
                             level=adm_logger.INFO,
                         )
+                        new_name = new_name_2
                     else:
                         adm_logger.log_transformation(
-                            f"No translation for: {name} ({len(df)} places)",
+                            f"No second translation for: {name} ({len(df)} places)",
                             level=adm_logger.DEBUG,
                         )
                 else:
@@ -278,3 +287,288 @@ class AddTaxonRanks(Transformer):
                 adm_logger.log_transformation(
                     f"Adding {col} for {name} ({len(df)} places)", level=adm_logger.DEBUG
                 )
+
+
+class PolarsAddReportedDyntaxaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    col_to_set = "reported_dyntaxa_id"
+    source_col = "dyntaxa_id"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddReportedDyntaxaId.col_to_set} "
+            f"from {PolarsAddReportedDyntaxaId.source_col} if not given."
+        )
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.col_to_set in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Column {self.col_to_set} already in data. Will not add",
+                level=adm_logger.DEBUG,
+            )
+            return
+        if self.source_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"No source column {self.source_col}. "
+                f"Setting empty column {self.col_to_set}",
+                level=adm_logger.DEBUG,
+            )
+            self._add_empty_col_to_set(data_holder)
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.source_col).alias(self.col_to_set)
+        )
+
+
+class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "reported_scientific_name"
+    col_to_set = "reported_scientific_name_dyntaxa_id"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddReportedScientificNameDyntaxaId.col_to_set} "
+            f"from {PolarsAddReportedScientificNameDyntaxaId.source_col} "
+            f"if it is a digit."
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            name = str(name)
+            if not name.isdigit():
+                continue
+            adm_logger.log_transformation(
+                f"Adding dyntaxa_id {name} to {self.col_to_set} "
+                f"from {self.source_col} ({len(df)} places)",
+                level=adm_logger.DEBUG,
+            )
+            self._add_to_col_to_set(data_holder, name, name)
+            # data_holder.data = data_holder.data.with_columns(
+            #     pl.when(pl.col(self.source_col) == name)
+            #     .then(pl.lit(name))
+            #     .otherwise(pl.col(self.col_to_set))
+            #     .alias(self.col_to_set)
+            # )
+
+
+class PolarsAddDyntaxaScientificName(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "reported_scientific_name"
+    col_to_set = "dyntaxa_scientific_name"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"PolarsAdds {PolarsAddDyntaxaScientificName.col_to_set} "
+            f"translated from nodc_dyntaxa. "
+            f"Source column is {AddDyntaxaScientificName.source_col}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            name = str(name)
+            new_name = translate_dyntaxa.get(name)
+            if new_name:
+                if name.isdigit():
+                    new_name_2 = translate_dyntaxa.get(new_name)
+                    if new_name_2:
+                        adm_logger.log_transformation(
+                            f"Translated from dyntaxa: {name} -> {new_name} -> "
+                            f"{new_name_2} ({len(df)} places)",
+                            level=adm_logger.INFO,
+                        )
+                        new_name = new_name_2
+                    else:
+                        adm_logger.log_transformation(
+                            f"No second translation for: {new_name} ({len(df)} places)",
+                            level=adm_logger.DEBUG,
+                        )
+                else:
+                    adm_logger.log_transformation(
+                        f"Translated from dyntaxa: {name} -> {new_name} "
+                        f"({len(df)} places)",
+                        level=adm_logger.INFO,
+                    )
+            else:
+                if name.isdigit():
+                    adm_logger.log_transformation(
+                        f"{self.source_col} {name} seems to be a dyntaxa_id "
+                        f"and could not be translated ({len(df)} places)",
+                        level=adm_logger.WARNING,
+                    )
+                else:
+                    adm_logger.log_transformation(
+                        f"No translation for: {name} ({len(df)} places)",
+                        level=adm_logger.WARNING,
+                    )
+                new_name = name
+
+            self._add_to_col_to_set(data_holder, name, new_name)
+            # data_holder.data = data_holder.data.with_columns(
+            #     pl.when(pl.col(self.source_col) == name)
+            #     .then(pl.lit(new_name))
+            #     .otherwise(pl.col(self.col_to_set))
+            #     .alias(self.col_to_set)
+            # )
+
+
+class PolarsAddDyntaxaTranslatedScientificNameDyntaxaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "reported_scientific_name"
+    col_to_set = "dyntaxa_translated_scientific_name_dyntaxa_id"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddDyntaxaTranslatedScientificNameDyntaxaId.col_to_set} "
+            f"translated from nodc_dyntaxa. Source column is "
+            f"{PolarsAddDyntaxaTranslatedScientificNameDyntaxaId.source_col}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            name = str(name)
+            _id = translate_dyntaxa.get_dyntaxa_id(name)
+            if not _id:
+                continue
+            adm_logger.log_transformation(
+                f"Adding {_id} to {self.col_to_set} ({len(df)} places)",
+                level=adm_logger.INFO,
+            )
+            self._add_to_col_to_set(data_holder, name, _id)
+            # data_holder.data = data_holder.data.with_columns(
+            #     pl.when(pl.col(self.source_col) == name)
+            #     .then(pl.lit(_id))
+            #     .otherwise(pl.col(self.col_to_set))
+            #     .alias(self.col_to_set)
+            # )
+
+
+class PolarsAddTaxonRanks(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll", "bacterioplankton")
+    ranks = (
+        "kingdom",
+        "phylum",
+        "class",
+        "order",
+        "family",
+        "genus",
+        "species",
+        "taxon_hierarchy",
+    )
+    cols_to_set = tuple(
+        f"taxon_{rank}" if "taxon" not in rank else rank for rank in ranks
+    )
+    source_col = "dyntaxa_scientific_name"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds taxon rank columns. Data from dyntaxa."
+
+    def _add_columns(self, data_holder: PolarsDataHolder):
+        for col in self.cols_to_set:
+            self._add_empty_col(data_holder, col)
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_columns(data_holder=data_holder)
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus="accepted")
+            if not info:
+                adm_logger.log_transformation(
+                    f"Could not add information about taxon rank for {name} "
+                    f"({len(df)} places)",
+                    item=name,
+                    level=adm_logger.WARNING,
+                )
+                continue
+            if len(info) != 1:
+                adm_logger.log_transformation(
+                    f"Several matches in dyntaxa for {name} ({len(df)} places)",
+                    item=name,
+                    level=adm_logger.WARNING,
+                )
+                continue
+            single_info = info[0]
+            adm_logger.log_transformation(
+                f"Adding taxon rank for {name} ({len(df)} places)", level=adm_logger.INFO
+            )
+            for rank, col in zip(self.ranks, self.cols_to_set):
+                value = single_info.get(rank, "") or ""
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(pl.col(self.source_col) == name)
+                    .then(pl.lit(value))
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                )
+                adm_logger.log_transformation(
+                    f"Adding {col} for {name} ({len(df)} places)", level=adm_logger.DEBUG
+                )
+
+
+class PolarsAddDyntaxaId(PolarsTransformer):
+    invalid_data_types = ("physicalchemical", "chlorophyll")
+    source_col = "dyntaxa_scientific_name"
+    col_to_set = "dyntaxa_id"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {AddDyntaxaId.col_to_set} translated from nodc_dyntaxa. "
+            f"Source column is {AddDyntaxaId.source_col}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.source_col not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Could not add column {self.col_to_set}. "
+                f"Source column {self.source_col} not in data.",
+                level=adm_logger.ERROR,
+            )
+            return
+        if self.col_to_set not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG
+            )
+            self._add_empty_col_to_set(data_holder)
+
+        for (name,), df in data_holder.data.group_by(self.source_col):
+            if not str(name).strip():
+                adm_logger.log_transformation(
+                    f"Missing {self.source_col} when trying to add dyntaxa_id, "
+                    f"{len(df)} rows.",
+                    level=adm_logger.WARNING,
+                )
+                continue
+            dyntaxa_id = dyntaxa_taxon.get(str(name))
+            if not dyntaxa_id:
+                adm_logger.log_transformation(
+                    f"No {self.col_to_set} found for {name}, {len(df)} rows.",
+                    level=adm_logger.WARNING,
+                )
+                continue
+            adm_logger.log_transformation(
+                f"Adding {self.col_to_set} {dyntaxa_id} translated from {name} "
+                f"({len(df)} places)",
+                level=adm_logger.INFO,
+            )
+            self._add_to_col_to_set(data_holder, name, dyntaxa_id)

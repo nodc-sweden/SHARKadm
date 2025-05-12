@@ -4,12 +4,22 @@ from sharkadm.config import CONFIG_DIRECTORY
 
 
 def add_concatenated_column(df: pl.DataFrame, column_name: str = "key") -> pl.DataFrame:
+    lat_col = "sample_latitude_dd"
+    lon_col = "sample_longitude_dd"
+    if "sample_latitude_dd_float" in df.columns:
+        lat_col = "sample_latitude_dd_float"
+    if "sample_longitude_dd_float" in df.columns:
+        lon_col = "sample_longitude_dd_float"
+
     return df.with_columns(
         pl.concat_str(
             [
-                pl.col("dataset_name"),
-                pl.col("sample_date").cast(str).str.replace_all("-", ""),
-                pl.col("reported_station_name"),
+                pl.col("delivery_datatype"),
+                pl.col(lat_col).cast(str),
+                pl.col(lon_col).cast(str),
+                # pl.col("dataset_name"),
+                # pl.col("sample_date").cast(str).str.replace_all("-", ""),
+                # pl.col("reported_station_name"),
             ],
             separator=":",
         ).alias(column_name)
@@ -33,6 +43,8 @@ class ApprovedData:
         dfs = []
         directory = CONFIG_DIRECTORY / "sharkadm" / "approved_data"
         for path in directory.iterdir():
+            if path.suffix != ".csv":
+                continue
             dfs.append(pl.read_csv(path))
         self._df = pl.concat(dfs)
 

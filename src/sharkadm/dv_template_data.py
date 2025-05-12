@@ -22,6 +22,8 @@ def get_row_data_from_fyschem_dv_template(
     c.transform(transformers.AddDatetime())
     c.transform(transformers.AddVisitKey())
     c.transform(transformers.AddAnalyseInfo())
+    c.transform(transformers.AddUncertainty())
+    c.transform(transformers.AddLmqnt())
     c.transform(transformers.ConvertFlagsToSDN())
     c.transform(transformers.RemoveColumns("COPY_VARIABLE.*"))
     c.transform(transformers.MapperParameterColumn(import_column="SHARKarchive"))

@@ -198,7 +198,7 @@ class BaseSHARKadmController:
     def export(self, *exporters: Exporter) -> Any:
         for exp in exporters:
             data = exp.export(self._data_holder)
-            if isinstance(data, pd.DataFrame):
+            if isinstance(data, (pd.DataFrame, pl.DataFrame)):
                 return data
         return self
 
@@ -290,8 +290,10 @@ def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
     return c
 
 
-def get_polars_controller_with_data(path: pathlib.Path | str) -> SHARKadmPolarsController:
+def get_polars_controller_with_data(
+    path: pathlib.Path | str, **kwargs
+) -> SHARKadmPolarsController:
     c = SHARKadmPolarsController()
-    holder = get_polars_data_holder(path)
+    holder = get_polars_data_holder(path, **kwargs)
     c.set_data_holder(holder)
     return c

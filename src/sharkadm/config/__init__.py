@@ -4,6 +4,7 @@ import pathlib
 from typing import Protocol
 
 from sharkadm import config_paths
+from sharkadm.config import utils
 from sharkadm.config.column_views import ColumnViews
 from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
@@ -24,14 +25,16 @@ OTHER_CONFIG_SOURCES = [
     home / ".nodc_config",
 ]
 
-CONFIG_DIRECTORY = None
-if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
-    CONFIG_DIRECTORY = pathlib.Path(os.getenv(CONFIG_ENV))
-else:
-    for directory in OTHER_CONFIG_SOURCES:
-        if directory.exists():
-            CONFIG_DIRECTORY = directory
-            break
+# CONFIG_DIRECTORY = None
+CONFIG_DIRECTORY = utils.get_user_given_config_dir()
+if not CONFIG_DIRECTORY:
+    if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
+        CONFIG_DIRECTORY = pathlib.Path(os.getenv(CONFIG_ENV))
+    else:
+        for directory in OTHER_CONFIG_SOURCES:
+            if directory.exists():
+                CONFIG_DIRECTORY = directory
+                break
 
 
 def get_config_path(name: str | None = None) -> pathlib.Path:

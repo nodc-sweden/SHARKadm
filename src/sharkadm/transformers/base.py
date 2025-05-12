@@ -7,7 +7,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
-from sharkadm.data import is_valid_data_holder
+from sharkadm.data import is_valid_data_holder, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter, PolarsDataFilter
 
@@ -153,14 +153,17 @@ class Transformer(ABC):
 class PolarsTransformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
-    valid_data_types = ()
-    invalid_data_types = ()
+    valid_data_types: tuple[str, ...] = ()
+    invalid_data_types: tuple[str, ...] = ()
 
-    valid_data_holders = ()
-    invalid_data_holders = ()
+    valid_data_holders: tuple[str, ...] = ()
+    invalid_data_holders: tuple[str, ...] = ()
 
-    valid_data_structures = ()
-    invalid_data_structures = ()
+    valid_data_structures: tuple[str, ...] = ()
+    invalid_data_structures: tuple[str, ...] = ()
+
+    source_col: str = ""
+    col_to_set: str = ""
 
     def __init__(self, data_filter: PolarsDataFilter = None, **kwargs):
         self._data_filter = data_filter
@@ -184,8 +187,12 @@ class PolarsTransformer(ABC):
         return self.get_transformer_description()
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
-        if data_holder.data_type_internal not in config.get_valid_data_types(
-            valid=self.valid_data_types, invalid=self.invalid_data_types
+        if (
+            data_holder.data_type_internal != "unknown"
+            and data_holder.data_type_internal
+            not in config.get_valid_data_types(
+                valid=self.valid_data_types, invalid=self.invalid_data_types
+            )
         ):
             adm_logger.log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} for transformer"
@@ -193,7 +200,7 @@ class PolarsTransformer(ABC):
                 level=adm_logger.DEBUG,
             )
             return
-        if not is_valid_data_holder(
+        if not is_valid_polars_data_holder(
             data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
         ):
             adm_logger.log_workflow(
@@ -235,3 +242,25 @@ class PolarsTransformer(ABC):
             level=adm_logger.WARNING,
         )
         return self._data_filter.get_filter_mask(data_holder)
+
+    def _add_empty_col_to_set(self, data_holder: "PolarsDataHolder") -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.col_to_set)
+        )
+
+    def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
+        data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
+
+    def _add_to_col_to_set(
+        self, data_holder: "PolarsDataHolder", lookup_name, new_name: str
+    ) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(self.source_col) == lookup_name)
+            .then(pl.lit(new_name))
+            .otherwise(pl.col(self.col_to_set))
+            .alias(self.col_to_set)
+        )
+
+    def _remove_columns(self, data_holder: "PolarsDataHolder", *cols) -> None:
+        cols = [col for col in cols if col in data_holder.data.columns]
+        data_holder.data = data_holder.data.drop(cols)

@@ -52,7 +52,7 @@ class SHARKdataTxtAsGiven(FileExporter):
             export_file_name = "shark_data.txt"
         self._export_file_name = export_file_name
         exclude_columns = exclude_columns or []
-        self.exclude_columns = tuple(list(self.exclude_columns) + exclude_columns)
+        self.exclude_columns = tuple(list(self.exclude_columns + exclude_columns))
 
     @property
     def export_file_path(self):

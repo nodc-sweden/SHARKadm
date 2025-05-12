@@ -1,16 +1,19 @@
 import re
 
 import numpy as np
+import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
+from ..data.zip_archive import PolarsZipArchiveDataHolder
 from ..utils.data_filter import (
     DataFilterRestrictDepth,
     PolarsDataFilter,
 )
 from .base import (
     DataHolderProtocol,
+    PolarsDataHolderProtocol,
     PolarsTransformer,
     Transformer,
 )
@@ -200,7 +203,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
 
     visit_id_columns = (
         "shark_sample_id_md5",
-        "visit_data",
+        "visit_date",
         "sample_date",
         "sample_time",
         "sample_latitude_dd",
@@ -501,3 +504,145 @@ class SetMaxLengthOfValuesInColumns(Transformer):
                 f"(all {len_data} places)",
                 level=adm_logger.INFO,
             )
+
+
+class PolarsRemoveProfiles(PolarsTransformer):
+    valid_data_types = ("profile",)
+    valid_data_holders = ("PolarsZipArchiveDataHolder",)
+
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter,
+        **kwargs,
+    ) -> None:
+        super().__init__(data_filter=data_filter, **kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes profiles specified in the given filter"
+
+    def _transform(self, data_holder: PolarsZipArchiveDataHolder) -> None:
+        mask = self._get_filter_mask(data_holder)
+        if mask.is_empty():
+            adm_logger.log_transformation(
+                f"Could not run transformer {PolarsRemoveProfiles.__class__.__name__}. "
+                f"Missing data_filter",
+                level=adm_logger.ERROR,
+            )
+            return
+        remove_df = data_holder.data.filter(mask)
+        file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
+        file_names_to_remove.append("metadata.txt")
+        data_holder.remove_files_in_processed_directory(file_names_to_remove)
+        data_holder.remove_received_data_directory()
+
+
+class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
+    valid_data_structures = ("row",)
+
+    parameter_column = "parameter"
+    value_column = "value"
+
+    def __init__(self, *parameters: str, replace_value: str = "", **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._replace_value = replace_value
+        self.apply_on_parameters = parameters
+        if isinstance(parameters[0], list):
+            self.apply_on_parameters = parameters[0]
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            "Removes or replaces value column in rows for given parameters. "
+            "Transformer also takes data filter. "
+        )
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        if self.parameter_column not in data_holder.data:
+            adm_logger.log_transformation(
+                f"Can not remove values in rows. "
+                f'Missing column "{self.parameter_column}"',
+                level=adm_logger.WARNING,
+            )
+            return
+        filter_mask = self._get_filter_mask(data_holder)
+        for par in self.apply_on_parameters:
+            mask = data_holder.data[self.parameter_column] == par
+            if not filter_mask.is_empty():
+                mask = filter_mask & mask
+
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(mask)
+                .then(pl.lit(self._replace_value))
+                .otherwise(pl.col(self.value_column))
+                .alias(self.value_column)
+            )
+
+            nr_rows = len(data_holder.data.filter(mask))
+            if not nr_rows:
+                continue
+            adm_logger.log_transformation(
+                f'Replacing value (-> {self._replace_value}) for parameter "{par}" '
+                f"({nr_rows} rows)",
+                level=adm_logger.WARNING,
+            )
+
+
+class PolarsRemoveValueInColumns(PolarsTransformer):
+    def __init__(
+        self, *columns: str, replace_value: int | float | str = "", **kwargs
+    ) -> None:
+        super().__init__(**kwargs)
+        self.apply_on_columns = columns
+        if isinstance(columns[0], list):
+            self.apply_on_columns = columns[0]
+
+        self._replace_value = str(replace_value)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            "Removes all values in given columns. "
+            "Column names can be perfect match or regular expresiones. "
+            "Option to set replace_value. Transformer also takes data filter. "
+        )
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        filter_mask = self._get_filter_mask(data_holder)
+        # for col in self.apply_on_columns:
+        for col in self._get_apply_on_columns(data_holder):
+            if col not in data_holder.data:
+                continue
+            if not filter_mask.is_empty():
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(filter_mask)
+                    .then(pl.lit(self._replace_value))
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                )
+                nr_rows = len(data_holder.data.filter(filter_mask))
+            else:
+                data_holder.data = data_holder.data.with_columns(
+                    pl.lit(self._replace_value).alias(col)
+                )
+                nr_rows = len(data_holder.data)
+            if self._replace_value:
+                adm_logger.log_transformation(
+                    f"All values in column {col} are set to {self._replace_value} "
+                    f"(all {nr_rows} places)",
+                    level=adm_logger.WARNING,
+                )
+            else:
+                adm_logger.log_transformation(
+                    f"All values in column {col} are removed (all {nr_rows} places)",
+                    level=adm_logger.WARNING,
+                )
+
+    def _get_apply_on_columns(self, data_holder: DataHolderProtocol):
+        columns = []
+        for col in data_holder.data.columns:
+            for arg in self.apply_on_columns:
+                if re.match(arg, col):
+                    columns.append(col)
+                    break
+        return columns

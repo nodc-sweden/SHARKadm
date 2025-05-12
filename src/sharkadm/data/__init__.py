@@ -13,7 +13,7 @@ from sharkadm.data.archive import (
     get_polars_archive_data_holder,
 )
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
-from sharkadm.data.df import PandasDataFrameDataHolder
+from sharkadm.data.df import PandasDataFrameDataHolder, PolarsDataFrameDataHolder
 from sharkadm.data.dv_template import DvTemplateDataHolder, get_dv_template_data_holder
 from sharkadm.data.lims import (
     LimsDataHolder,
@@ -21,7 +21,19 @@ from sharkadm.data.lims import (
     get_lims_data_holder,
     get_polars_lims_data_holder,
 )
-from sharkadm.data.shark_api import get_shark_api_data_holder
+from sharkadm.data.odv import (
+    get_polars_odv_data_holder,
+    path_has_or_is_odv_data,
+)
+from sharkadm.data.profile import (
+    get_polars_profile_standard_format_data_holder,
+    path_has_or_is_standard_format_profile_data,
+)
+from sharkadm.data.shark import (
+    file_is_from_shark,
+    get_polars_shark_data_holder,
+    get_shark_api_data_holder,
+)
 from sharkadm.data.zip_archive import (
     get_polars_zip_archive_data_holder,
     get_zip_archive_data_holder,
@@ -40,6 +52,11 @@ def get_data_holder_list() -> list[str]:
 def get_data_holders() -> dict[str, Type[PandasDataHolder]]:
     """Returns a dictionary with data_holders"""
     return utils.get_all_class_children(PandasDataHolder)
+
+
+def get_polars_data_holders() -> dict[str, Type[PolarsDataHolder]]:
+    """Returns a dictionary with data_holders"""
+    return utils.get_all_class_children(PolarsDataHolder)
 
 
 def get_data_holder_object(trans_name: str, **kwargs) -> PandasDataHolder:
@@ -133,13 +150,22 @@ def get_polars_data_holder(
         #     return get_dv_template_data_holder(path)
         if path_is_zip_archive(path):
             return get_polars_zip_archive_data_holder(path)
+        if path.is_file():
+            if file_is_from_shark(path):
+                return get_polars_shark_data_holder(path, **kwargs)
         if path.is_dir():
             archive_directory = directory_is_archive(path)
             if archive_directory:
                 return get_polars_archive_data_holder(archive_directory)
+            if path_has_or_is_standard_format_profile_data(path):
+                return get_polars_profile_standard_format_data_holder(path, **kwargs)
         lims_directory = directory_is_lims(path)
         if lims_directory:
             return get_polars_lims_data_holder(lims_directory)
+        if path_has_or_is_standard_format_profile_data(path):
+            return get_polars_profile_standard_format_data_holder(path, **kwargs)
+        if path_has_or_is_odv_data(path):
+            return get_polars_odv_data_holder(path, **kwargs)
     # if sharkweb:
     #     return get_shark_api_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f"Could not find dataholder for: {path}")
@@ -174,6 +200,21 @@ def is_valid_data_holder(
     if not any([valid, invalid]):
         return True
     holders = get_data_holders()
+    if any([val for val in invalid if isinstance(data_holder, holders[val])]):
+        return False
+    if any([val for val in valid if isinstance(data_holder, holders[val])]):
+        return True
+    return True
+
+
+def is_valid_polars_data_holder(
+    data_holder: PolarsDataHolder,
+    valid: tuple[str, ...] | None = None,
+    invalid: tuple[str, ...] | None = None,
+) -> bool:
+    if not any([valid, invalid]):
+        return True
+    holders = get_polars_data_holders()
     if any([val for val in invalid if isinstance(data_holder, holders[val])]):
         return False
     if any([val for val in valid if isinstance(data_holder, holders[val])]):
