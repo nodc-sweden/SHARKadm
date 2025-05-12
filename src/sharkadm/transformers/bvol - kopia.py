@@ -285,7 +285,8 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
             adm_logger.log_transformation(
-                f"Translating to Bvol scientific name: {from_name} -> {to_name} ({len(df)} places)",
+                f"Translating to Bvol scientific name: "
+                f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
 
@@ -352,7 +353,8 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
             pl.col("bvol_combined_from") != pl.col("bvol_combined_to")
         ).group_by("bvol_combined_from", "bvol_combined_to"):
             adm_logger.log_transformation(
-                f"Translating Bvol name and size_class  {from_name} -> {to_name} ({len(df)} places)",
+                f"Translating Bvol name and size_class "
+                f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
             # TODO: Log level here?
@@ -464,7 +466,10 @@ class OldPolarsAddBvolAphiaId(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolAphiaId.col_to_set} from {PolarsAddBvolAphiaId.source_col}"
+        return (
+            f"Adds {PolarsAddBvolAphiaId.col_to_set} "
+            f"from {PolarsAddBvolAphiaId.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:
@@ -510,7 +515,10 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolAphiaId.col_to_set} from {PolarsAddBvolAphiaId.source_col}"
+        return (
+            f"Adds {PolarsAddBvolAphiaId.col_to_set} "
+            f"from {PolarsAddBvolAphiaId.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
@@ -559,7 +567,10 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolRefList.col_to_set} from {PolarsAddBvolRefList.source_col}"
+        return (
+            f"Adds {PolarsAddBvolRefList.col_to_set} "
+            f"from {PolarsAddBvolRefList.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
@@ -607,7 +618,10 @@ class OldPolarsAddBvolRefList(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolRefList.col_to_set} from {PolarsAddBvolRefList.source_col}"
+        return (
+            f"Adds {PolarsAddBvolRefList.col_to_set} "
+            f"from {PolarsAddBvolRefList.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:
@@ -671,7 +685,8 @@ class NewPolarsAddBvolInfo(PolarsTransformer):
             bvol_scientific_name_original = translate_bvol_name.get(str(reported_name))
             if bvol_scientific_name_original:
                 adm_logger.log_transformation(
-                    f"Translating {reported_name} -> {bvol_scientific_name_original} ({len(df)} places)",
+                    f"Translating {reported_name} -> {bvol_scientific_name_original} "
+                    f"({len(df)} places)",
                     level=adm_logger.INFO,
                 )
             else:

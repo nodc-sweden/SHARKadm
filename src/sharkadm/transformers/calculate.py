@@ -25,8 +25,10 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating abundance. "
-                f"Setting value to column {PolarsCalculateAbundance.col_to_set}")
+        return (
+            f"Calculating abundance. "
+            f"Setting value to column {PolarsCalculateAbundance.col_to_set}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
@@ -82,8 +84,10 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating biovolume. "
-                f"Setting value to column {PolarsCalculateBiovolume.col_to_set}")
+        return (
+            f"Calculating biovolume. "
+            f"Setting value to column {PolarsCalculateBiovolume.col_to_set}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
@@ -171,8 +175,10 @@ class PolarsCalculateCarbon(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating {PolarsCalculateCarbon.parameter}. "
-                f"Setting value to column {PolarsCalculateCarbon.col_to_set}")
+        return (
+            f"Calculating {PolarsCalculateCarbon.parameter}. "
+            f"Setting value to column {PolarsCalculateCarbon.col_to_set}"
+        )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data["reported_carbon"] = data_holder.data[self.carbon_col]

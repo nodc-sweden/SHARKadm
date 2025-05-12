@@ -33,7 +33,7 @@ def path_has_or_is_odv_data(path: str | pathlib.Path) -> Union[pathlib.Path, Fal
         return False
 
     if root_path.is_file():
-        if is_odv_file(p):
+        if is_odv_file(root_path):
             return True
         return False
     for p in root_path.iterdir():

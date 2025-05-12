@@ -1,4 +1,3 @@
-
 import pandas as pd
 import polars as pl
 
@@ -211,8 +210,10 @@ class PolarsAddReportedPosition(Transformer):
     # TODO: Can also come in as latitude_deg, latitude_min
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Adds reported position prioritized as follow: sample_reported_-pos, "
-                "visit_reported_-pos")
+        return (
+            "Adds reported position prioritized as follow: sample_reported_-pos, "
+            "visit_reported_-pos"
+        )
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         self._add_columns_if_missing(data_holder)

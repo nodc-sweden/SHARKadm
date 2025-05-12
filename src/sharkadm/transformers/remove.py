@@ -560,7 +560,7 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.parameter_column not in data_holder.data:
             adm_logger.log_transformation(
-                f'Can not remove values in rows. '
+                f"Can not remove values in rows. "
                 f'Missing column "{self.parameter_column}"',
                 level=adm_logger.WARNING,
             )
@@ -583,7 +583,7 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
                 continue
             adm_logger.log_transformation(
                 f'Replacing value (-> {self._replace_value}) for parameter "{par}" '
-                f'({nr_rows} rows)',
+                f"({nr_rows} rows)",
                 level=adm_logger.WARNING,
             )
 

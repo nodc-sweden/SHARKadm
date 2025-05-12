@@ -4,11 +4,14 @@ from .base import DataHolderProtocol, Transformer
 
 
 class AddLmqnt(Transformer):
-    valid_data_types = ("physicalchemical", )
+    valid_data_types = ("physicalchemical",)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds the limit of quantification (lmqnt) in float associated to a parameter value"
+        return (
+            "Adds the limit of quantification (lmqnt) in float "
+            "associated to a parameter value"
+        )
 
     def _clean_lmqnt_str(self, lmqnt_str: str) -> str:
         if any(char.isdigit() for char in lmqnt_str):
@@ -36,7 +39,8 @@ class AddLmqnt(Transformer):
         return lmqnt_str
 
     def _conversions_to_shark_units(self, val: float, element: str) -> float:
-        # Unit conversions from ICES: https://www.ices.dk/data/tools/Pages/Unit-conversions.aspx
+        # Unit conversions from ICES:
+        #     https://www.ices.dk/data/tools/Pages/Unit-conversions.aspx
         # O2 from mg/l to ml/l
         # N from ug/l to umol/l
         # P from ug/l to umol/l

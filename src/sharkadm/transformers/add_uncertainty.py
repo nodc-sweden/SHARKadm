@@ -7,7 +7,7 @@ from .base import DataHolderProtocol, Transformer
 
 
 class AddUncertainty(Transformer):
-    valid_data_types = ("physicalchemical", )
+    valid_data_types = ("physicalchemical",)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -37,7 +37,8 @@ class AddUncertainty(Transformer):
         return uncert_str
 
     def _conversions_to_shark_units(self, val: float, element: str) -> float:
-        # Unit conversions from ICES: https://www.ices.dk/data/tools/Pages/Unit-conversions.aspx
+        # Unit conversions from ICES:
+        #     https://www.ices.dk/data/tools/Pages/Unit-conversions.aspx
         # O2 from mg/l to ml/l
         # N from ug/l to umol/l
         # P from ug/l to umol/l
@@ -78,7 +79,8 @@ class AddUncertainty(Transformer):
         element = ""
         if name in parameter_name_list:
             element = element_list[parameter_name_list.index(name)]
-        # fall med annan separator kan behöva hanteras, ok för DEEP, UMSC, SMHI i arkivmapp ej original.
+        # fall med annan separator kan behöva hanteras, ok för DEEP, UMSC, SMHI
+        # i arkivmapp ej original.
         uncert_levels = uncert_str.split(",")
         i = 0
         for level in uncert_levels:
@@ -217,9 +219,10 @@ class AddUncertainty(Transformer):
                     (uncertainties["limit_unit"] == unit)
                     | (uncertainties["limit_unit"] == "")
                 ).all():
-                    # note that UMSC does not have ranges, but gives two different values at two levels.
-                    # the code below assumes values below the first level has the uncertainty of that level,
-                    # whereas values above the first level have the uncertainty of the second level.
+                    # Note that UMSC does not have ranges, but gives two different values
+                    # at two levels. The code below assumes values below the first level
+                    # has the uncertainty of that level, whereas values above the first
+                    # level have the uncertainty of the second level.
                     if prior_endpoint == "yes":
                         bool_range_low = param_vals <= uncertainties["limit"][0]
                         bool_range_high = param_vals > uncertainties["limit"][0]

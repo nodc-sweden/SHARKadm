@@ -7,6 +7,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, FileExporter
 
 try:
     from nodc_station import DEFAULT_STATION_FILE_PATH
@@ -42,9 +43,6 @@ except ModuleNotFoundError as e:
         f"install this dependency if you want to use this module.",
         level=adm_logger.WARNING,
     )
-
-
-from .base import DataHolderProtocol, FileExporter
 
 
 class HtmlStationMap(FileExporter):
@@ -187,10 +185,10 @@ class PolarsHtmlMap(FileExporter):
         # load_station_list: bool = False,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        shape_layers: list[str | pathlib.Path] = None,
-        shape_files: list[str | pathlib.Path] = None,
+        shape_layers: list[str | pathlib.Path] | None = None,
+        shape_files: list[str | pathlib.Path] | None = None,
         highlight_stations_in_areas: bool = False,
-        columns_to_show: list[str] = None,
+        columns_to_show: list[str] | None = None,
         **kwargs,
     ):
         # self._load_station_list = load_station_list

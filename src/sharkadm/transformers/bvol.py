@@ -147,8 +147,10 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Adds {PolarsAddBvolAphiaId.col_to_set} "
-                f"from {PolarsAddBvolAphiaId.source_col}")
+        return (
+            f"Adds {PolarsAddBvolAphiaId.col_to_set} "
+            f"from {PolarsAddBvolAphiaId.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
@@ -197,8 +199,10 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Adds {PolarsAddBvolRefList.col_to_set} "
-                f"from {PolarsAddBvolRefList.source_col}")
+        return (
+            f"Adds {PolarsAddBvolRefList.col_to_set} "
+            f"from {PolarsAddBvolRefList.source_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
