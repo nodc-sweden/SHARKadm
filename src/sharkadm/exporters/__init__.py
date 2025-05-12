@@ -9,9 +9,9 @@ from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
 from sharkadm.exporters.dataframe import DataFrame
 from sharkadm.exporters.html_station_map import (
     HtmlStationMap,
-    PolarsHtmlStationMap,
     PolarsHtmlMap,
     PolarsHtmlMapR,
+    PolarsHtmlStationMap,
 )
 from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles
 from sharkadm.exporters.print_on_screen import PrintDataFrame

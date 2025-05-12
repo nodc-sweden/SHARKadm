@@ -1,7 +1,6 @@
-from typing import Union
+import pathlib
 
 from sharkadm import config
-import pathlib
 
 from .shark_api import SHARKapiDataHolder
 from .shark_format import PolarsSharkDataHolder

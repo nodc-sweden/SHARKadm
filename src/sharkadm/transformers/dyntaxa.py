@@ -4,9 +4,9 @@ from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
-    Transformer,
     PolarsDataHolderProtocol,
     PolarsTransformer,
+    Transformer,
 )
 
 try:
@@ -333,7 +333,8 @@ class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
     def get_transformer_description() -> str:
         return (
             f"Adds {PolarsAddReportedScientificNameDyntaxaId.col_to_set} "
-            f"from {PolarsAddReportedScientificNameDyntaxaId.source_col} if it is a digit."
+            f"from {PolarsAddReportedScientificNameDyntaxaId.source_col} "
+            f"if it is a digit."
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
@@ -367,7 +368,8 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"PolarsAdds {PolarsAddDyntaxaScientificName.col_to_set} translated from nodc_dyntaxa. "
+            f"PolarsAdds {PolarsAddDyntaxaScientificName.col_to_set} "
+            f"translated from nodc_dyntaxa. "
             f"Source column is {AddDyntaxaScientificName.source_col}"
         )
 

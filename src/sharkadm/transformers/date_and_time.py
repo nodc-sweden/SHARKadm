@@ -6,9 +6,9 @@ import polars as pl
 from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
+    PolarsDataHolderProtocol,
     PolarsTransformer,
     Transformer,
-    PolarsDataHolderProtocol,
 )
 
 DATETIME_FORMATS = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d")

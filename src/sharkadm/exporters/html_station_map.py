@@ -1,11 +1,11 @@
 import pathlib
 
-import geopandas
+import numpy as np
 import pandas as pd
 import polars as pl
-import numpy as np
 
 from sharkadm.sharkadm_logger import adm_logger
+
 from ..data import PolarsDataHolder
 
 try:
@@ -320,7 +320,8 @@ class PolarsHtmlMap(FileExporter):
         for info in self._station_info:
             if not info.get("x"):
                 adm_logger.log_export(
-                    f"Could not highlight stations in areas. Missing column sample_sweref99tm_x",
+                    "Could not highlight stations in areas. "
+                    "Missing column sample_sweref99tm_x",
                     level=adm_logger.ERROR,
                 )
                 raise KeyError("sample_sweref99tm_x and sample_sweref99tm_y")

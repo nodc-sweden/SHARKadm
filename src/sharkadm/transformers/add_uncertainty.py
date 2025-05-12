@@ -1,15 +1,17 @@
-from .base import Transformer, DataHolderProtocol
-import pandas as pd
-import numpy as np
 import re
+
+import numpy as np
+import pandas as pd
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddUncertainty(Transformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical", )
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds the uncertainty in float associated to a parameter value"
+        return "Adds the uncertainty in float associated to a parameter value"
 
     def _clean_uncert_str(self, uncert_str: str) -> str:
         uncert_str = uncert_str.replace("nivå", "")

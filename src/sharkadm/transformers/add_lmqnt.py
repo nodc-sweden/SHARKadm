@@ -1,14 +1,14 @@
-from .base import Transformer, DataHolderProtocol
-import pandas as pd
 import re
+
+from .base import DataHolderProtocol, Transformer
 
 
 class AddLmqnt(Transformer):
-    valid_data_types = ["physicalchemical"]
+    valid_data_types = ("physicalchemical", )
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds the limit of quantification (lmqnt) in float associated to a parameter value"
+        return "Adds the limit of quantification (lmqnt) in float associated to a parameter value"
 
     def _clean_lmqnt_str(self, lmqnt_str: str) -> str:
         if any(char.isdigit() for char in lmqnt_str):

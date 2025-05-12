@@ -1,4 +1,3 @@
-import dataclasses
 
 import pandas as pd
 import polars as pl
@@ -6,13 +5,13 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import geography
 
+from ..data import PolarsDataHolder
 from .base import (
     DataHolderProtocol,
     PolarsDataHolderProtocol,
     PolarsTransformer,
     Transformer,
 )
-from ..data import PolarsDataHolder
 
 
 class AddSamplePositionDD(Transformer):
@@ -212,7 +211,8 @@ class PolarsAddReportedPosition(Transformer):
     # TODO: Can also come in as latitude_deg, latitude_min
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds reported position prioritized as follow: sample_reported_-pos, visit_reported_-pos"
+        return ("Adds reported position prioritized as follow: sample_reported_-pos, "
+                "visit_reported_-pos")
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         self._add_columns_if_missing(data_holder)

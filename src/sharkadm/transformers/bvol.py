@@ -1,12 +1,10 @@
+import polars as pl
+
 from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import (
-    DataHolderProtocol,
-    Transformer,
-    PolarsDataHolderProtocol,
     PolarsTransformer,
 )
-import polars as pl
 
 try:
     import nodc_bvol
@@ -63,7 +61,8 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
             adm_logger.log_transformation(
-                f"Translating to Bvol scientific name: {from_name} -> {to_name} ({len(df)} places)",
+                f"Translating to Bvol scientific name: "
+                f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
 
@@ -129,7 +128,8 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
             pl.col("bvol_combined_from") != pl.col("bvol_combined_to")
         ).group_by("bvol_combined_from", "bvol_combined_to"):
             adm_logger.log_transformation(
-                f"Translating Bvol name and size_class  {from_name} -> {to_name} ({len(df)} places)",
+                f"Translating Bvol name and size_class "
+                f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
             # TODO: Log level here?
@@ -147,7 +147,8 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolAphiaId.col_to_set} from {PolarsAddBvolAphiaId.source_col}"
+        return (f"Adds {PolarsAddBvolAphiaId.col_to_set} "
+                f"from {PolarsAddBvolAphiaId.source_col}")
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
@@ -196,7 +197,8 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddBvolRefList.col_to_set} from {PolarsAddBvolRefList.source_col}"
+        return (f"Adds {PolarsAddBvolRefList.col_to_set} "
+                f"from {PolarsAddBvolRefList.source_col}")
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:

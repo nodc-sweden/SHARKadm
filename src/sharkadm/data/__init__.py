@@ -21,18 +21,18 @@ from sharkadm.data.lims import (
     get_lims_data_holder,
     get_polars_lims_data_holder,
 )
-from sharkadm.data.profile import (
-    get_polars_profile_standard_format_data_holder,
-    path_has_or_is_standard_format_profile_data,
-)
 from sharkadm.data.odv import (
     get_polars_odv_data_holder,
     path_has_or_is_odv_data,
 )
+from sharkadm.data.profile import (
+    get_polars_profile_standard_format_data_holder,
+    path_has_or_is_standard_format_profile_data,
+)
 from sharkadm.data.shark import (
-    get_shark_api_data_holder,
-    get_polars_shark_data_holder,
     file_is_from_shark,
+    get_polars_shark_data_holder,
+    get_shark_api_data_holder,
 )
 from sharkadm.data.zip_archive import (
     get_polars_zip_archive_data_holder,

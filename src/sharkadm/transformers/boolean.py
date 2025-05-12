@@ -1,9 +1,10 @@
 from types import MappingProxyType
+
 import polars as pl
 
 from sharkadm.data import PolarsDataHolder
+from sharkadm.transformers.base import DataHolderProtocol, PolarsTransformer, Transformer
 from sharkadm.utils import matching_strings
-from sharkadm.transformers.base import DataHolderProtocol, Transformer, PolarsTransformer
 
 
 class FixYesNo(Transformer):

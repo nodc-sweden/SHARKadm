@@ -1,11 +1,9 @@
-import numpy as np
-import pandas as pd
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer, PolarsTransformer
 from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 try:
     from nodc_bvol import get_bvol_nomp_object
@@ -27,7 +25,8 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Calculating abundance. Setting value to column {PolarsCalculateAbundance.col_to_set}"
+        return (f"Calculating abundance. "
+                f"Setting value to column {PolarsCalculateAbundance.col_to_set}")
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
@@ -83,7 +82,8 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Calculating biovolume. Setting value to column {PolarsCalculateBiovolume.col_to_set}"
+        return (f"Calculating biovolume. "
+                f"Setting value to column {PolarsCalculateBiovolume.col_to_set}")
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
@@ -171,7 +171,8 @@ class PolarsCalculateCarbon(Transformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Calculating {PolarsCalculateCarbon.parameter}. Setting value to column {PolarsCalculateCarbon.col_to_set}"
+        return (f"Calculating {PolarsCalculateCarbon.parameter}. "
+                f"Setting value to column {PolarsCalculateCarbon.col_to_set}")
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data["reported_carbon"] = data_holder.data[self.carbon_col]

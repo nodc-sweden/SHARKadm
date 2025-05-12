@@ -4,8 +4,8 @@ import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer, PolarsTransformer
 from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 try:
     from nodc_bvol import get_bvol_nomp_object
@@ -528,12 +528,12 @@ class ColCalculateCarbon(Transformer):
 class FixReportedValueAfterCalculations(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Setting reported_value after calculations"
+        return "Setting reported_value after calculations"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_structure != "row":
             adm_logger.log_transformation(
-                f"Could not fix reported value. Data is not in row format",
+                "Could not fix reported value. Data is not in row format",
                 level=adm_logger.ERROR,
             )
             return

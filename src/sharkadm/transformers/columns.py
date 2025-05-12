@@ -1,15 +1,16 @@
 import re
 
-from sharkadm.config import get_column_views_config
-from sharkadm.utils import approved_data
 import polars as pl
 
+from sharkadm.config import get_column_views_config
+from sharkadm.utils import approved_data
+
+from ..data import PolarsDataHolder
 from .base import (
     DataHolderProtocol,
     PolarsTransformer,
     Transformer,
 )
-from ..data import PolarsDataHolder
 
 
 class AddColumnViewsColumns(Transformer):

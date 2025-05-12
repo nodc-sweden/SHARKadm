@@ -1,6 +1,6 @@
 import time
 from abc import abstractmethod
-from typing import Protocol, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, Type
 
 import pandas as pd
 import polars as pl

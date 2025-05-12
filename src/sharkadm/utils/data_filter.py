@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 import polars as pl
+
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import approved_data
@@ -61,9 +62,9 @@ class PolarsDataFilter(ABC):
 class PolarsCombinedDataFilter:
     def __init__(
         self,
-        mask: Mask | CombinedMask,
-        _and: Mask | CombinedMask = None,
-        _or: Mask | CombinedMask = None,
+        mask: PolarsDataFilter | PolarsCombinedDataFilter,
+        _and: PolarsDataFilter | PolarsCombinedDataFilter = None,
+        _or: PolarsDataFilter | PolarsCombinedDataFilter = None,
     ):
         self._mask = mask
         self._and = _and

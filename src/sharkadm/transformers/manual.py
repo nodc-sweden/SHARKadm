@@ -1,9 +1,10 @@
 import numpy as np
 import polars as pl
+
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer, PolarsTransformer
 from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 
 class ManualSealPathology(Transformer):
