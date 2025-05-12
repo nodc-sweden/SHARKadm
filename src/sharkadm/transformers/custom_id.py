@@ -40,9 +40,7 @@ class AddCustomId(Transformer):
             )
             if self._add_md5:
                 col_name_md5 = f"{col_name}_md5"
-                data_holder.data[col_name_md5] = data_holder.data[col_name].apply(
-                    get_md5
-                )
+                data_holder.data[col_name_md5] = data_holder.data[col_name].apply(get_md5)
 
     @staticmethod
     def get_md5(x) -> str:
@@ -115,10 +113,7 @@ class PolarsAddCustomId(PolarsTransformer):
                 concat_cols.append(pl.col(col).str.replace_all("/", "_"))
 
             data_holder.data = data_holder.data.with_columns(
-                pl.concat_str(
-                    concat_cols,
-                    separator="_"
-                ).alias(col_name)
+                pl.concat_str(concat_cols, separator="_").alias(col_name)
             )
             if self._add_md5:
                 col_name_md5 = f"{col_name}_md5"
@@ -161,10 +156,7 @@ class PolarsAddSharkSampleMd5(PolarsTransformer):
             concat_cols.append(pl.col(col).str.replace_all("/", "_"))
 
         data_holder.data = data_holder.data.with_columns(
-            pl.concat_str(
-                concat_cols,
-                separator="_"
-            ).alias(building_blocks_col)
+            pl.concat_str(concat_cols, separator="_").alias(building_blocks_col)
         )
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.col_to_set)

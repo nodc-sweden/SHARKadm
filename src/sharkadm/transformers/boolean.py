@@ -50,6 +50,7 @@ class PolarsFixYesNo(PolarsTransformer):
 
         for col in use_columns:
             data_holder.data = data_holder.data.with_columns(
-                pl.col(col).str.to_lowercase().replace_strict(self._mapping,
-                                                              default=pl.col(col))
+                pl.col(col)
+                .str.to_lowercase()
+                .replace_strict(self._mapping, default=pl.col(col))
             )

@@ -50,11 +50,11 @@ class PolarsCalculateAbundance(PolarsTransformer):
         )
 
         max_boolean = boolean & data_holder.data[self.col_to_set].cast(float) > (
-                data_holder.data[self.abundance_col].cast(float) * 2
+            data_holder.data[self.abundance_col].cast(float) * 2
         )
 
         min_boolean = boolean & data_holder.data[self.col_to_set].cast(float) < (
-                data_holder.data[self.abundance_col].cast(float) * 0.5
+            data_holder.data[self.abundance_col].cast(float) * 0.5
         )
 
         out_of_range_boolean = max_boolean | min_boolean
@@ -63,7 +63,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
             pl.when(out_of_range_boolean)
             .then(pl.col(self.col_to_set))
             .otherwise(pl.col(self.abundance_col))
-            .alias('combined_abundance'),
+            .alias("combined_abundance"),
             pl.when(out_of_range_boolean)
             .then(pl.lit("Y"))
             .otherwise(pl.lit(""))
@@ -122,25 +122,25 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         )
 
         boolean = (data_holder.data[self.abundance_col] != "") & (
-                data_holder.data[self.combined_cell_volume_col] != ""
+            data_holder.data[self.combined_cell_volume_col] != ""
         )
 
         data_holder.data = data_holder.data.with_columns(
             pl.when(boolean)
             .then(
-                pl.col(self.abundance_col).cast(float) *
-                pl.col(self.combined_cell_volume_col).cast(float)
+                pl.col(self.abundance_col).cast(float)
+                * pl.col(self.combined_cell_volume_col).cast(float)
             )
             .otherwise(pl.lit(""))
             .alias(self.col_to_set)
         )
 
         max_boolean = boolean & data_holder.data[self.col_to_set].cast(float) > (
-                data_holder.data[self.bvol_col].cast(float) * 2
+            data_holder.data[self.bvol_col].cast(float) * 2
         )
 
         min_boolean = boolean & data_holder.data[self.col_to_set].cast(float) < (
-                data_holder.data[self.bvol_col].cast(float) * 0.5
+            data_holder.data[self.bvol_col].cast(float) * 0.5
         )
 
         out_of_range_boolean = max_boolean | min_boolean
@@ -149,7 +149,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
             pl.when(out_of_range_boolean)
             .then(pl.col(self.col_to_set))
             .otherwise(pl.col(self.bvol_col))
-            .alias('combined_biovolume'),
+            .alias("combined_biovolume"),
             pl.when(out_of_range_boolean)
             .then(pl.lit("Y"))
             .otherwise(pl.lit(""))
@@ -198,4 +198,3 @@ class PolarsCalculateCarbon(Transformer):
         )
         data_holder.data.loc[out_of_range_boolean, "calc_by_dc_carbon"] = "Y"
         data_holder.data["carbon_unit"] = "ugC/l"
-

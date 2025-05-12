@@ -140,9 +140,7 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
             if col in data_holder.data.columns:
                 continue
             empty_cols_to_add.append(pl.lit("").alias(col))
-        data_holder.data = data_holder.data.with_columns(
-            empty_cols_to_add
-        )
+        data_holder.data = data_holder.data.with_columns(empty_cols_to_add)
 
 
 class PolarsSortColumns(PolarsTransformer):

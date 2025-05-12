@@ -27,9 +27,12 @@ class PolarsAddCruiseId(Transformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.concat_st([
-                pl.col("visit_year"),
-                pl.col("platform_code"),
-                pl.col("expedition_id"),
-            ], separator="_")
+            pl.concat_st(
+                [
+                    pl.col("visit_year"),
+                    pl.col("platform_code"),
+                    pl.col("expedition_id"),
+                ],
+                separator="_",
+            )
         )

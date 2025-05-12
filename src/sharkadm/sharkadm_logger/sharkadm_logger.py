@@ -376,11 +376,11 @@ class SHARKadmLogger:
 
     def print_on_screen(self, *args, **kwargs):
         def _print(data: dict):
-            if data['level'] not in levels:
+            if data["level"] not in levels:
                 return
-            if data['log_type'] not in log_types:
+            if data["log_type"] not in log_types:
                 return
-            if data['purpose'] and data['purpose'] not in purposes:
+            if data["purpose"] and data["purpose"] not in purposes:
                 return
             print(data)
 
@@ -390,7 +390,7 @@ class SHARKadmLogger:
         print(f"{log_types=}")
         print(f"{levels=}")
         print(f"{purposes=}")
-        self.subscribe('log', _print)
+        self.subscribe("log", _print)
 
 
 class old_SHARKadmLogger:
@@ -714,5 +714,3 @@ class old_SHARKadmLogger:
     @staticmethod
     def subscribe(ev: str, func, prio: int = 50) -> None:
         event.subscribe(ev, func, prio)
-
-
