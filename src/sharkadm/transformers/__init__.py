@@ -31,6 +31,7 @@ from sharkadm.transformers.columns import (
     AddColumnViewsColumns,
     AddDEPHqcColumn,
     PolarsAddApprovedKeyColumn,
+    PolarsAddColumnViewsColumns,
     PolarsRemoveColumns,
     RemoveColumns,
     SortColumns,
