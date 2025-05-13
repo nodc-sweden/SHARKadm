@@ -28,10 +28,10 @@ class AddCalculatedSamplerArea(Transformer):
             self.transect_width_par,
         ]:
             if par not in row:
-                adm_logger.log_transformation(f"Missing key: {par}", level="warning")
+                self._log(f"Missing key: {par}", level="warning")
                 can_calculate = False
             elif not row[par]:
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing value for parameter: {par}", level="warning"
                 )
                 can_calculate = False

@@ -42,14 +42,14 @@ class AddStationInfo(Transformer):
         ):
             if not (lat_str and lon_str):
                 rows = ", ".join(list(df["row_number"]))
-                adm_logger.log_transformation(
+                self._log(
                     adm_logger.feedback.missing_position(
                         rows=sorted(set(df["row_number"]))
                     ),
                     level=adm_logger.ERROR,
                     purpose=adm_logger.FEEDBACK,
                 )  # Ska kanske vara i validator istället
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing {self.source_lat_column} and/or {self.source_lon_column} "
                     f"in {self.__class__.__name__}",
                     row_number=rows,
@@ -77,14 +77,14 @@ class AddStationInfo(Transformer):
                 if len(closest_info) == 1:
                     closest_info = closest_info[0]
                     if closest_info["accepted"]:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Station '{reported_station}' is not found as a synonym in "
                             f"station list Closest station is "
                             f"{closest_info['STATION_NAME']} and is accepted",
                             level=adm_logger.WARNING,
                         )
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Station '{reported_station}' is not found as a synonym in "
                             f"station list Closest station is "
                             f"{closest_info['STATION_NAME']} but is not accepted",
@@ -95,14 +95,14 @@ class AddStationInfo(Transformer):
                     station_names_str = ", ".join(
                         [info["STATION_NAME"] for info in closest_info]
                     )
-                    adm_logger.log_transformation(
+                    self._log(
                         f"Station '{reported_station}' is not found as a synonym in "
                         f"station list. Closest station(s) is/are {station_names_str}",
                         level=adm_logger.WARNING,
                     )
                     continue
             if not info["accepted"]:
-                adm_logger.log_transformation(
+                self._log(
                     f"Reported station name found in station list but it is outside "
                     f"the accepted radius. Distance={info['calc_dist']}, "
                     f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
@@ -112,7 +112,7 @@ class AddStationInfo(Transformer):
 
             if reported_station != info["STATION_NAME"]:
                 name = info["STATION_NAME"]
-                adm_logger.log_transformation(
+                self._log(
                     f"Station name translated: {reported_station} -> {name}",
                     level="warning",
                 )
@@ -124,7 +124,7 @@ class AddStationInfo(Transformer):
     def _create_columns_if_missing(self, data_holder: DataHolderProtocol) -> None:
         for col in self.columns_to_set:
             if col not in data_holder.data.columns:
-                adm_logger.log_transformation(
+                self._log(
                     f"Adding column {col}", level=adm_logger.DEBUG
                 )
                 data_holder.data[col] = ""

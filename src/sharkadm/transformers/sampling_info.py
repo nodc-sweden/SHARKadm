@@ -17,7 +17,7 @@ class AddSamplingInfo(Transformer):
 
     def _transform(self, data_holder: ArchiveDataHolder | LimsDataHolder) -> None:
         if "parameter" not in data_holder.columns:
-            adm_logger.log_transformation(
+            self._log(
                 "Can not add sampling info. Data is not in row format.",
                 level=adm_logger.ERROR,
             )

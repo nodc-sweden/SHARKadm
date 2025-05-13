@@ -18,7 +18,7 @@ class AddAnalyseInfo(Transformer):
 
     def _transform(self, data_holder: ArchiveDataHolder | LimsDataHolder) -> None:
         if "parameter" not in data_holder.columns:
-            adm_logger.log_transformation(
+            self._log(
                 "Can not add analyse info. Data is not in row format.",
                 level=adm_logger.ERROR,
             )
@@ -28,7 +28,7 @@ class AddAnalyseInfo(Transformer):
             if not dtime:
                 continue
             if par not in pars:
-                adm_logger.log_transformation(
+                self._log(
                     f'No analyse info for parameter "{par}"', level=adm_logger.WARNING
                 )
                 continue
@@ -52,7 +52,7 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
         self, data_holder: PolarsArchiveDataHolder | PolarsLimsDataHolder
     ) -> None:
         if "parameter" not in data_holder.columns:
-            adm_logger.log_transformation(
+            self._log(
                 "Can not add analyse info. Data is not in row format.",
                 level=adm_logger.ERROR,
             )
@@ -65,7 +65,7 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
             if not dtime:
                 continue
             if parameter not in parameters:
-                adm_logger.log_transformation(
+                self._log(
                     f"No analyse info for parameter '{parameter}'",
                     level=adm_logger.WARNING,
                 )

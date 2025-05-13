@@ -73,7 +73,9 @@ class Exporter(ABC):
             return
 
         if not is_valid_data_holder(
-            data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
+            data_holder,
+            valid=self.valid_data_holders,
+            invalid=self.invalid_data_holders,
         ):
             adm_logger.log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for exporter"
@@ -96,6 +98,9 @@ class Exporter(ABC):
 
     @abstractmethod
     def _export(self, data_holder: DataHolderProtocol) -> None: ...
+
+    def _log(self, msg: str, **kwargs):
+        adm_logger.log_export(msg, cls=self.__class__.__name__, **kwargs)
 
 
 class FileExporter(Exporter, ABC):

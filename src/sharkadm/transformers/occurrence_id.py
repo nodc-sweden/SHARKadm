@@ -31,7 +31,7 @@ class AddOccurrenceId(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if not nodc_occurrence_id:
-            adm_logger.log_transformation(
+            self._log(
                 "Missing package nodc_occurrence_id to add occurrence_id",
                 level=adm_logger.ERROR,
             )
@@ -80,7 +80,7 @@ class AddOccurrenceId(Transformer):
     #     self.database.add_matching_to_data(*self.valid_matches)
     #
     def _on_missing_mandatory_columns(self, data: dict) -> None:
-        adm_logger.log_transformation(
+        self._log(
             f"Could not add {self.col_to_set}. "
             f"Missing columns: {data['missing_columns']}",
             level=adm_logger.WARNING,
@@ -92,27 +92,27 @@ class AddOccurrenceId(Transformer):
     #     if data['perfect_match_in_db']:
     #         perfect = 'perfect match'
     #     if data.get('forced'):
-    #         adm_logger.log_transformation(
+    #         self._log(
     #             f'Existing ({perfect}) {self.col_to_set} ({data["id"]}) "
     #             f"added "by force" ({data["nr_places"]})',
     #             level=adm_logger.INFO)
     #     else:
-    #         adm_logger.log_transformation(
+    #         self._log(
     #             f'Existing ({perfect}) {self.col_to_set} ({data["id"]}) added "
     #             f"({data["nr_places"]})',
     #             level=adm_logger.INFO)
     #
     # def _on_new_id_added_to_data_and_database(self, data: dict) -> None:
-    #     adm_logger.log_transformation(
+    #     self._log(
     #         f'New {self.col_to_set} ({data["id"]}) added ({data["nr_places"]})',
     #         level=adm_logger.INFO
     #     )
-    #     adm_logger.log_transformation(
+    #     self._log(
     #         f'New {self.col_to_set} ({data["id"]}) added to database',
     #                                   level=adm_logger.DEBUG)
     #
     # def _on_several_valid_matches_in_database(self, data: dict) -> None:
-    #     adm_logger.log_transformation(
+    #     self._log(
     #         f'Several valid matches in database "
     #         f"for {self.col_to_set}: {data["temp_id_str"]}',
     #         level=adm_logger.WARNING
@@ -120,7 +120,7 @@ class AddOccurrenceId(Transformer):
     #
     # def _on_valid_match_in_database(self, data: dict) -> None:
     #     self.valid_matches.append(data['valid_match'])
-    #     adm_logger.log_transformation(
+    #     self._log(
     #         f'Valid match found in database "
     #         f"for {self.col_to_set}: {data["temp_id_str"]}',
     #         level=adm_logger.WARNING
@@ -130,7 +130,7 @@ class AddOccurrenceId(Transformer):
         event.post_event("progress", data)
 
     def _on_result(self, data: dict) -> None:
-        adm_logger.log_transformation(data.get("msg", ""), level=adm_logger.INFO)
+        self._log(data.get("msg", ""), level=adm_logger.INFO)
         # self._post_event_result('nr_perfect_match', tot_nr_perfect_matches)
         # self._post_event_result(
         #     'nr_added_valid_suggestions', tot_nr_added_valid_suggestions

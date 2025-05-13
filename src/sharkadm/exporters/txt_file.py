@@ -18,7 +18,9 @@ class TxtAsIs(FileExporter):
         **kwargs,
     ):
         super().__init__(
-            export_directory=export_directory, export_file_name=export_file_name, **kwargs
+            export_directory=export_directory,
+            export_file_name=export_file_name,
+            **kwargs,
         )
         self._header_as = header_as
 
@@ -33,9 +35,7 @@ class TxtAsIs(FileExporter):
                 data_holder, import_column=self._header_as
             )
             if not mapper:
-                adm_logger.log_export(
-                    f"Could not find mapper using header_as = {self._header_as}"
-                )
+                self._log(f"Could not find mapper using header_as = {self._header_as}")
                 return
             # mapper = get_import_matrix_mapper(
             #     data_type=data_holder.data_type, import_column=self._header_as
@@ -49,7 +49,9 @@ class TxtAsIs(FileExporter):
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )
         except PermissionError:
-            self._export_file_name = get_next_incremented_file_path(self.export_file_path)
+            self._export_file_name = get_next_incremented_file_path(
+                self.export_file_path
+            )
             df.to_csv(
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )

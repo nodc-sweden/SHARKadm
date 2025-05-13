@@ -51,7 +51,7 @@ class AddRowNumber(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Column {self.col_to_set} already present. Will not overwrite"
             )
             return
@@ -73,7 +73,7 @@ class PolarsAddRowNumber(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsRowsDataHolderProtocol) -> None:
         if self.col_to_set in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Column {self.col_to_set} already present. Will not overwrite"
             )
             return

@@ -30,7 +30,7 @@ class AddCustomId(Transformer):
             col_name = f"custom_{level}_id"
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing columns for creating {col_name}: "
                     f"{', '.join(list(missing))}",
                     level=adm_logger.WARNING,
@@ -63,7 +63,7 @@ class AddSharkSampleMd5(Transformer):
         )
         missing = set(id_handler.id_columns) - set(data_holder.data.columns)
         if missing:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing columns for creating {self.col_to_set}: "
                 f"{', '.join(list(missing))}",
                 level=adm_logger.WARNING,
@@ -103,7 +103,7 @@ class PolarsAddCustomId(PolarsTransformer):
             col_name = f"custom_{level}_id"
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing columns for creating {col_name}: "
                     f"{', '.join(list(missing))}",
                     level=adm_logger.WARNING,
@@ -145,7 +145,7 @@ class PolarsAddSharkSampleMd5(PolarsTransformer):
         )
         missing = set(id_handler.id_columns) - set(data_holder.data.columns)
         if missing:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing columns for creating {self.col_to_set}: "
                 f"{', '.join(list(missing))}",
                 level=adm_logger.WARNING,

@@ -39,7 +39,7 @@ class _AddCodes(Transformer):
                 source_col = col
                 break
         if not source_col:
-            adm_logger.log_transformation(
+            self._log(
                 f"None of the source columns {self.source_cols} found "
                 f"when trying to set {self.col_to_set}",
                 level=adm_logger.WARNING,
@@ -55,7 +55,7 @@ class _AddCodes(Transformer):
             info = _translate_codes.get_info(self.lookup_field, code.strip())
             if info:
                 names = [info[self.lookup_key]]
-                adm_logger.log_transformation(
+                self._log(
                     f"{source_col} {code} translated to {info[self.lookup_key]} "
                     f"({len_df} places)",
                     level=adm_logger.INFO,
@@ -66,13 +66,13 @@ class _AddCodes(Transformer):
                     info = _translate_codes.get_info(self.lookup_field, part)
                     if info:
                         names.append(info[self.lookup_key])
-                        adm_logger.log_transformation(
+                        self._log(
                             f"{source_col} {part} translated to {info[self.lookup_key]} "
                             f"({len_df} places)",
                             level=adm_logger.INFO,
                         )
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Could not find information for {source_col}: {part}",
                             level=adm_logger.WARNING,
                         )
@@ -100,7 +100,7 @@ class _PolarsAddCodes(PolarsTransformer):
                 source_col = col
                 break
         if not source_col:
-            adm_logger.log_transformation(
+            self._log(
                 f"None of the source columns {self.source_cols} found "
                 f"when trying to set {self.col_to_set}",
                 level=adm_logger.WARNING,
@@ -119,7 +119,7 @@ class _PolarsAddCodes(PolarsTransformer):
             info = _translate_codes.get_info(self.lookup_field, code.strip())
             if info:
                 names = [info[self.lookup_key]]
-                adm_logger.log_transformation(
+                self._log(
                     f"{source_col} {code} translated to {info[self.lookup_key]} "
                     f"({len_df} places)",
                     level=adm_logger.INFO,
@@ -130,13 +130,13 @@ class _PolarsAddCodes(PolarsTransformer):
                     info = _translate_codes.get_info(self.lookup_field, part)
                     if info:
                         names.append(info[self.lookup_key])
-                        adm_logger.log_transformation(
+                        self._log(
                             f"{source_col} {part} translated to {info[self.lookup_key]} "
                             f"({len_df} places)",
                             level=adm_logger.INFO,
                         )
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Could not find information for {source_col}: {part}",
                             level=adm_logger.WARNING,
                         )

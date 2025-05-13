@@ -21,14 +21,14 @@ class QCRange(Transformer):
         header = list(data_holder.data.columns)
         for col in self._columns:
             if col not in header:
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing column for range check: {col}", level="warning"
                 )
                 continue
             qc0_col = f"QC0_{col}"
             if qc0_col not in header:
                 # Maybe it should be possible to add this column here?
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing QC0 column for range check: {qc0_col}", level="warning"
                 )
                 continue

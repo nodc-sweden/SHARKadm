@@ -65,7 +65,7 @@ class ZipArchive(FileExporter):
 
     def _copy_received_files(self) -> None:
         if not hasattr(self._data_holder, "received_data_files"):
-            adm_logger.log_export(
+            self._log(
                 f"No attribute for received_data_files for data_holder "
                 f"{self._data_holder.data_holder_name}",
                 level=adm_logger.DEBUG,
@@ -79,7 +79,7 @@ class ZipArchive(FileExporter):
 
     def _copy_processed_files(self) -> None:
         if not hasattr(self._data_holder, "processed_data_files"):
-            adm_logger.log_export(
+            self._log(
                 f"No attribute for processed_data_files for data_holder "
                 f"{self._data_holder.data_holder_name}",
                 level=adm_logger.DEBUG,
@@ -89,7 +89,7 @@ class ZipArchive(FileExporter):
         target_dir.mkdir(parents=True, exist_ok=True)
         for path in self._data_holder.processed_data_files:
             if not path.exists():
-                adm_logger.log_export(
+                self._log(
                     f"Missing processed file: {path.name}", level=adm_logger.WARNING
                 )
                 continue
@@ -102,7 +102,7 @@ class ZipArchive(FileExporter):
 
     def _add_shark_metadata(self) -> None:
         if not hasattr(self._data_holder, "shark_metadata_path"):
-            adm_logger.log_export(
+            self._log(
                 f"No attribute for shark_metadata_path for data_holder "
                 f"{self._data_holder.data_holder_name}",
                 level=adm_logger.DEBUG,
@@ -113,10 +113,10 @@ class ZipArchive(FileExporter):
         shutil.copy2(source_path, target_path)
 
     def _add_readme_en(self) -> None:
-        adm_logger.log_export("Add README.txt not implemented", level=adm_logger.DEBUG)
+        self._log("Add README.txt not implemented", level=adm_logger.DEBUG)
 
     def _add_readme_sv(self) -> None:
-        adm_logger.log_export("Add README_sv.txt not implemented", level=adm_logger.DEBUG)
+        self._log("Add README_sv.txt not implemented", level=adm_logger.DEBUG)
 
     def _create_shark_metadata_auto(self) -> None:
         print(f"{self._temp_target_directory=}")

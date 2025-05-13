@@ -40,7 +40,7 @@ class DataFrame(Exporter):
                     for value, part_df in df.groupby(col):
                         new_value = self._convert_to_float(str(value))
                         if new_value == np.nan:
-                            adm_logger.log_export(
+                            self._log(
                                 f"Could not convert {value} to numeric in column {col}. "
                                 f"setting value to np.nan ({len(part_df)} places).",
                                 item=col,
@@ -52,7 +52,7 @@ class DataFrame(Exporter):
                 data_holder, import_column=self._header_as
             )
             if not mapper:
-                adm_logger.log_export(
+                self._log(
                     f"Could not find mapper using header_as = {self._header_as}",
                     level=adm_logger.WARNING,
                 )

@@ -149,6 +149,9 @@ class Transformer(ABC):
         )
         return self._data_filter.get_filter_mask(data_holder)
 
+    def _log(self, msg: str, **kwargs):
+        adm_logger.log_transformation(msg, cls=self.__class__.__name__, **kwargs)
+
 
 class PolarsTransformer(ABC):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
@@ -264,3 +267,7 @@ class PolarsTransformer(ABC):
     def _remove_columns(self, data_holder: "PolarsDataHolder", *cols) -> None:
         cols = [col for col in cols if col in data_holder.data.columns]
         data_holder.data = data_holder.data.drop(cols)
+
+    def _log(self, msg: str, **kwargs):
+        adm_logger.log_transformation(msg, cls=self.__class__.__name__, **kwargs)
+

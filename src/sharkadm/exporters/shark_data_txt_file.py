@@ -34,7 +34,9 @@ class SHARKdataTxt(FileExporter):
             view=data_holder.data_type_internal
         )
         data = data_holder.data[column_list]
-        data.to_csv(self.export_file_path, encoding=self._encoding, sep="\t", index=False)
+        data.to_csv(
+            self.export_file_path, encoding=self._encoding, sep="\t", index=False
+        )
 
 
 class SHARKdataTxtAsGiven(FileExporter):

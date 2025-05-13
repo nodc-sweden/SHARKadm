@@ -46,7 +46,7 @@ class _mall_PolarsReportingInstitute(PolarsTransformer):
                 source_col = col
                 break
         if not source_col:
-            adm_logger.log_transformation(
+            self._log(
                 f"None of the source columns {self.source_cols} found "
                 f"when trying to set {self.col_to_set}",
                 level=adm_logger.WARNING,
@@ -65,7 +65,7 @@ class _mall_PolarsReportingInstitute(PolarsTransformer):
             info = _translate_codes.get_info(self.lookup_field, code.strip())
             if info:
                 names = [info[self.lookup_key]]
-                adm_logger.log_transformation(
+                self._log(
                     f"{source_col} {code} translated to {info[self.lookup_key]} "
                     f"({len_df} places)",
                     level=adm_logger.INFO,
@@ -76,13 +76,13 @@ class _mall_PolarsReportingInstitute(PolarsTransformer):
                     info = _translate_codes.get_info(self.lookup_field, part)
                     if info:
                         names.append(info[self.lookup_key])
-                        adm_logger.log_transformation(
+                        self._log(
                             f"{source_col} {part} translated to {info[self.lookup_key]} "
                             f"({len_df} places)",
                             level=adm_logger.INFO,
                         )
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Could not find information for {source_col}: {part}",
                             level=adm_logger.WARNING,
                         )
@@ -112,7 +112,7 @@ class _PolarsReportingInstitute(PolarsTransformer):
         if self._set_from_data(data_holder=data_holder):
             return
         if not self._set_from_other(data_holder=data_holder):
-            adm_logger.log_transformation(
+            self._log(
                 f"None of the source columns {self.source_cols} found when trying to set "
                 f"{self.col_to_set}. And no other reporting institute found.",
                 level=adm_logger.WARNING,
@@ -126,7 +126,7 @@ class _PolarsReportingInstitute(PolarsTransformer):
             info = _translate_codes.get_info(
                 self.lookup_field, data_holder.reporting_institute
             )
-            adm_logger.log_transformation("Setting reporting_institute from data_holder")
+            self._log("Setting reporting_institute from data_holder")
             data_holder.data = data_holder.data.with_columns(
                 pl.lit(info[self.lookup_key]).alias(self.col_to_set)
             )
@@ -157,7 +157,7 @@ class _PolarsReportingInstitute(PolarsTransformer):
                 if info:
                     names.append(info[self.lookup_key])
                 else:
-                    adm_logger.log_transformation(
+                    self._log(
                         f"Could not find information for {source_col}: {part}",
                         level=adm_logger.WARNING,
                     )
@@ -191,7 +191,7 @@ class _ReportingInstitute(Transformer):
         if self._set_from_data(data_holder=data_holder):
             return
         if not self._set_from_other(data_holder=data_holder):
-            adm_logger.log_transformation(
+            self._log(
                 f"None of the source columns {self.source_cols} found when trying to set "
                 f"{self.col_to_set}. And no other reporting institute found.",
                 level=adm_logger.WARNING,
@@ -205,7 +205,7 @@ class _ReportingInstitute(Transformer):
             info = _translate_codes.get_info(
                 self.lookup_field, data_holder.reporting_institute
             )
-            adm_logger.log_transformation("Setting")
+            self._log("Setting")
             data_holder.data[self.col_to_set] = info[self.lookup_key]
             return True
         return False
@@ -228,7 +228,7 @@ class _ReportingInstitute(Transformer):
                 if info:
                     names.append(info[self.lookup_key])
                 else:
-                    adm_logger.log_transformation(
+                    self._log(
                         f"Could not find information for {source_col}: {part}",
                         level=adm_logger.WARNING,
                     )

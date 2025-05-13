@@ -23,7 +23,7 @@ class AddSampleMinAndMaxDepth(Transformer):
         if row.get(par):
             return row[par]
         if row.get(self.depth_par):
-            adm_logger.log_transformation(f"Added {par} from {self.depth_par}")
+            self._log(f"Added {par} from {self.depth_par}")
             return row[self.depth_par]
 
 
@@ -50,12 +50,12 @@ class AddSectionStartAndEndDepth(Transformer):
         if row.get(self.min_depth_par):
             return row[self.min_depth_par]
         if row.get(self.depth_par):
-            adm_logger.log_transformation(
+            self._log(
                 f"Added {self.min_depth_par} from {self.depth_par}"
             )
             return row[self.depth_par]
         if row.get(self.section_end_depth_par):
-            adm_logger.log_transformation(
+            self._log(
                 f"Added {self.min_depth_par} from {self.section_end_depth_par}"
             )
             return row[self.section_end_depth_par]
@@ -64,12 +64,12 @@ class AddSectionStartAndEndDepth(Transformer):
         if row.get(self.max_depth_par):
             return row[self.max_depth_par]
         if row.get(self.depth_par):
-            adm_logger.log_transformation(
+            self._log(
                 f"Added {self.max_depth_par} from {self.depth_par}"
             )
             return row[self.depth_par]
         if row.get(self.section_start_depth_par):
-            adm_logger.log_transformation(
+            self._log(
                 f"Added {self.max_depth_par} from {self.section_start_depth_par}"
             )
             return row[self.section_start_depth_par]
@@ -97,7 +97,7 @@ class ReorderSampleMinAndMaxDepth(Transformer):
 
     def reorder(self, row: pd.Series) -> list[str, str]:
         if row[self.min_depth_par] > row[self.max_depth_par]:
-            adm_logger.log_transformation(
+            self._log(
                 f"Changed value order of {self.min_depth_par} and {self.max_depth_par}"
             )
             return [row[self.max_depth_par], row[self.min_depth_par]]

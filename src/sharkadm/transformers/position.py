@@ -118,7 +118,7 @@ class AddSamplePositionSweref99tm(Transformer):
             [self.lat_source_col, self.lon_source_col]
         ):
             if not all([lat, lon]):
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing position when trying to set {self.x_column_to_set} "
                     f"and {self.y_column_to_set}"
                 )
@@ -154,7 +154,7 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
             [self.lat_source_col, self.lon_source_col]
         ):
             if not all([lat, lon]):
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing position when trying to set {self.x_column_to_set} "
                     f"and {self.y_column_to_set}"
                 )
@@ -195,7 +195,7 @@ class AddSamplePositionDM(Transformer):
             [self.lat_source_col, self.lon_source_col]
         ):
             if not all([lat, lon]):
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing position when trying to set {self.lat_column_to_set} "
                     f"and {self.lon_column_to_set}"
                 )
@@ -310,7 +310,7 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
         elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
             return geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon)
         else:
-            adm_logger.log_transformation(
+            self._log(
                 f"Unknown format of reported_latitude and/or "
                 f"reported_longitude when tying to to set "
                 f"{self.lat_source_col} and "
@@ -366,7 +366,7 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
             [self.lat_source_col, self.lon_source_col]
         ):
             if not all([lat, lon]):
-                adm_logger.log_transformation(
+                self._log(
                     f"Missing position when trying to set {self.lat_col_to_set} "
                     f"and {self.lon_col_to_set}",
                     level=adm_logger.WARNING,

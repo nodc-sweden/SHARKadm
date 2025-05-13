@@ -32,7 +32,7 @@ class MoveLessThanFlagRowFormat(Transformer):
 
         nr_flags = boolean.value_counts().get(True)
         if nr_flags:
-            adm_logger.log_transformation(
+            self._log(
                 f'Moving {nr_flags} "<"-flags to quality_flag column'
             )
 
@@ -67,7 +67,7 @@ class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
         )
 
         if affected_rows:
-            adm_logger.log_transformation(
+            self._log(
                 f'Moving {affected_rows} "<"-flags to quality_flag column'
             )
 
@@ -107,11 +107,11 @@ class MoveLessThanFlagColumnFormat(Transformer):
         if not row[col].startswith("<"):
             return row[q_col]
         if row[q_col]:
-            adm_logger.log_transformation(
+            self._log(
                 f"Will not overwrite flag {row[q_col]} with flag <"
             )
             return row[q_col]
-        adm_logger.log_transformation(f"Moving {col} flag < to flag column")
+        self._log(f"Moving {col} flag < to flag column")
         return "<"
 
 

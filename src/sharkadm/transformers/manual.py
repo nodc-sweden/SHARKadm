@@ -20,7 +20,7 @@ class ManualSealPathology(Transformer):
         boolean = data_holder.data["shark_sample_id_md5"] == md5
         df = data_holder.data[boolean]
         if df.empty:
-            adm_logger.log_transformation(f"md5 not found: {md5}", level=adm_logger.INFO)
+            self._log(f"md5 not found: {md5}", level=adm_logger.INFO)
             return
         data_holder.data.loc[boolean, "visit_year"] = "2018"
         data_holder.data.loc[boolean, "visit_month"] = "01"
@@ -39,7 +39,7 @@ class ManualHarbourPorpoise(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Source column {self.source_col} not found", level=adm_logger.DEBUG
             )
             return
@@ -57,14 +57,14 @@ class ManualHarbourPorpoise(Transformer):
             boolean = data_holder.data["shark_sample_id_md5"] == md5
             df = data_holder.data[boolean]
             if df.empty:
-                adm_logger.log_transformation(
+                self._log(
                     f"md5 not found: {md5}", level=adm_logger.DEBUG
                 )
                 continue
             data_holder.data.loc[boolean, self.col_to_set] = data_holder.data.loc[
                 boolean, self.source_col
             ]
-            adm_logger.log_transformation(
+            self._log(
                 f"{self.col_to_set} set from {self.source_col} for md5={md5} "
                 f"in {len(np.where(boolean)[0])} places",
                 level=adm_logger.INFO,
@@ -83,7 +83,7 @@ class PolarsManualSealPathology(PolarsTransformer):
         md5 = "364768f88de5f22c0e415150eddee722"
         if md5 not in data_holder.data["shark_sample_id_md5"]:
             return
-        adm_logger.log_transformation(
+        self._log(
             f"Setting manual info for md5: {md5}", level=adm_logger.INFO
         )
         data_holder.data = data_holder.data.with_columns(
@@ -115,7 +115,7 @@ class PolarsManualHarbourPorpoise(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Source column {self.source_col} not found", level=adm_logger.DEBUG
             )
             return
@@ -138,7 +138,7 @@ class PolarsManualHarbourPorpoise(PolarsTransformer):
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
-            adm_logger.log_transformation(
+            self._log(
                 f"{self.col_to_set} set from {self.source_col} for md5={md5}",
                 level=adm_logger.INFO,
             )

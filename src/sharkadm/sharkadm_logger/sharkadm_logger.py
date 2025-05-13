@@ -157,11 +157,12 @@ class SHARKadmLogger:
         purpose: str = "",
         row_number: str | int | None = None,
         item: str | None = None,
+        cls: str | None = None
     ) -> None:
-        cls = ""
-        stack = inspect.stack()
-        if stack[1][0].f_locals.get("self"):
-            cls = stack[1][0].f_locals["self"].__class__.__name__
+        # cls = ""
+        # stack = inspect.stack()
+        # if stack[1][0].f_locals.get("self"):
+        #     cls = stack[1][0].f_locals["self"].__class__.__name__
         data = dict(
             log_type=self.TRANSFORMATION,
             msg=msg,

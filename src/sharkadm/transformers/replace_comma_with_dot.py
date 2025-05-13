@@ -39,7 +39,7 @@ class ReplaceCommaWithDot(Transformer):
                 if "," not in item:
                     continue
                 new_item = item.replace(",", ".")
-                adm_logger.log_transformation(
+                self._log(
                     f"Replacing comma with dot for value {item} in column {col}",
                     level=adm_logger.INFO,
                 )
@@ -123,7 +123,7 @@ class ReplaceCommaWithDotPolars(Transformer):
             for (old, new), df in data_holder.data.group_by([col, "_temp"]):
                 if old == new:
                     continue
-                adm_logger.log_transformation(
+                self._log(
                     f"Replacing comma with dot for value {old} in column {col} "
                     f"({len(df)} places)",
                     level=adm_logger.INFO,

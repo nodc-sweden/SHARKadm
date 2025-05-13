@@ -79,7 +79,7 @@ class HtmlStationMap(FileExporter):
         list_name = "sharkadm_data"
         df = self._get_position_dataframe(data_holder.data)
         if df.empty:
-            adm_logger.log_export("No data to plot html map", level=adm_logger.WARNING)
+            self._log("No data to plot html map", level=adm_logger.WARNING)
             return
         app.add_list_data(df, list_name=list_name)
 
@@ -147,7 +147,7 @@ class PolarsHtmlStationMap(FileExporter):
 
         df = self._get_position_dataframe(data_holder.data)
         if df.empty:
-            adm_logger.log_export("No data to plot html map", level=adm_logger.WARNING)
+            self._log("No data to plot html map", level=adm_logger.WARNING)
             return
         app.add_list_data(df, list_name=list_name)
 
@@ -216,7 +216,7 @@ class PolarsHtmlMap(FileExporter):
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
         if not folium:
-            adm_logger.log_export(
+            self._log(
                 f"Could not export {self.__class__.__name__}. folium package not found!",
                 level=adm_logger.WARNING,
             )
@@ -252,7 +252,7 @@ class PolarsHtmlMap(FileExporter):
         if not self._shape_layers:
             return
         if not nodc_geography:
-            adm_logger.log_export(
+            self._log(
                 f"Could not add shape layers to {self.__class__.__name__}. "
                 f"Package nodc_qeography not found!",
                 level=adm_logger.WARNING,
@@ -261,7 +261,7 @@ class PolarsHtmlMap(FileExporter):
         for layer in self._shape_layers:
             shape = nodc_geography._get_shapefile_for_variable(layer)
             if not shape:
-                adm_logger.log_export(
+                self._log(
                     f"No shape file found for layer {layer}", level=adm_logger.WARNING
                 )
                 continue
@@ -317,7 +317,7 @@ class PolarsHtmlMap(FileExporter):
             return
         for info in self._station_info:
             if not info.get("x"):
-                adm_logger.log_export(
+                self._log(
                     "Could not highlight stations in areas. "
                     "Missing column sample_sweref99tm_x",
                     level=adm_logger.ERROR,

@@ -32,7 +32,9 @@ class WriteStatisticsToFile(FileExporter):
         **kwargs,
     ):
         super().__init__(
-            export_directory=export_directory, export_file_name=export_file_name, **kwargs
+            export_directory=export_directory,
+            export_file_name=export_file_name,
+            **kwargs,
         )
 
     @staticmethod
@@ -49,7 +51,9 @@ class WriteStatisticsToFile(FileExporter):
                 for key, value in stats.items():
                     fid.write(f"{key.ljust(40)}\t{value}\n")
         except PermissionError:
-            self._export_file_name = get_next_incremented_file_path(self.export_file_path)
+            self._export_file_name = get_next_incremented_file_path(
+                self.export_file_path
+            )
             with open(self.export_file_path, "w", encoding=self._encoding) as fid:
                 for key, value in stats.items():
                     fid.write(f"{key.ljust(40)}\t{value}\n")
