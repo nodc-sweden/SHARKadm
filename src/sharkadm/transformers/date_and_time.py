@@ -318,17 +318,14 @@ class AddMonth(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
-            self._log(
-                "Missing column: datetime", level=adm_logger.WARNING
-            )
+            self._log("Missing column: datetime", level=adm_logger.WARNING)
             return
         for col in self.month_columns:
             data_holder.data[col] = data_holder.data["datetime"].apply(
                 lambda x, dh=data_holder: self.get_month(x, dh)
             )
 
-    @staticmethod
-    def get_month(x: datetime.datetime, data_holder: DataHolderProtocol) -> str:
+    def get_month(self, x: datetime.datetime, data_holder: DataHolderProtocol) -> str:
         if not x:
             self._log(f"Missing datetime in {data_holder}")
             return ""
@@ -350,9 +347,7 @@ class AddReportedDates(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:
             if source_col not in data_holder.data.columns:
-                self._log(
-                    f"Missing column: {source_col}", level=adm_logger.WARNING
-                )
+                self._log(f"Missing column: {source_col}", level=adm_logger.WARNING)
                 continue
             target_col = f"{self.reported_col_prefix}_{source_col}"
             if target_col in data_holder.data.columns:
@@ -382,9 +377,7 @@ class PolarsAddReportedDates(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:
             if source_col not in data_holder.data.columns:
-                self._log(
-                    f"Missing column: {source_col}", level=adm_logger.WARNING
-                )
+                self._log(f"Missing column: {source_col}", level=adm_logger.WARNING)
                 continue
             target_col = f"{self.reported_col_prefix}_{source_col}"
             if target_col in data_holder.data.columns:
@@ -687,9 +680,7 @@ class PolarsAddMonth(PolarsTransformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
-            self._log(
-                "Missing column: datetime", level=adm_logger.WARNING
-            )
+            self._log("Missing column: datetime", level=adm_logger.WARNING)
             return
         for col in self.month_columns:
             data_holder.data = data_holder.data.with_columns(

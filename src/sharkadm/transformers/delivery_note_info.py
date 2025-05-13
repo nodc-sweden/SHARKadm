@@ -10,7 +10,10 @@ from sharkadm.utils import yaml_data
 
 
 class AddDeliveryNoteInfo(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -80,7 +83,10 @@ class AddDeliveryNoteInfo(Transformer):
 
 
 class AddStatus(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -121,7 +127,10 @@ class AddStatus(Transformer):
 
 
 class PolarsAddDeliveryNoteInfo(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

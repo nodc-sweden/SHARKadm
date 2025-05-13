@@ -69,9 +69,7 @@ class AddWormsScientificName(Transformer):
         for name, df in data_holder.data.groupby(self.source_col):
             new_name = translate_worms.get(str(name))
             if new_name:
-                self._log(
-                    f"Translate worms: {name} -> {new_name} ({len(df)} places)"
-                )
+                self._log(f"Translate worms: {name} -> {new_name} ({len(df)} places)")
             else:
                 new_name = name
             boolean = data_holder.data[self.source_col] == name
@@ -93,9 +91,7 @@ class AddWormsAphiaId(Transformer):
     @adm_logger.log_time
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:
-            self._log(
-                f"Adding column {self.col_to_set}", level=adm_logger.DEBUG
-            )
+            self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ""
 
         for source_name, df in data_holder.data.groupby(self.source_col):
@@ -190,9 +186,7 @@ class PolarsAddWormsScientificName(PolarsTransformer):
         for (name,), df in data_holder.data.group_by(self.source_col):
             new_name = translate_worms.get(str(name))
             if new_name:
-                self._log(
-                    f"Translate worms: {name} -> {new_name} ({len(df)} places)"
-                )
+                self._log(f"Translate worms: {name} -> {new_name} ({len(df)} places)")
             else:
                 new_name = name
             self._add_to_col_to_set(data_holder, name, new_name)
@@ -216,9 +210,7 @@ class PolarsAddWormsAphiaId(PolarsTransformer):
     @adm_logger.log_time
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_set not in data_holder.data.columns:
-            self._log(
-                f"Adding column {self.col_to_set}", level=adm_logger.DEBUG
-            )
+            self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
             self._add_empty_col_to_set(data_holder)
 
         for (source_name,), df in data_holder.data.group_by(self.source_col):

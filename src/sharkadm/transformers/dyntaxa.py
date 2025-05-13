@@ -169,9 +169,7 @@ class AddDyntaxaId(Transformer):
             )
             return
         if self.col_to_set not in data_holder.data.columns:
-            self._log(
-                f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG
-            )
+            self._log(f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ""
 
         for name, df in data_holder.data.groupby(self.source_col):
@@ -278,14 +276,16 @@ class AddTaxonRanks(Transformer):
                 continue
             single_info = info[0]
             self._log(
-                f"Adding taxon rank for {name} ({len(df)} places)", level=adm_logger.INFO
+                f"Adding taxon rank for {name} ({len(df)} places)",
+                level=adm_logger.INFO,
             )
             for rank, col in zip(self.ranks, self.cols_to_set):
                 value = single_info.get(rank, "") or ""
                 boolean = data_holder.data[self.source_col] == name
                 data_holder.data.loc[boolean, col] = value
                 self._log(
-                    f"Adding {col} for {name} ({len(df)} places)", level=adm_logger.DEBUG
+                    f"Adding {col} for {name} ({len(df)} places)",
+                    level=adm_logger.DEBUG,
                 )
 
 
@@ -507,7 +507,8 @@ class PolarsAddTaxonRanks(PolarsTransformer):
                 continue
             single_info = info[0]
             self._log(
-                f"Adding taxon rank for {name} ({len(df)} places)", level=adm_logger.INFO
+                f"Adding taxon rank for {name} ({len(df)} places)",
+                level=adm_logger.INFO,
             )
             for rank, col in zip(self.ranks, self.cols_to_set):
                 value = single_info.get(rank, "") or ""
@@ -518,7 +519,8 @@ class PolarsAddTaxonRanks(PolarsTransformer):
                     .alias(col)
                 )
                 self._log(
-                    f"Adding {col} for {name} ({len(df)} places)", level=adm_logger.DEBUG
+                    f"Adding {col} for {name} ({len(df)} places)",
+                    level=adm_logger.DEBUG,
                 )
 
 
@@ -546,9 +548,7 @@ class PolarsAddDyntaxaId(PolarsTransformer):
             )
             return
         if self.col_to_set not in data_holder.data.columns:
-            self._log(
-                f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG
-            )
+            self._log(f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG)
             self._add_empty_col_to_set(data_holder)
 
         for (name,), df in data_holder.data.group_by(self.source_col):

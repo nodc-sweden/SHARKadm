@@ -37,9 +37,7 @@ class StandardFormat(Exporter):
     def _export(self, data_holder: DataHolderProtocol) -> None:
         groups = data_holder.data.groupby("visit_key")
         data_cols = self._get_data_columns(data_holder.data.columns)
-        metadata_cols = [
-            col for col in data_holder.data.columns if col not in data_cols
-        ]
+        metadata_cols = [col for col in data_holder.data.columns if col not in data_cols]
         ordered_cols = self._get_reordered_columns(data_cols)
         for _id, data in groups:
             meta_rows = self._get_metadata_rows(data, metadata_cols)

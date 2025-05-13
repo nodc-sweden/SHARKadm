@@ -1,5 +1,3 @@
-from sharkadm.sharkadm_logger import adm_logger
-
 from .base import DataHolderProtocol, Transformer
 
 
@@ -31,9 +29,7 @@ class AddCalculatedSamplerArea(Transformer):
                 self._log(f"Missing key: {par}", level="warning")
                 can_calculate = False
             elif not row[par]:
-                self._log(
-                    f"Missing value for parameter: {par}", level="warning"
-                )
+                self._log(f"Missing value for parameter: {par}", level="warning")
                 can_calculate = False
         if not can_calculate:
             return ""

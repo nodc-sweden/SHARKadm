@@ -107,7 +107,9 @@ class Transformer(ABC):
             )
             return
         if not is_valid_data_holder(
-            data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
+            data_holder,
+            valid=self.valid_data_holders,
+            invalid=self.invalid_data_holders,
         ):
             adm_logger.log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
@@ -204,7 +206,9 @@ class PolarsTransformer(ABC):
             )
             return
         if not is_valid_polars_data_holder(
-            data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
+            data_holder,
+            valid=self.valid_data_holders,
+            invalid=self.invalid_data_holders,
         ):
             adm_logger.log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
@@ -270,4 +274,3 @@ class PolarsTransformer(ABC):
 
     def _log(self, msg: str, **kwargs):
         adm_logger.log_transformation(msg, cls=self.__class__.__name__, **kwargs)
-

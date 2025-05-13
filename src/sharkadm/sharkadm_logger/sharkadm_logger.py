@@ -157,12 +157,8 @@ class SHARKadmLogger:
         purpose: str = "",
         row_number: str | int | None = None,
         item: str | None = None,
-        cls: str | None = None
+        cls: str | None = None,
     ) -> None:
-        # cls = ""
-        # stack = inspect.stack()
-        # if stack[1][0].f_locals.get("self"):
-        #     cls = stack[1][0].f_locals["self"].__class__.__name__
         data = dict(
             log_type=self.TRANSFORMATION,
             msg=msg,
@@ -203,11 +199,8 @@ class SHARKadmLogger:
         level: str = "info",
         purpose: str = "",
         item: str | None = None,
+        cls: str | None = None,
     ) -> None:
-        cls = ""
-        stack = inspect.stack()
-        if stack[1][0].f_locals.get("self"):
-            cls = stack[1][0].f_locals["self"].__class__.__name__
         data = dict(
             log_type=self.EXPORT,
             msg=msg,
@@ -532,7 +525,12 @@ class old_SHARKadmLogger:
         if stack[1][0].f_locals.get("self"):
             cls = stack[1][0].f_locals["self"].__class__.__name__
         data = dict(
-            log_type=self.EXPORT, msg=msg, level=level, cls=cls, item=add, purpose=purpose
+            log_type=self.EXPORT,
+            msg=msg,
+            level=level,
+            cls=cls,
+            item=add,
+            purpose=purpose,
         )
         self.log(**data)
         event.post_event("log_export", data)

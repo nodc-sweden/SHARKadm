@@ -124,9 +124,7 @@ class AddStationInfo(Transformer):
     def _create_columns_if_missing(self, data_holder: DataHolderProtocol) -> None:
         for col in self.columns_to_set:
             if col not in data_holder.data.columns:
-                self._log(
-                    f"Adding column {col}", level=adm_logger.DEBUG
-                )
+                self._log(f"Adding column {col}", level=adm_logger.DEBUG)
                 data_holder.data[col] = ""
 
 

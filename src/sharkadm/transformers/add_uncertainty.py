@@ -75,7 +75,21 @@ class AddUncertainty(Transformer):
             "Dissolved organic carbon DOC",
             "Particulate organic carbon POC",
         ]
-        element_list = ["O", "O", "N", "N", "N", "N", "N", "N", "P", "P", "Si", "C", "C"]
+        element_list = [
+            "O",
+            "O",
+            "N",
+            "N",
+            "N",
+            "N",
+            "N",
+            "N",
+            "P",
+            "P",
+            "Si",
+            "C",
+            "C",
+        ]
         element = ""
         if name in parameter_name_list:
             element = element_list[parameter_name_list.index(name)]

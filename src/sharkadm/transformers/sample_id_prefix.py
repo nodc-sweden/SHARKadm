@@ -1,5 +1,3 @@
-from sharkadm.sharkadm_logger import adm_logger
-
 from .base import DataHolderProtocol, Transformer
 
 

@@ -123,7 +123,9 @@ class SimpleFletApp:
         self._button_load_data_file = self._get_load_file_data_button()
 
         self._button_run_workflow = ft.ElevatedButton(
-            "Starta workflow", on_click=self._start_workflow, bgcolor=ft.colors.GREEN_100
+            "Starta workflow",
+            on_click=self._start_workflow,
+            bgcolor=ft.colors.GREEN_100,
         )
 
     def _create_config_controls(self) -> None:

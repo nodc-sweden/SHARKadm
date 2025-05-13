@@ -1,6 +1,5 @@
 import pandas as pd
 
-from ..sharkadm_logger import adm_logger
 from .base import DataHolderProtocol, Transformer
 
 
@@ -50,28 +49,20 @@ class AddSectionStartAndEndDepth(Transformer):
         if row.get(self.min_depth_par):
             return row[self.min_depth_par]
         if row.get(self.depth_par):
-            self._log(
-                f"Added {self.min_depth_par} from {self.depth_par}"
-            )
+            self._log(f"Added {self.min_depth_par} from {self.depth_par}")
             return row[self.depth_par]
         if row.get(self.section_end_depth_par):
-            self._log(
-                f"Added {self.min_depth_par} from {self.section_end_depth_par}"
-            )
+            self._log(f"Added {self.min_depth_par} from {self.section_end_depth_par}")
             return row[self.section_end_depth_par]
 
     def add_max_depth(self, row: pd.Series) -> str:
         if row.get(self.max_depth_par):
             return row[self.max_depth_par]
         if row.get(self.depth_par):
-            self._log(
-                f"Added {self.max_depth_par} from {self.depth_par}"
-            )
+            self._log(f"Added {self.max_depth_par} from {self.depth_par}")
             return row[self.depth_par]
         if row.get(self.section_start_depth_par):
-            self._log(
-                f"Added {self.max_depth_par} from {self.section_start_depth_par}"
-            )
+            self._log(f"Added {self.max_depth_par} from {self.section_start_depth_par}")
             return row[self.section_start_depth_par]
 
 

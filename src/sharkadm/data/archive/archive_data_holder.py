@@ -126,7 +126,11 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
 
     @property
     def processed_data_files(self) -> list[pathlib.Path]:
-        paths = [self.delivery_note_path, self.sampling_info_path, self.analyse_info_path]
+        paths = [
+            self.delivery_note_path,
+            self.sampling_info_path,
+            self.analyse_info_path,
+        ]
         for name, source in self._data_sources.items():
             print(f"{source.path=}")
             paths.append(source.path)
@@ -389,7 +393,11 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
 
     @property
     def processed_data_files(self) -> list[pathlib.Path]:
-        paths = [self.delivery_note_path, self.sampling_info_path, self.analyse_info_path]
+        paths = [
+            self.delivery_note_path,
+            self.sampling_info_path,
+            self.analyse_info_path,
+        ]
         for name, source in self._data_sources.items():
             paths.append(source.path)
         return paths

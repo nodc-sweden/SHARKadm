@@ -398,7 +398,8 @@ class XmlMartransDataFile(DataFile):
             "section_distance_start_m", ["avsnitt.startavstand", "prov.avstand"]
         )
         self._concatenate(
-            "section_distance_end_m", ["avsnitt.slutavstand", "prov.avsnitt_slutavstand"]
+            "section_distance_end_m",
+            ["avsnitt.slutavstand", "prov.avsnitt_slutavstand"],
         )
         self._concatenate("taxanomist", ["transekt.inventerare", "prov.sorterare"])
 

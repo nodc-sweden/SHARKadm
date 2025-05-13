@@ -57,9 +57,7 @@ class ManualHarbourPorpoise(Transformer):
             boolean = data_holder.data["shark_sample_id_md5"] == md5
             df = data_holder.data[boolean]
             if df.empty:
-                self._log(
-                    f"md5 not found: {md5}", level=adm_logger.DEBUG
-                )
+                self._log(f"md5 not found: {md5}", level=adm_logger.DEBUG)
                 continue
             data_holder.data.loc[boolean, self.col_to_set] = data_holder.data.loc[
                 boolean, self.source_col
@@ -83,9 +81,7 @@ class PolarsManualSealPathology(PolarsTransformer):
         md5 = "364768f88de5f22c0e415150eddee722"
         if md5 not in data_holder.data["shark_sample_id_md5"]:
             return
-        self._log(
-            f"Setting manual info for md5: {md5}", level=adm_logger.INFO
-        )
+        self._log(f"Setting manual info for md5: {md5}", level=adm_logger.INFO)
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col("shark_sample_id_md5") == md5)
             .then(pl.lit("2018"))

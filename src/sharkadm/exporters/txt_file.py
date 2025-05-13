@@ -1,7 +1,6 @@
 import pathlib
 
 from sharkadm.config import get_header_mapper_from_data_holder
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.paths import get_next_incremented_file_path
 
 from .base import DataHolderProtocol, FileExporter
@@ -49,9 +48,7 @@ class TxtAsIs(FileExporter):
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )
         except PermissionError:
-            self._export_file_name = get_next_incremented_file_path(
-                self.export_file_path
-            )
+            self._export_file_name = get_next_incremented_file_path(self.export_file_path)
             df.to_csv(
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )

@@ -1,7 +1,5 @@
 import qc_lib
 
-from sharkadm.sharkadm_logger import adm_logger
-
 from ..base import DataHolderProtocol, Transformer
 
 
@@ -21,9 +19,7 @@ class QCRange(Transformer):
         header = list(data_holder.data.columns)
         for col in self._columns:
             if col not in header:
-                self._log(
-                    f"Missing column for range check: {col}", level="warning"
-                )
+                self._log(f"Missing column for range check: {col}", level="warning")
                 continue
             qc0_col = f"QC0_{col}"
             if qc0_col not in header:

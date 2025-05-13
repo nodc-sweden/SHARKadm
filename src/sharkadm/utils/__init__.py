@@ -123,7 +123,9 @@ def get_export_directory(*subdirectories: str, date_directory=True) -> pathlib.P
         )
     if date_directory:
         folder = pathlib.Path(
-            EXPORT_DIRECTORY, datetime.datetime.now().strftime("%Y%m%d"), *subdirectories
+            EXPORT_DIRECTORY,
+            datetime.datetime.now().strftime("%Y%m%d"),
+            *subdirectories,
         )
     else:
         folder = pathlib.Path(EXPORT_DIRECTORY, *subdirectories)
