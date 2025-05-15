@@ -34,7 +34,7 @@ class ValidateValuesInMandatoryNatColumns(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.mandatory_nat_columns:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing mandatory national column: {col}. "
                     f"Maybe it's not a national station?",
                     level="warning",
@@ -45,7 +45,7 @@ class ValidateValuesInMandatoryNatColumns(Validator):
     @staticmethod
     def check(x, col):
         if not x:
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Missing value for mandatory column (national): {col}"
             )
 
@@ -63,7 +63,7 @@ class ValidateValuesInMandatoryRegColumns(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.mandatory_reg_columns:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing mandatory reg column: {col}.", level="warning"
                 )
                 continue
@@ -72,7 +72,7 @@ class ValidateValuesInMandatoryRegColumns(Validator):
     @staticmethod
     def check(x, col):
         if not x:
-            adm_logger.log_validation(
+            adm_logger.log_validation_failed(
                 f"Missing value for mandatory column (regional): {col}"
             )
 
@@ -87,7 +87,7 @@ class ValidateMandatoryNatColumnsExists(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.mandatory_nat_columns:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing mandatory national column: {col}. "
                     f"Maybe it's not a national station?",
                     level="warning",
@@ -105,7 +105,7 @@ class ValidateMandatoryRegColumnsExists(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in data_holder.mandatory_reg_columns:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation(
+                adm_logger.log_validation_failed(
                     f"Missing mandatory regional column: {col}.", level="warning"
                 )
                 continue

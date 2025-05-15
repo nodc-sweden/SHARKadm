@@ -29,6 +29,8 @@ class Validator(ABC):
     valid_data_holders = ()
     invalid_data_holders = ()
 
+    _display_name = None
+
     def __init__(self, **kwargs):
         self._kwargs = kwargs
 
@@ -48,6 +50,10 @@ class Validator(ABC):
     @property
     def name(self) -> str:
         return self.__class__.__name__
+
+    @property
+    def display_name(self) -> str:
+        return self._display_name or self.name
 
     def validate(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_type_internal not in config.get_valid_data_types(
