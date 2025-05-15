@@ -42,7 +42,7 @@ class ConvertFlagsToSDN(Transformer):
             stripped_flag = str(flag).strip()
             new_flag = self.mapping.get(stripped_flag)
             if new_flag:
-                adm_logger.log_transformation(
+                self._log(
                     f"Converting flag: {flag} -> {new_flag} ({len(df)} places)",
                     level=adm_logger.INFO,
                 )

@@ -10,7 +10,10 @@ from sharkadm.utils import yaml_data
 
 
 class AddDeliveryNoteInfo(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -24,7 +27,7 @@ class AddDeliveryNoteInfo(Transformer):
 
     def _transform(self, data_holder: PandasDataHolder | ArchiveDataHolder) -> None:
         if not hasattr(data_holder, "delivery_note"):
-            adm_logger.log_transformation(
+            self._log(
                 f"No delivery note found for data holder {data_holder}",
                 level=adm_logger.WARNING,
             )
@@ -35,13 +38,13 @@ class AddDeliveryNoteInfo(Transformer):
     def _add_delivery_note_info(self, data_holder: PandasDataHolder | ArchiveDataHolder):
         for key in data_holder.delivery_note.fields:
             if key in data_holder.data and any(data_holder.data[key]):
-                adm_logger.log_transformation(
+                self._log(
                     f"Not setting info from delivery_note. "
                     f"{key} already a column with data.",
                     level=adm_logger.DEBUG,
                 )
                 continue
-            adm_logger.log_transformation(
+            self._log(
                 f"Adding {key} info from delivery_note",
                 item=data_holder.delivery_note[key],
             )
@@ -58,7 +61,7 @@ class AddDeliveryNoteInfo(Transformer):
             return
         checked_by = data_holder.delivery_note["data kontrollerad av"]
         if not checked_by:
-            adm_logger.log_transformation(
+            self._log(
                 'Could not set "status" and "checked". Missing information in '
                 "delivery_note: data kontrollerad av",
                 level=adm_logger.WARNING,
@@ -80,7 +83,10 @@ class AddDeliveryNoteInfo(Transformer):
 
 
 class AddStatus(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -100,7 +106,7 @@ class AddStatus(Transformer):
             return
         checked_by = data_holder.delivery_note["data kontrollerad av"]
         if not checked_by:
-            adm_logger.log_transformation(
+            self._log(
                 'Could not set "status" and "checked". '
                 "Missing information in delivery_note: data kontrollerad av",
                 level=adm_logger.WARNING,
@@ -121,7 +127,10 @@ class AddStatus(Transformer):
 
 
 class PolarsAddDeliveryNoteInfo(Transformer):
-    physical_chemical_keys = ("PhysicalChemical".lower(), "Physical and Chemical".lower())
+    physical_chemical_keys = (
+        "PhysicalChemical".lower(),
+        "Physical and Chemical".lower(),
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -135,7 +144,7 @@ class PolarsAddDeliveryNoteInfo(Transformer):
 
     def _transform(self, data_holder: PolarsDataHolder | PolarsArchiveDataHolder) -> None:
         if not hasattr(data_holder, "delivery_note"):
-            adm_logger.log_transformation(
+            self._log(
                 f"No delivery note found for data holder {data_holder}",
                 level=adm_logger.WARNING,
             )
@@ -149,13 +158,13 @@ class PolarsAddDeliveryNoteInfo(Transformer):
         ops_to_run = []
         for key in data_holder.delivery_note.fields:
             # if key in data_holder.data and any(data_holder.data[key]):
-            #     adm_logger.log_transformation(
+            #     self._log(
             #         f"Not setting info from delivery_note. "
             #         f"{key} already a column with data.",
             #         level=adm_logger.DEBUG,
             #     )
             #     continue
-            # adm_logger.log_transformation(
+            # self._log(
             #     f"Adding {key} info from delivery_note",
             #     item=data_holder.delivery_note[key],
             # )
@@ -175,7 +184,7 @@ class PolarsAddDeliveryNoteInfo(Transformer):
             return
         checked_by = data_holder.delivery_note["data kontrollerad av"]
         if not checked_by:
-            adm_logger.log_transformation(
+            self._log(
                 'Could not set "status" and "checked". Missing information in '
                 "delivery_note: data kontrollerad av",
                 level=adm_logger.WARNING,

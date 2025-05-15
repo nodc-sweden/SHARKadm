@@ -44,7 +44,7 @@ class FixTimeFormat(Transformer):
             xx = ":".join(parts[:2])
         if ":" in xx:
             if len(xx) > 5:
-                adm_logger.log_transformation(
+                self._log(
                     f"Cant handle time format {self._current_col} = {x}",
                     item=x,
                     level=adm_logger.ERROR,
@@ -53,7 +53,7 @@ class FixTimeFormat(Transformer):
             xx = xx.zfill(5)
         else:
             if len(xx) > 4:
-                adm_logger.log_transformation(
+                self._log(
                     f"Cant handle time format in column {self._current_col}",
                     item=x,
                     level=adm_logger.ERROR,
@@ -62,7 +62,7 @@ class FixTimeFormat(Transformer):
             xx = xx.zfill(4)
             xx = f"{xx[:2]}:{xx[2:]}"
         if int(xx.split(":")[1]) > 59:
-            adm_logger.log_transformation(
+            self._log(
                 f"Invalid minutes in column {self._current_col}",
                 item=x,
                 level=adm_logger.ERROR,
@@ -105,15 +105,15 @@ class FixDateFormat(Transformer):
                         self.to_format
                     )
                     data_holder.data.loc[df.index, col] = dd
-                    adm_logger.log_transformation(msg, level=adm_logger.DEBUG)
+                    self._log(msg, level=adm_logger.DEBUG)
                     tot_rows += len(df)
                 except ValueError:
                     if d != dd:
                         data_holder.data.loc[df.index, col] = dd
-                        adm_logger.log_transformation(msg, level=adm_logger.DEBUG)
+                        self._log(msg, level=adm_logger.DEBUG)
                         tot_rows += len(df)
             if tot_rows:
-                adm_logger.log_transformation(
+                self._log(
                     f"Changing date format in column {col} "
                     f"in a total of {tot_rows} places",
                     level=adm_logger.INFO,
@@ -318,19 +318,16 @@ class AddMonth(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
-            adm_logger.log_transformation(
-                "Missing column: datetime", level=adm_logger.WARNING
-            )
+            self._log("Missing column: datetime", level=adm_logger.WARNING)
             return
         for col in self.month_columns:
             data_holder.data[col] = data_holder.data["datetime"].apply(
                 lambda x, dh=data_holder: self.get_month(x, dh)
             )
 
-    @staticmethod
-    def get_month(x: datetime.datetime, data_holder: DataHolderProtocol) -> str:
+    def get_month(self, x: datetime.datetime, data_holder: DataHolderProtocol) -> str:
         if not x:
-            adm_logger.log_transformation(f"Missing datetime in {data_holder}")
+            self._log(f"Missing datetime in {data_holder}")
             return ""
         return str(x.month).zfill(2)
 
@@ -350,13 +347,11 @@ class AddReportedDates(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:
             if source_col not in data_holder.data.columns:
-                adm_logger.log_transformation(
-                    f"Missing column: {source_col}", level=adm_logger.WARNING
-                )
+                self._log(f"Missing column: {source_col}", level=adm_logger.WARNING)
                 continue
             target_col = f"{self.reported_col_prefix}_{source_col}"
             if target_col in data_holder.data.columns:
-                adm_logger.log_transformation(
+                self._log(
                     f"Column already present. Will do nothing: {target_col}",
                     level=adm_logger.DEBUG,
                 )
@@ -382,13 +377,11 @@ class PolarsAddReportedDates(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for source_col in self.source_columns:
             if source_col not in data_holder.data.columns:
-                adm_logger.log_transformation(
-                    f"Missing column: {source_col}", level=adm_logger.WARNING
-                )
+                self._log(f"Missing column: {source_col}", level=adm_logger.WARNING)
                 continue
             target_col = f"{self.reported_col_prefix}_{source_col}"
             if target_col in data_holder.data.columns:
-                adm_logger.log_transformation(
+                self._log(
                     f"Column already present. Will do nothing: {target_col}",
                     level=adm_logger.DEBUG,
                 )
@@ -397,7 +390,7 @@ class PolarsAddReportedDates(Transformer):
             data_holder.data = data_holder.data.with_columns(
                 [pl.col(source_col).alias(target_col)]
             )
-            adm_logger.log_transformation(
+            self._log(
                 f"Column {target_col} set from source column {source_col}",
                 level=adm_logger.DEBUG,
             )
@@ -421,7 +414,7 @@ class CreateFakeFullDates(Transformer):
             data_holder.data[self.shark_comment_column] = ""
         for source_col in self.source_columns:
             if source_col not in data_holder.data.columns:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not transform {self.__class__.__name__}. "
                     f"Missing column {source_col}",
                     level=adm_logger.INFO,
@@ -429,7 +422,7 @@ class CreateFakeFullDates(Transformer):
                 continue
             mandatory_col = f"{self.mandatory_col_prefix}_{source_col}"
             if mandatory_col not in data_holder.data.columns:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not transform {self.__class__.__name__}. "
                     f"Missing column {mandatory_col}",
                     level=adm_logger.INFO,
@@ -444,7 +437,7 @@ class CreateFakeFullDates(Transformer):
                     new_date_str = None
                     if len(date_str) == 4:
                         # Probably only year
-                        adm_logger.log_transformation(
+                        self._log(
                             f"{source_col} is {date_str}. Will be handled as <YEAR>. "
                             f"First day of year will be set!",
                             level=adm_logger.WARNING,
@@ -452,7 +445,7 @@ class CreateFakeFullDates(Transformer):
                         new_date_str = f"{date_str}-01-01"
                     elif len(date_str) == 6:
                         # Probably only year
-                        adm_logger.log_transformation(
+                        self._log(
                             f"{source_col} is {date_str}. Will be handled as "
                             f"<YEAR><MONTH>. "
                             f"First day of month in that year will be set!",
@@ -462,7 +455,7 @@ class CreateFakeFullDates(Transformer):
                     else:
                         date_parts = date_str.split("-")
                         if len(date_parts) == 2:
-                            adm_logger.log_transformation(
+                            self._log(
                                 f"{source_col} is {date_str}. Will be handled as "
                                 f"<YEAR>-<MONTH>. "
                                 f"First day of month in that year will be set!",
@@ -474,7 +467,7 @@ class CreateFakeFullDates(Transformer):
 
                     if new_date_str is None:
                         comment_str = f'Unable to interpret {source_col} "{date_str}"'
-                        adm_logger.log_transformation(comment_str, level=adm_logger.ERROR)
+                        self._log(comment_str, level=adm_logger.ERROR)
                     else:
                         data_holder.data.loc[index, source_col] = new_date_str
                         comment_str = (
@@ -502,12 +495,12 @@ class AddVisitDateFromObservationDate(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Source column {self.source_col} not found", level=adm_logger.DEBUG
             )
             return
         data_holder.data[self.col_to_set] = data_holder.data[self.source_col]
-        adm_logger.log_transformation(
+        self._log(
             f"Column {self.col_to_set} set from source column {self.source_col}",
             level=adm_logger.INFO,
         )
@@ -543,7 +536,7 @@ class PolarsFixDateFormat(PolarsTransformer):
                 data_holder.data = data_holder.data.with_columns(
                     pl.col(col).str.to_date("%Y%m%d").dt.strftime("%Y-%m-%d").alias(col)
                 )
-                adm_logger.log_transformation(
+                self._log(
                     f"Converting date format from %Y%m%d to %Y-%m-%d in column {col} "
                     f"({boolean.sum()} places)",
                     level=adm_logger.INFO,
@@ -556,7 +549,7 @@ class PolarsFixDateFormat(PolarsTransformer):
                 continue
 
             unique_values = set(data_holder.data.filter(boolean)[col])
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not convert the following dates in column {col}: "
                 f"{', '.join(sorted(unique_values))}",
                 level=adm_logger.ERROR,
@@ -580,7 +573,7 @@ class PolarsFixTimeFormat(Transformer):
                 data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
             )
             if not boolean.any():
-                adm_logger.log_transformation(
+                self._log(
                     f"All values in column {col} correct format HH:MM:SS",
                     level=adm_logger.DEBUG,
                 )
@@ -588,7 +581,7 @@ class PolarsFixTimeFormat(Transformer):
 
             boolean = data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}$").is_null()
             if not boolean.any():
-                adm_logger.log_transformation(
+                self._log(
                     f"All values in column {col} correct format HH:MM",
                     level=adm_logger.DEBUG,
                 )
@@ -607,7 +600,7 @@ class PolarsFixTimeFormat(Transformer):
                     if self._is_valid_value(new_value):
                         self._set_new_value(data_holder, col, value, new_value)
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Cant handle time format {value} in column {col}",
                             level=adm_logger.ERROR,
                         )
@@ -617,7 +610,7 @@ class PolarsFixTimeFormat(Transformer):
                     if self._is_valid_value(new_value):
                         self._set_new_value(data_holder, col, value, new_value)
                     else:
-                        adm_logger.log_transformation(
+                        self._log(
                             f"Cant handle time format {value} in column {col}",
                             level=adm_logger.ERROR,
                         )
@@ -630,7 +623,7 @@ class PolarsFixTimeFormat(Transformer):
         new_value: str,
     ):
         b = data_holder.data[col] == current_value
-        adm_logger.log_transformation(
+        self._log(
             f"Converting date {current_value} to {new_value} in column {col} "
             f"({b.sum()} places)",
             level=adm_logger.INFO,
@@ -662,14 +655,14 @@ class PolarsAddVisitDateFromObservationDate(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Source column {self.source_col} not found", level=adm_logger.DEBUG
             )
             return
         data_holder.data = data_holder.data.with_columns(
             pl.col(self.source_col).alias(self.col_to_set)
         )
-        adm_logger.log_transformation(
+        self._log(
             f"Column {self.col_to_set} set from source column {self.source_col}",
             level=adm_logger.DEBUG,
         )
@@ -687,9 +680,7 @@ class PolarsAddMonth(PolarsTransformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "datetime" not in data_holder.data.columns:
-            adm_logger.log_transformation(
-                "Missing column: datetime", level=adm_logger.WARNING
-            )
+            self._log("Missing column: datetime", level=adm_logger.WARNING)
             return
         for col in self.month_columns:
             data_holder.data = data_holder.data.with_columns(

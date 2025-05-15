@@ -32,7 +32,9 @@ class WriteStatisticsToFile(FileExporter):
         **kwargs,
     ):
         super().__init__(
-            export_directory=export_directory, export_file_name=export_file_name, **kwargs
+            export_directory=export_directory,
+            export_file_name=export_file_name,
+            **kwargs,
         )
 
     @staticmethod

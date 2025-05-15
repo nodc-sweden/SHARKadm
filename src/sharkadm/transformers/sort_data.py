@@ -42,7 +42,7 @@ class SortData(Transformer):
             col for col in self.sort_by_columns if col in data_holder.data.columns
         ]
         column_string = ", ".join(sort_by_columns)
-        adm_logger.log_transformation(
+        self._log(
             f"Sorting data based on columns: {column_string}", level=adm_logger.DEBUG
         )
         data_holder.data.sort_values(

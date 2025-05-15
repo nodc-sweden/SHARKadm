@@ -32,9 +32,7 @@ class AddRedList(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:
-            adm_logger.log_transformation(
-                f"Adding column {self.col_to_set}", level=adm_logger.DEBUG
-            )
+            self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
             data_holder.data[self.col_to_set] = ""
         data_holder.data[self.col_to_set] = data_holder.data.apply(
             lambda row: self._add(row), axis=1
@@ -51,8 +49,6 @@ class AddRedList(Transformer):
             info = self.red_list_obj.get_info(value)
             if info:
                 self.mapped[value] = True
-                adm_logger.log_transformation(
-                    f"{value} is marked as red listed", level=adm_logger.INFO
-                )
+                self._log(f"{value} is marked as red listed", level=adm_logger.INFO)
                 return "Y"
         return ""

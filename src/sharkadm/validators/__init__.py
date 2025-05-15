@@ -14,7 +14,9 @@ from sharkadm.validators.aphia_id import (
     ValidateReportedVsBvolAphiaId as ValidateReportedVsBvolAphiaId,
 )
 from sharkadm.validators.base import Validator as Validator
-from sharkadm.validators.column_combination import AssertCombination as AssertCombination
+from sharkadm.validators.column_combination import (
+    AssertCombination as AssertCombination,
+)
 from sharkadm.validators.column_combination import (
     AssertMinMaxDepthCombination as AssertMinMaxDepthCombination,
 )
@@ -28,11 +30,15 @@ from sharkadm.validators.mandatory import (
 from sharkadm.validators.mandatory import (
     ValidateValuesInMandatoryRegColumns as ValidateValuesInMandatoryRegColumns,
 )
-from sharkadm.validators.occurrence_id import ValidateOccurrenceId as ValidateOccurrenceId
+from sharkadm.validators.occurrence_id import (
+    ValidateOccurrenceId as ValidateOccurrenceId,
+)
 from sharkadm.validators.position import (
     CheckIfLatLonIsSwitched as CheckIfLatLonIsSwitched,
 )
-from sharkadm.validators.positive import ValidatePositiveValues as ValidatePositiveValues
+from sharkadm.validators.positive import (
+    ValidatePositiveValues as ValidatePositiveValues,
+)
 from sharkadm.validators.unique import ValidateUniqueSampleId as ValidateUniqueSampleId
 from sharkadm.validators.year import ValidateYearNrDigits as ValidateYearNrDigits
 

@@ -49,7 +49,7 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
         for (from_name, to_name), df in data_holder.data.filter(
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
-            adm_logger.log_transformation(
+            self._log(
                 f"Translating {from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
@@ -60,7 +60,7 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
         for (from_name, to_name), df in data_holder.data.filter(
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
-            adm_logger.log_transformation(
+            self._log(
                 f"Translating to Bvol scientific name: "
                 f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
@@ -91,7 +91,7 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
 
     def _add_column(self, data_holder: PolarsDataHolder):
         if self.source_size_class_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.source_size_class_col} "
                 f"when setting bvol information",
                 level=adm_logger.Warning,
@@ -127,7 +127,7 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
         for (from_name, to_name), df in data_holder.data.filter(
             pl.col("bvol_combined_from") != pl.col("bvol_combined_to")
         ).group_by("bvol_combined_from", "bvol_combined_to"):
-            adm_logger.log_transformation(
+            self._log(
                 f"Translating Bvol name and size_class "
                 f"{from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
@@ -154,7 +154,7 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.source_col} when trying to set bvol aphia_id",
                 level=adm_logger.WARNING,
             )
@@ -180,7 +180,7 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
         for (from_name, to_name), df in data_holder.data.filter(
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
-            adm_logger.log_transformation(
+            self._log(
                 f"Adding Bvol AphiaID: {from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )
@@ -206,7 +206,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.source_col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.source_col} when trying to set bvol ref list",
                 level=adm_logger.WARNING,
             )
@@ -233,7 +233,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
         for (from_name, to_name), df in data_holder.data.filter(
             pl.col(self.source_col) != pl.col(self.col_to_set)
         ).group_by(self.source_col, self.col_to_set):
-            adm_logger.log_transformation(
+            self._log(
                 f"Adding Bvol ref list: {from_name} -> {to_name} ({len(df)} places)",
                 level=adm_logger.INFO,
             )

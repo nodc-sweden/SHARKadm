@@ -100,40 +100,41 @@ class Transformer(ABC):
         if data_holder.data_type_internal not in config.get_valid_data_types(
             valid=self.valid_data_types, invalid=self.invalid_data_types
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} for transformer"
-                f" {self.__class__.__name__}",
+                f" {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
         if not is_valid_data_holder(
-            data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
+            data_holder,
+            valid=self.valid_data_holders,
+            invalid=self.invalid_data_holders,
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
-                f" {self.__class__.__name__}"
+                f" {self.name}"
             )
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
             valid=self.invalid_data_structures, invalid=self.invalid_data_structures
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_format {data_holder.data_structure} for transformer"
-                f" {self.__class__.__name__}",
+                f" {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
 
-        adm_logger.log_workflow(
+        self._log_workflow(
             f"Applying transformer: {self.__class__.__name__}",
             item=self.get_transformer_description(),
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
         self._transform(data_holder=data_holder)
-        adm_logger.log_workflow(
-            f"Transformer {self.__class__.__name__} "
-            f"executed in {time.perf_counter() - t0:.6f} seconds",
+        self._log_workflow(
+            f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
             level=adm_logger.DEBUG,
         )
 
@@ -143,11 +144,17 @@ class Transformer(ABC):
     def _get_filter_mask(self, data_holder: "PandasDataHolder") -> pd.Series | np.ndarray:
         if not self._data_filter:
             return np.ones(len(data_holder.data), dtype=bool)
-        adm_logger.log_workflow(
+        self._log_workflow(
             f"Using data filter {self._data_filter.name} on transformer {self.name}",
             level=adm_logger.WARNING,
         )
         return self._data_filter.get_filter_mask(data_holder)
+
+    def _log(self, msg: str, **kwargs):
+        adm_logger.log_transformation(msg, cls=self.__class__.__name__, **kwargs)
+
+    def _log_workflow(self, msg: str, **kwargs):
+        adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
 
 
 class PolarsTransformer(ABC):
@@ -194,40 +201,41 @@ class PolarsTransformer(ABC):
                 valid=self.valid_data_types, invalid=self.invalid_data_types
             )
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} for transformer"
-                f" {self.__class__.__name__}",
+                f" {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
         if not is_valid_polars_data_holder(
-            data_holder, valid=self.valid_data_holders, invalid=self.invalid_data_holders
+            data_holder,
+            valid=self.valid_data_holders,
+            invalid=self.invalid_data_holders,
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
-                f" {self.__class__.__name__}"
+                f" {self.name}"
             )
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
             valid=self.invalid_data_structures, invalid=self.invalid_data_structures
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_format {data_holder.data_structure} for transformer"
-                f" {self.__class__.__name__}",
+                f" {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
 
-        adm_logger.log_workflow(
-            f"Applying transformer: {self.__class__.__name__}",
+        self._log_workflow(
+            f"Applying transformer: {self.name}",
             item=self.get_transformer_description(),
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
         self._transform(data_holder=data_holder)
-        adm_logger.log_workflow(
-            f"Transformer {self.__class__.__name__} "
-            f"executed in {time.perf_counter() - t0:.6f} seconds",
+        self._log_workflow(
+            f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
             level=adm_logger.DEBUG,
         )
 
@@ -237,7 +245,7 @@ class PolarsTransformer(ABC):
     def _get_filter_mask(self, data_holder: "PolarsDataHolder") -> pl.Series:
         if not self._data_filter:
             return pl.Series()
-        adm_logger.log_workflow(
+        self._log_workflow(
             f"Using data filter {self._data_filter.name} on transformer {self.name}",
             level=adm_logger.WARNING,
         )
@@ -264,3 +272,9 @@ class PolarsTransformer(ABC):
     def _remove_columns(self, data_holder: "PolarsDataHolder", *cols) -> None:
         cols = [col for col in cols if col in data_holder.data.columns]
         data_holder.data = data_holder.data.drop(cols)
+
+    def _log(self, msg: str, **kwargs):
+        adm_logger.log_transformation(msg, cls=self.__class__.__name__, **kwargs)
+
+    def _log_workflow(self, msg: str, **kwargs):
+        adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)

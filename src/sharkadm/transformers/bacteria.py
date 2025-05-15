@@ -1,4 +1,3 @@
-from ..sharkadm_logger import adm_logger
 from .base import DataHolderProtocol, Transformer
 
 
@@ -22,6 +21,4 @@ class SetBacteriaAsReportedScientificName(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_set not in data_holder.data.columns:
             data_holder.data[self.col_to_set] = self.value_to_set
-            adm_logger.log_transformation(
-                f"Added column {self.col_to_set} with value {self.value_to_set}"
-            )
+            self._log(f"Added column {self.col_to_set} with value {self.value_to_set}")

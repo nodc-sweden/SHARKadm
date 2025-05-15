@@ -26,7 +26,7 @@ class AddSharkId(Transformer):
             col_name = f"shark_{level}_id"
             cols = self._filter_cols(cols)
             if not all([col in data_holder.data.columns for col in cols]):
-                adm_logger.log_transformation(
+                self._log(
                     "Can not create shark_id. All columns are not in data",
                     item=", ".join(cols),
                     level=adm_logger.WARNING,

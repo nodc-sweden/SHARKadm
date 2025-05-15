@@ -94,7 +94,7 @@ class SHARKMetadataAuto(FileExporter):
         export_file_name: pathlib.Path | str | None = None,
     ) -> None:
         if not self._data_holder:
-            adm_logger.log_export(
+            self._log(
                 "No data_holder set to create shark_metadata_auto.txt",
                 level=adm_logger.CRITICAL,
             )

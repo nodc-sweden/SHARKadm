@@ -1,7 +1,6 @@
 import pathlib
 
 from sharkadm.config import get_header_mapper_from_data_holder
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.paths import get_next_incremented_file_path
 
 from .base import DataHolderProtocol, FileExporter
@@ -18,7 +17,9 @@ class TxtAsIs(FileExporter):
         **kwargs,
     ):
         super().__init__(
-            export_directory=export_directory, export_file_name=export_file_name, **kwargs
+            export_directory=export_directory,
+            export_file_name=export_file_name,
+            **kwargs,
         )
         self._header_as = header_as
 
@@ -33,9 +34,7 @@ class TxtAsIs(FileExporter):
                 data_holder, import_column=self._header_as
             )
             if not mapper:
-                adm_logger.log_export(
-                    f"Could not find mapper using header_as = {self._header_as}"
-                )
+                self._log(f"Could not find mapper using header_as = {self._header_as}")
                 return
             # mapper = get_import_matrix_mapper(
             #     data_type=data_holder.data_type, import_column=self._header_as

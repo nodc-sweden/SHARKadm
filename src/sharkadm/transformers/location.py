@@ -35,13 +35,13 @@ class _AddLocationBase(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.x_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.x_pos_col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )
             return
         if self.y_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.y_pos_col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )
@@ -80,13 +80,13 @@ class _PolarsAddLocationBase(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.x_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.x_pos_col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )
             return
         if self.y_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.y_pos_col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )
@@ -134,14 +134,14 @@ class test_PolarsAddLocations(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.x_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.x_pos_col}. "
                 f"Cannot add columns {', '.join(self.cols_to_set)}",
                 level=adm_logger.ERROR,
             )
             return
         if self.y_pos_col not in data_holder.data.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {self.y_pos_col}. "
                 f"Cannot add columns {', '.join(self.cols_to_set)}",
                 level=adm_logger.ERROR,
@@ -267,7 +267,7 @@ class AddLocationWaterCategory(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         col = "location_typ_nfs06"
         if col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )
@@ -275,7 +275,7 @@ class AddLocationWaterCategory(Transformer):
 
         col = "location_wb"
         if col not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Missing column {col}. Cannot add column {self.col_to_set}",
                 level=adm_logger.ERROR,
             )

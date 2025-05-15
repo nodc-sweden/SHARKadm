@@ -37,7 +37,7 @@ class CalculateAbundance(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self.col_must_exist not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not calculate {CalculateAbundance.parameter}. "
                 f"Missing {self.col_must_exist} column",
                 level=adm_logger.ERROR,
@@ -64,7 +64,7 @@ class CalculateAbundance(Transformer):
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
-            adm_logger.log_transformation(
+            self._log(
                 f"Calculated {self.parameter.lower()} differs to much from reported "
                 f"value. Setting calculated value {row['reported_value']} -> "
                 f"{row['calculated_value']} (row number {row['row_number']})",
@@ -94,7 +94,7 @@ class CalculateBiovolume(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "custom_occurrence_id" not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not calculate {CalculateBiovolume.parameter}. "
                 f"Missing custom_occurrence_id column",
                 level=adm_logger.ERROR,
@@ -105,14 +105,14 @@ class CalculateBiovolume(Transformer):
             ["bvol_aphia_id", "bvol_size_class", "custom_occurrence_id"]
         ):
             if not aphia_id:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateBiovolume.parameter}. "
                     f"Missing bvol_aphia_id",
                     level=adm_logger.WARNING,
                 )
                 continue
             if not size_class:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateBiovolume.parameter}. "
                     f"Missing bvol_size_class",
                     level=adm_logger.WARNING,
@@ -120,20 +120,20 @@ class CalculateBiovolume(Transformer):
                 continue
             cell_volume = self._get_bvol_cell_volume(aphia_id, size_class)
             # if cell_volume:
-            #     adm_logger.log_transformation(
+            #     self._log(
             #         f'Using cell volume from nomp for aphia_id="{aphia_id}" '
             #         'and size_class="{size_class}"',
             #         level=adm_logger.DEBUG)
             if not cell_volume:
                 cell_volume = self._get_reported_cell_volume(df, aphia_id, size_class)
                 if cell_volume:
-                    adm_logger.log_transformation(
+                    self._log(
                         f'Using reported cell volume for aphia_id="{aphia_id}" '
                         f'and size_class="{size_class}"',
                         level=adm_logger.DEBUG,
                     )
             if not cell_volume:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateBiovolume.parameter}. "
                     f'No cell volume in nomp or in data for aphia_id="{aphia_id}" '
                     f'and size_class="{size_class}"',
@@ -169,7 +169,7 @@ class CalculateBiovolume(Transformer):
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
-            adm_logger.log_transformation(
+            self._log(
                 f"Calculated {self.parameter.lower()} differs to much from reported "
                 f"value. Setting calculated value {row['reported_value']} -> "
                 f"{row['calculated_value']} (row number {row['row_number']})",
@@ -188,7 +188,7 @@ class CalculateBiovolume(Transformer):
         use_volume = None
         if not info:
             pass
-            # adm_logger.log_transformation(
+            # self._log(
             #     f'Could not calculate {CalculateBiovolume.parameter} with '
             #     'aphia_id="{aphia_id}" and size_class="{size_class}"',
             #     level=adm_logger.WARNING)
@@ -196,7 +196,7 @@ class CalculateBiovolume(Transformer):
             volume = info.get("Calculated_volume_µm3")  # This is in um^3
             if volume is None:
                 pass
-                # adm_logger.log_transformation(
+                # self._log(
                 #     f'Could not calculate {CalculateBiovolume.parameter}. '
                 #     'No Calculated_volume_µm3 found in nomp list for '
                 #     f'aphia_id="{aphia_id}" and size_class="{size_class}"',
@@ -213,7 +213,7 @@ class CalculateBiovolume(Transformer):
         values = set(df[self.reported_cell_volume_col])
         if len(values) != 1:
             pass
-            # adm_logger.log_transformation(
+            # self._log(
             #     f'Could not calculate {CalculateBiovolume.parameter}. '
             #     f'{self.reported_cell_volume_col} has several values '
             #     f'for aphia_id="{aphia_id}" and size_class="{size_class}"',
@@ -239,7 +239,7 @@ class CalculateCarbon(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "custom_occurrence_id" not in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not calculate {CalculateCarbon.parameter}. "
                 f"Missing custom_occurrence_id column",
                 level=adm_logger.ERROR,
@@ -249,13 +249,13 @@ class CalculateCarbon(Transformer):
             ["bvol_aphia_id", "bvol_size_class", "custom_occurrence_id"]
         ):
             if not aphia_id:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateCarbon.parameter}. Missing aphia_id",
                     level=adm_logger.WARNING,
                 )
                 continue
             if not size_class:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateCarbon.parameter}. "
                     f"Missing size_class",
                     level=adm_logger.WARNING,
@@ -263,7 +263,7 @@ class CalculateCarbon(Transformer):
                 continue
             carbon = self._get_carbon_per_unit_volume(aphia_id, size_class)
             if not carbon:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateCarbon.parameter}. "
                     f'No carbon per unit volume info in nomp for aphia_id="{aphia_id}" '
                     f'and size_class="{size_class}"',
@@ -300,7 +300,7 @@ class CalculateCarbon(Transformer):
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
-            adm_logger.log_transformation(
+            self._log(
                 f"Calculated {self.parameter.lower()} differs to much from reported "
                 f"value. Setting calculated value {row['reported_value']} -> "
                 f"{row['calculated_value']} (row number {row['row_number']})",
@@ -318,7 +318,7 @@ class CalculateCarbon(Transformer):
         info = _nomp.get_info(AphiaID=str(aphia_id), SizeClassNo=str(size_class))
         use_volume = None
         if not info:
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not calculate {CalculateCarbon.parameter} "
                 f'with aphia_id="{aphia_id}" and size_class="{size_class}"',
                 level=adm_logger.WARNING,
@@ -326,7 +326,7 @@ class CalculateCarbon(Transformer):
         else:
             volume = info.get("Calculated_Carbon_pg/counting_unit")
             if volume is None:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not calculate {CalculateCarbon.parameter}. "
                     f"No Calculated_Carbon_pg/counting_unit found in nomp list "
                     f'for aphia_id="{aphia_id}" and size_class="{size_class}"',
@@ -350,14 +350,14 @@ class old_CleanupCalculations(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         for col in ["reported_value", "calculated_value", "parameter"]:
             if col not in data_holder.data:
-                adm_logger.log_transformation(
+                self._log(
                     f"Could not cleanup calculations. Missing column {col}",
                     level=adm_logger.ERROR,
                 )
                 return
 
         if "original_calculated_value" in data_holder.data:
-            adm_logger.log_transformation(
+            self._log(
                 "CleanupCalculations already made. You dont want to do this again!",
                 level=adm_logger.WARNING,
             )
@@ -381,7 +381,7 @@ class old_CleanupCalculations(Transformer):
         boolean = max_boolean | min_boolean
         red_df = df[boolean]
         for i, row in red_df.iterrows():
-            adm_logger.log_transformation(
+            self._log(
                 f"Calculated abundance differs to much from reported value. "
                 f"Setting calculated value {row['reported_value']} -> {row['value']} "
                 f"(row number {row['row_number']})",
@@ -541,7 +541,7 @@ class FixReportedValueAfterCalculations(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_structure != "row":
-            adm_logger.log_transformation(
+            self._log(
                 "Could not fix reported value. Data is not in row format",
                 level=adm_logger.ERROR,
             )

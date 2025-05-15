@@ -51,7 +51,7 @@ class WideToLong(Transformer):
         self._data_columns = []
         self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
-            adm_logger.log_transformation(
+            self._log(
                 f"Could not transform to row format. "
                 f"Column {self._column_name_parameter} already in data",
                 level=adm_logger.WARNING,
@@ -154,7 +154,7 @@ class WideToLong(Transformer):
                 par = self._get_parameter_name_from_parameter(col)
                 qf = row.get(q_col)
                 if qf is None:
-                    # adm_logger.log_transformation(
+                    # self._log(
                     #     f'No quality_flag parameter ({q_col}) found for {par}',
                     #     level=adm_logger.WARNING
                     # )
@@ -290,7 +290,7 @@ class PolarsWideToLong(PolarsTransformer):
         self._data_columns = []
         self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
-            adm_logger.log_transformation(
+            self._log(
                 "Could not transform to row format. "
                 f"Column {self._column_name_parameter} already in data",
                 level=adm_logger.WARNING,
@@ -368,7 +368,7 @@ class PolarsWideToLong(PolarsTransformer):
                 par = self._get_parameter_name_from_parameter(col)
                 qf = row.get(q_col)
                 if qf is None:
-                    # adm_logger.log_transformation(
+                    # self._log(
                     #     f'No quality_flag parameter ({q_col}) found for {par}',
                     #     level=adm_logger.WARNING
                     # )
