@@ -1,10 +1,5 @@
-import logging
-
 from sharkadm.sharkadm_logger import adm_logger
-
-from .base import DataHolderProtocol, Validator
-
-logger = logging.getLogger(__name__)
+from sharkadm.validators.base import DataHolderProtocol, Validator
 
 
 class ValidatePositiveValues(Validator):
@@ -30,16 +25,26 @@ class ValidatePositiveValues(Validator):
         for col in self.cols_to_validate:
             if col not in data_holder.data:
                 continue
-            adm_logger.log_validation_failed(
+            self._log_workflow(
                 f"Checking that all values are positive in column {col}",
                 level=adm_logger.DEBUG,
             )
+            error = False
             for val, df in data_holder.data.groupby(col):
                 if not val:
                     continue
                 if float(val) < 0:
-                    adm_logger.log_validation_failed(
+                    self._log_fail(
                         f"Negative values found in colum {col} LINES: "
                         f"{sorted(df['row_number'])}",
+                        column=col,
+                        row_numbers=list(df["row_number"]),
                         level=adm_logger.WARNING,
                     )
+                    error = True
+            if not error:
+                self._log_success(
+                    "No negative values found in column {col}.",
+                    column=col,
+                    level=adm_logger.INFO,
+                )
