@@ -211,11 +211,13 @@ class SHARKadmLogger:
         validator: str | None = None,
         column: str | None = None,
         row_number: str | int | None = None,
+        cls: str | None = None,
     ) -> None:
-        cls = ""
-        stack = inspect.stack()
-        if stack[1][0].f_locals.get("self"):
-            cls = stack[1][0].f_locals["self"].__class__.__name__
+        if not cls:
+            cls = ""
+            stack = inspect.stack()
+            if stack[1][0].f_locals.get("self"):
+                cls = stack[1][0].f_locals["self"].__class__.__name__
         data = dict(
             log_type=self.VALIDATION,
             msg=msg,
