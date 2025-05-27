@@ -157,10 +157,14 @@ class SHARKadmLogger:
         msg: str,
         level: str = "info",
         purpose: str = "",
-        row_number: str | int | None = None,
+        row_number: int | None = None,
+        row_numbers: list[int] | None = None,
         item: str | None = None,
         cls: str | None = None,
     ) -> None:
+        if row_number is not None:
+            row_numbers = [row_number] + (row_numbers or [])
+
         data = dict(
             log_type=self.TRANSFORMATION,
             msg=msg,
@@ -168,7 +172,7 @@ class SHARKadmLogger:
             cls=cls,
             item=item,
             purpose=purpose,
-            row_number=row_number,
+            row_numbers=row_numbers,
         )
         self._log(**data)
 
@@ -180,7 +184,8 @@ class SHARKadmLogger:
         purpose: str = "",
         validator: str | None = None,
         column: str | None = None,
-        row_number: str | int | None = None,
+        row_number: int | None = None,
+        row_numbers: list[int] | None = None,
         cls: str | None = None,
     ) -> None:
         if not cls:
@@ -188,6 +193,10 @@ class SHARKadmLogger:
             stack = inspect.stack()
             if stack[1][0].f_locals.get("self"):
                 cls = stack[1][0].f_locals["self"].__class__.__name__
+
+        if row_number is not None:
+            row_numbers = [row_number] + (row_numbers or [])
+
         data = dict(
             log_type=self.VALIDATION,
             msg=msg,
@@ -197,7 +206,7 @@ class SHARKadmLogger:
             purpose=purpose,
             validator=validator,
             column=column,
-            row_number=row_number,
+            row_numbers=row_numbers,
             validation_success=False,
         )
         self._log(**data)
@@ -210,12 +219,19 @@ class SHARKadmLogger:
         purpose: str = "",
         validator: str | None = None,
         column: str | None = None,
-        row_number: str | int | None = None,
+        row_number: int | None = None,
+        row_numbers: list[int] | None = None,
+        cls: str | None = None,
     ) -> None:
-        cls = ""
-        stack = inspect.stack()
-        if stack[1][0].f_locals.get("self"):
-            cls = stack[1][0].f_locals["self"].__class__.__name__
+        if not cls:
+            cls = ""
+            stack = inspect.stack()
+            if stack[1][0].f_locals.get("self"):
+                cls = stack[1][0].f_locals["self"].__class__.__name__
+
+        if row_number is not None:
+            row_numbers = [row_number] + (row_numbers or [])
+
         data = dict(
             log_type=self.VALIDATION,
             msg=msg,
@@ -225,7 +241,7 @@ class SHARKadmLogger:
             purpose=purpose,
             validator=validator,
             column=column,
-            row_number=row_number,
+            row_numbers=row_numbers,
             validation_success=True,
         )
         self._log(**data)
