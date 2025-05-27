@@ -16,6 +16,8 @@ dependencies = [
     "fastexcel>=0.13.0",
     "rich>=14.0.0",
     "typer>=0.15.2",
+    "geopandas>=1.1.0",
+    "shapely>=2.1.1",
 ]
 requires-python = ">=3.11"
 readme = "README.md"

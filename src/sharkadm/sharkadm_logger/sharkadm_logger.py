@@ -214,7 +214,7 @@ class SHARKadmLogger:
     def log_validation_succeeded(
         self,
         msg: str,
-        level: str = "warning",
+        level: str = "info",
         item: str | None = None,
         purpose: str = "",
         validator: str | None = None,
