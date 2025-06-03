@@ -56,6 +56,7 @@ class PolarsAddPhysicalChemicalKey(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         data_holder.data = data_holder.data.with_columns(
             pl.concat_str(
+                pl.col("reported_station_name"),
                 pl.col("visit_year"),
                 pl.col("platform_code").str.slice(0, 2),
                 pl.col("platform_code").str.slice(2, 4),

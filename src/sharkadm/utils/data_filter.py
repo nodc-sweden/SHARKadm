@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -141,8 +142,8 @@ class DataFilterRestrictDepth(DataFilter):
 
 class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        if "location_r" in data_holder.data:
-            return data_holder.data["location_r"]
+        # if "location_r" in data_holder.data:
+        #     return data_holder.data["location_r"]
         return (
             data_holder.data["location_ra"]
             | data_holder.data["location_rb"]
@@ -153,9 +154,26 @@ class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
         )
 
 
+class PolarsDataFilterRestrictAreaRred(PolarsDataFilter):
+    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        # if "location_r" in data_holder.data:
+        #     return data_holder.data["location_r"]
+        return (
+            data_holder.data["location_rc"]
+            | data_holder.data["location_rg"]
+        )
+
+
+class PolarsDataFilterRestrictAreaGandC(PolarsDataFilter):
+    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        return (data_holder.data["location_rc"]
+            | data_holder.data["location_rg"]
+        )
+
+
 class PolarsDataFilterLocation(PolarsDataFilter):
     def __init__(self, locations: list[str]):
-        super().__init__()
+        super().__init__(locations=locations)
         self._locations = locations
 
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
@@ -173,6 +191,13 @@ class PolarsDataFilterRestrictAreaO(PolarsDataFilter):
 class PolarsDataFilterRestrictAreaRorO(PolarsDataFilter):
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
         r = PolarsDataFilterRestrictAreaR().get_filter_mask(data_holder)
+        o = PolarsDataFilterRestrictAreaO().get_filter_mask(data_holder)
+        return r | o
+
+
+class PolarsDataFilterRestrictAreaRredorO(PolarsDataFilter):
+    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        r = PolarsDataFilterRestrictAreaRred().get_filter_mask(data_holder)
         o = PolarsDataFilterRestrictAreaO().get_filter_mask(data_holder)
         return r | o
 
@@ -244,6 +269,32 @@ class PolarsDataFilterInside12nmAndNotRestricted(PolarsDataFilter):
         not_restrict_boolean = ~restrict_boolean
         inside12nm_bool = PolarsDataFilterInside12nm().get_filter_mask(data_holder)
         return inside12nm_bool & not_restrict_boolean
+
+
+class PolarsDataFilterMatchInColumn(PolarsDataFilter):
+    def __init__(self, column: str, pattern: str, ignore_case: bool=False):
+        """pattern can be a regex"""
+        super().__init__(column=column, pattern=pattern)
+        self._column = column
+        self._pattern = pattern
+
+    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
+        all_values = _get_all_values(self._pattern, set(data_holder.data[self._column]))
+        return data_holder.data.select(
+            pl.col(self._column).is_in(all_values)
+        ).to_series()
+
+        # return data_holder.data.select(
+        #     pl.col(self._column).str.contains(self._pattern)
+        # ).to_series()
+
+
+def _get_all_values(pattern: str, collection_values: list[str]):
+    all_values = []
+    for value in set(collection_values):
+        if re.match(pattern, value):
+            all_values.append(value)
+    return all_values
 
 
 class working_PolarsDataFilterDeepestDepthRowsForEachVisit(PolarsDataFilter):

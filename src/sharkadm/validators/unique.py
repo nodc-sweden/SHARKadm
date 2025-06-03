@@ -7,13 +7,12 @@ from .base import DataHolderProtocol, Validator
 logger = logging.getLogger(__name__)
 
 
-class CheckIfLatLonIsSwitched(Validator):
-    lat_col = "latitude"
-    lon_col = "longitude"
+class ValidateUniqueSampleId(Validator):
+    unique_column = "sharkadm_sample_id"
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Check if latitude and longitude is reported in wrong order"
+        return "Checks for duplicates in sharkadm_sample_id"
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.unique_column not in data_holder.data.columns:

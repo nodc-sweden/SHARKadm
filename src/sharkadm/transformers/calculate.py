@@ -170,8 +170,8 @@ class PolarsCalculateCarbon(Transformer):
     # aphia_id_col = 'aphia_id'
     # reported_cell_volume_col = 'reported_cell_volume_um3'
     # col_must_exist = 'reported_value'
-    # parameter = 'Carbon concentration'
-    # col_to_set = 'calculated_value'
+    parameter = 'Carbon concentration'
+    col_to_set = 'calculated_value'
 
     @staticmethod
     def get_transformer_description() -> str:

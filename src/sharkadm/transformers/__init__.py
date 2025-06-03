@@ -184,6 +184,7 @@ from sharkadm.transformers.red_list import AddRedList
 from sharkadm.transformers.remove import (
     PolarsKeepMask,
     PolarsRemoveMask,
+    PolarsReplaceColumnWithMask,
     PolarsRemoveProfiles,
     PolarsRemoveValueInColumns,
     PolarsRemoveValueInRowsForParameters,

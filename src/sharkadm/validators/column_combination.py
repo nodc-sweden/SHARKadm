@@ -43,7 +43,7 @@ class AssertCombination(Validator):
             if col not in data_holder.data:
                 missing_cols.append(col)
         if not all([col in data_holder.data for col in self.columns]):
-            adm_logger.log_validation_failed(
+            adm_logger.log_validation(
                 f"Could not check valid_combinations. "
                 f"Missing column(s) {missing_cols} in data",
                 level=adm_logger.DEBUG,
@@ -53,7 +53,7 @@ class AssertCombination(Validator):
             inter = "-".join(vals)
             if inter in self._valid_combinations:
                 continue
-            adm_logger.log_validation_failed(
+            adm_logger.log_validation(
                 f"Invalid combination: {inter} ({len(df)} places)",
                 level=adm_logger.WARNING,
             )

@@ -350,7 +350,7 @@ class PolarsAddLocationRO(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_rh"
+        return "Adds location_ro"
 
 
 class PolarsAddLocationR(PolarsTransformer):
@@ -361,6 +361,7 @@ class PolarsAddLocationR(PolarsTransformer):
         return "Adds location_r"
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        print(f'{[col for col in data_holder.data.columns if "location" in col]=}')
         exp = (
             data_holder.data["location_ra"]
             | data_holder.data["location_rb"]

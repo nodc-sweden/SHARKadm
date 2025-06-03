@@ -30,8 +30,12 @@ def path_has_or_is_standard_format_profile_data(
     if root_path.is_file():
         if root_path.suffix == ".txt" and root_path.name.upper().startswith("SBE"):
             return True
+        if root_path.suffix == ".txt" and root_path.name.lower().startswith("ctd_profile"):
+            return True
         return False
     for p in root_path.iterdir():
         if p.suffix == ".txt" and p.name.upper().startswith("SBE"):
+            return True
+        if p.suffix == ".txt" and p.name.lower().startswith("ctd_profile"):
             return True
     return False

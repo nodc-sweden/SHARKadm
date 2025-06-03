@@ -50,13 +50,15 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         for col in ["Datatyp", "Data type", "DTYPE", "delivery_datatype", "data_type"]:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])
-                if len(all_data_types) > 1:
-                    raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
+                # if len(all_data_types) > 1:
+                #     raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
                 d_source._data_type = all_data_types.pop()
                 break
 
         if d_source._data_type:
-            data_type_internal = d_source._data_type.lower()
+            self._data_type = d_source._data_type.lower().replace(" ", "")
+            data_type_internal = self._data_type
+            # data_type_internal = d_source._data_type.lower()
         else:
             data_type_internal = ""
 
@@ -70,6 +72,14 @@ class PolarsSharkDataHolder(PolarsDataHolder):
             data_type_internal = "greyseal"
         elif "ringed" in data_type_internal:
             data_type_internal = "ringedseal"
+        elif "porpoise" in data_type_internal:
+            data_type_internal = "harbourporpoise"
+        elif "barcoding" in data_type_internal:
+            data_type_internal = "plankton_barcoding"
+        elif "production" in data_type_internal:
+            data_type_internal = "primaryproduction"
+        elif "production" in data_type_internal:
+            data_type_internal = "primaryproduction"
 
         self._data_type_internal = data_type_internal
 

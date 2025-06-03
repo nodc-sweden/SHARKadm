@@ -154,6 +154,11 @@ class PolarsMultiTransformer(Transformer):
         return self.get_transformer_description()
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
+        print('¤¤¤')
+        print(config.get_valid_data_types(
+                valid=self.valid_data_types, invalid=self.invalid_data_types
+            ))
+        print()
         if (
             data_holder.data_type_internal != "unknown"
             and data_holder.data_type_internal
