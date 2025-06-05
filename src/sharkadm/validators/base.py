@@ -61,7 +61,7 @@ class Validator(ABC):
         ):
             adm_logger.log_workflow(
                 f"Invalid data_type {data_holder.data_type_internal} "
-                f"for validator {self.__class__.__name__}",
+                f"for validator {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
@@ -71,23 +71,36 @@ class Validator(ABC):
             valid=self.valid_data_holders,
             invalid=self.invalid_data_holders,
         ):
-            adm_logger.log_workflow(
+            self._log_workflow(
                 f"Invalid data_holder {data_holder.__class__.__name__} for validator"
-                f" {self.__class__.__name__}"
+                f" {self.name}"
             )
             return
 
         adm_logger.log_workflow(
-            f"Applying validator: {self.__class__.__name__}",
+            f"Applying validator: {self.name}",
             item=self.get_validator_description(),
             level=adm_logger.DEBUG,
         )
         t0 = time.time()
         self._validate(data_holder=data_holder)
         adm_logger.log_workflow(
-            f"Validator {self.__class__.__name__} executed in {time.time() - t0} seconds",
+            f"Validator {self.name} executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
 
     @abstractmethod
     def _validate(self, data_holder: DataHolderProtocol) -> None: ...
+
+    def _log_success(self, msg: str, **kwargs):
+        adm_logger.log_validation_succeeded(
+            msg, validator=self.display_name, cls=self.__class__.__name__, **kwargs
+        )
+
+    def _log_fail(self, msg: str, **kwargs):
+        adm_logger.log_validation_failed(
+            msg, validator=self.display_name, cls=self.__class__.__name__, **kwargs
+        )
+
+    def _log_workflow(self, msg: str, **kwargs):
+        adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
