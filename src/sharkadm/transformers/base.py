@@ -105,7 +105,7 @@ class Transformer(ABC):
                 f" {self.name}",
                 level=adm_logger.DEBUG,
             )
-            print(f'Unknown: {data_holder.data_type_internal=}')
+            print(f"Unknown: {data_holder.data_type_internal=}")
             return
         if not is_valid_data_holder(
             data_holder,
@@ -173,15 +173,17 @@ class PolarsTransformer(ABC):
     source_col: str = ""
     col_to_set: str = ""
 
-    def __init__(self,
-                 data_filter: PolarsDataFilter = None,
-                 valid_data_types: tuple[str, ...] = (),
-                 invalid_data_types: tuple[str, ...] = (),
-                 valid_data_holders: tuple[str, ...] = (),
-                 invalid_data_holders: tuple[str, ...] = (),
-                 valid_data_structures: tuple[str, ...] = (),
-                 invalid_data_structures: tuple[str, ...] = (),
-                 **kwargs):
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter = None,
+        valid_data_types: tuple[str, ...] = (),
+        invalid_data_types: tuple[str, ...] = (),
+        valid_data_holders: tuple[str, ...] = (),
+        invalid_data_holders: tuple[str, ...] = (),
+        valid_data_structures: tuple[str, ...] = (),
+        invalid_data_structures: tuple[str, ...] = (),
+        **kwargs,
+    ):
         self._data_filter = data_filter
 
         self.valid_data_types = valid_data_types or self.valid_data_types
@@ -191,7 +193,9 @@ class PolarsTransformer(ABC):
         self.invalid_data_holders = invalid_data_holders or self.invalid_data_holders
 
         self.valid_data_structures = valid_data_structures or self.valid_data_structures
-        self.invalid_data_structures = invalid_data_structures or self.invalid_data_structures
+        self.invalid_data_structures = (
+            invalid_data_structures or self.invalid_data_structures
+        )
 
         self._kwargs = kwargs
 

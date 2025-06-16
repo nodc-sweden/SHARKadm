@@ -2,7 +2,7 @@ import pathlib
 
 import polars as pl
 
-from sharkadm import config, sharkadm_exceptions
+from sharkadm import config
 
 from ...config import ImportMatrixConfig, ImportMatrixMapper
 from .. import PolarsDataHolder

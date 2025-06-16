@@ -57,7 +57,9 @@ class SHARKdataTxtAsGiven(FileExporter):
         # print(f"{exclude_columns=}")
         # print(f"{type(exclude_columns)=}")
         # raise
-        self.exclude_columns = tuple(set(list(self.exclude_columns) + list(exclude_columns)))
+        self.exclude_columns = tuple(
+            set(list(self.exclude_columns) + list(exclude_columns))
+        )
 
     @property
     def export_file_path(self):

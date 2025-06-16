@@ -416,8 +416,10 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
 
     def _load_delivery_note(self) -> None:
         if not self.delivery_note_path.exists():
-            adm_logger.log_workflow(f'Delivery note not found: {self.delivery_note_path}',
-                                    level=adm_logger.DEBUG)
+            adm_logger.log_workflow(
+                f"Delivery note not found: {self.delivery_note_path}",
+                level=adm_logger.DEBUG,
+            )
             return
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(
             self.delivery_note_path

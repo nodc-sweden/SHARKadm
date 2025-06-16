@@ -572,7 +572,7 @@ class PolarsCreateFakeFullDates(PolarsTransformer):
                         .then(
                             pl.concat_str(
                                 [pl.col(self.shark_comment_column), pl.lit(comment_str)],
-                                separator="; "
+                                separator="; ",
                             )
                         )
                         # .then(pl.col(self.shark_comment_column) + f"; {comment_str}")
@@ -677,7 +677,9 @@ class PolarsFixTimeFormat(Transformer):
             if col not in data_holder.data:
                 continue
 
-            t_boolean = data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
+            t_boolean = (
+                data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
+            )
             if not t_boolean.any():
                 self._log(
                     f"All values in column {col} correct format HH:MM:SS",
@@ -738,15 +740,15 @@ class PolarsFixTimeFormat(Transformer):
         new_value: str,
     ):
         b = data_holder.data[col] == current_value
-        print(f'{b.sum()=}')
+        print(f"{b.sum()=}")
         self._log(
             f"Converting date {current_value} to {new_value} in column {col} "
             f"({b.sum()} places)",
             level=adm_logger.INFO,
         )
-        print(f'{col=}')
-        print(f'{current_value=}')
-        print(f'{new_value=}')
+        print(f"{col=}")
+        print(f"{current_value=}")
+        print(f"{new_value=}")
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col(col) == current_value)
             .then(pl.lit(new_value))

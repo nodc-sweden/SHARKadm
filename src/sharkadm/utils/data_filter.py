@@ -158,17 +158,12 @@ class PolarsDataFilterRestrictAreaRred(PolarsDataFilter):
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
         # if "location_r" in data_holder.data:
         #     return data_holder.data["location_r"]
-        return (
-            data_holder.data["location_rc"]
-            | data_holder.data["location_rg"]
-        )
+        return data_holder.data["location_rc"] | data_holder.data["location_rg"]
 
 
 class PolarsDataFilterRestrictAreaGandC(PolarsDataFilter):
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        return (data_holder.data["location_rc"]
-            | data_holder.data["location_rg"]
-        )
+        return data_holder.data["location_rc"] | data_holder.data["location_rg"]
 
 
 class PolarsDataFilterLocation(PolarsDataFilter):
@@ -272,7 +267,7 @@ class PolarsDataFilterInside12nmAndNotRestricted(PolarsDataFilter):
 
 
 class PolarsDataFilterMatchInColumn(PolarsDataFilter):
-    def __init__(self, column: str, pattern: str, ignore_case: bool=False):
+    def __init__(self, column: str, pattern: str, ignore_case: bool = False):
         """pattern can be a regex"""
         super().__init__(column=column, pattern=pattern)
         self._column = column
@@ -280,9 +275,7 @@ class PolarsDataFilterMatchInColumn(PolarsDataFilter):
 
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
         all_values = _get_all_values(self._pattern, set(data_holder.data[self._column]))
-        return data_holder.data.select(
-            pl.col(self._column).is_in(all_values)
-        ).to_series()
+        return data_holder.data.select(pl.col(self._column).is_in(all_values)).to_series()
 
         # return data_holder.data.select(
         #     pl.col(self._column).str.contains(self._pattern)

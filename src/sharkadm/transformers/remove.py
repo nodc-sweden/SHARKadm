@@ -39,10 +39,7 @@ class RemoveReportedValueIfNotCalculated(Transformer):
 
 class RemoveValuesInColumns(Transformer):
     def __init__(
-            self,
-            *columns: str,
-            replace_value: int | float | str = "",
-            **kwargs
+        self, *columns: str, replace_value: int | float | str = "", **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.apply_on_columns = columns
@@ -604,7 +601,7 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.parameter_column not in data_holder.data:
             adm_logger.log_transformation(
-                f'Can not remove values in rows. '
+                f"Can not remove values in rows. "
                 f'Missing column "{self.parameter_column}"',
                 level=adm_logger.WARNING,
             )
@@ -627,18 +624,18 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
                 continue
             adm_logger.log_transformation(
                 f'Replacing value (-> {self._replace_value}) for parameter "{par}" '
-                f'({nr_rows} rows)',
+                f"({nr_rows} rows)",
                 level=adm_logger.WARNING,
             )
 
 
 class PolarsRemoveValueInColumns(PolarsTransformer):
     def __init__(
-            self,
-            *columns: str,
-            replace_value: int | float | str = "",
-            only_when_value: bool = True,
-            **kwargs
+        self,
+        *columns: str,
+        replace_value: int | float | str = "",
+        only_when_value: bool = True,
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self.apply_on_columns = columns
@@ -657,24 +654,14 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        filter_mask = self._get_filter_mask(data_holder)
-        # for col in self.apply_on_columns:
-        # print(f"{self._get_apply_on_columns(data_holder)=}")
         for col in self._get_apply_on_columns(data_holder):
             if col not in data_holder.data.columns:
                 continue
-            # print(f"{col=}")
-            # mask = filter_mask
             mask = self._get_filter_mask(data_holder)
-            # print(f"A {sum(mask)=}")
             if self._only_when_value:
                 if not mask.is_empty():
                     mask = mask & (data_holder.data[col] != "")
-            # print(f"{mask.is_empty()=}")
             if not mask.is_empty():
-                # print(f"B {sum(mask)=}")
-                # print(f"{set(data_holder.data.filter(~mask)[col])=}")
-                # print()
                 data_holder.data = data_holder.data.with_columns(
                     pl.when(mask)
                     .then(pl.lit(self._replace_value))
