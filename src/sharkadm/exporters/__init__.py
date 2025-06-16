@@ -11,6 +11,7 @@ from sharkadm.exporters.html_station_map import (
     HtmlStationMap,
     PolarsHtmlMap,
     PolarsHtmlMapR,
+    PolarsHtmlMapRred,
     PolarsHtmlStationMap,
 )
 from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles

@@ -39,7 +39,10 @@ class RemoveReportedValueIfNotCalculated(Transformer):
 
 class RemoveValuesInColumns(Transformer):
     def __init__(
-        self, *columns: str, replace_value: int | float | str = "", **kwargs
+            self,
+            *columns: str,
+            replace_value: int | float | str = "",
+            **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.apply_on_columns = columns
@@ -61,13 +64,13 @@ class RemoveValuesInColumns(Transformer):
                 continue
             data_holder.data.loc[filter_bool, col] = self._replace_value
             if self._replace_value:
-                self._log(
+                adm_logger.log_transformation(
                     f"All values in column {col} are set to {self._replace_value} "
                     f"(all {len_data} places)",
                     level=adm_logger.WARNING,
                 )
             else:
-                self._log(
+                adm_logger.log_transformation(
                     f"All values in column {col} are removed (all {len_data} places)",
                     level=adm_logger.WARNING,
                 )
@@ -99,7 +102,7 @@ class RemoveRowsForParameters(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if "parameter" not in data_holder.data:
-            self._log(
+            adm_logger.log_transformation(
                 f'Can not remove rows in data. Missing column "{self.parameter_column}"',
                 level=adm_logger.WARNING,
             )
@@ -116,7 +119,7 @@ class RemoveRowsForParameters(Transformer):
             if not len(index):
                 continue
             data_holder.data.drop(index=index, inplace=True)
-            self._log(
+            adm_logger.log_transformation(
                 f'Removing parameter "{par}" ({len(index)} rows)',
                 level=adm_logger.WARNING,
             )
@@ -127,10 +130,7 @@ class RemoveRowsAtDepthRestriction(Transformer):
     valid_data_structures = ("row",)
 
     def __init__(
-        self,
-        valid_data_types: list[str],
-        data_filter: DataFilterRestrictDepth,
-        **kwargs,
+        self, valid_data_types: list[str], data_filter: DataFilterRestrictDepth, **kwargs
     ) -> None:
         self.valid_data_types = valid_data_types
         super().__init__(data_filter=data_filter, **kwargs)
@@ -143,7 +143,7 @@ class RemoveRowsAtDepthRestriction(Transformer):
         filter_bool = self._get_filter_mask(data_holder)
         index = np.where(filter_bool)
         data_holder.data = data_holder.data[~filter_bool]
-        self._log(
+        adm_logger.log_transformation(
             f"Removing rows due to depth restrictions ({len(index)} rows)",
             level=adm_logger.WARNING,
         )
@@ -166,7 +166,7 @@ class PolarsKeepMask(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         mask = self._get_filter_mask(data_holder)
         if mask.is_empty():
-            self._log(
+            adm_logger.log_transformation(
                 f"Could not run transformer {PolarsKeepMask.__class__.__name__}. "
                 f"Missing data_filter",
                 level=adm_logger.ERROR,
@@ -192,12 +192,53 @@ class PolarsRemoveMask(PolarsTransformer):
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         mask = self._get_filter_mask(data_holder)
         if mask.is_empty():
-            self._log(
+            adm_logger.log_transformation(
                 f"Could not run transformer {PolarsRemoveMask.__class__.__name__}. "
                 f"Missing data_filter",
                 level=adm_logger.ERROR,
             )
         data_holder.data = data_holder.data.remove(mask)
+
+
+class PolarsReplaceColumnWithMask(PolarsTransformer):
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter,
+        column: str,
+        replace_value: str = "",
+        valid_data_types: tuple[str, ...] = (),
+        **kwargs,
+    ) -> None:
+        self.valid_data_types = valid_data_types or self.valid_data_types
+        self._column = column
+        self._replace_value = replace_value
+        super().__init__(data_filter=data_filter, **kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes all rows that are valid in filter"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self._column not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"No column named {self._column}",
+                level=adm_logger.DEBUG,
+            )
+            return
+        mask = self._get_filter_mask(data_holder)
+        if mask.is_empty():
+            adm_logger.log_transformation(
+                f"Could not run transformer {PolarsRemoveMask.__class__.__name__}. "
+                f"Missing data_filter",
+                level=adm_logger.ERROR,
+            )
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(mask)
+            .then(pl.lit(self._replace_value))
+            .otherwise(pl.col(self._column))
+            .alias(self._column)
+        )
 
 
 class RemoveDeepestDepthAtEachVisit(Transformer):
@@ -237,7 +278,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         if self._depth_column not in data_holder.data:
-            self._log(
+            adm_logger.log_transformation(
                 f"Depth column {self._depth_column} not found in data",
                 level=adm_logger.DEBUG,
             )
@@ -251,7 +292,7 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
             df = df.loc[df[self._depth_column] != ""]
             depths = set(df[self._depth_column])
             if not len(depths):
-                self._log(
+                adm_logger.log_transformation(
                     f"No depths in column {self._depth_column} at {_id}",
                     level=adm_logger.WARNING,
                 )
@@ -274,18 +315,18 @@ class RemoveDeepestDepthAtEachVisit(Transformer):
         data_holder.data.loc[all_index_to_set, self._depth_column] = self._replace_value
 
         for col in additional_cols:
-            self._log(
+            adm_logger.log_transformation(
                 f"Removing deepest {col} info at {nr_visits} visits",
                 level=adm_logger.WARNING,
             )
 
         if self._replace_value:
-            self._log(
+            adm_logger.log_transformation(
                 f"Setting deepest depth to {self._replace_value} at {nr_visits} visits",
                 level=adm_logger.WARNING,
             )
         else:
-            self._log(
+            adm_logger.log_transformation(
                 f"Removing deepest depth info at {nr_visits} visits",
                 level=adm_logger.WARNING,
             )
@@ -340,7 +381,7 @@ class RemoveInterval(Transformer):
                     f"{self._replace_value}-{self._replace_value} in columns "
                     f"{self.min_col} and {self.max_col} ({len(df)} places)"
                 )
-            self._log(msg, level=adm_logger.WARNING)
+            adm_logger.log_transformation(msg, level=adm_logger.WARNING)
             if self._keep_if_min_depths_are and mi in self._keep_if_min_depths_are:
                 pass
             else:
@@ -358,7 +399,7 @@ class RemoveInterval(Transformer):
                         f"Replacing values in column {col} with {self._replace_value} "
                         f"at interval {inter} ({len(df)} places)"
                     )
-                self._log(msg, level=adm_logger.WARNING)
+                adm_logger.log_transformation(msg, level=adm_logger.WARNING)
                 data_holder.data.loc[df.index, col] = self._replace_value
             for col in self._also_remove_from_columns:
                 if col not in data_holder.data:
@@ -367,7 +408,7 @@ class RemoveInterval(Transformer):
                     f"Removing values in column {col} at interval {inter} "
                     f"({len(df)} places)"
                 )
-                self._log(msg, level=adm_logger.WARNING)
+                adm_logger.log_transformation(msg, level=adm_logger.WARNING)
                 data_holder.data.loc[df.index, col] = ""
 
 
@@ -408,18 +449,18 @@ class RemoveInterval(Transformer):
 #         data_holder.data.loc[all_index_to_set, self.depth_column] = self._replace_value
 #
 #         for col in additional_cols:
-#             self._log(
+#             adm_logger.log_transformation(
 #                 f'Removing deepest {col} info at {nr_visits} visits',
 #                 level=adm_logger.WARNING
 #             )
 #
 #         if self._replace_value:
-#             self._log(
+#             adm_logger.log_transformation(
 #                 f'Setting deepest depth to {self._replace_value} at {nr_visits} visits',
 #                 level=adm_logger.WARNING
 #             )
 #         else:
-#             self._log(
+#             adm_logger.log_transformation(
 #                 f'Removing deepest depth info at {nr_visits} visits',
 #                 level=adm_logger.WARNING
 #             )
@@ -465,19 +506,19 @@ class RemoveInterval(Transformer):
 #             data_holder.data.loc[all_index_to_set[column], column] = self._replace_value
 #
 #             for col in additional_cols:
-#                 self._log(
+#                 adm_logger.log_transformation(
 #                     f'Removing deepest {col} info at {nr_visits} visits',
 #                     level=adm_logger.WARNING
 #                 )
 #
 #             if self._replace_value:
-#                 self._log(
+#                 adm_logger.log_transformation(
 #                     f'Setting deepest depth to {self._replace_value} at '
 #                     f'{nr_visits} visits',
 #                     level=adm_logger.WARNING
 #                 )
 #             else:
-#                 self._log(
+#                 adm_logger.log_transformation(
 #                     f'Removing deepest depth info at {nr_visits} visits',
 #                     level=adm_logger.WARNING
 #                 )
@@ -502,7 +543,7 @@ class SetMaxLengthOfValuesInColumns(Transformer):
             if col not in data_holder.data:
                 continue
             data_holder.data[col] = data_holder.data[col].str[: self._length]
-            self._log(
+            adm_logger.log_transformation(
                 f"Setting all values in column {col} to length {self._length} "
                 f"(all {len_data} places)",
                 level=adm_logger.INFO,
@@ -527,7 +568,7 @@ class PolarsRemoveProfiles(PolarsTransformer):
     def _transform(self, data_holder: PolarsZipArchiveDataHolder) -> None:
         mask = self._get_filter_mask(data_holder)
         if mask.is_empty():
-            self._log(
+            adm_logger.log_transformation(
                 f"Could not run transformer {PolarsRemoveProfiles.__class__.__name__}. "
                 f"Missing data_filter",
                 level=adm_logger.ERROR,
@@ -562,8 +603,8 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         if self.parameter_column not in data_holder.data:
-            self._log(
-                f"Can not remove values in rows. "
+            adm_logger.log_transformation(
+                f'Can not remove values in rows. '
                 f'Missing column "{self.parameter_column}"',
                 level=adm_logger.WARNING,
             )
@@ -584,16 +625,20 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
             nr_rows = len(data_holder.data.filter(mask))
             if not nr_rows:
                 continue
-            self._log(
+            adm_logger.log_transformation(
                 f'Replacing value (-> {self._replace_value}) for parameter "{par}" '
-                f"({nr_rows} rows)",
+                f'({nr_rows} rows)',
                 level=adm_logger.WARNING,
             )
 
 
 class PolarsRemoveValueInColumns(PolarsTransformer):
     def __init__(
-        self, *columns: str, replace_value: int | float | str = "", **kwargs
+            self,
+            *columns: str,
+            replace_value: int | float | str = "",
+            only_when_value: bool = True,
+            **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.apply_on_columns = columns
@@ -601,6 +646,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
             self.apply_on_columns = columns[0]
 
         self._replace_value = str(replace_value)
+        self._only_when_value = only_when_value
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -613,30 +659,51 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         filter_mask = self._get_filter_mask(data_holder)
         # for col in self.apply_on_columns:
+        # print(f"{self._get_apply_on_columns(data_holder)=}")
         for col in self._get_apply_on_columns(data_holder):
-            if col not in data_holder.data:
+            if col not in data_holder.data.columns:
                 continue
-            if not filter_mask.is_empty():
+            # print(f"{col=}")
+            # mask = filter_mask
+            mask = self._get_filter_mask(data_holder)
+            # print(f"A {sum(mask)=}")
+            if self._only_when_value:
+                if not mask.is_empty():
+                    mask = mask & (data_holder.data[col] != "")
+            # print(f"{mask.is_empty()=}")
+            if not mask.is_empty():
+                # print(f"B {sum(mask)=}")
+                # print(f"{set(data_holder.data.filter(~mask)[col])=}")
+                # print()
                 data_holder.data = data_holder.data.with_columns(
-                    pl.when(filter_mask)
+                    pl.when(mask)
                     .then(pl.lit(self._replace_value))
                     .otherwise(pl.col(col))
                     .alias(col)
                 )
-                nr_rows = len(data_holder.data.filter(filter_mask))
+                nr_rows = len(data_holder.data.filter(mask))
             else:
-                data_holder.data = data_holder.data.with_columns(
-                    pl.lit(self._replace_value).alias(col)
-                )
+                if self._only_when_value:
+                    mask = data_holder.data[col] == ""
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.when(mask)
+                        .then(pl.lit(self._replace_value))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                    )
+                else:
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.lit(self._replace_value).alias(col)
+                    )
                 nr_rows = len(data_holder.data)
             if self._replace_value:
-                self._log(
+                adm_logger.log_transformation(
                     f"All values in column {col} are set to {self._replace_value} "
                     f"(all {nr_rows} places)",
                     level=adm_logger.WARNING,
                 )
             else:
-                self._log(
+                adm_logger.log_transformation(
                     f"All values in column {col} are removed (all {nr_rows} places)",
                     level=adm_logger.WARNING,
                 )

@@ -138,3 +138,31 @@ class PolarsManualHarbourPorpoise(PolarsTransformer):
                 f"{self.col_to_set} set from {self.source_col} for md5={md5}",
                 level=adm_logger.INFO,
             )
+
+
+class PolarsManualEpibenthos(PolarsTransformer):
+    valid_data_types = ("Epibenthos",)
+    valid_data_holders = ("PolarsZipArchiveDataHolder",)
+    md5_column = "shark_sample_id_md5"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Manual fixes for HarbourPorpoise"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._remove_md5s(data_holder)
+
+    def _remove_md5s(self, data_holder: PolarsDataHolder) -> None:
+        md5s = [
+            "1bca52840114772f32cfa192409333a9",
+            "aae307678f513c1c4c7efec3e0a1b9e0",
+        ]
+        for md5 in md5s:
+            if md5 not in data_holder.data[self.md5_column]:
+                continue
+            mask = data_holder.data[self.md5_column] == md5
+            data_holder.data = data_holder.data.remove(mask)
+            self._log(
+                f"Removing rows with md5 = {md5}",
+                level=adm_logger.INFO,
+            )

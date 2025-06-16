@@ -415,6 +415,10 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         )
 
     def _load_delivery_note(self) -> None:
+        if not self.delivery_note_path.exists():
+            adm_logger.log_workflow(f'Delivery note not found: {self.delivery_note_path}',
+                                    level=adm_logger.DEBUG)
+            return
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(
             self.delivery_note_path
         )
@@ -470,7 +474,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             )
             return
         d_source = CsvRowFormatPolarsDataFile(
-            path=self.shark_data_path, data_type=self.delivery_note.data_type
+            path=self.shark_data_path, data_type=self.data_type
         )
         self._set_data_source(d_source)
 
