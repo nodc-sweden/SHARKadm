@@ -1,14 +1,12 @@
-from .base import FileExporter
 from ..config import get_header_mapper_from_data_holder
 from ..data import PolarsDataHolder
+from .base import FileExporter
 
 
 class ExportJellyfishRowsFromLimsExport(FileExporter):
-    valid_data_holders = ("LimsDataHolder", )
+    valid_data_holders = ("LimsDataHolder",)
 
-    def __init__(self,
-                 header_as: str | None = None,
-                 **kwargs):
+    def __init__(self, header_as: str | None = None, **kwargs):
         super().__init__(**kwargs)
 
         self._header_as = header_as
@@ -19,9 +17,7 @@ class ExportJellyfishRowsFromLimsExport(FileExporter):
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
         if not self._export_file_name:
-            self._export_file_name = (
-                f"data_jellyfish_{data_holder.dataset_name}.txt"
-            )
+            self._export_file_name = f"data_jellyfish_{data_holder.dataset_name}.txt"
 
         df = data_holder.data.with_columns()
         if self._header_as:
@@ -37,6 +33,3 @@ class ExportJellyfishRowsFromLimsExport(FileExporter):
         df = data_holder.data.drop("row_number")
         df = df.to_pandas()
         df.to_csv(self.export_file_path, encoding=self._encoding, sep="\t")
-
-
-
