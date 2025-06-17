@@ -50,6 +50,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         for col in ["Datatyp", "Data type", "DTYPE", "delivery_datatype", "data_type"]:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])
+                # Not sure if we want to raise exception if multiple datatypes are found
                 # if len(all_data_types) > 1:
                 #     raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
                 d_source._data_type = all_data_types.pop()
@@ -58,7 +59,6 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         if d_source._data_type:
             self._data_type = d_source._data_type.lower().replace(" ", "")
             data_type_internal = self._data_type
-            # data_type_internal = d_source._data_type.lower()
         else:
             data_type_internal = ""
 

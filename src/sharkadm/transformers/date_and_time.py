@@ -575,17 +575,9 @@ class PolarsCreateFakeFullDates(PolarsTransformer):
                                 separator="; ",
                             )
                         )
-                        # .then(pl.col(self.shark_comment_column) + f"; {comment_str}")
                         .otherwise(pl.col(self.shark_comment_column))
                         .alias(self.shark_comment_column)
                     )
-                    # print(f"{set(data_holder.data[self.shark_comment_column])=}")
-
-                    # data_holder.data.loc[index, self.shark_comment_column] = (
-                    #     data_holder.data.loc[index, self.shark_comment_column]
-                    #     + comment_str
-                    #     + "; "
-                    # )
 
 
 class AddVisitDateFromObservationDate(Transformer):
@@ -712,9 +704,7 @@ class PolarsFixTimeFormat(Transformer):
                 elif ":" in value:
                     h, m = value.split(":")
                     new_value = f"{h.zfill(2)}:{m.zfill(2)}"
-                    # new_value = value.replace(".", ":")
                     if self._is_valid_value(new_value):
-                        print(f"{new_value=}")
                         self._set_new_value(data_holder, col, value, new_value)
                     else:
                         self._log(
@@ -740,15 +730,11 @@ class PolarsFixTimeFormat(Transformer):
         new_value: str,
     ):
         b = data_holder.data[col] == current_value
-        print(f"{b.sum()=}")
         self._log(
             f"Converting date {current_value} to {new_value} in column {col} "
             f"({b.sum()} places)",
             level=adm_logger.INFO,
         )
-        print(f"{col=}")
-        print(f"{current_value=}")
-        print(f"{new_value=}")
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col(col) == current_value)
             .then(pl.lit(new_value))
