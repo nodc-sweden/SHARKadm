@@ -1,4 +1,5 @@
 # ruff: noqa: F401
+# ruff: noqa: I001
 import functools
 import pathlib
 from typing import Type
@@ -121,6 +122,7 @@ from sharkadm.transformers.lims import (
     PolarsMoveLessThanFlagRowFormat,
     PolarsRemoveNonDataLines,
     RemoveNonDataLines,
+    PolarsKeepOnlyJellyfishLines,
 )
 from sharkadm.transformers.location import (
     AddLocationCounty,

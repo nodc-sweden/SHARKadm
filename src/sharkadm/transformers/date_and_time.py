@@ -691,7 +691,14 @@ class PolarsFixTimeFormat(Transformer):
 
             unique_values = set(data_holder.data.filter(boolean)[col])
             for value in unique_values:
-                if "." in value:
+                if re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", value):
+                    new_value = value.split()[-1]
+                    self._log(
+                        f"Strange formatting found in column {col}: {value}. "
+                        f"Translating value to: {new_value}"
+                    )
+                    self._set_new_value(data_holder, col, value, new_value)
+                elif "." in value:
                     h, m = value.split(".")
                     new_value = f"{h.zfill(2)}:{m.zfill(2)}"
                     if self._is_valid_value(new_value):
@@ -702,6 +709,8 @@ class PolarsFixTimeFormat(Transformer):
                             level=adm_logger.ERROR,
                         )
                 elif ":" in value:
+                    print(f"{col=}")
+                    print(f"{value=}")
                     h, m = value.split(":")
                     new_value = f"{h.zfill(2)}:{m.zfill(2)}"
                     if self._is_valid_value(new_value):

@@ -6,15 +6,19 @@ from sharkadm import config
 from .lims_data_holder import LimsDataHolder, PolarsLimsDataHolder
 
 
-def get_polars_lims_data_holder(path: str | pathlib.Path) -> PolarsLimsDataHolder:
+def get_polars_lims_data_holder(
+    path: str | pathlib.Path, **kwargs
+) -> PolarsLimsDataHolder:
     path = pathlib.Path(path)
     if path.name == "data.txt" and path.parent.name.lower() == "raw_data":
         path = path.parent.parent
     if path.name.lower() == "raw_data":
         path = path.parent
-    mapper = config.get_import_matrix_mapper(
-        data_type="physicalchemical", import_column="LIMS"
-    )
+    mapper = None
+    if not kwargs.get("keep_header"):
+        mapper = config.get_import_matrix_mapper(
+            data_type="physicalchemical", import_column="LIMS"
+        )
     return PolarsLimsDataHolder(lims_root_directory=path, header_mapper=mapper)
 
 

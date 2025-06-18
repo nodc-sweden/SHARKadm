@@ -4,6 +4,7 @@ import datetime
 import logging
 import pathlib
 import re
+import string
 from typing import Protocol
 
 import openpyxl
@@ -84,8 +85,8 @@ class UncertComment:
         self._save_data()
 
     def _save_data(self):
-        for string in self._orig_comment.split(","):
-            self._info.append(UncertString(string))
+        for com in self._orig_comment.split(","):
+            self._info.append(UncertString(com))
 
     def get(self, value: str | float | int) -> str:
         for item in self._info:
@@ -253,7 +254,8 @@ class AnalyseInfo:
             return
             # raise Exception(f'Could not find analyse_info sheet in file: {path}')
 
-        ws = wb.get_sheet_by_name(sheet_name)
+        # ws = wb.get_sheet_by_name(sheet_name)
+        ws = wb[sheet_name]
         skip_nr_rows = 0
         for r in range(1, 5):
             if ws.cell(r, 1).value in ["Tabellhuvud:"]:
@@ -261,10 +263,31 @@ class AnalyseInfo:
                 break
         df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
         df.fillna("", inplace=True)
+
+        uncert_col_name = "UNCERT"
+        uncert_col_char = None
+        for col, char in zip(df.columns, string.ascii_uppercase):
+            if col == uncert_col_name:
+                uncert_col_char = char
+                break
+
         data = dict()
         data["path"] = path
-        for row in df.iterrows():
+        for r, row in enumerate(df.iterrows()):
             line_dict = row[1].to_dict()
+            if not line_dict["PARAM"]:
+                continue
+
+            cell_name = f"{uncert_col_char}{r + skip_nr_rows + 2}"
+            num_format = ws[cell_name].number_format
+            uncert = line_dict[uncert_col_name]
+            if uncert and "%" in num_format:
+                fixed_uncert = convert_uncert_value_to_percent(uncert)
+            else:
+                fixed_uncert = fix_uncert_value(uncert)
+            line_dict["original_uncert"] = line_dict[uncert_col_name]
+            line_dict[uncert_col_name] = fixed_uncert
+
             line_dict["VALIDFR"] = _get_date(line_dict["VALIDFR"])
             line_dict["VALIDTO"] = _get_date(line_dict["VALIDTO"])
             par = line_dict["PARAM"]
@@ -306,3 +329,23 @@ def _get_date(date_str: str) -> datetime.date | str:
         purpose=adm_logger.FEEDBACK,
     )
     return ""
+
+
+def convert_uncert_value_to_percent(value: str) -> str:
+    if not value:
+        return ""
+    if "%" in value:
+        return value.strip().replace(" ", "")
+    try:
+        float_val = float(value)
+        return f"{round(float_val * 100)}%"
+    except ValueError:
+        return value.replace(",", ".")
+
+
+def fix_uncert_value(value: str) -> str:
+    if not value:
+        return ""
+    if "%" in value:
+        return value.strip().replace(" ", "")
+    return value.replace(",", ".").strip()
