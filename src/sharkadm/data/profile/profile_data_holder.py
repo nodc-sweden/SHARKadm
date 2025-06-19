@@ -35,11 +35,14 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
         if root_path.is_file():
             self._paths = [root_path]
         else:
-            self._paths = [
-                p
-                for p in root_path.iterdir()
-                if p.suffix == ".txt" and p.name.upper().startswith("SBE")
-            ]
+            self._paths = []
+            for p in root_path.iterdir():
+                if p.suffix != ".txt":
+                    continue
+                if p.name.upper().startswith("SBE"):
+                    self._paths.append(p)
+                if p.name.lower().startswith("ctd_profile"):
+                    self._paths.append(p)
 
         self._header_mapper = header_mapper
 

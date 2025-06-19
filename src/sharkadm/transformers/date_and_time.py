@@ -3,6 +3,7 @@ import re
 
 import polars as pl
 
+from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import (
     DataHolderProtocol,
@@ -480,6 +481,105 @@ class CreateFakeFullDates(Transformer):
                     )
 
 
+class PolarsCreateFakeFullDates(PolarsTransformer):
+    shark_comment_column = "shark_comment"
+    mandatory_col_prefix = "reported"
+    source_columns = ("visit_date", "sample_date")
+    date_format = "%Y-%m-%d"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Creates fake date in columns {PolarsCreateFakeFullDates.source_columns} "
+            f"if incomplete. Sets first date in month or year depending of precision"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.shark_comment_column not in data_holder.data.columns:
+            self._add_empty_col(data_holder, self.shark_comment_column)
+
+        for source_col in self.source_columns:
+            if source_col not in data_holder.data.columns:
+                self._log(
+                    f"Could not transform {self.__class__.__name__}. "
+                    f"Missing column {source_col}",
+                    level=adm_logger.INFO,
+                )
+                continue
+            mandatory_col = f"{self.mandatory_col_prefix}_{source_col}"
+            if mandatory_col not in data_holder.data.columns:
+                self._log(
+                    f"Could not transform {self.__class__.__name__}. "
+                    f"Missing column {mandatory_col}",
+                    level=adm_logger.INFO,
+                )
+                continue
+            for date_str in set(data_holder.data[source_col]):
+                date_str = date_str.strip()
+                try:
+                    datetime.datetime.strptime(date_str, self.date_format)
+                    # All is good
+                except ValueError:
+                    new_date_str = None
+                    if len(date_str) == 4:
+                        # Probably only year
+                        self._log(
+                            f"{source_col} is {date_str}. Will be handled as <YEAR>. "
+                            f"First day of year will be set!",
+                            level=adm_logger.WARNING,
+                        )
+                        new_date_str = f"{date_str}-01-01"
+                    elif len(date_str) == 6:
+                        # Probably only year
+                        self._log(
+                            f"{source_col} is {date_str}. Will be handled as "
+                            f"<YEAR><MONTH>. "
+                            f"First day of month in that year will be set!",
+                            level=adm_logger.WARNING,
+                        )
+                        new_date_str = f"{date_str[:4]}-{date_str[4:]}-01"
+                    else:
+                        date_parts = date_str.split("-")
+                        if len(date_parts) == 2:
+                            self._log(
+                                f"{source_col} is {date_str}. Will be handled as "
+                                f"<YEAR>-<MONTH>. "
+                                f"First day of month in that year will be set!",
+                                level=adm_logger.WARNING,
+                            )
+                            new_date_str = f"{date_parts[0]}-{date_parts[1]}-01"
+
+                    # index = data_holder.data[source_col].str.strip() == date_str
+
+                    if new_date_str is None:
+                        comment_str = f'Unable to interpret {source_col} "{date_str}"'
+                        self._log(comment_str, level=adm_logger.ERROR)
+                    else:
+                        data_holder.data = data_holder.data.with_columns(
+                            pl.when(pl.col(source_col).str.strip_chars() == date_str)
+                            .then(pl.lit(new_date_str))
+                            .otherwise(pl.col(source_col))
+                            .alias(source_col)
+                        )
+
+                        # data_holder.data.loc[index, source_col] = new_date_str
+                        comment_str = (
+                            f"Fake {source_col} set from {date_str} to {new_date_str}"
+                        )
+
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.when(pl.col(source_col).str.strip_chars() == date_str)
+                        .then(
+                            pl.concat_str(
+                                [pl.col(self.shark_comment_column), pl.lit(comment_str)],
+                                separator="; ",
+                            )
+                        )
+                        .otherwise(pl.col(self.shark_comment_column))
+                        .alias(self.shark_comment_column)
+                    )
+
+
 class AddVisitDateFromObservationDate(Transformer):
     valid_data_types = ("HarbourPorpoise",)
     valid_data_holders = ("ZipArchiveDataHolder",)
@@ -569,34 +669,50 @@ class PolarsFixTimeFormat(Transformer):
             if col not in data_holder.data:
                 continue
 
-            boolean = (
+            t_boolean = (
                 data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
             )
-            if not boolean.any():
+            if not t_boolean.any():
                 self._log(
                     f"All values in column {col} correct format HH:MM:SS",
                     level=adm_logger.DEBUG,
                 )
                 continue
 
-            boolean = data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}$").is_null()
-            if not boolean.any():
+            m_boolean = data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}$").is_null()
+            if not m_boolean.any():
                 self._log(
                     f"All values in column {col} correct format HH:MM",
                     level=adm_logger.DEBUG,
                 )
                 continue
 
-            t_boolean = (
-                data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
-            )
-            m_boolean = data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}$").is_null()
-            boolean = t_boolean | m_boolean
+            boolean = t_boolean & m_boolean
 
             unique_values = set(data_holder.data.filter(boolean)[col])
             for value in unique_values:
-                if "." in value:
-                    new_value = value.replace(".", ":")
+                if re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", value):
+                    new_value = value.split()[-1]
+                    self._log(
+                        f"Strange formatting found in column {col}: {value}. "
+                        f"Translating value to: {new_value}"
+                    )
+                    self._set_new_value(data_holder, col, value, new_value)
+                elif "." in value:
+                    h, m = value.split(".")
+                    new_value = f"{h.zfill(2)}:{m.zfill(2)}"
+                    if self._is_valid_value(new_value):
+                        self._set_new_value(data_holder, col, value, new_value)
+                    else:
+                        self._log(
+                            f"Cant handle time format {value} in column {col}",
+                            level=adm_logger.ERROR,
+                        )
+                elif ":" in value:
+                    print(f"{col=}")
+                    print(f"{value=}")
+                    h, m = value.split(":")
+                    new_value = f"{h.zfill(2)}:{m.zfill(2)}"
                     if self._is_valid_value(new_value):
                         self._set_new_value(data_holder, col, value, new_value)
                     else:
@@ -632,6 +748,7 @@ class PolarsFixTimeFormat(Transformer):
             pl.when(pl.col(col) == current_value)
             .then(pl.lit(new_value))
             .otherwise(pl.col(col))
+            .alias(col)
         )
 
     def _is_valid_value(self, value: str) -> bool | None:

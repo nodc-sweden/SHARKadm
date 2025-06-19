@@ -136,6 +136,8 @@ class SamplingInfo:
         data["path"] = path
         for row in df.iterrows():
             line_dict = row[1].to_dict()
+            if not line_dict["PARAM"]:
+                continue
             line_dict["VALIDFR"] = _get_date(line_dict["VALIDFR"])
             line_dict["VALIDTO"] = _get_date(line_dict["VALIDTO"])
             par = line_dict["PARAM"]

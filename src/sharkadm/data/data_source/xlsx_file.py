@@ -20,7 +20,6 @@ class XlsxFormatDataFile(DataFile):
             sheet_name=self._sheet_name,
             dtype=str,
             skiprows=self._skip_rows,
-            has_header=True,
         )
 
 

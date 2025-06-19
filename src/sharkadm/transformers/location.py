@@ -350,7 +350,7 @@ class PolarsAddLocationRO(_PolarsAddLocationBase):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds location_rh"
+        return "Adds location_ro"
 
 
 class PolarsAddLocationR(PolarsTransformer):

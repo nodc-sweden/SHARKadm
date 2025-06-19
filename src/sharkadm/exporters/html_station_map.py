@@ -352,3 +352,11 @@ class PolarsHtmlMapR(PolarsHtmlMap):
         "location_rh",
         "location_ro",
     )
+
+
+class PolarsHtmlMapRred(PolarsHtmlMap):
+    shape_layers: tuple[str, ...] = (
+        "location_rc",
+        "location_rg",
+        "location_ro",
+    )

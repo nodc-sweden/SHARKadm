@@ -42,7 +42,11 @@ class AddAnalyseInfo(Transformer):
 
 
 class PolarsAddAnalyseInfo(PolarsTransformer):
-    valid_data_holders = ("ArchiveDataHolder", "LimsDataHolder", "DvTemplateDataHolder")
+    valid_data_holders = (
+        "PolarsArchiveDataHolder",
+        "PolarsLimsDataHolder",
+        "PolarsDvTemplateDataHolder",
+    )
 
     @staticmethod
     def get_transformer_description() -> str:

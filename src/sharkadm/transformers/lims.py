@@ -126,7 +126,7 @@ class RemoveNonDataLines(Transformer):
 
 
 class PolarsRemoveNonDataLines(PolarsTransformer):
-    valid_data_holders = ("LimsDataHolder",)
+    valid_data_holders = ("PolarsLimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -139,3 +139,33 @@ class PolarsRemoveNonDataLines(PolarsTransformer):
         data_holder.data = data_holder.data.filter(
             ~pl.col("sample_id").str.contains_any(["-SLA_", "-ZOO_"])
         )
+
+
+class PolarsKeepOnlyJellyfishLines(PolarsTransformer):
+    valid_data_holders = ("PolarsLimsDataHolder",)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Keep all rows identified as jellyfish rows from LIMS export"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        samp_nr_col = "SMPNO"
+        if samp_nr_col not in data_holder.data.columns:
+            samp_nr_col = "sample_id"
+        conds = [
+            pl.col(samp_nr_col).str.contains("ZOO_")
+            & (
+                (pl.col("JEL_MNDEP") != "")
+                | (pl.col("JEL_MXDEP") != "")
+                | (pl.col("JEL_FLOWM_READING") != "")
+                | (pl.col("TOT_VOL") != "")
+                | (pl.col("FILT_VOL") != "")
+                | (pl.col("EXT_VOL") != "")
+                | (pl.col("DISP_VOL") != "")
+            )
+        ]
+
+        data_holder.data = data_holder.data.filter(conds)

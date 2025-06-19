@@ -1,4 +1,5 @@
 # ruff: noqa: F401
+# ruff: noqa: I001
 import functools
 import pathlib
 from typing import Type
@@ -17,6 +18,7 @@ from sharkadm.transformers.bvol import (
     PolarsAddBvolScientificNameAndSizeClass,
     # AddBvolAphiaId,
     # AddBvolRefList,
+    # AddBvolScientificNameAndSizeClass,
     # AddBvolScientificNameAndSizeClass,
     # AddBvolScientificNameOriginal,
     PolarsAddBvolScientificNameOriginal,
@@ -75,6 +77,7 @@ from sharkadm.transformers.date_and_time import (
     PolarsAddSampleDate,
     PolarsAddSampleTime,
     PolarsAddVisitDateFromObservationDate,
+    PolarsCreateFakeFullDates,
     PolarsFixDateFormat,
     PolarsFixTimeFormat,
 )
@@ -120,6 +123,7 @@ from sharkadm.transformers.lims import (
     PolarsMoveLessThanFlagRowFormat,
     PolarsRemoveNonDataLines,
     RemoveNonDataLines,
+    PolarsKeepOnlyJellyfishLines,
 )
 from sharkadm.transformers.location import (
     AddLocationCounty,
@@ -147,6 +151,7 @@ from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import (
     ManualHarbourPorpoise,
     ManualSealPathology,
+    PolarsManualEpibenthos,
     PolarsManualHarbourPorpoise,
     PolarsManualSealPathology,
 )
@@ -187,6 +192,7 @@ from sharkadm.transformers.remove import (
     PolarsRemoveProfiles,
     PolarsRemoveValueInColumns,
     PolarsRemoveValueInRowsForParameters,
+    PolarsReplaceColumnWithMask,
     RemoveDeepestDepthAtEachVisit,
     RemoveInterval,
     RemoveReportedValueIfNotCalculated,
