@@ -126,7 +126,7 @@ class RemoveNonDataLines(Transformer):
 
 
 class PolarsRemoveNonDataLines(PolarsTransformer):
-    valid_data_holders = ("LimsDataHolder",)
+    valid_data_holders = ("PolarsLimsDataHolder",)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

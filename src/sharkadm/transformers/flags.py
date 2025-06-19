@@ -79,5 +79,5 @@ class PolarsConvertFlagsToSDN(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.col(self.flag_col).replace(self.mapping, default="9").alias(self.flag_col)
+            pl.col(self.flag_col).replace_strict(self.mapping, default="9").alias(self.flag_col)
         )

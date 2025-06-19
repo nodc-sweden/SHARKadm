@@ -3,7 +3,7 @@ import pathlib
 from typing import Any, Self
 
 import pandas as pd
-import pandas as pl
+import polars as pl
 
 from sharkadm import event, exporters, transformers, utils, validators
 from sharkadm.data import get_data_holder, get_polars_data_holder

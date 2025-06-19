@@ -7,7 +7,10 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.exporters.base import Exporter
 from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
-from sharkadm.exporters.dataframe import DataFrame
+from sharkadm.exporters.dataframe import (
+    DataFrame,
+    PolarsDataFrame
+)
 from sharkadm.exporters.html_station_map import (
     HtmlStationMap,
     PolarsHtmlMap,
