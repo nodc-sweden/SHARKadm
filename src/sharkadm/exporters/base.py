@@ -6,7 +6,7 @@ from typing import Any, Protocol
 import pandas as pd
 
 from sharkadm import config, utils
-from sharkadm.data import is_valid_data_holder, PolarsDataHolder
+from sharkadm.data import PolarsDataHolder, is_valid_data_holder
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -119,16 +119,15 @@ class PolarsExporter(ABC):
     col_to_set: str = ""
 
     def __init__(
-            self,
-            valid_data_types: tuple[str, ...] = (),
-            invalid_data_types: tuple[str, ...] = (),
-            valid_data_holders: tuple[str, ...] = (),
-            invalid_data_holders: tuple[str, ...] = (),
-            valid_data_structures: tuple[str, ...] = (),
-            invalid_data_structures: tuple[str, ...] = (),
-            **kwargs,
+        self,
+        valid_data_types: tuple[str, ...] = (),
+        invalid_data_types: tuple[str, ...] = (),
+        valid_data_holders: tuple[str, ...] = (),
+        invalid_data_holders: tuple[str, ...] = (),
+        valid_data_structures: tuple[str, ...] = (),
+        invalid_data_structures: tuple[str, ...] = (),
+        **kwargs,
     ):
-
         self.valid_data_types = valid_data_types or self.valid_data_types
         self.invalid_data_types = invalid_data_types or self.invalid_data_types
 
@@ -137,7 +136,7 @@ class PolarsExporter(ABC):
 
         self.valid_data_structures = valid_data_structures or self.valid_data_structures
         self.invalid_data_structures = (
-                invalid_data_structures or self.invalid_data_structures
+            invalid_data_structures or self.invalid_data_structures
         )
 
         self._kwargs = kwargs

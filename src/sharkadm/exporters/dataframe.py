@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 import polars as pl
+
 from sharkadm.config import get_header_mapper_from_data_holder
 from sharkadm.data import PolarsDataHolder
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.exporters.base import DataHolderProtocol, Exporter, PolarsExporter
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class DataFrame(Exporter):
@@ -111,11 +112,9 @@ class PolarsDataFrame(PolarsExporter):
                 if col not in df.columns:
                     continue
                 try:
-                    df = df.with_columns(
-                        pl.col(col).cast(float)
-                    )
+                    df = df.with_columns(pl.col(col).cast(float))
                 except pl.exceptions.InvalidOperationError:
-                    for (value, ), part_df in df.group_by(col):
+                    for (value,), part_df in df.group_by(col):
                         new_value = self._convert_to_float(str(value))
                         if new_value == np.nan:
                             self._log(
