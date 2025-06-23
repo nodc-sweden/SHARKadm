@@ -34,9 +34,9 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "pytest>=8.2.2",
-     "notebook>=7.3.2",
-     "ruff>=0.11.10",
-     "pre-commit>=4.2.0",
+    "notebook>=7.3.2",
+    "ruff>=0.12.0",
+    "pre-commit>=4.2.0",
 ]
 
 [tool.ruff]
@@ -50,6 +50,6 @@ select = [
     "F",  # pyflakes
     "E", # pycodestyle: error
     "W",  # pycodestyle: warning
-    "I001",  # isort: unsorted-imports
+    "I",  # isort: unsorted-imports
     "RUF"  # Ruff-specific rules
 ]
