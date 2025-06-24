@@ -53,3 +53,5 @@ select = [
     "I",  # isort: unsorted-imports
     "RUF"  # Ruff-specific rules
 ]
+
+per-file-ignores."__init__.py" = ["F401"]
