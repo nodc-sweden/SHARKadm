@@ -1,4 +1,3 @@
-# ruff: noqa: F401
 # ruff: noqa: I001
 import functools
 import pathlib

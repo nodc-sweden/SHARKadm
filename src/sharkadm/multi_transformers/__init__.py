@@ -1,4 +1,3 @@
-# ruff: noqa: F401
 import functools
 import pathlib
 from typing import Type

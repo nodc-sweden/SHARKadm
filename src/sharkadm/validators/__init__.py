@@ -3,46 +3,28 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
-from sharkadm.utils.inspect_kwargs import get_kwargs_for_class as get_kwargs_for_class
+from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 from sharkadm.validators.aphia_id import (
-    ValidateAphiaIdVsBvolAphiaId as ValidateAphiaIdVsBvolAphiaId,
+    ValidateAphiaIdVsBvolAphiaId,
+    ValidateReportedVsAphiaId,
+    ValidateReportedVsBvolAphiaId,
 )
-from sharkadm.validators.aphia_id import (
-    ValidateReportedVsAphiaId as ValidateReportedVsAphiaId,
-)
-from sharkadm.validators.aphia_id import (
-    ValidateReportedVsBvolAphiaId as ValidateReportedVsBvolAphiaId,
-)
-from sharkadm.validators.base import Validator as Validator
+from sharkadm.validators.base import Validator
 from sharkadm.validators.column_combination import (
-    AssertCombination as AssertCombination,
+    AssertCombination,
+    AssertMinMaxDepthCombination,
 )
-from sharkadm.validators.column_combination import (
-    AssertMinMaxDepthCombination as AssertMinMaxDepthCombination,
-)
-from sharkadm.validators.columns import (
-    ValidateColumnViewColumnsNotInDataset as ValidateColumnViewColumnsNotInDataset,
-)
-from sharkadm.validators.common_values import (
-    ValidateCommonValuesByVisit as ValidateCommonValuesByVisit,
-)
-from sharkadm.validators.date_and_time import MissingTime as MissingTime
+from sharkadm.validators.columns import ValidateColumnViewColumnsNotInDataset
+from sharkadm.validators.common_values import ValidateCommonValuesByVisit
+from sharkadm.validators.date_and_time import MissingTime
 from sharkadm.validators.mandatory import (
-    ValidateValuesInMandatoryNatColumns as ValidateValuesInMandatoryNatColumns,
+    ValidateValuesInMandatoryNatColumns,
+    ValidateValuesInMandatoryRegColumns,
 )
-from sharkadm.validators.mandatory import (
-    ValidateValuesInMandatoryRegColumns as ValidateValuesInMandatoryRegColumns,
-)
-from sharkadm.validators.occurrence_id import (
-    ValidateOccurrenceId as ValidateOccurrenceId,
-)
-from sharkadm.validators.position import (
-    CheckIfLatLonIsSwitched as CheckIfLatLonIsSwitched,
-)
-from sharkadm.validators.positive import (
-    ValidatePositiveValues as ValidatePositiveValues,
-)
-from sharkadm.validators.year import ValidateYearNrDigits as ValidateYearNrDigits
+from sharkadm.validators.occurrence_id import ValidateOccurrenceId
+from sharkadm.validators.position import CheckIfLatLonIsSwitched
+from sharkadm.validators.positive import ValidatePositiveValues
+from sharkadm.validators.year import ValidateYearNrDigits
 
 
 @functools.cache
