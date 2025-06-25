@@ -8,16 +8,16 @@ class ValidateNameInMaster(Validator):
     def __init__(
         self,
         station_names: set | None = None,
-        station_name_column: str = "statn",
+        station_name_column: str = "reported_station_name",
         **kwargs,
     ):
         super().__init__(**kwargs)
         self._station_name_column = station_name_column
-        self._station_names = set(map(str.lower, station_names or set()))
+        self._station_names = set(map(str.upper, station_names or set()))
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Checks if station names are known stations."
+        return "Checks if station name is a known station."
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if not self._station_names:
@@ -28,7 +28,7 @@ class ValidateNameInMaster(Validator):
             return
 
         for station_name, data in data_holder.data.groupby(self._station_name_column):
-            if station_name.lower() not in self._station_names:
+            if station_name.upper() not in self._station_names:
                 self._log_fail(
                     f"Unknown station. "
                     f"Station '{station_name}' is not in the station collection."

@@ -7,12 +7,11 @@ class ValidateCommonValuesByVisit(Validator):
     _display_name = "Unique visit data"
 
     unique_columns = (
-        "sample_id",
         "sample_date",
         "sample_time",
         "sample_latitude_dd",
         "sample_longitude_dd",
-        "station_name",
+        "reported_station_name",
         "water_depth_m",
         "visit_id",
         "expedition_id",
@@ -26,14 +25,17 @@ class ValidateCommonValuesByVisit(Validator):
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Validate if certain columns have unique values per visit."
+        return (
+            "Check if these columns have unique values per visit: "
+            f"{ValidateCommonValuesByVisit.unique_columns}"
+        )
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for column_name in self.unique_columns:
             if column_name not in data_holder.data.columns:
                 adm_logger.log_validation_failed(
                     f"Could not check uniqueness of '{column_name}'. Column not found.",
-                    validator=self.display_name,
+                    validator=self.get_display_name(),
                     column=column_name,
                     level=adm_logger.WARNING,
                 )
@@ -45,7 +47,7 @@ class ValidateCommonValuesByVisit(Validator):
                     adm_logger.log_validation_failed(
                         f"Multiple values for '{column_name}' "
                         f"in visit '{visit_key}': {list(unique_values)}",
-                        validator=self.display_name,
+                        validator=self.get_display_name(),
                         column=column_name,
                         level=adm_logger.ERROR,
                     )
@@ -53,7 +55,7 @@ class ValidateCommonValuesByVisit(Validator):
                     adm_logger.log_validation_succeeded(
                         f"Only one value for '{column_name}' "
                         f"in visit '{visit_key}': {unique_values[0]}",
-                        validator=self.display_name,
+                        validator=self.get_display_name(),
                         column=column_name,
                         level=adm_logger.INFO,
                     )

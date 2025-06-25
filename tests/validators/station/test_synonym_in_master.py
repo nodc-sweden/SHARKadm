@@ -32,7 +32,9 @@ def test_validate_station_synonym(
     expected_success,
 ):
     # Given data with a given station name
-    given_data = pd.DataFrame([{"statn": given_station_name, "row_number": 1}])
+    given_data = pd.DataFrame(
+        [{"reported_station_name": given_station_name, "row_number": 1}]
+    )
 
     # Given a valid data holder
     given_data_holder = pandas_data_frame_holder_class(given_data)

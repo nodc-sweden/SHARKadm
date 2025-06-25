@@ -6,7 +6,7 @@ from sharkadm.validators.base import DataHolderProtocol
 
 
 class ValidatePositionWithinStationRadius(Validator):
-    _display_name = "Position within station radius"
+    _display_name = "Position within any station radius"
 
     def __init__(
         self,

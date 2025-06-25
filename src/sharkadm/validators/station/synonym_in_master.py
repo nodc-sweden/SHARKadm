@@ -10,7 +10,7 @@ class ValidateSynonymsInMaster(Validator):
     def __init__(
         self,
         station_aliases: dict[str, set] | None = None,
-        station_name_column: str = "statn",
+        station_name_column: str = "reported_station_name",
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -19,11 +19,11 @@ class ValidateSynonymsInMaster(Validator):
         self._station_aliases = defaultdict(set)
         for station, aliases in station_aliases.items():
             for alias in aliases:
-                self._station_aliases[alias.lower()].add(station)
+                self._station_aliases[alias.upper()].add(station)
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Checks if station names are synonyms of known stations."
+        return "Checks if station name is a known station synonym."
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if not self._station_aliases:
@@ -34,14 +34,14 @@ class ValidateSynonymsInMaster(Validator):
             return
 
         for station_name, data in data_holder.data.groupby(self._station_name_column):
-            if station_name.lower() not in self._station_aliases:
+            if station_name.upper() not in self._station_aliases:
                 self._log_fail(
                     f"Unknown station. "
                     f"Station '{station_name}' is not in the synonym dictionary.",
                     row_numbers=list(data["row_number"]),
                 )
             else:
-                stations = self._station_aliases[station_name.lower()]
+                stations = self._station_aliases[station_name.upper()]
                 station_list = "', '".join(stations)
                 self._log_success(
                     f"Known station. Station '{station_name}' is synonym for "

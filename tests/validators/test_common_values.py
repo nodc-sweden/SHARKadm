@@ -32,12 +32,11 @@ class PandasDataFrameHolder(PandasDataHolder):
 @pytest.mark.parametrize(
     "given_column, given_value_a, given_value_b, given_should_be_checked",
     (
-        ("sample_id", "ABC", "123", True),
         ("sample_date", "20250101", "20250102", True),
         ("sample_time", "10:20", "10:21", True),
         ("sample_latitude_dd", "16.1", "16.2", True),
         ("sample_longitude_dd", "58.5", "58.6", True),
-        ("station_name", "Station X", "Station Y", True),
+        ("reported_station_name", "Station X", "Station Y", True),
         ("water_depth_m", "100", "99", True),
         ("visit_id", "Visit 1", "Visit 2", True),
         ("expedition_id", "Expidition 1", "Expidition 2", True),
