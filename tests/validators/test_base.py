@@ -30,7 +30,7 @@ def test_display_name_falls_back_to_class_name(given_class_name):
     validator = GivenValidationClass()
 
     # Then the class name will be used
-    assert validator.display_name == given_class_name
+    assert validator.get_display_name() == given_class_name
 
 
 @pytest.mark.parametrize(
@@ -52,5 +52,5 @@ def test_display_name_when_specified(given_class_name, given_display_name):
     validator = GivenValidationClass()
 
     # Then the display name will be used
-    assert validator.display_name != given_class_name
-    assert validator.display_name == given_display_name
+    assert validator.get_display_name() != given_class_name
+    assert validator.get_display_name() == given_display_name

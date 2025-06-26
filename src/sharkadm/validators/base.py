@@ -51,9 +51,9 @@ class Validator(ABC):
     def name(self) -> str:
         return self.__class__.__name__
 
-    @property
-    def display_name(self) -> str:
-        return self._display_name or self.name
+    @classmethod
+    def get_display_name(cls) -> str:
+        return cls._display_name or cls.__name__
 
     def validate(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_type_internal not in config.get_valid_data_types(
@@ -94,12 +94,12 @@ class Validator(ABC):
 
     def _log_success(self, msg: str, **kwargs):
         adm_logger.log_validation_succeeded(
-            msg, validator=self.display_name, cls=self.__class__.__name__, **kwargs
+            msg, validator=self.get_display_name(), cls=self.__class__.__name__, **kwargs
         )
 
     def _log_fail(self, msg: str, **kwargs):
         adm_logger.log_validation_failed(
-            msg, validator=self.display_name, cls=self.__class__.__name__, **kwargs
+            msg, validator=self.get_display_name(), cls=self.__class__.__name__, **kwargs
         )
 
     def _log_workflow(self, msg: str, **kwargs):

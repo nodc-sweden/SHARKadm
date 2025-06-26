@@ -35,8 +35,7 @@ class ValidatePositiveValues(Validator):
                     continue
                 if float(val) < 0:
                     self._log_fail(
-                        f"Negative values found in colum {col} LINES: "
-                        f"{sorted(df['row_number'])}",
+                        f"Negative values found in colum {col}: {set(df[col])}",
                         column=col,
                         row_numbers=list(df["row_number"]),
                     )

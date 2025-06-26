@@ -37,6 +37,7 @@ def test_name_validation_fails_if_no_station_list(
         ("station_1", {"not_station_1"}, False),
         ("station NAME", {"STATION name"}, True),
         ("station_1", {"not_station_1", "station_1", "station_2"}, True),
+        ("BCS III-10", {"not_station_1", "BCS III-10", "station_2"}, True),
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
@@ -48,7 +49,7 @@ def test_validate_station_name(
     expected_success,
 ):
     # Given data with a given station name
-    given_data = pd.DataFrame([{"statn": given_station_name}])
+    given_data = pd.DataFrame([{"reported_station_name": given_station_name}])
 
     # Given a valid data holder
     given_data_holder = pandas_data_frame_holder_class(given_data)
