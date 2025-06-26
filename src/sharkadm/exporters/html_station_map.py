@@ -27,6 +27,7 @@ class AreaColor(StrEnum):
     BUFFER = "gray"
     MASTER_RADIUS = "blue"
     MASTER_RADIUS_MATCH = "darkblue"
+    MANUAL_RADIUS = '#3186cc'
 
 
 nodc_station = None
@@ -598,7 +599,7 @@ class PolarsHtmlMap(FileExporter):
                 location=[info["lat_dd"], info["lon_dd"]],
                 tooltip=f"Radius: {info['radius']:_} m".replace("_", " "),
                 radius=int(info["radius"]),
-                fill_color='#3186cc',
+                fill_color=AreaColor.MANUAL_RADIUS,
                 weight=.5,
                 ).add_to(fg)
         fg.add_to(m)
