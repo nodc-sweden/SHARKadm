@@ -91,7 +91,7 @@ def test_validate_position_within_station_radius(
     given_data = pd.DataFrame(
         [
             {
-                "statn": given_station_name,
+                "reported_station_name": given_station_name,
                 "LATIT": given_latitude_value,
                 "LONGI": given_longitude_value,
                 "row_number": 1,
