@@ -5,4 +5,5 @@ from sharkadm.validators.station.position_in_ocean import ValidatePositionInOcea
 from sharkadm.validators.station.position_within_station_radius import (
     ValidatePositionWithinStationRadius,
 )
+from sharkadm.validators.station.station_identity import ValidateStationIdentity
 from sharkadm.validators.station.synonym_in_master import ValidateSynonymsInMaster
