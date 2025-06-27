@@ -124,7 +124,7 @@ def test_validate_position_in_ocean(
     given_data = pd.DataFrame(
         [
             {
-                "statn": "Station 1",
+                "reported_station_name": "Station 1",
                 "LATIT": given_latitude_value,
                 "LONGI": given_longitude_value,
                 "row_number": 1,

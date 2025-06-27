@@ -11,7 +11,7 @@ class ValidatePositionInOcean(Validator):
     def __init__(
         self,
         ocean_shapefile: gp.GeoDataFrame,
-        station_name_key="statn",
+        station_name_key="reported_station_name",
         latitude_key="LATIT",
         longitude_key="LONGI",
         **kwargs,
