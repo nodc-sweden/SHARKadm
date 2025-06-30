@@ -109,9 +109,9 @@ class PolarsHtmlMap(FileExporter):
         shape_files: list[str | pathlib.Path] | None = None,
         highlight_stations_in_areas: bool = False,
         columns_to_show: list[str] | None = None,
-        show_master_stations_within_radius: int | bool = 10_000,
+        show_master_stations_within_radius: int | bool = 12_000,
         show_accepted: bool = True,
-        show_stations: list[str] | None = None,
+        show_master_stations: list[str] | None = None,
         **kwargs,
     ):
         self._shape_layers = self.shape_layers or shape_layers or []
@@ -127,7 +127,7 @@ class PolarsHtmlMap(FileExporter):
         self._columns_to_show = columns_to_show or []
         self._show_master_stations_within_radius = show_master_stations_within_radius
         self._show_accepted = show_accepted
-        self._show_stations = show_stations
+        self._show_master_stations = show_master_stations
         super().__init__(export_directory, export_file_name, **kwargs)
 
         self._master = nodc_station.get_station_object()
@@ -274,7 +274,7 @@ class PolarsHtmlMap(FileExporter):
                     title=info["reported_station_name"], data=popup_data
                 )
 
-                self._station_info.append(
+                info.update(
                     dict(
                         lat_dd=float(info["sample_latitude_dd"]),
                         lon_dd=float(info["sample_longitude_dd"]),
@@ -286,6 +286,10 @@ class PolarsHtmlMap(FileExporter):
                         accepted=accepted,
                         matching_station=matching,
                     )
+                )
+
+                self._station_info.append(
+                    info
                 )
 
     def _save_master_station_info(self, data_holder: PolarsDataHolder):
@@ -320,9 +324,9 @@ class PolarsHtmlMap(FileExporter):
             self._master_station_info.append(info)
 
     def _save_other_stations_info(self):
-        if not self._show_stations:
+        if not self._show_master_stations:
             return
-        df = self._master.get_stations_by_name(self._show_stations)
+        df = self._master.get_stations_by_name(self._show_master_stations)
         station_infos = df.to_dict(orient="records")
         for info in station_infos:
             html = get_popup_html_table(
