@@ -145,6 +145,7 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRO,
     PolarsAddLocationTypeArea,
     PolarsAddLocationWB,
+    PolarsAddLocationOnLand,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import (

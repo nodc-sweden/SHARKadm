@@ -386,3 +386,23 @@ class PolarsAddLocationCounty(_PolarsAddLocationBase):
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds location_county from shape files"
+
+
+class PolarsAddLocationOnLand(_PolarsAddLocationBase):
+    col_to_set = "location_on_land"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Sets True for stations that are on land"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        col = "location_wb"
+        if col not in data_holder.data:
+            adm_logger.log_workflow(
+                f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
+            )
+            raise
+        boolean = data_holder.data["location_wb"] == ""
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit(boolean).alias(self.col_to_set)
+        )
