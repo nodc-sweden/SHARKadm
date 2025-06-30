@@ -404,4 +404,5 @@ class PolarsAddLocationOnLand(_PolarsAddLocationBase):
             raise
         boolean = data_holder.data["location_wb"] == ""
         data_holder.data = data_holder.data.with_columns(
-            pl.lit(boolean).alias(self.col_to_set))
+            pl.lit(boolean).alias(self.col_to_set)
+        )
