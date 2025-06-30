@@ -10,7 +10,7 @@ from .base import DataHolderProtocol, FileExporter
 from ..data import PolarsDataHolder
 
 POPUP_WIDTH = 300
-POPUP_HEIGHT = 400
+POPUP_HEIGHT = 300
 
 
 class MarkerColor(StrEnum):
@@ -71,9 +71,12 @@ except ModuleNotFoundError as e:
 
 def get_popup_html_table(title: str, data: dict) -> str:
     lines = [f"""
-        <body style="font-family:Verdana; "></body>
-        <h1 style="font-size:14px; font-weight:bold">{title}</h1>
-        <table style="font-size:12px;border-collapse:collapse;">
+        <body style="font-family:Verdana;"></body>
+        <h1 style="font-size:14px; 
+            font-weight:bold">{title}</h1>
+        <table style="font-size:12px; 
+            border-collapse:collapse;  
+            white-space: pre-wrap;">
         """]
 
     for key, value in data.items():
@@ -486,18 +489,20 @@ class PolarsHtmlMap(FileExporter):
         fg = folium.FeatureGroup(name="Stations", show=True)
         for info in self._station_info:
             color = MarkerColor.NOT_ACCEPTED
-            if info.get("accepted"):
+            if info.get("location_on_land"):
+                color = MarkerColor.ON_LAND
+            elif info.get("accepted"):
                 color = MarkerColor.ACCEPTED
             elif info.get("in_areas"):
                 color = MarkerColor.IN_SHAPE
             iframe = folium.IFrame(info["popup_html"],
                                    # width=POPUP_WIDTH,
-                                   # height=POPUP_HEIGHT
+                                   height=POPUP_HEIGHT
                                    )
             popup = folium.Popup(iframe, lazy=True,
                                  min_width=POPUP_WIDTH,
                                  max_width=POPUP_WIDTH,
-                                 # min_height=POPUP_HEIGHT,
+                                 min_height=POPUP_HEIGHT,
                                  # max_height=POPUP_HEIGHT,
                                  )
             folium.Marker(
@@ -518,18 +523,12 @@ class PolarsHtmlMap(FileExporter):
                 location=[info["lat_dd"],
                           info["lon_dd"]],
                 tooltip=f"Radius: "
-                        f"{self._show_master_stations_within_radius:_} m".replace("_", " "),
-                # popup=f"Radius: {self._show_master_stations_within_radius} m",
+                        f"{self._show_master_stations_within_radius:_} "
+                        f"m".replace("_", " "),
                 radius=self._show_master_stations_within_radius,
                 fill_color=AreaColor.BUFFER,
                 weight=.5,
                 ).add_to(fg)
-            # folium.Marker(
-            #     location=[info["lat"], info["lon"]],
-            #     tooltip=info["station"],
-            #     popup=info["text"],
-            #     icon=folium.Icon(color=color),
-            # ).add_to(fg)
         fg.add_to(m)
 
     def _add_master_markers(self, m: "folium.Map") -> None:
