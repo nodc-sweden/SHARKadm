@@ -8,11 +8,9 @@ from sharkadm.exporters.base import Exporter
 from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
 from sharkadm.exporters.dataframe import DataFrame, PolarsDataFrame
 from sharkadm.exporters.html_station_map import (
-    HtmlStationMap,
     PolarsHtmlMap,
     PolarsHtmlMapR,
     PolarsHtmlMapRred,
-    PolarsHtmlStationMap,
 )
 from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles
 from sharkadm.exporters.jellyfish import ExportJellyfishRowsFromLimsExport
