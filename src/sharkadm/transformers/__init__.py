@@ -119,7 +119,9 @@ from sharkadm.transformers.laboratory import (
 from sharkadm.transformers.lims import (
     MoveLessThanFlagColumnFormat,
     MoveLessThanFlagRowFormat,
+    MoveLargerThanFlagRowFormat,
     PolarsMoveLessThanFlagRowFormat,
+    PolarsMoveLargerThanFlagRowFormat,
     PolarsRemoveNonDataLines,
     RemoveNonDataLines,
     PolarsKeepOnlyJellyfishLines,
