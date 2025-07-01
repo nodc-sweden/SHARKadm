@@ -34,6 +34,31 @@ class MoveLessThanFlagRowFormat(Transformer):
             self._log(f'Moving {nr_flags} "<"-flags to quality_flag column')
 
 
+class MoveLargerThanFlagRowFormat(Transformer):
+    valid_data_structures = ("row",)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Moves flag > in value column to quality_flag column"
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        boolean = data_holder.data["value"].str.startswith(">")
+
+        qf_boolean = data_holder.data["value"] != ""
+
+        move_boolean = boolean & qf_boolean
+        data_holder.data.loc[move_boolean, "quality_flag"] = ">"
+
+        data_holder.data["value"] = data_holder.data["value"].str.lstrip(">")
+
+        nr_flags = boolean.value_counts().get(True)
+        if nr_flags:
+            self._log(f'Moving {nr_flags} ">"-flags to quality_flag column')
+
+
 class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
     valid_data_structures = ("row",)
 
@@ -65,6 +90,39 @@ class PolarsMoveLessThanFlagRowFormat(PolarsTransformer):
 
         if affected_rows:
             self._log(f'Moving {affected_rows} "<"-flags to quality_flag column')
+
+
+class PolarsMoveLargerThanFlagRowFormat(PolarsTransformer):
+    valid_data_structures = ("row",)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Moves flag > in value column to quality_flag column"
+
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(
+                (pl.col("value").str.starts_with(">")) & (pl.col("quality_flag") == "")
+            )
+            .then(pl.lit(">"))
+            .otherwise(pl.col("quality_flag"))
+            .alias("quality_flag")
+        )
+
+        affected_rows = len(data_holder.data.filter(pl.col("value").str.starts_with(">")))
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("value").str.starts_with(">"))
+            .then(pl.col("value").str.strip_prefix(">"))
+            .otherwise(pl.col("value"))
+            .alias("value")
+        )
+
+        if affected_rows:
+            self._log(f'Moving {affected_rows} ">"-flags to quality_flag column')
 
 
 class MoveLessThanFlagColumnFormat(Transformer):
