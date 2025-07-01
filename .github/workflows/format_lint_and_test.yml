@@ -21,6 +21,8 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           version: "0.7.17"  # Update regularly
+          enable-cache: true
+          prune-cache: false
 
       - name: Make sure project is synced
         run: uv lock --check
