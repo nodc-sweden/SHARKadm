@@ -1,9 +1,11 @@
+import pathlib
 import re
 
 import numpy as np
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.utils import modify
 
 from ..data import PolarsDataHolder
 from ..data.zip_archive import PolarsZipArchiveDataHolder
@@ -575,6 +577,44 @@ class PolarsRemoveProfiles(PolarsTransformer):
         file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
         file_names_to_remove.append("metadata.txt")
         data_holder.remove_files_in_processed_directory(file_names_to_remove)
+        data_holder.remove_received_data_directory()
+
+
+class PolarsRemoveBottomDepthInfoProfiles(PolarsTransformer):
+    valid_data_types = ("profile",)
+    valid_data_holders = ("PolarsZipArchiveDataHolder",)
+
+    def __init__(
+        self,
+        data_filter: PolarsDataFilter,
+        **kwargs,
+    ) -> None:
+        super().__init__(data_filter=data_filter, **kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes profiles specified in the given filter"
+
+    def _transform(self, data_holder: PolarsZipArchiveDataHolder) -> None:
+        mask = self._get_filter_mask(data_holder)
+        if mask.is_empty():
+            raise
+            adm_logger.log_transformation(
+                f"Could not run transformer {PolarsRemoveProfiles.__class__.__name__}. "
+                f"Missing data_filter",
+                level=adm_logger.ERROR,
+            )
+            return
+        remove_df = data_holder.data.filter(mask)
+        file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
+
+        data_holder.modify_files_in_processed_directory(["metadata.txt"],
+                                                        func=modify.remove_wadep_in_metadata_file,
+                                                        overwrite=True)
+
+        data_holder.modify_files_in_processed_directory(file_names_to_remove,
+                                                        func=modify.remove_depth_info_in_standard_format,
+                                                        overwrite=True)
         data_holder.remove_received_data_directory()
 
 

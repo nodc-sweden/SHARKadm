@@ -192,6 +192,7 @@ from sharkadm.transformers.remove import (
     PolarsKeepMask,
     PolarsRemoveMask,
     PolarsRemoveProfiles,
+    PolarsRemoveBottomDepthInfoProfiles,
     PolarsRemoveValueInColumns,
     PolarsRemoveValueInRowsForParameters,
     PolarsReplaceColumnWithMask,
