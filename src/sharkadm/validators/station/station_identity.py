@@ -1,5 +1,5 @@
-import geopandas as gp
-from shapely import Point
+from nodc_station.station_file import StationFile
+from nodc_station.utils import transform_ref_system
 
 from sharkadm.validators import Validator
 from sharkadm.validators.base import DataHolderProtocol
@@ -10,7 +10,7 @@ class ValidateStationIdentity(Validator):
 
     def __init__(
         self,
-        stations: tuple[str, set[str], str, str, int] = (),
+        stations: StationFile = None,
         station_name_key="reported_station_name",
         visit_key="visit_key",
         latitude_key="LATIT",
@@ -22,22 +22,7 @@ class ValidateStationIdentity(Validator):
         self._visit_key = visit_key
         self._latitude_key = latitude_key
         self._longitude_key = longitude_key
-
-        self._stations = set(station.upper() for station, *_ in stations)
-        self._station_aliases = {}
-        for station, aliases, *_ in stations:
-            for alias in aliases:
-                self._station_aliases[alias.upper()] = station.upper()
-
-        self._positions = gp.GeoDataFrame(
-            (
-                {
-                    "station": station_name.upper(),
-                    "geometry": Point(longitude, latitude).buffer(radius),
-                }
-                for station_name, _, longitude, latitude, radius in stations
-            )
-        )
+        self._stations = stations
 
     @staticmethod
     def get_validator_description() -> str:
@@ -52,29 +37,34 @@ class ValidateStationIdentity(Validator):
                 self._longitude_key,
             ]
         ):
-            if name.upper() in self._stations:
-                station_name = name.upper()
-                name = f"'{name}'"
-            elif name.upper() in self._station_aliases:
-                station_name = self._station_aliases[name.upper()]
-                name = f"'{name}' (a.k.a '{station_name}')"
-            else:
-                name = f"Unknown station '{name}'"
-
-            point = Point(longitude, latitude)
-            if (selected := self._positions.contains(point)).any():
-                nearby_stations = set(
-                    station for station in self._positions[selected]["station"]
-                )
-                if station_name in nearby_stations:
-                    self._log_success(
-                        f"{visit_key}: {name} is within radius for expected location."
+            latitude_dd, longitude_dd = transform_ref_system(latitude, longitude)
+            matching_stations = self._stations.get_matching_stations(
+                name, latitude_dd, longitude_dd
+            )
+            if matching_stations:
+                if station := matching_stations.get_accepted_station():
+                    if name != station.station:
+                        name = f"{station.station}(a.k.a. {name})"
+                    self._log_success(f"{visit_key}: {name} is a known station.")
+                elif name_matches := [
+                    station for station in matching_stations if station.accepted_name
+                ]:
+                    station = next(iter(name_matches))
+                    if name != station.station:
+                        f"{name} ({station.station})"
+                    self._log_fail(f"{visit_key}: {name} is not near any known stations.")
+                elif position_matches := [
+                    station for station in matching_stations if station.accepted_position
+                ]:
+                    nearby_stations = ", ".join(
+                        f"'{station.station}'" for station in position_matches
                     )
-                else:
-                    known_station_string = "'" + "', '".join(nearby_stations) + "'"
                     self._log_fail(
-                        f"{visit_key}: {name} is within radius for "
-                        f"{known_station_string}."
+                        f"{visit_key}: Unknown station '{name}' "
+                        f"is near {nearby_stations}."
                     )
             else:
-                self._log_fail(f"{visit_key}: {name} is not near any known station.")
+                self._log_fail(
+                    f"{visit_key}: Unknown station '{name}' "
+                    "is not near any known station."
+                )
