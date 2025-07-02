@@ -3,6 +3,7 @@ import os
 import pathlib
 import shutil
 from abc import ABC
+from typing import Callable
 
 import pandas as pd
 
@@ -491,6 +492,14 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         for path in self.processed_data_directory.iterdir():
             if names.get(path.name):
                 os.remove(path)
+
+    def modify_files_in_processed_directory(
+        self, file_names: list[str], func: Callable | None = None, **kwargs
+    ) -> None:
+        names = {name: True for name in file_names}
+        for path in self.processed_data_directory.iterdir():
+            if names.get(path.name):
+                func(path, **kwargs)
 
     def remove_readme_files(self) -> None:
         for path in self.unzipped_archive_directory.iterdir():
