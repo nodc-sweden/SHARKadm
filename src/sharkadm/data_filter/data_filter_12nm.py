@@ -1,28 +1,12 @@
-from __future__ import annotations
+import polars as pl
 
-from abc import ABC, abstractmethod
-
-import pandas as pd
-
-from sharkadm.data import PandasDataHolder
-from sharkadm.sharkadm_logger import adm_logger
+from sharkadm import adm_logger
+from sharkadm.data import PolarsDataHolder
+from sharkadm.data_filter.base import PolarsDataFilter
 
 
-class DataFilter(ABC):
-    """Create child class to filter data in data_holder"""
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
-
-    @abstractmethod
-    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None: ...
-
-
-class DataFilterRestrictDepth(DataFilter):
-    col_to_check = "location_wb"
-
-    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None:
+class PolarsDataFilterInside12nm(PolarsDataFilter):
+    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series | None:
         col = "location_wb"
         if col not in data_holder.data:
             adm_logger.log_workflow(
@@ -35,6 +19,8 @@ class DataFilterRestrictDepth(DataFilter):
                 f"Could not filter data. Missing column {col}", level=adm_logger.ERROR
             )
             raise
+
+        # boolean_wb = data_holder.data['location_wb'] != 'N'
         boolean_wb = (data_holder.data["location_wb"] == "Y") | (
             data_holder.data["location_wb"] == "P"
         )

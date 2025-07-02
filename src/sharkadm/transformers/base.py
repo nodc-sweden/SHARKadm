@@ -8,8 +8,9 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder, is_valid_polars_data_holder
+from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils.data_filter import DataFilter, PolarsDataFilter
+from sharkadm.utils.data_filter import DataFilter
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder

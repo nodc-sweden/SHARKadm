@@ -1,18 +1,15 @@
-import pathlib
 import re
 
 import numpy as np
 import polars as pl
 
+from sharkadm.data import PolarsDataHolder
+from sharkadm.data.zip_archive import PolarsZipArchiveDataHolder
+from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import modify
+from sharkadm.utils.data_filter import DataFilterRestrictDepth
 
-from ..data import PolarsDataHolder
-from ..data.zip_archive import PolarsZipArchiveDataHolder
-from ..utils.data_filter import (
-    DataFilterRestrictDepth,
-    PolarsDataFilter,
-)
 from .base import (
     DataHolderProtocol,
     PolarsDataHolderProtocol,
@@ -57,7 +54,6 @@ class RemoveValuesInColumns(Transformer):
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         len_data = len(data_holder.data)
         filter_bool = self._get_filter_mask(data_holder)
-        # for col in self.apply_on_columns:
         for col in self._get_apply_on_columns(data_holder):
             if col not in data_holder.data:
                 continue
@@ -608,13 +604,15 @@ class PolarsRemoveBottomDepthInfoProfiles(PolarsTransformer):
         remove_df = data_holder.data.filter(mask)
         file_names_to_remove = list(set(remove_df["profile_file_name_db"]))
 
-        data_holder.modify_files_in_processed_directory(["metadata.txt"],
-                                                        func=modify.remove_wadep_in_metadata_file,
-                                                        overwrite=True)
+        data_holder.modify_files_in_processed_directory(
+            ["metadata.txt"], func=modify.remove_wadep_in_metadata_file, overwrite=True
+        )
 
-        data_holder.modify_files_in_processed_directory(file_names_to_remove,
-                                                        func=modify.remove_depth_info_in_standard_format,
-                                                        overwrite=True)
+        data_holder.modify_files_in_processed_directory(
+            file_names_to_remove,
+            func=modify.remove_depth_info_in_standard_format,
+            overwrite=True,
+        )
         data_holder.remove_received_data_directory()
 
 

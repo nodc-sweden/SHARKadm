@@ -493,10 +493,9 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             if names.get(path.name):
                 os.remove(path)
 
-    def modify_files_in_processed_directory(self,
-                                            file_names: list[str],
-                                            func: Callable | None = None,
-                                            **kwargs) -> None:
+    def modify_files_in_processed_directory(
+        self, file_names: list[str], func: Callable | None = None, **kwargs
+    ) -> None:
         names = {name: True for name in file_names}
         for path in self.processed_data_directory.iterdir():
             if names.get(path.name):

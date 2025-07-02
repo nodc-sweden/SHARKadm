@@ -1,11 +1,13 @@
 import pathlib
 
 
-def remove_depth_info_in_standard_format(path: pathlib.Path,
-                                         export_directory: pathlib.Path | None = None,
-                                         overwrite: bool = False,
-                                         encoding: str = "cp1252",
-                                         replace_value: str | int | float = "999") -> None:
+def remove_depth_info_in_standard_format(
+    path: pathlib.Path,
+    export_directory: pathlib.Path | None = None,
+    overwrite: bool = False,
+    encoding: str = "cp1252",
+    replace_value: str | int | float = "999",
+) -> None:
     if not export_directory:
         export_directory = path.parent
 
@@ -22,12 +24,14 @@ def remove_depth_info_in_standard_format(path: pathlib.Path,
         fid.write("".join(lines))
 
 
-def remove_wadep_in_metadata_file(path: pathlib.Path,
-                                        export_directory: pathlib.Path | None = None,
-                                        replace_value: str | int | float = "999",
-                                        overwrite=False,
-                                        encoding="cp1252",
-                                        sep="\t") -> None:
+def remove_wadep_in_metadata_file(
+    path: pathlib.Path,
+    export_directory: pathlib.Path | None = None,
+    replace_value: str | int | float = "999",
+    overwrite=False,
+    encoding="cp1252",
+    sep="\t",
+) -> None:
     if not export_directory:
         export_directory = path.parent
     index = None
