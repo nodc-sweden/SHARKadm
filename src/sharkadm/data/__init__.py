@@ -19,9 +19,9 @@ from sharkadm.data.dv_template import (
 )
 from sharkadm.data.lims import (
     LimsDataHolder,
-    directory_is_lims,
     get_lims_data_holder,
     get_polars_lims_data_holder,
+    is_lims_directory,
 )
 from sharkadm.data.odv import (
     get_polars_odv_data_holder,
@@ -131,7 +131,7 @@ def get_data_holder(
             archive_directory = directory_is_archive(path)
             if archive_directory:
                 return get_archive_data_holder(archive_directory)
-        lims_directory = directory_is_lims(path)
+        lims_directory = is_lims_directory(path)
         if lims_directory:
             return get_lims_data_holder(lims_directory)
     if sharkweb:
@@ -152,6 +152,8 @@ def get_polars_data_holder(
             return get_polars_dv_template_data_holder(path)
         if path_is_zip_archive(path):
             return get_polars_zip_archive_data_holder(path)
+        if lims_directory := is_lims_directory(path):
+            return get_polars_lims_data_holder(lims_directory, **kwargs)
         if path.is_file():
             if file_is_from_shark(path):
                 return get_polars_shark_data_holder(path, **kwargs)
@@ -161,9 +163,6 @@ def get_polars_data_holder(
                 return get_polars_archive_data_holder(archive_directory)
             if path_has_or_is_standard_format_profile_data(path):
                 return get_polars_profile_standard_format_data_holder(path, **kwargs)
-        lims_directory = directory_is_lims(path)
-        if lims_directory:
-            return get_polars_lims_data_holder(lims_directory, **kwargs)
         if path_has_or_is_standard_format_profile_data(path):
             return get_polars_profile_standard_format_data_holder(path, **kwargs)
         if path_has_or_is_odv_data(path):

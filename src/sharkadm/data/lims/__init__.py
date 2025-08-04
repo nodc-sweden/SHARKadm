@@ -34,7 +34,7 @@ def get_lims_data_holder(path: str | pathlib.Path) -> LimsDataHolder:
     return LimsDataHolder(lims_root_directory=path, header_mapper=mapper)
 
 
-def directory_is_lims(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:
+def is_lims_directory(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:
     """Returns path to lims directory if it is recognised as a lims directory. Else
     returns False
     directory"""
