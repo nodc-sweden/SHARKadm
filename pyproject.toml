@@ -19,6 +19,7 @@ dependencies = [
     "typer>=0.15.2",
     "geopandas>=1.1.0",
     "shapely>=2.1.1",
+    "gsw",
     "nodc-station",
 ]
 requires-python = ">=3.11"
@@ -37,7 +38,7 @@ build-backend = "hatchling.build"
 dev = [
     "pytest>=8.2.2",
     "notebook>=7.3.2",
-    "ruff>=0.12.0",
+    "ruff>=0.12.7",
     "pre-commit>=4.2.0",
 ]
 

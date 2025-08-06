@@ -8,14 +8,14 @@ from sharkadm.validators.station.coordinates_dm import ValidateCoordinatesDm
 
 
 @patch("sharkadm.config.get_all_data_types")
-def test_coordinates_dm_validation_fails_if_coordinates(
+def test_coordinates_dm_validation_fails_if_no_data(
     mocked_data_types, pandas_data_frame_holder_class
 ):
-    # Given a valid data holder
+    # Given a valid data holder without data
     given_data_holder = pandas_data_frame_holder_class(pd.DataFrame())
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
-    # When validating the data without a set of known station names
+    # When validating the data
     adm_logger.reset_log()
     ValidateCoordinatesDm().validate(given_data_holder)
 
@@ -67,6 +67,7 @@ def test_validate_coordinates_dm(
     # Given a valid data holder
     given_data_holder = pandas_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
+
     # When validating the data
     adm_logger.reset_log()
     ValidateCoordinatesDm().validate(given_data_holder)
