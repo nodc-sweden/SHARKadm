@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sharkadm import adm_logger
@@ -18,13 +18,13 @@ from sharkadm.validators.depth import ValidateSampleDepth, ValidateSecchiDepth
 @patch("sharkadm.config.get_all_data_types")
 def test_sample_depth_is_validated_against_water_depth(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_sample_depth,
     given_water_depth,
     expected_success,
 ):
     # Given data with given sample depth and water depth
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [
             {
                 "sample_depth_m": given_sample_depth,
@@ -35,7 +35,7 @@ def test_sample_depth_is_validated_against_water_depth(
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -57,13 +57,13 @@ def test_sample_depth_is_validated_against_water_depth(
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_sample_depth_cant_be_validated_if_missing_parameters(
-    mocked_data_types, pandas_data_frame_holder_class, given_parameters
+    mocked_data_types, polars_data_frame_holder_class, given_parameters
 ):
     # Given data with subset of required parameters
-    given_data = pd.DataFrame([given_parameters | {"row_number": 1}])
+    given_data = pl.DataFrame([given_parameters | {"row_number": 1}])
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -91,13 +91,13 @@ def test_sample_depth_cant_be_validated_if_missing_parameters(
 @patch("sharkadm.config.get_all_data_types")
 def test_secchi_depth_is_validated_against_water_depth(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_secchi_depth,
     given_water_depth,
     expected_success,
 ):
     # Given data with given secchi depth and water depth
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [
             {
                 "parameter": "SECCHI",
@@ -109,7 +109,7 @@ def test_secchi_depth_is_validated_against_water_depth(
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -142,14 +142,14 @@ def test_secchi_depth_is_validated_against_water_depth(
 @patch("sharkadm.config.get_all_data_types")
 def test_secchi_depth_cant_be_validated_if_missing_parameters(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_parameters,
 ):
     # Given data with subset of required parameters
-    given_data = pd.DataFrame([given_parameters | {"row_number": 1}])
+    given_data = pl.DataFrame([given_parameters | {"row_number": 1}])
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
