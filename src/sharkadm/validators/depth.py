@@ -26,7 +26,7 @@ class ValidateSampleDepth(Validator):
             return
 
         error = False
-        for (sample_depth, water_depth), df in data_holder.data.groupby(
+        for (sample_depth, water_depth), df in data_holder.data.group_by(
             ["sample_depth_m", "water_depth_m"]
         ):
             if float(sample_depth) >= float(water_depth):
@@ -69,11 +69,11 @@ class ValidateSecchiDepth(Validator):
 
         error = False
         secchi_value = False
-        for value, df in data_holder.data[
+        for (value, water_depth), df in data_holder.data.filter(
             data_holder.data["parameter"] == "SECCHI"
-        ].groupby("value"):
+        ).group_by(["value", "water_depth_m"]):
             secchi_value = True
-            if float(value) >= float(df["water_depth_m"]):
+            if float(value) >= float(water_depth):
                 self._log_fail(
                     f"Sample depth below water depth: {value} >= {df['water_depth_m']}",
                     row_numbers=list(df["row_number"]),

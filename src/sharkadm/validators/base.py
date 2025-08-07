@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 import pandas as pd
+import polars as pl
 
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
@@ -12,7 +13,7 @@ from sharkadm.sharkadm_logger import adm_logger
 class DataHolderProtocol(Protocol):
     @property
     @abstractmethod
-    def data(self) -> pd.DataFrame: ...
+    def data(self) -> pd.DataFrame | pl.DataFrame: ...
 
     @property
     @abstractmethod
