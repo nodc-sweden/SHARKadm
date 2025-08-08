@@ -1,6 +1,7 @@
-from sharkadm.sharkadm_logger import adm_logger
+import polars as pl
 
-from .base import DataHolderProtocol, Validator
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.validators.base import DataHolderProtocol, Validator
 
 
 class ValidateCommonValuesByVisit(Validator):
@@ -40,8 +41,11 @@ class ValidateCommonValuesByVisit(Validator):
                     level=adm_logger.WARNING,
                 )
                 continue
+
             for visit_key, unique_values in (
-                data_holder.data.groupby("visit_key")[column_name].unique().items()
+                data_holder.data.group_by("visit_key")
+                .agg(pl.col(column_name).unique())
+                .iter_rows()
             ):
                 if len(unique_values) > 1:
                     adm_logger.log_validation_failed(
