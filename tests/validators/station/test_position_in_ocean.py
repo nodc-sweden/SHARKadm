@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import geopandas as gp
-import pandas as pd
+import polars as pl
 import pytest
 from shapely import Polygon
 
@@ -114,14 +114,14 @@ from sharkadm.validators.station.position_in_ocean import ValidatePositionInOcea
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_position_in_ocean(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_longitude_value,
     given_latitude_value,
     given_ocean_polygon,
     expected_success,
 ):
     # Given data with given coordinates
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [
             {
                 "reported_station_name": "Station 1",
@@ -133,7 +133,7 @@ def test_validate_position_in_ocean(
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # Given a shapefile with oceans

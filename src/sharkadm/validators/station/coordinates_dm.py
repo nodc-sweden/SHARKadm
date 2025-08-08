@@ -31,7 +31,7 @@ class ValidateCoordinatesDm(Validator):
             self._log_fail("No coordinates found in data.")
             return
 
-        for (latitude, longitude), data in data_holder.data.groupby(
+        for (latitude, longitude), data in data_holder.data.group_by(
             [self._latitude_dm_column, self._longitude_dm_column]
         ):
             errors = self._validate_longitude(longitude)

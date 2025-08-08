@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pandas as pd
+import polars as pl
 import pytest
 from nodc_station.station_file import StationFile
 from nodc_station.utils import transform_ref_system
@@ -95,7 +96,7 @@ from sharkadm.validators.station.station_identity import ValidateStationIdentity
 def test_validate_station_identity(
     mocked_data_types,
     tmp_path,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_station_name,
     given_longitude_value,
     given_latitude_value,
@@ -103,7 +104,7 @@ def test_validate_station_identity(
     expected_success,
 ):
     # Given data with a given station name and position
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [
             {
                 "reported_station_name": given_station_name,
@@ -136,7 +137,7 @@ def test_validate_station_identity(
     station_file = StationFile(stations_path, case_sensitive=False)
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

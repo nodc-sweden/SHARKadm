@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sharkadm import adm_logger
@@ -25,18 +25,18 @@ from sharkadm.validators.station.coordinates_sweref99 import ValidateCoordinates
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_coordinates_sweref99(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_latitude_value,
     given_longitude_value,
     expected_success,
 ):
     # Given data with given Sweref 99 coordinates
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [{"LATIT": given_latitude_value, "LONGI": given_longitude_value, "row_number": 1}]
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

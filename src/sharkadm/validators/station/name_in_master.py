@@ -27,7 +27,7 @@ class ValidateNameInMaster(Validator):
             )
             return
 
-        for station_name, data in data_holder.data.groupby(self._station_name_column):
+        for (station_name,), data in data_holder.data.group_by(self._station_name_column):
             if station_name.upper() not in self._station_names:
                 self._log_fail(
                     f"Unknown station. "

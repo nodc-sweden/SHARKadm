@@ -42,7 +42,7 @@ class ValidatePositionWithinStationRadius(Validator):
             )
             return
 
-        for (name, latitude, longitude), data in data_holder.data.groupby(
+        for (name, latitude, longitude), data in data_holder.data.group_by(
             [self._station_name_key, self._latitude_key, self._longitude_key]
         ):
             point = Point(longitude, latitude)

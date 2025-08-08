@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sharkadm import adm_logger
@@ -80,7 +80,7 @@ from sharkadm.validators.station.position_within_station_radius import (
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_position_within_station_radius(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_station_name,
     given_longitude_value,
     given_latitude_value,
@@ -88,7 +88,7 @@ def test_validate_position_within_station_radius(
     expected_success,
 ):
     # Given data with given coordinates
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [
             {
                 "reported_station_name": given_station_name,
@@ -100,7 +100,7 @@ def test_validate_position_within_station_radius(
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

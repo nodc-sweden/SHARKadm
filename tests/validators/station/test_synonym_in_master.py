@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sharkadm import adm_logger
@@ -26,18 +26,18 @@ from sharkadm.validators.station.synonym_in_master import ValidateSynonymsInMast
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_station_synonym(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_station_name,
     given_master_synonym_list,
     expected_success,
 ):
     # Given data with a given station name
-    given_data = pd.DataFrame(
+    given_data = pl.DataFrame(
         [{"reported_station_name": given_station_name, "row_number": 1}]
     )
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
