@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sharkadm import adm_logger
@@ -23,7 +23,7 @@ from sharkadm.validators import ValidatePositiveValues
 @patch("sharkadm.config.get_all_data_types")
 def test_negative_values_are_identified(
     mocked_data_types,
-    pandas_data_frame_holder_class,
+    polars_data_frame_holder_class,
     given_column,
     given_negative_value,
     given_row_number,
@@ -35,7 +35,7 @@ def test_negative_values_are_identified(
         {
             column: f"{12.34 * (0.8 + ((col_n + row_n / 10) % 0.123)):.3f}"
             for col_n, column in enumerate(
-                ValidatePositiveValues.cols_to_validate, start=1
+                ValidatePositiveValues.columns_to_validate, start=1
             )
         }
         | {"row_number": row_n}
@@ -44,10 +44,10 @@ def test_negative_values_are_identified(
 
     given_values[given_row_number - 1][given_column] = str(given_negative_value)
 
-    given_data = pd.DataFrame(given_values)
+    given_data = pl.DataFrame(given_values)
 
     # Given a valid data holder
-    given_data_holder = pandas_data_frame_holder_class(given_data)
+    given_data_holder = polars_data_frame_holder_class(given_data)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
