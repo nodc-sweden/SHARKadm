@@ -29,7 +29,7 @@ class ValidateStationIdentity(Validator):
         return "Checks if station name (or synonym) and position matches known stations."
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
-        for (name, visit_key, latitude, longitude), data in data_holder.data.groupby(
+        for (name, visit_key, latitude, longitude), data in data_holder.data.group_by(
             [
                 self._station_name_key,
                 self._visit_key,
