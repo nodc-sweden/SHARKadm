@@ -42,20 +42,22 @@ class PolarsAddDensityWide(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_set in data_holder.data.columns:
-            adm_logger.info(
-                f"{self.col_to_set} already exists, values will be recalculated"
+            adm_logger.log_transformation(
+                f"{self.col_to_set} already exists, values will be recalculated",
+                level=adm_logger.INFO,
             )
-        required_cols = [
+        must_haves = [
             self.longitude_col,
             self.latitude_col,
             self.depth_col,
             self.practical_salinity,
             self.temperature,
         ]
-        if not all(col in data_holder.data.columns for col in required_cols):
-            adm_logger.warning(
+        if not all(col in data_holder.data.columns for col in must_haves):
+            adm_logger.log_transformation(
                 "Missing required columns: "
-                f"{[col for col in required_cols if col not in data_holder.data.columns]}"
+                f"{[col for col in must_haves if col not in data_holder.data.columns]}",
+                level=adm_logger.WARNING,
             )
             return
 
@@ -82,13 +84,18 @@ class PolarsAddDensityWide(PolarsTransformer):
 
             data_holder.data = data_holder.data.with_columns(
                 pl.when(valid_rows)
-                .then(pl.Series(dens))
+                .then(
+                    pl.Series(dens).map_elements(
+                        lambda x: None if np.isnan(x) else x, return_dtype=pl.Float64
+                    )
+                )
                 .otherwise(None)
                 .alias(self.col_to_set)
             )
-
         else:
-            adm_logger.warning("No valid data rows for density calculation.")
+            adm_logger.log_transformation(
+                "No valid data rows for density calculation.", level=adm_logger.WARNING
+            )
 
 
 class PolarsAddDensity(PolarsTransformer):
@@ -109,19 +116,21 @@ class PolarsAddDensity(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_set in data_holder.data.columns:
-            adm_logger.info(
-                f"{self.col_to_set} already exists, values will be recalculated"
+            adm_logger.log_transformation(
+                f"{self.col_to_set} already exists, values will be recalculated",
+                level=adm_logger.INFO,
             )
-        required_cols = [
+        must_haves = [
             "visit_key",
             self.longitude_col,
             self.latitude_col,
             self.depth_col,
         ]
-        if not all(col in data_holder.data.columns for col in required_cols):
-            adm_logger.warning(
+        if not all(col in data_holder.data.columns for col in must_haves):
+            adm_logger.log_transformation(
                 "Missing required columns: "
-                f"{[col for col in required_cols if col not in data_holder.data.columns]}"
+                f"{[col for col in must_haves if col not in data_holder.data.columns]}",
+                level=adm_logger.WARNING,
             )
             return
         elif (
@@ -130,8 +139,9 @@ class PolarsAddDensity(PolarsTransformer):
             .sum()
             < 2
         ):
-            adm_logger.warning(
-                f"Missing required {self.practical_salinity} and/or {self.temperature}."
+            adm_logger.log_transformation(
+                f"Missing required {self.practical_salinity} and/or {self.temperature}.",
+                level=adm_logger.WARNING,
             )
             return
         elif (
@@ -140,9 +150,10 @@ class PolarsAddDensity(PolarsTransformer):
             )
             & (data_holder.data["value"].is_not_null())
         ).sum() == 0:
-            adm_logger.warning(
+            adm_logger.log_transformation(
                 f"Not enough {self.practical_salinity} and "
-                f"{self.temperature} data to calculate from."
+                f"{self.temperature} data to calculate from.",
+                level=adm_logger.WARNING,
             )
             return
 
@@ -180,9 +191,10 @@ class PolarsAddDensity(PolarsTransformer):
         if (
             df[self.practical_salinity].is_not_null() & df[self.temperature].is_not_null()
         ).sum() == 0:
-            adm_logger.warning(
+            adm_logger.log_transformation(
                 f"Not enough {self.practical_salinity} and "
-                f"{self.temperature} data to calculate from."
+                f"{self.temperature} data to calculate from.",
+                level=adm_logger.WARNING,
             )
             return
 
