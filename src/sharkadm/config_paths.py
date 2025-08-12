@@ -2,10 +2,11 @@ import pathlib
 
 
 class ConfigPaths:
-    def __init__(self, root_path: str | pathlib.Path) -> None:
-        self._root_path = pathlib.Path(root_path)
+    def __init__(self, root_path: str | pathlib.Path | None) -> None:
+        self._root_path = pathlib.Path(root_path) if root_path else None
         self._paths = dict()
-        self._save_paths()
+        if self._root_path:
+            self._save_paths()
 
     def __call__(self, item: str) -> pathlib.Path | None:
         return self._paths.get(item, None)
