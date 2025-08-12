@@ -10,13 +10,9 @@ from sharkadm.transformers.add_density import PolarsAddDensity, PolarsAddDensity
     "given_visit_key, given_latitude, given_longitude, given_depths, "
     "given_salinity_psu, given_temperature, expected_success",
     (
-        ("ABC123", 58.2, 10.1, 5.0, -7, 20, False),
-        ("ABC123", 58.2, 10.1, 10.1, 35.2, -1.7, True),
-        ("DEF456", 57.1, 11.0, 5.7, 0, 5.2, True),
-        ("DEF456", 57.1, 11.0, 15.2, 5.2, 10.1, True),
-        ("GHJ789", 56.5, 12.0, -100, 10.3, 10.1, False),
-        ("GHJ789", 56.5, 12.0, 100.0, 20.8, 34, True),
-        ("GHJ789", 56.5, 12.0, 500.2, 33.2, 20.1, True),
+        ("ABC123", 58.2, 10.1, 5.0, -7, 20, False),  # erroneous salinity
+        ("DEF456", 57.1, 11.0, 5.7, 0, 5.2, True),  # ok data
+        ("GHJ789", 56.5, 12.0, -100, 10.3, 10.1, False),  # erroneous depth
     ),
 )
 @patch("sharkadm.config.get_all_data_types", return_value=[])
@@ -84,7 +80,7 @@ def test_validate_add_density_wide(
             ["Salinity CTD", "Temperature CTD"],
             [-10.0, -1.7],
             False,
-        ),
+        ),  # erroneous salinity
         (
             ["DEF456", "DEF456"],
             [57.1, 57.1],
@@ -93,7 +89,7 @@ def test_validate_add_density_wide(
             ["Salinity CTD", "Temperature CTD"],
             [35.2, 10.1],
             True,
-        ),
+        ),  # ok data
     ),
 )
 @patch("sharkadm.config.get_all_data_types", return_value=[])

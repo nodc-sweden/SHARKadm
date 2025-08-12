@@ -205,7 +205,10 @@ from sharkadm.transformers.remove import (
     RemoveValuesInColumns,
     SetMaxLengthOfValuesInColumns,
 )
-from sharkadm.transformers.replace import ReplaceNanWithEmptyString
+from sharkadm.transformers.replace import (
+    ReplaceNanWithEmptyString,
+    PolarsReplaceNanWithNone,
+)
 from sharkadm.transformers.replace_comma_with_dot import (
     PolarsReplaceCommaWithDot,
     ReplaceCommaWithDot,
