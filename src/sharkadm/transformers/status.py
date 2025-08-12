@@ -4,9 +4,10 @@ from sharkadm.utils import yaml_data
 
 from .base import Transformer
 
-STATUS_CONFIG = yaml_data.load_yaml(
-    adm_config_paths("delivery_note_status"), encoding="utf8"
-)
+if _config_path := adm_config_paths("delivery_note_status"):
+    STATUS_CONFIG = yaml_data.load_yaml(_config_path, encoding="utf8")
+else:
+    STATUS_CONFIG = None
 
 
 class SetStatusDataHost(Transformer):

@@ -93,7 +93,7 @@ def get_header_mapper_from_data_holder(
 
 def get_custom_id_handler(config_directory: str | pathlib.Path | None = None):
     config_directory = config_directory or adm_config_paths("ids")
-    return CustomIdsHandler(config_directory)
+    return CustomIdsHandler(config_directory) if config_directory else None
 
 
 def get_delivery_note_mapper(
@@ -149,10 +149,7 @@ def get_valid_data_structures(
 
 
 def get_adm_config_paths(config_directory=None):
-    if not config_directory:
-        return None
-
-    root = config_directory / "sharkadm"
+    root = config_directory / "sharkadm" if config_directory else None
     return config_paths.ConfigPaths(root)
 
 

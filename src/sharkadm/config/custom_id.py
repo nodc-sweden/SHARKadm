@@ -104,5 +104,4 @@ class CustomIdsHandler:
         return self._id_objects[data_type][level]
 
     def get_levels_for_datatype(self, data_type: str) -> list[str]:
-        print(f"{self._id_objects=}")
         return list(self._id_objects[data_type.lower()])
