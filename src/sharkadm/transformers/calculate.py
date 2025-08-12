@@ -176,8 +176,8 @@ class PolarsCalculateCarbon(Transformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Calculating {PolarsCalculateCarbon.parameter}. "
-            f"Setting value to column {PolarsCalculateCarbon.col_to_set}"
+            # f"Calculating {PolarsCalculateCarbon.parameter}. "
+            # f"Setting value to column {PolarsCalculateCarbon.col_to_set}"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
