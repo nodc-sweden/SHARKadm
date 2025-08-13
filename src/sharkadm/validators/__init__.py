@@ -16,7 +16,8 @@ from sharkadm.validators.column_combination import (
 )
 from sharkadm.validators.columns import ValidateColumnViewColumnsNotInDataset
 from sharkadm.validators.common_values import ValidateCommonValuesByVisit
-from sharkadm.validators.date_and_time import MissingTime
+from sharkadm.validators.date_and_time import MissingTime, ValidateDateAndTime
+from sharkadm.validators.depth import ValidateSampleDepth, ValidateSecchiDepth
 from sharkadm.validators.mandatory import (
     ValidateValuesInMandatoryNatColumns,
     ValidateValuesInMandatoryRegColumns,
@@ -24,6 +25,14 @@ from sharkadm.validators.mandatory import (
 from sharkadm.validators.occurrence_id import ValidateOccurrenceId
 from sharkadm.validators.position import CheckIfLatLonIsSwitched
 from sharkadm.validators.positive import ValidatePositiveValues
+from sharkadm.validators.station import (
+    ValidateCoordinatesDm,
+    ValidateNameInMaster,
+    ValidatePositionInOcean,
+    ValidatePositionWithinStationRadius,
+    ValidateStationIdentity,
+    ValidateSynonymsInMaster,
+)
 from sharkadm.validators.year import ValidateYearNrDigits
 
 
