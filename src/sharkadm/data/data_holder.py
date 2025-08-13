@@ -1,5 +1,4 @@
 import datetime
-import logging
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -13,8 +12,6 @@ from sharkadm.data.data_source.base import (
     PolarsDataSource,
 )
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 
 class DataHolder(ABC):
@@ -239,6 +236,7 @@ class PandasDataHolder(DataHolder, ABC):
 class PolarsDataHolder(DataHolder, ABC):
     def __init__(self, *args, **kwargs):
         self._data = pl.DataFrame()
+        self._filtered_data = pl.DataFrame()
         super().__init__(*args, **kwargs)
 
     def __add__(self, other):
@@ -262,6 +260,8 @@ class PolarsDataHolder(DataHolder, ABC):
 
     @property
     def data(self) -> pl.DataFrame:
+        if self.is_filtered:
+            return self._filtered_data
         return self._data
 
     @data.setter
@@ -276,6 +276,23 @@ class PolarsDataHolder(DataHolder, ABC):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
+
+    @property
+    def is_filtered(self) -> bool:
+        return not self._filtered_data.is_empty()
+
+    def filter(self, data_filter):
+        mask = data_filter.get_filter_mask(self)
+        if mask.is_empty():
+            adm_logger.log_transformation(
+                "Could / Will not filter due to empty mask.",
+                level=adm_logger.WARNING,
+            )
+            return
+        self._filtered_data = self.data.remove(mask)
+
+    def reset_filter(self):
+        self._filtered_data = pl.DataFrame()
 
     def year_span(self) -> list[str]:
         years = list(set(self.data["visit_year"]))

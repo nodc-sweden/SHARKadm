@@ -1,4 +1,3 @@
-import logging
 import pathlib
 from typing import Any, Self
 
@@ -13,8 +12,6 @@ from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
-
-logger = logging.getLogger(__name__)
 
 
 class BaseSHARKadmController:
@@ -251,10 +248,46 @@ class SHARKadmPolarsController(BaseSHARKadmController):
     def data(self) -> pl.DataFrame:
         return self._data_holder.data
 
+    @property
+    def is_filtered(self) -> bool:
+        return self._data_holder.is_filtered
+
+    def filter(self, data_filter) -> Self:
+        self._data_holder.filter(data_filter)
+        return self
+
+    def reset_filter(self) -> Self:
+        self._data_holder.reset_filter()
+        return self
+
     def set_data_holder(self, data_holder: DataHolder) -> Self:
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.PolarsAddRowNumber())
+        return self
+
+    def transform_all(self) -> Self:
+        if self.is_filtered:
+            adm_logger.log_workflow(
+                "Not allowed to transform when data is filtered!", level=adm_logger.ERROR
+            )
+            return self
+        super().transform_all()
+        return self
+
+    def transform(
+        self,
+        *transformers: Transformer
+        | MultiTransformer
+        | PolarsTransformer
+        | PolarsMultiTransformer,
+    ) -> Self:
+        if self.is_filtered:
+            adm_logger.log_workflow(
+                "Not allowed to transform when data is filtered!", level=adm_logger.ERROR
+            )
+            return self
+        super().transform(*transformers)
         return self
 
 
