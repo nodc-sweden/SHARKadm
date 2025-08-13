@@ -1,11 +1,17 @@
-import logging
 import pathlib
 from typing import Any, Self
 
 import pandas as pd
 import polars as pl
 
-from sharkadm import event, exporters, transformers, utils, validators
+from sharkadm import (
+    event,
+    exporters,
+    sharkadm_exceptions,
+    transformers,
+    utils,
+    validators,
+)
 from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
@@ -13,8 +19,6 @@ from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
-
-logger = logging.getLogger(__name__)
 
 
 class BaseSHARKadmController:
@@ -158,7 +162,7 @@ class BaseSHARKadmController:
                 ),
             )
 
-    def validate(self, *validators: Validator) -> "SHARKadmController":
+    def validate(self, *validators: Validator) -> Self:
         for val in validators:
             val.validate(self._data_holder)
         return self
@@ -251,10 +255,44 @@ class SHARKadmPolarsController(BaseSHARKadmController):
     def data(self) -> pl.DataFrame:
         return self._data_holder.data
 
+    @property
+    def is_filtered(self) -> bool:
+        return self._data_holder.is_filtered
+
+    def filter(self, data_filter) -> Self:
+        self._data_holder.filter(data_filter)
+        return self
+
+    def reset_filter(self) -> Self:
+        self._data_holder.reset_filter()
+        return self
+
     def set_data_holder(self, data_holder: DataHolder) -> Self:
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.PolarsAddRowNumber())
+        return self
+
+    def transform_all(self) -> Self:
+        if self.is_filtered:
+            raise sharkadm_exceptions.DataIsFilteredError(
+                "Not allowed to transform when data is filtered!"
+            )
+        super().transform_all()
+        return self
+
+    def transform(
+        self,
+        *transformers: Transformer
+        | MultiTransformer
+        | PolarsTransformer
+        | PolarsMultiTransformer,
+    ) -> Self:
+        if self.is_filtered:
+            raise sharkadm_exceptions.DataIsFilteredError(
+                "Not allowed to transform when data is filtered!"
+            )
+        super().transform(*transformers)
         return self
 
 
