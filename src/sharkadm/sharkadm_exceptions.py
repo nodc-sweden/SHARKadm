@@ -15,6 +15,10 @@ class DeliveryNoteError(SHARKadmException):
     pass
 
 
+class DataIsFilteredError(SHARKadmException):
+    pass
+
+
 class NoDataFormatFoundError(SHARKadmException):
     pass
 

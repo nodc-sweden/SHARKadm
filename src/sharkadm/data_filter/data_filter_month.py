@@ -7,7 +7,7 @@ from sharkadm.data_filter.base import PolarsDataFilter
 class PolarsDataFilterMonths(PolarsDataFilter):
     def __init__(self, months: list[str | int]):
         super().__init__(months=months)
-        self._str_months = [str(m).zfill(2) for m in months]
+        self._str_months = [f"{m:02}" for m in months]
 
     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
         return (

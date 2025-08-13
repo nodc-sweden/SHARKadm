@@ -284,7 +284,7 @@ class PolarsDataHolder(DataHolder, ABC):
     def filter(self, data_filter):
         mask = data_filter.get_filter_mask(self)
         if mask.is_empty():
-            adm_logger.log_transformation(
+            adm_logger.log_workflow(
                 "Could / Will not filter due to empty mask.",
                 level=adm_logger.WARNING,
             )

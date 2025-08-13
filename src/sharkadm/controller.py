@@ -4,7 +4,14 @@ from typing import Any, Self
 import pandas as pd
 import polars as pl
 
-from sharkadm import event, exporters, transformers, utils, validators
+from sharkadm import (
+    event,
+    exporters,
+    sharkadm_exceptions,
+    transformers,
+    utils,
+    validators,
+)
 from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
@@ -155,7 +162,7 @@ class BaseSHARKadmController:
                 ),
             )
 
-    def validate(self, *validators: Validator) -> "SHARKadmController":
+    def validate(self, *validators: Validator) -> Self:
         for val in validators:
             val.validate(self._data_holder)
         return self
@@ -268,10 +275,9 @@ class SHARKadmPolarsController(BaseSHARKadmController):
 
     def transform_all(self) -> Self:
         if self.is_filtered:
-            adm_logger.log_workflow(
-                "Not allowed to transform when data is filtered!", level=adm_logger.ERROR
+            raise sharkadm_exceptions.DataIsFilteredError(
+                "Not allowed to transform when data is filtered!"
             )
-            return self
         super().transform_all()
         return self
 
@@ -283,10 +289,9 @@ class SHARKadmPolarsController(BaseSHARKadmController):
         | PolarsMultiTransformer,
     ) -> Self:
         if self.is_filtered:
-            adm_logger.log_workflow(
-                "Not allowed to transform when data is filtered!", level=adm_logger.ERROR
+            raise sharkadm_exceptions.DataIsFilteredError(
+                "Not allowed to transform when data is filtered!"
             )
-            return self
         super().transform(*transformers)
         return self
 
