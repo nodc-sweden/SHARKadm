@@ -3,7 +3,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from .base import DataHolderProtocol, PolarsTransformer, Transformer
+from .base import DataHolderProtocol, PolarsTransformer
 
 try:
     from nodc_bvol import get_bvol_nomp_object
@@ -161,7 +161,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         )
 
 
-class PolarsCalculateCarbon(Transformer):
+class PolarsCalculateCarbon(PolarsTransformer):
     abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
     carbon_col = "COPY_VARIABLE.Carbon concentration.ugC/l"
     carbon_per_volume_col = "bvol_carbon_per_volume"

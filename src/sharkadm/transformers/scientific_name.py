@@ -1,6 +1,7 @@
 import polars as pl
-from sharkadm.transformers.base import DataHolderProtocol, Transformer, PolarsTransformer
+
 from sharkadm.data import PolarsDataHolder
+from sharkadm.transformers.base import DataHolderProtocol, PolarsTransformer, Transformer
 
 
 class SetScientificNameFromReportedScientificName(Transformer):

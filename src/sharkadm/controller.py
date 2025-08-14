@@ -283,16 +283,15 @@ class SHARKadmPolarsController(BaseSHARKadmController):
 
     def transform(
         self,
-        *transformers: Transformer
-        | MultiTransformer
-        | PolarsTransformer
-        | PolarsMultiTransformer,
+        *trans: (
+            Transformer | MultiTransformer | PolarsTransformer | PolarsMultiTransformer
+        ),
     ) -> Self:
         if self.is_filtered:
             raise sharkadm_exceptions.DataIsFilteredError(
                 "Not allowed to transform when data is filtered!"
             )
-        super().transform(*transformers)
+        super().transform(*trans)
         return self
 
 
