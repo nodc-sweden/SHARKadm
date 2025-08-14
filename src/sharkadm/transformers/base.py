@@ -281,7 +281,8 @@ class PolarsTransformer(ABC):
         )
 
     def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
-        data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
+        if col not in data_holder.columns:
+            data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
 
     def _add_to_col_to_set(
         self, data_holder: "PolarsDataHolder", lookup_name, new_name: str
