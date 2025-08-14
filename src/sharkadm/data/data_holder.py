@@ -23,7 +23,7 @@ class DataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_structure = "row"
+        self._data_structure = "column"
 
     def __repr__(self) -> str:
         return (
