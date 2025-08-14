@@ -37,7 +37,7 @@ class PolarsDataFrameHolder(PolarsDataHolder):
 
     @property
     def data_type_internal(self) -> str:
-        return "unknown"
+        return "data_type_internal"
 
     @property
     def dataset_name(self) -> str:

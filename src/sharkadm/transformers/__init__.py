@@ -5,7 +5,7 @@ from typing import Type
 
 from sharkadm import utils
 from sharkadm.transformers.add_density import PolarsAddDensityWide, PolarsAddDensity
-from sharkadm.transformers.add_lmqnt import AddLmqnt
+from sharkadm.transformers.add_lmqnt import AddLmqnt, PolarsAddLmqnt
 from sharkadm.transformers.add_uncertainty import AddUncertainty
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import Divide, Multiply
