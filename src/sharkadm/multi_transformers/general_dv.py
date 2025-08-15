@@ -13,7 +13,7 @@ class GeneralDVPolars(MultiTransformer):
         transformers.PolarsAddSamplingInfo,
         # transformers.PolarsAddSampleMinAndMaxDepth,
         # transformers.PolarsReorderSampleMinAndMaxDepth,
-        transformers.PolarsAddStationInfo,
+        # transformers.PolarsAddStationInfo,
         TranslatePolars,
         transformers.PolarsAddStaticInternetAccessInfo,
         transformers.PolarsAddStaticDataHoldingCenterSwedish,

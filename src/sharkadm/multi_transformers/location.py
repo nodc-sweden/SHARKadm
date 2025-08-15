@@ -21,6 +21,25 @@ class Location(MultiTransformer):
         return "\n".join(string_list)
 
 
+class LocationPolars(PolarsMultiTransformer):
+    _transformers = (
+        transformers.PolarsAddLocationCounty,
+        transformers.PolarsAddLocationHelcomOsparArea,
+        transformers.PolarsAddLocationMunicipality,
+        transformers.PolarsAddLocationNation,
+        transformers.PolarsAddLocationSeaBasin,
+        # transformers.PolarsAddLocationTypeArea,
+        transformers.PolarsAddLocationWaterDistrict,
+    )
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        string_list = ["Performs all transformations related to location."]
+        for trans in LocationPolars._transformers:
+            string_list.append(f"    {trans.get_transformer_description()}")
+        return "\n".join(string_list)
+
+
 class LocationRPolars(PolarsMultiTransformer):
     _transformers = (
         transformers.PolarsAddLocationRA,

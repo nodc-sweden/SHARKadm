@@ -49,14 +49,16 @@ class PolarsCalculateAbundance(PolarsTransformer):
             .otherwise(pl.lit(""))
             .alias(self.col_to_set)
         )
-
-        max_boolean = boolean & data_holder.data[self.col_to_set].cast(float) > (
+        print(f"{boolean=}")
+        calc_values = data_holder.data[self.col_to_set].cast(float)
+        print(f"{calc_values=}")
+        max_boolean = boolean & (data_holder.data[self.col_to_set].cast(float) > (
             data_holder.data[self.abundance_col].cast(float) * 2
-        )
+        ))
 
-        min_boolean = boolean & data_holder.data[self.col_to_set].cast(float) < (
+        min_boolean = boolean & (data_holder.data[self.col_to_set].cast(float) < (
             data_holder.data[self.abundance_col].cast(float) * 0.5
-        )
+        ))
 
         out_of_range_boolean = max_boolean | min_boolean
 
@@ -73,6 +75,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
 
 class PolarsCalculateBiovolume(PolarsTransformer):
+    valid_data_structures = ("column",)
     bvol_col = "COPY_VARIABLE.Biovolume concentration.mm3/l"
     # abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
     abundance_col = "combined_abundance"
@@ -162,6 +165,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
 
 class PolarsCalculateCarbon(PolarsTransformer):
+    valid_data_structures = ("column",)
     abundance_col = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
     carbon_col = "COPY_VARIABLE.Carbon concentration.ugC/l"
     carbon_per_volume_col = "bvol_carbon_per_volume"

@@ -64,6 +64,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
         ".*wind.*",
         ".*pressure.*",
         ".*temperature.*",
+        ".*secchi.*",
     )
 
     def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:

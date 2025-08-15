@@ -14,6 +14,7 @@ from sharkadm.multi_transformers.general_initial import GeneralInitial
 from sharkadm.multi_transformers.lims import Lims
 from sharkadm.multi_transformers.location import (
     Location,
+    LocationPolars,
     LocationRPolars,
     LocationRredPolars,
 )

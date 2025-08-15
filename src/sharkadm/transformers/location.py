@@ -4,10 +4,10 @@ from sharkadm.sharkadm_logger import adm_logger
 
 from .base import (
     DataHolderProtocol,
-    PolarsDataHolderProtocol,
     PolarsTransformer,
     Transformer,
 )
+from sharkadm.data import PolarsDataHolder
 
 try:
     import nodc_geography
@@ -78,7 +78,7 @@ class _PolarsAddLocationBase(PolarsTransformer):
     def get_transformer_description() -> str:
         return ""
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.x_pos_col not in data_holder.data.columns:
             self._log(
                 f"Missing column {self.x_pos_col}. Cannot add column {self.col_to_set}",
@@ -132,7 +132,7 @@ class test_PolarsAddLocations(PolarsTransformer):
     def get_transformer_description() -> str:
         return ""
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.x_pos_col not in data_holder.data.columns:
             self._log(
                 f"Missing column {self.x_pos_col}. "
@@ -199,6 +199,71 @@ class PolarsAddLocationTypeArea(_PolarsAddLocationBase):
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds location_type_area from shape files"
+
+
+class PolarsAddLocationTYPNFS06(_PolarsAddLocationBase):
+    col_to_set = "location_typ_nfs06"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_typ_nfs06 from shape files"
+
+
+class PolarsAddLocationWaterCategory(PolarsTransformer):
+    col_to_set = "location_water_category"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_water_category information"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        mandatory_cols = ("location_typ_nfs06", "location_wb")
+        for col in mandatory_cols:
+            if col not in data_holder.data:
+                self._log(
+                    f"Missing column {col}. Cannot add column {self.col_to_set}",
+                    level=adm_logger.ERROR,
+                )
+                return
+
+        self._add_empty_col_to_set(data_holder)
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("location_wb") != "0")
+            .then(pl.lit("Havsområde innanför 1 NM"))
+            .otherwise(pl.col(self.col_to_set)))
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col("location_wb") == "0",
+                pl.col("location_typ_nfs06") == "Y",
+            )
+            .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
+            .otherwise(pl.col(self.col_to_set)))
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(
+                pl.col("location_wb") == "0",
+                pl.col("location_typ_nfs06") == "P",
+            )
+            .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
+            .otherwise(pl.col(self.col_to_set)))
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(
+                pl.col("location_wb") == "0",
+                (pl.col("location_typ_nfs06") != "Y"),
+                (pl.col("location_typ_nfs06") != "P"),
+            )
+            .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
+            .otherwise(pl.col(self.col_to_set)))
+
+
+class PolarsAddLocationWaterDistrict(_PolarsAddLocationBase):
+    col_to_set = "location_water_district"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_water_district from shape files"
 
 
 class AddLocationSeaBasin(_AddLocationBase):
@@ -360,7 +425,7 @@ class PolarsAddLocationR(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Adds location_r"
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         exp = (
             data_holder.data["location_ra"]
             | data_holder.data["location_rb"]
@@ -388,6 +453,38 @@ class PolarsAddLocationCounty(_PolarsAddLocationBase):
         return "Adds location_county from shape files"
 
 
+class PolarsAddLocationHelcomOsparArea(_PolarsAddLocationBase):
+    col_to_set = "location_helcom_ospar_area"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_helcom_ospar_area from shape files"
+
+
+class PolarsAddLocationMunicipality(_PolarsAddLocationBase):
+    col_to_set = "location_municipality"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_municipality from shape files"
+
+
+class PolarsAddLocationSeaBasin(_PolarsAddLocationBase):
+    col_to_set = "location_sea_basin"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_sea_basin from shape files"
+
+
+class PolarsAddLocationNation(_PolarsAddLocationBase):
+    col_to_set = "location_nation"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds location_nation from shape files"
+
+
 class PolarsAddLocationOnLand(_PolarsAddLocationBase):
     col_to_set = "location_on_land"
 
@@ -395,7 +492,7 @@ class PolarsAddLocationOnLand(_PolarsAddLocationBase):
     def get_transformer_description() -> str:
         return "Sets True for stations that are on land"
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         col = "location_wb"
         if col not in data_holder.data:
             adm_logger.log_workflow(

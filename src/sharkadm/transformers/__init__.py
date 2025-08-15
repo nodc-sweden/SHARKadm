@@ -143,7 +143,19 @@ from sharkadm.transformers.location import (
     AddLocationWaterCategory,
     AddLocationWaterDistrict,
     AddLocationWB,
+
     PolarsAddLocationCounty,
+    PolarsAddLocationHelcomOsparArea,
+    PolarsAddLocationMunicipality,
+    PolarsAddLocationNation,
+    PolarsAddLocationSeaBasin,
+    PolarsAddLocationTypeArea,
+    PolarsAddLocationTYPNFS06,
+    PolarsAddLocationWaterCategory,
+    PolarsAddLocationWaterDistrict,
+    PolarsAddLocationWB,
+    PolarsAddLocationCounty,
+
     PolarsAddLocationR,
     PolarsAddLocationRA,
     PolarsAddLocationRB,
@@ -151,8 +163,7 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRG,
     PolarsAddLocationRH,
     PolarsAddLocationRO,
-    PolarsAddLocationTypeArea,
-    PolarsAddLocationWB,
+
     PolarsAddLocationOnLand,
 )
 from sharkadm.transformers.long_to_wide import LongToWide

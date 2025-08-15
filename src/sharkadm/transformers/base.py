@@ -242,11 +242,11 @@ class PolarsTransformer(ABC):
             )
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
-            valid=self.invalid_data_structures, invalid=self.invalid_data_structures
+            valid=self.valid_data_structures, invalid=self.invalid_data_structures
         ):
             self._log_workflow(
-                f"Invalid data_format {data_holder.data_structure} for transformer"
-                f" {self.name}",
+                f"Invalid data structure {data_holder.data_structure} "
+                f"for transformer {self.name}",
                 level=adm_logger.DEBUG,
             )
             return

@@ -203,6 +203,9 @@ class PolarsExporter(ABC):
     def _log(self, msg: str, **kwargs):
         adm_logger.log_export(msg, cls=self.__class__.__name__, **kwargs)
 
+    def _log_workflow(self, msg: str, **kwargs):
+        adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
+
 
 class FileExporter(Exporter, ABC):
     def __init__(
@@ -281,3 +284,82 @@ class FileExporter(Exporter, ABC):
 
     @abstractmethod
     def _export(self, data_holder: DataHolderProtocol) -> None: ...
+
+
+class PolarsFileExporter(PolarsExporter, ABC):
+    def __init__(
+        self,
+        export_directory: str | pathlib.Path | None = None,
+        export_file_name: str | pathlib.Path | None = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        if not export_directory:
+            export_directory = utils.get_export_directory()
+        self._export_directory = pathlib.Path(export_directory)
+        self._export_directory.mkdir(parents=True, exist_ok=True)
+        self._export_file_name = export_file_name
+        self._encoding = kwargs.get("encoding", "cp1252")
+
+    @property
+    def export_directory(self):
+        return self._export_directory
+
+    @property
+    def export_file_name(self):
+        return self._export_file_name
+
+    @property
+    def export_file_path(self):
+        if not (self.export_directory and self.export_file_name):
+            return
+        return pathlib.Path(self._export_directory, self._export_file_name)
+
+    def export(self, data_holder: PolarsDataHolder):
+        super().export(data_holder=data_holder)
+        self.open_file()
+        self.open_file_with_excel()
+        self.open_directory()
+
+    def open_file(self):
+        if not self.export_file_name:
+            return
+        if (
+            self._kwargs.get(
+                "open_file",
+                self._kwargs.get("open_export_file", self._kwargs.get("open")),
+            )
+            and self.export_file_path
+        ):
+            utils.open_file_with_default_program(self.export_file_path)
+        return self
+
+    def open_file_with_excel(self):
+        if not self.export_file_name:
+            return
+        if self.export_file_path and any(
+            [
+                self._kwargs.get("open_file_with_excel"),
+                self._kwargs.get("open_export_file_with_excel"),
+                self._kwargs.get("open_with_excel"),
+                self._kwargs.get("open_file_in_excel"),
+                self._kwargs.get("open_export_file_in_excel"),
+                self._kwargs.get("open_in_excel"),
+            ]
+        ):
+            utils.open_file_with_excel(self.export_file_path)
+        return self
+
+    def open_directory(self):
+        if self._kwargs.get("open_directory") and self.export_directory:
+            utils.open_file_or_directory(self.export_directory)
+        return self
+
+    @staticmethod
+    @abstractmethod
+    def get_exporter_description() -> str:
+        """Verbal description describing what the exporter is doing"""
+        ...
+
+    @abstractmethod
+    def _export(self, data_holder: PolarsDataHolder) -> None: ...

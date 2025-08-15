@@ -177,128 +177,128 @@ class PolarsCopyReportedStationNameToStationName(PolarsTransformer):
         )
 
 
-# class PolarsAddStationInfo(PolarsTransformer):
-#     source_lat_column = "sample_latitude_dd"
-#     source_lon_column = "sample_longitude_dd"
-#     reported_station_col = "reported_station_name"
-#     columns_to_set = (
-#         "station_name",
-#         "station_id",
-#         "sample_location_id",
-#         "station_viss_eu_id",
-#     )
-#
-#     def __init__(self, **kwargs):
-#         super().__init__(**kwargs)
-#         self._stations = get_station_object()
-#         self._station_synonyms = {}
-#         self._loaded_stations_info = {}
-#
-#     @staticmethod
-#     def get_transformer_description() -> str:
-#         return "Adds station information to all places"
-#
-#     def _transform(self, data_holder: PolarsDataHolder) -> None:
-#         self._create_columns_if_missing(data_holder)
-#
-#         for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
-#             [self.source_lat_column, self.source_lon_column, self.reported_station_col]
-#         ):
-#             if not (lat_str and lon_str):
-#                 rows = list(df["row_number"])
-#                 self._log(
-#                     adm_logger.feedback.missing_position(
-#                         rows=sorted(set(df["row_number"]))
-#                     ),
-#                     level=adm_logger.ERROR,
-#                     purpose=adm_logger.FEEDBACK,
-#                 )  # Ska kanske vara i validator istället
-#                 self._log(
-#                     f"Missing {self.source_lat_column} "
-#                     f"and/or {self.source_lon_column}",
-#                     row_numbers=rows,
-#                     level=adm_logger.ERROR,
-#                 )
-#                 continue
-#
-#             # boolean = (
-#             #     (data_holder.data[self.source_lat_column] == lat_str)
-#             #     & (data_holder.data[self.source_lon_column] == lon_str)
-#             #     & (data_holder.data[self.reported_station_col] == reported_station)
-#             # )
-#
-#             lat = float(lat_str)
-#             lon = float(lon_str)
-#
-#             info = self._loaded_stations_info.setdefault(
-#                 reported_station,
-#                 self._stations.get_matching_stations(
-#                     reported_station, lat, lon
-#                 ),
-#             )
-#             if not info:
-#                 closest_info = self._stations.get_closest_station_info(lat, lon)
-#                 if len(closest_info) == 1:
-#                     closest_info = closest_info[0]
-#                     if closest_info["accepted"]:
-#                         self._log(
-#                             f"Station '{reported_station}' is not found as a synonym "
-#                             f" instation list Closest station is "
-#                             f"{closest_info['STATION_NAME']} and is accepted",
-#                             level=adm_logger.WARNING,
-#                         )
-#                     else:
-#                         self._log(
-#                             f"Station '{reported_station}' is not found as a synonym "
-#                             f"in station list Closest station is "
-#                             f"{closest_info['STATION_NAME']} but is not accepted",
-#                             level=adm_logger.WARNING,
-#                         )
-#                     continue
-#                 else:
-#                     station_names_str = ", ".join(
-#                         [info["STATION_NAME"] for info in closest_info]
-#                     )
-#                     self._log(
-#                         f"Station '{reported_station}' is not found as a synonym in "
-#                         f"station list. Closest station(s) is/are {station_names_str}",
-#                         level=adm_logger.WARNING,
-#                     )
-#                     continue
-#             if not info["accepted"]:
-#                 self._log(
-#                     f"Reported station name found in station list but it is outside "
-#                     f"the accepted radius. Distance={info['calc_dist']}, "
-#                     f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
-#                     level=adm_logger.WARNING,
-#                 )
-#                 adm_logger.log_validation_failed(
-#                     f"Reported station name found in station list but it is outside "
-#                     f"the accepted radius. Distance={info['calc_dist']}, "
-#                     f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
-#                     level=adm_logger.WARNING,
-#                 )
-#                 continue
-#
-#             if reported_station != info["STATION_NAME"]:
-#                 name = info["STATION_NAME"]
-#                 self._log(
-#                     f"Station name translated: {reported_station} -> {name}",
-#                     level="warning",
-#                 )
-#             data_holder.data.loc[boolean, "station_name"] = info["STATION_NAME"]
-#             data_holder.data.loc[boolean, "station_id"] = info["REG_ID_GROUP"]
-#             data_holder.data.loc[boolean, "sample_location_id"] = info["REG_ID"]
-#             data_holder.data.loc[boolean, "station_viss_eu_id"] = info["EU_CD"]
-#             adm_logger.log_validation_succeeded(
-#                 f"Station '{info['STATION_NAME']}' ({info['REG_ID_GROUP']}) "
-#                 f"transformed without error.",
-#                 level=adm_logger.INFO,
-#             )
-#
-#     def _create_columns_if_missing(self, data_holder: PolarsDataHolder) -> None:
-#         for col in self.columns_to_set:
-#             if col in data_holder.data.columns:
-#                 continue
-#             self._log(f"Adding column {col}", level=adm_logger.DEBUG)
-#             self._add_empty_col(data_holder, col)
+class PolarsAddStationInfo(PolarsTransformer):
+    source_lat_column = "sample_latitude_dd"
+    source_lon_column = "sample_longitude_dd"
+    reported_station_col = "reported_station_name"
+    columns_to_set = (
+        "station_name",
+        "station_id",
+        "sample_location_id",
+        "station_viss_eu_id",
+    )
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._stations = get_station_object()
+        self._station_synonyms = {}
+        self._loaded_stations_info = {}
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds station information to all places"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._create_columns_if_missing(data_holder)
+
+        for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
+            [self.source_lat_column, self.source_lon_column, self.reported_station_col]
+        ):
+            if not (lat_str and lon_str):
+                rows = list(df["row_number"])
+                self._log(
+                    adm_logger.feedback.missing_position(
+                        rows=sorted(set(df["row_number"]))
+                    ),
+                    level=adm_logger.ERROR,
+                    purpose=adm_logger.FEEDBACK,
+                )  # Ska kanske vara i validator istället
+                self._log(
+                    f"Missing {self.source_lat_column} "
+                    f"and/or {self.source_lon_column}",
+                    row_numbers=rows,
+                    level=adm_logger.ERROR,
+                )
+                continue
+
+            # boolean = (
+            #     (data_holder.data[self.source_lat_column] == lat_str)
+            #     & (data_holder.data[self.source_lon_column] == lon_str)
+            #     & (data_holder.data[self.reported_station_col] == reported_station)
+            # )
+
+            lat = float(lat_str)
+            lon = float(lon_str)
+
+            info = self._loaded_stations_info.setdefault(
+                reported_station,
+                self._stations.get_matching_stations(
+                    reported_station, lat, lon
+                ),
+            )
+            if not info:
+                closest_info = self._stations.get_closest_station_info(lat, lon)
+                if len(closest_info) == 1:
+                    closest_info = closest_info[0]
+                    if closest_info["accepted"]:
+                        self._log(
+                            f"Station '{reported_station}' is not found as a synonym "
+                            f" instation list Closest station is "
+                            f"{closest_info['STATION_NAME']} and is accepted",
+                            level=adm_logger.WARNING,
+                        )
+                    else:
+                        self._log(
+                            f"Station '{reported_station}' is not found as a synonym "
+                            f"in station list Closest station is "
+                            f"{closest_info['STATION_NAME']} but is not accepted",
+                            level=adm_logger.WARNING,
+                        )
+                    continue
+                else:
+                    station_names_str = ", ".join(
+                        [info["STATION_NAME"] for info in closest_info]
+                    )
+                    self._log(
+                        f"Station '{reported_station}' is not found as a synonym in "
+                        f"station list. Closest station(s) is/are {station_names_str}",
+                        level=adm_logger.WARNING,
+                    )
+                    continue
+            if not info["accepted"]:
+                self._log(
+                    f"Reported station name found in station list but it is outside "
+                    f"the accepted radius. Distance={info['calc_dist']}, "
+                    f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
+                    level=adm_logger.WARNING,
+                )
+                adm_logger.log_validation_failed(
+                    f"Reported station name found in station list but it is outside "
+                    f"the accepted radius. Distance={info['calc_dist']}, "
+                    f"Accepted radius={info['OUT_OF_BOUNDS_RADIUS']}",
+                    level=adm_logger.WARNING,
+                )
+                continue
+
+            if reported_station != info["STATION_NAME"]:
+                name = info["STATION_NAME"]
+                self._log(
+                    f"Station name translated: {reported_station} -> {name}",
+                    level="warning",
+                )
+            data_holder.data.loc[boolean, "station_name"] = info["STATION_NAME"]
+            data_holder.data.loc[boolean, "station_id"] = info["REG_ID_GROUP"]
+            data_holder.data.loc[boolean, "sample_location_id"] = info["REG_ID"]
+            data_holder.data.loc[boolean, "station_viss_eu_id"] = info["EU_CD"]
+            adm_logger.log_validation_succeeded(
+                f"Station '{info['STATION_NAME']}' ({info['REG_ID_GROUP']}) "
+                f"transformed without error.",
+                level=adm_logger.INFO,
+            )
+
+    def _create_columns_if_missing(self, data_holder: PolarsDataHolder) -> None:
+        for col in self.columns_to_set:
+            if col in data_holder.data.columns:
+                continue
+            self._log(f"Adding column {col}", level=adm_logger.DEBUG)
+            self._add_empty_col(data_holder, col)
