@@ -3,7 +3,9 @@ import re
 import pandas as pd
 import polars as pl
 
-from .base import DataHolderProtocol, Transformer
+from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
+
+from .base import Transformer
 
 
 class AddLmqnt(Transformer):
@@ -82,7 +84,7 @@ class AddLmqnt(Transformer):
 
         element = parameter_element_list.get(name, "")
 
-        pattern = r"(-?\d+(?:\.\d+)?)(?:\s*)([^\d]*)"
+        pattern = r"(-?\d+(?:\.\d+)?)(?:\s*)(.*)"
         matches = re.search(pattern, lmqnt_str.strip())
 
         if not matches:
@@ -107,33 +109,22 @@ class AddLmqnt(Transformer):
             return lmqnt, new_lmqnt_unit
         return lmqnt, lmqnt_unit
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for unique_lmqnt in data_holder.data["quantification_limit"].unique():
-            lmqnt_bool = data_holder.data["quantification_limit"] == unique_lmqnt
+    def _transform(self, data_holder: PandasDataHolder) -> None:
+        grouped = data_holder.data.groupby(["quantification_limit", "parameter", "unit"])
 
+        for (lmqnt_str, name, unit), group_idx in grouped.groups.items():
             if (
-                unique_lmqnt is None
-                or pd.isna(unique_lmqnt)
-                or (isinstance(unique_lmqnt, str) and not unique_lmqnt.strip())
+                lmqnt_str is None
+                or pd.isna(lmqnt_str)
+                or (isinstance(lmqnt_str, str) and not lmqnt_str.strip())
             ):
-                data_holder.data.loc[lmqnt_bool, "LMQNT_VAL"] = float("nan")
+                data_holder.data.loc[group_idx, "LMQNT_VAL"] = float("nan")
                 continue
-
-            temp = data_holder.data.loc[lmqnt_bool, "quantification_limit"]
-            lmqnt_str = temp.iloc[0]
-            temp = data_holder.data.loc[lmqnt_bool, "unit"]
-            unit = str(temp.iloc[0])
-            temp = data_holder.data.loc[lmqnt_bool, "parameter"]
-            name = str(temp.iloc[0])
 
             lmqnt, lmqnt_unit = self._parse_lmqnt(lmqnt_str, name)
 
-            if lmqnt_unit == "":
-                data_holder.data.loc[lmqnt_bool, "LMQNT_VAL"] = (
-                    lmqnt if lmqnt is not None else float("nan")
-                )
-            elif lmqnt_unit == unit:
-                data_holder.data.loc[lmqnt_bool, "LMQNT_VAL"] = (
+            if lmqnt_unit == "" or lmqnt_unit == unit:
+                data_holder.data.loc[group_idx, "LMQNT_VAL"] = (
                     lmqnt if lmqnt is not None else float("nan")
                 )
 
@@ -214,7 +205,7 @@ class PolarsAddLmqnt(Transformer):
 
         element = parameter_element_list.get(name, "")
 
-        pattern = r"(-?\d+(?:\.\d+)?)(?:\s*)([^\d]*)"
+        pattern = r"(-?\d+(?:\.\d+)?)(?:\s*)(.*)"
         matches = re.search(pattern, lmqnt_str.strip())
 
         if not matches:
@@ -253,7 +244,7 @@ class PolarsAddLmqnt(Transformer):
             return lmqnt_val
         return None
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         unique_lmqnt_df = data_holder.data.select(
             ["quantification_limit", "parameter", "unit"]
         ).unique()
