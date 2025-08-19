@@ -1,5 +1,5 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import MultiTransformer, PolarsMultiTransformer
 
 
 class StaticDV(MultiTransformer):
@@ -16,7 +16,7 @@ class StaticDV(MultiTransformer):
         return "\n".join(string_list)
 
 
-class StaticDVPolars(MultiTransformer):
+class StaticDVPolars(PolarsMultiTransformer):
     _transformers = (
         transformers.PolarsAddStaticInternetAccessInfo,
         transformers.PolarsAddStaticDataHoldingCenterEnglish,

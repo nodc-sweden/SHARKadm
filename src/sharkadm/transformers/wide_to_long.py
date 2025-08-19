@@ -299,7 +299,8 @@ class PolarsWideToLong(PolarsTransformer):
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
-        self._add_reported_columns(data_holder)
+        self._cleanup(data_holder)
+        # self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
 
     def _save_metadata_columns(self, df: pd.DataFrame) -> None:
@@ -397,13 +398,13 @@ class PolarsWideToLong(PolarsTransformer):
         )
         return new_df
 
-    def _cleanup(self, data_holder: PandasDataHolder):
+    def _cleanup(self, data_holder: PolarsDataHolder):
         keep_columns = [
             col for col in data_holder.data.columns if not col.startswith("COPY_VARIABLE")
         ]
         data_holder.data = data_holder.data[keep_columns]
 
-    def _add_reported_columns(self, data_holder: PandasDataHolder) -> None:
+    def _add_reported_columns(self, data_holder: PolarsDataHolder) -> None:
         cols_to_save = [
             "parameter",
             "value",
