@@ -42,6 +42,8 @@ from sharkadm.transformers.columns import (
     RemoveColumns,
     SortColumns,
     PolarsSortColumns,
+    PolarsAddDEPHqcColumn,
+    PolarsAddFloatColumn,
 )
 from sharkadm.transformers.cruise import AddCruiseId, PolarsAddCruiseId
 from sharkadm.transformers.custom_id import (

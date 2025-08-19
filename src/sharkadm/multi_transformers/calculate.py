@@ -4,6 +4,11 @@ from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 class CalculatePolars(PolarsMultiTransformer):
     _transformers = (
+        # transformers.PolarsAddFloatColumn(
+        #     columns=[
+        #
+        #     ]
+        # ),
         transformers.PolarsCalculateAbundance,
         transformers.PolarsCalculateBiovolume,
         transformers.PolarsCalculateCarbon,

@@ -15,6 +15,7 @@ from sharkadm import (
 from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
+from sharkadm.exporters.base import PolarsExporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
@@ -199,7 +200,7 @@ class BaseSHARKadmController:
                 dict(total=tot_nr_operators, current=i, title=f"Exporting...{exp.name}"),
             )
 
-    def export(self, *exporters: Exporter) -> Any:
+    def export(self, *exporters: Exporter | PolarsExporter) -> Any:
         for exp in exporters:
             data = exp.export(self._data_holder)
             if isinstance(data, (pd.DataFrame, pl.DataFrame)):

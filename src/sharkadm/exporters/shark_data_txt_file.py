@@ -54,6 +54,7 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
         super().__init__(export_directory, export_file_name, **kwargs)
         self._exclude_missing_columns = exclude_missing_columns
         self._column_views = get_column_views_config()
+        self._separator = kwargs.get("separator", "\t")
 
     @staticmethod
     def get_exporter_description() -> str:
@@ -76,7 +77,14 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
                           f"not being included in the export: {missing_str}",
                           level=adm_logger.WARNING)
         data = data_holder.data[column_list]
-        data.write_csv(self.export_file_path, separator="\t")
+        if self._encoding == "utf8":
+            data.write_csv(self.export_file_path, separator=self._separator)
+        else:
+            pdf = data.to_pandas()
+            pdf.to_csv(self.export_file_path,
+                       sep=self._separator,
+                       index=False,
+                       encoding=self._encoding)
 
 
 class SHARKdataTxtAsGiven(FileExporter):

@@ -4,6 +4,8 @@ import polars as pl
 
 from sharkadm.config import get_column_views_config
 from sharkadm.utils import approved_data
+from sharkadm.utils import matching_strings
+from sharkadm.utils import add_column
 
 from ..data import PolarsDataHolder
 from .base import (
@@ -158,7 +160,7 @@ class PolarsSortColumns(PolarsTransformer):
         data_holder.data = data_holder.data[new_col_order]
 
 
-class PolarsAddDEPHqcColumn(Transformer):
+class PolarsAddDEPHqcColumn(PolarsTransformer):
     valid_data_holders = ("PolarsLimsDataHolder",)
 
     def __init__(self, **kwargs):
@@ -172,3 +174,25 @@ class PolarsAddDEPHqcColumn(Transformer):
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if "Q_DEPH" not in data_holder.data.columns:
             data_holder.data["Q_DEPH"] = ""
+
+
+class PolarsAddFloatColumn(PolarsTransformer):
+
+    def __init__(self, columns: list[str], **kwargs):
+        super().__init__(**kwargs)
+        self._columns = columns
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Converts matching columns to float. Uses regex to match columns."
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        columns = matching_strings.get_matching_strings(
+            data_holder.data.columns,
+            self._columns
+        )
+        for col in columns:
+            data_holder.data = add_column.add_float_column(
+                data_holder.data,
+                col
+            )

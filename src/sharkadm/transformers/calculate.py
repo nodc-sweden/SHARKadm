@@ -2,8 +2,9 @@ import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from ..data import PolarsDataHolder
-from .base import DataHolderProtocol, PolarsTransformer
+from sharkadm.data import PolarsDataHolder
+from sharkadm.transformers.base import DataHolderProtocol, PolarsTransformer
+from ..utils import add_column
 
 try:
     from nodc_bvol import get_bvol_nomp_object
@@ -115,14 +116,21 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(
             pl.col(self.aphia_id_size_class_map_col)
             .replace_strict(volume_mapper, default="")
-            .alias(self.calculated_cell_volume_col)
+            .alias("temp_calculated_cell_volume")
         )
+        data_holder.data = add_column.add_float_column(
+            data_holder.data,
+            "temp_calculated_cell_volume",
+            column_name=self.calculated_cell_volume_col
+        )
+        print(f"{type(data_holder.data[self.calculated_cell_volume_col])=}")
+        print(f"{set(data_holder.data[self.calculated_cell_volume_col])=}")
 
         # Combine cell_volume. Use calculated if present else use reported
         data_holder.data = data_holder.data.with_columns(
-            pl.when(pl.col(self.calculated_cell_volume_col) != "")
+            pl.when(pl.col(self.calculated_cell_volume_col).is_not_null())
             .then(pl.col(self.calculated_cell_volume_col).cast(float) * 10e-9)
-            .when(pl.col(self.reported_cell_volume_col) != "")
+            .when(pl.col(self.reported_cell_volume_col).is_not_null())
             .then(pl.col(self.reported_cell_volume_col).cast(float) * 10e-9)
             .otherwise(pl.lit(""))
             .alias(self.combined_cell_volume_col)
@@ -142,12 +150,12 @@ class PolarsCalculateBiovolume(PolarsTransformer):
             .alias(self.col_to_set)
         )
 
-        max_boolean = boolean & data_holder.data[self.col_to_set].cast(float) > (
-            data_holder.data[self.bvol_col].cast(float) * 2
+        max_boolean = boolean & (data_holder.data[self.col_to_set].cast(float) > (
+            (data_holder.data[self.bvol_col].cast(float) * 2))
         )
 
-        min_boolean = boolean & data_holder.data[self.col_to_set].cast(float) < (
-            data_holder.data[self.bvol_col].cast(float) * 0.5
+        min_boolean = boolean & (data_holder.data[self.col_to_set].cast(float) < (
+            (data_holder.data[self.bvol_col].cast(float) * 0.5))
         )
 
         out_of_range_boolean = max_boolean | min_boolean
@@ -184,9 +192,50 @@ class PolarsCalculateCarbon(PolarsTransformer):
             # f"Setting value to column {PolarsCalculateCarbon.col_to_set}"
         )
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data["reported_carbon"] = data_holder.data[self.carbon_col]
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(self.carbon_col)
+            .alias("reported_carbon")
+        )
+
+
+
         bool_carbon = data_holder.data[self.carbon_per_volume_col] != ""
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(bool_carbon)
+            .then(
+                pl.col(self.abundance_col).cast(float)
+                * pl.col(self.carbon_per_volume_col).cast(float)
+            )
+            .otherwise(pl.lit(""))
+            .alias(self.col_to_set)
+        )
+
+        max_boolean = bool_carbon & (data_holder.data[self.col_to_set].cast(float) > (
+            (data_holder.data[self.carbon_col].cast(float) * 2))
+                                 )
+
+        min_boolean = bool_carbon & (data_holder.data[self.col_to_set].cast(float) < (
+            (data_holder.data[self.carbon_col].cast(float) * 0.5))
+                                 )
+
+        out_of_range_boolean = max_boolean | min_boolean
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(out_of_range_boolean)
+            .then(pl.col(self.col_to_set))
+            .otherwise(pl.col(self.carbon_col))
+            .alias("combined_carbon"),
+            pl.when(out_of_range_boolean)
+            .then(pl.lit("Y"))
+            .otherwise(pl.lit(""))
+            .alias("calc_by_dc_biovolume"),
+        )
+
+
+
+
 
         data_holder.data["calculated_carbon"] = data_holder.data.loc[
             bool_carbon, self.abundance_col

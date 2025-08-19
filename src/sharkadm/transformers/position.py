@@ -354,8 +354,6 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
         return "Adds sample position in decimal minute"
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.lat_col_to_set in data_holder.data:
-            return
         data_holder.data = data_holder.data.with_columns(
             pl.lit("").alias(self.lat_col_to_set)
         )
@@ -377,13 +375,13 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
                 .then(pl.lit(new_lat))
-                .otherwise(pl.col(self.lat_source_col))
+                .otherwise(pl.col(self.lat_col_to_set))
                 .alias(self.lat_col_to_set)
             )
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lon_source_col) == lon)
                 .then(pl.lit(new_lon))
-                .otherwise(pl.col(self.lon_source_col))
+                .otherwise(pl.col(self.lon_col_to_set))
                 .alias(self.lon_col_to_set)
             )
 
