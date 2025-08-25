@@ -24,7 +24,7 @@ from sharkadm.exporters.shark_data_txt_file import (
 from sharkadm.exporters.shark_metadata_auto import SHARKMetadataAuto
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 from sharkadm.exporters.standard_format import StandardFormat
-from sharkadm.exporters.statistics import PrintStatistics, WriteStatisticsToFile
+from sharkadm.exporters.statistics import PrintStatistics, StatisticsToTxt
 from sharkadm.exporters.system import (
     ExportersSummaryFile,
     TransformersSummaryFile,

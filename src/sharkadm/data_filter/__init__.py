@@ -6,6 +6,7 @@ from sharkadm.data_filter.data_filter_combined import (
     PolarsDataFilterRestrictAreaRorO,
     PolarsDataFilterRestrictAreaRredorO,
 )
+from sharkadm.data_filter.data_filter_coordinates import PolarsDataFilterBoundingBox
 from sharkadm.data_filter.data_filter_depth import (
     PolarsDataFilterDeepestDepthAtEachVisit,
     PolarsDataFilterDepthDeeperThanWaterDepth,
@@ -23,4 +24,5 @@ from sharkadm.data_filter.data_filter_match_in_columns import (
 from sharkadm.data_filter.data_filter_month import PolarsDataFilterMonths
 from sharkadm.data_filter.data_filter_on_land import PolarsDataFilterOnLand
 from sharkadm.data_filter.data_filter_qflag import PolarsDataFilterQflag
+from sharkadm.data_filter.data_filter_value import PolarsDataFilterValueLessThan
 from sharkadm.data_filter.data_filter_year import PolarsDataFilterYears

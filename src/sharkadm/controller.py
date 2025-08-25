@@ -268,7 +268,7 @@ class SHARKadmPolarsController(BaseSHARKadmController):
         self._data_holder.reset_filter()
         return self
 
-    def set_data_holder(self, data_holder: DataHolder) -> Self:
+    def set_data_holder(self, data_holder: PolarsDataHolder) -> Self:
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.PolarsAddRowNumber())
@@ -329,9 +329,20 @@ def get_controller_with_data(path: pathlib.Path | str) -> SHARKadmController:
 
 
 def get_polars_controller_with_data(
-    path: pathlib.Path | str, **kwargs
+    *paths: pathlib.Path | str, **kwargs
 ) -> SHARKadmPolarsController:
+    if not paths:
+        raise FileNotFoundError("No paths provided!")
     c = SHARKadmPolarsController()
-    holder = get_polars_data_holder(path, **kwargs)
-    c.set_data_holder(holder)
+    if len(paths) == 1:
+        holder = get_polars_data_holder(paths[0], **kwargs)
+        c.set_data_holder(holder)
+    else:
+        holders = []
+        for p in paths:
+            holder = get_polars_data_holder(p, **kwargs)
+            holders.append(holder)
+        c.set_data_holder(sum(holders))
+        paths_string = "\n".join([str(p) for p in paths])
+        adm_logger.log_workflow(f"Combined data holder created with paths:\n{paths_string}")
     return c

@@ -1,5 +1,6 @@
 import polars as pl
 
+from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
 from .base import (
@@ -7,7 +8,6 @@ from .base import (
     PolarsTransformer,
     Transformer,
 )
-from sharkadm.data import PolarsDataHolder
 
 try:
     import nodc_geography

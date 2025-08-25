@@ -239,7 +239,7 @@ class PolarsDataHolder(DataHolder, ABC):
         self._filtered_data = pl.DataFrame()
         super().__init__(*args, **kwargs)
 
-    def __add__(self, other):
+    def __add__(self, other) -> "PolarsConcatDataHolder":
         if self.data_type != other.data_type:
             adm_logger.log_workflow(
                 f"Not allowed to merge data_sources of different data_types: "
@@ -253,10 +253,14 @@ class PolarsDataHolder(DataHolder, ABC):
             )
             return
         concat_data = pl.concat([self.data, other.data])
-        cdh = ConcatDataHolder()
+        cdh = PolarsConcatDataHolder()
         cdh.data = concat_data
         cdh.data_type = self.data_type
+        cdh.data_type_internal = self.data_type_internal
         return cdh
+
+    def __radd__(self, other) -> "PolarsDataHolder":
+        return self
 
     @property
     def data(self) -> pl.DataFrame:
@@ -515,6 +519,41 @@ class ConcatDataHolder(PandasDataHolder):
     @property
     def dataset_name(self) -> str:
         return "#".join(self.data["dataset_name"].unique())
+
+    @property
+    def number_metadata_rows(self) -> None:
+        return
+
+
+class PolarsConcatDataHolder(PolarsDataHolder):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._data_type = ""
+        self._data_type_internal = ""
+
+    @staticmethod
+    def get_data_holder_description() -> str:
+        return "This is a concatenated data holder"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @data_type_internal.setter
+    def data_type_internal(self, data_type_internal: str) -> None:
+        self._data_type_internal = data_type_internal
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type
+
+    @data_type.setter
+    def data_type(self, data_type: str) -> None:
+        self._data_type = data_type
+
+    @property
+    def dataset_name(self) -> str:
+        return " # ".join(self.data["dataset_name"].unique())
 
     @property
     def number_metadata_rows(self) -> None:

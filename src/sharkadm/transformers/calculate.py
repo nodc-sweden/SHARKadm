@@ -1,9 +1,9 @@
 import polars as pl
 
-from sharkadm.sharkadm_logger import adm_logger
-
 from sharkadm.data import PolarsDataHolder
-from sharkadm.transformers.base import DataHolderProtocol, PolarsTransformer
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.transformers.base import PolarsTransformer
+
 from ..utils import add_column
 
 try:

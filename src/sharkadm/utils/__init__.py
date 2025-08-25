@@ -80,7 +80,7 @@ def clear_temp_directory(days_old: int = 7):
 
 def clear_all_in_temp_directory():
     if TEMP_DIRECTORY.name != "_temp":
-        print(f"I do not dare ro remove temp directory: {TEMP_DIRECTORY}")
+        print(f"I do not dare to remove temp directory: {TEMP_DIRECTORY}")
         return
     for path in TEMP_DIRECTORY.iterdir():
         if path.is_dir():

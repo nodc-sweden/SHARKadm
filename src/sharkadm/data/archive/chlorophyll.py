@@ -2,7 +2,7 @@ import logging
 
 from sharkadm.data import data_source
 
-from .archive_data_holder import ArchiveDataHolder
+from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
 
@@ -35,3 +35,9 @@ class ChlorophyllArchiveDataHolder(ArchiveDataHolder):
         d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)
+
+
+class PolarsChlorophyllArchiveDataHolder(PolarsArchiveDataHolder):
+    _data_type_internal = "chlorophyll"
+    _data_type = "chlorophyll"
+    _data_format = "Chlorophyll"
