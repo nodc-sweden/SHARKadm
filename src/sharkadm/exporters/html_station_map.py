@@ -153,9 +153,23 @@ class PolarsHtmlMap(FileExporter):
             )
             return
 
-        lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
+        # lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
         m = folium.Map(
-            location=(lat_mid, lon_mid), zoom_start=6, tiles="Cartodb Positron"
+            # location=(lat_mid, lon_mid),
+            zoom_start=6,
+            tiles="Cartodb Positron"
+        )
+        m.fit_bounds(
+            (
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).min(),
+                    data_holder.data["sample_longitude_dd"].cast(float).min(),
+                ),
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).max(),
+                    data_holder.data["sample_longitude_dd"].cast(float).max(),
+                ),
+            )
         )
 
         # folium.TileLayer("OpenStreetMap").add_to(m)
