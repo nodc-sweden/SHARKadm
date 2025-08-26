@@ -287,7 +287,7 @@ from sharkadm.transformers.add_uncertainty import AddUncertainty, PolarsAddUncer
             4.2,
             "umol/l",
             "0.1 (0.1-0.2 mg/l), 12% (>0.2 mg/l)",
-            0.1,
+            2.9342,
         ),  # example DOXY_CTD from DEEP
         (
             "ABC123",
@@ -758,7 +758,7 @@ def test_validate_add_uncertainty(
             4.2,
             "umol/l",
             "0.1 (0.1-0.2 mg/l), 12% (>0.2 mg/l)",
-            0.1,
+            2.9342,
         ),  # example DOXY_CTD from DEEP
         (
             "ABC123",

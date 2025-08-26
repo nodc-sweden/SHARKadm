@@ -107,8 +107,6 @@ class AddUncertainty(Transformer):
             groups = re.search(pattern, level.strip())
             groups = groups.groupdict() if groups else {}
 
-            uncert_val = groups.get("uncert_val")
-            uncert_unit = (groups.get("uncert_unit") or "").strip()
             limit_operator = (groups.get("limit_operator") or "").strip()
             limit_val1 = groups.get("limit_val1")
             limit_val2 = groups.get("limit_val2")
@@ -116,6 +114,9 @@ class AddUncertainty(Transformer):
             limit_val_lower = limit_val1 if limit_val2 and limit_val1 else None
             limit_unit = (groups.get("limit_unit") or "").strip()
             limit_unit_lower = (groups.get("limit_unit") or "").strip()
+
+            uncert_val = groups.get("uncert_val")
+            uncert_unit = (groups.get("uncert_unit") or limit_unit or "").strip()
 
             if uncert_val:
                 uncert_val = float(uncert_val)
@@ -463,8 +464,6 @@ class PolarsAddUncertainty(Transformer):
             groups = re.search(pattern, level.strip())
             groups = groups.groupdict() if groups else {}
 
-            uncert_val = groups.get("uncert_val")
-            uncert_unit = (groups.get("uncert_unit") or "").strip()
             limit_operator = (groups.get("limit_operator") or "").strip()
             limit_val1 = groups.get("limit_val1")
             limit_val2 = groups.get("limit_val2")
@@ -472,6 +471,9 @@ class PolarsAddUncertainty(Transformer):
             limit_val_lower = limit_val1 if limit_val2 and limit_val1 else None
             limit_unit = (groups.get("limit_unit") or "").strip()
             limit_unit_lower = (groups.get("limit_unit") or "").strip()
+
+            uncert_val = groups.get("uncert_val")
+            uncert_unit = (groups.get("uncert_unit") or limit_unit or "").strip()
 
             temp = {}
             if uncert_val:
@@ -526,7 +528,6 @@ class PolarsAddUncertainty(Transformer):
             uncertainties.sort(
                 key=lambda x: x["limit"] if x["limit"] is not None else float("inf")
             )
-
         return uncertainties
 
     def _get_selection(
