@@ -250,7 +250,7 @@ class WideToLong(Transformer):
 
 
 class PolarsWideToLong(PolarsTransformer):
-    valid_data_structures = ('column', )
+    valid_data_structures = ("column",)
     # invalid_data_holders = ("ZoobenthosBedaArchiveDataHolder",)
 
     def __init__(
@@ -299,7 +299,7 @@ class PolarsWideToLong(PolarsTransformer):
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         data_holder.data = self._get_transposed_data(data_holder.data)
-        self._cleanup(data_holder)
+        # self._cleanup(data_holder)
         # self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
 

@@ -1,10 +1,10 @@
 import pathlib
 
-from sharkadm.data import PandasDataHolder, PolarsDataHolder
+from sharkadm.data import PandasDataHolder
 from sharkadm.utils import statistics
 
 from ..utils.paths import get_next_incremented_file_path
-from .base import Exporter, FileExporter, PolarsFileExporter
+from .base import Exporter, FileExporter
 
 
 class PrintStatistics(Exporter):
@@ -55,27 +55,3 @@ class StatisticsToTxt(FileExporter):
             with open(self.export_file_path, "w", encoding=self._encoding) as fid:
                 for key, value in stats.items():
                     fid.write(f"{key.ljust(40)}\t{value}\n")
-
-
-class PolarsStationsList(PolarsFileExporter):
-
-    def __init__(
-        self,
-        export_directory: str | pathlib.Path | None = None,
-        export_file_name: str | pathlib.Path | None = None,
-        header_as: str | None = None,
-        **kwargs,
-    ):
-        super().__init__(
-            export_directory=export_directory,
-            export_file_name=export_file_name,
-            **kwargs,
-        )
-        self._header_as = header_as
-
-    @staticmethod
-    def get_exporter_description() -> str:
-        return 'Writes station list to file'
-
-    def _export(self, data_holder: PolarsDataHolder) -> None:
-        df = data_holder.data.with_columns()

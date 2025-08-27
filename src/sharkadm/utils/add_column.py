@@ -1,10 +1,9 @@
 import polars as pl
 
 
-def add_float_column(data: pl.DataFrame,
-                     column: str,
-                     column_name: str = "",
-                     suffix: str = "float") -> pl.DataFrame:
+def add_float_column(
+    data: pl.DataFrame, column: str, column_name: str = "", suffix: str = "float"
+) -> pl.DataFrame:
     new_column_name = column_name
     if not new_column_name:
         suffix = suffix.strip("_")
@@ -16,4 +15,3 @@ def add_float_column(data: pl.DataFrame,
         .cast(float)
         .alias(new_column_name)
     )
-

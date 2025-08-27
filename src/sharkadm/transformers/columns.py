@@ -175,7 +175,6 @@ class PolarsAddDEPHqcColumn(PolarsTransformer):
 
 
 class PolarsAddFloatColumns(PolarsTransformer):
-
     def __init__(self, columns: list[str], **kwargs):
         super().__init__(**kwargs)
         self._columns = columns
@@ -186,18 +185,13 @@ class PolarsAddFloatColumns(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         columns = matching_strings.get_matching_strings(
-            data_holder.data.columns,
-            self._columns
+            data_holder.data.columns, self._columns
         )
         for col in columns:
-            data_holder.data = add_column.add_float_column(
-                data_holder.data,
-                col
-            )
+            data_holder.data = add_column.add_float_column(data_holder.data, col)
 
 
 class PolarsAddColumnDiff(PolarsTransformer):
-
     def __init__(self, col1: str, col2: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._col1 = col1
@@ -205,19 +199,21 @@ class PolarsAddColumnDiff(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Add column with calculated difference between two given columns. "
-                "New column name is <col1>_minus_<col2)>.")
+        return (
+            "Add column with calculated difference between two given columns. "
+            "New column name is <col1>_minus_<col2)>."
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         new_col_name = f"{self._col1}_minus_{self._col2}"
         float_col1 = f"{self._col1}_float"
         float_col2 = f"{self._col2}_float"
-        data_holder.data = add_column.add_float_column(data_holder.data,
-                                    self._col1,
-                                    column_name=float_col1)
-        data_holder.data = add_column.add_float_column(data_holder.data,
-                                    self._col2,
-                                    column_name=float_col2)
+        data_holder.data = add_column.add_float_column(
+            data_holder.data, self._col1, column_name=float_col1
+        )
+        data_holder.data = add_column.add_float_column(
+            data_holder.data, self._col2, column_name=float_col2
+        )
         data_holder.data = data_holder.data.with_columns(
             (pl.col(float_col1) - pl.col(float_col2)).alias(new_col_name)
         )
@@ -226,7 +222,6 @@ class PolarsAddColumnDiff(PolarsTransformer):
 
 
 class PolarsAddBooleanLargerThan(PolarsTransformer):
-
     def __init__(self, col1: str, col2: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._col1 = col1
@@ -234,19 +229,21 @@ class PolarsAddBooleanLargerThan(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Add boolean column with True values where col1 is larger than col2. "
-                "New column name is <col1>_is_larger_than_<col2)>.")
+        return (
+            "Add boolean column with True values where col1 is larger than col2. "
+            "New column name is <col1>_is_larger_than_<col2)>."
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         new_col_name = f"{self._col1}_is_larger_than_{self._col2}"
         float_col1 = f"{self._col1}_float"
         float_col2 = f"{self._col2}_float"
-        data_holder.data = add_column.add_float_column(data_holder.data,
-                                    self._col1,
-                                    column_name=float_col1)
-        data_holder.data = add_column.add_float_column(data_holder.data,
-                                    self._col2,
-                                    column_name=float_col2)
+        data_holder.data = add_column.add_float_column(
+            data_holder.data, self._col1, column_name=float_col1
+        )
+        data_holder.data = add_column.add_float_column(
+            data_holder.data, self._col2, column_name=float_col2
+        )
         data_holder.data = data_holder.data.with_columns(
             (pl.col(float_col1) > pl.col(float_col2)).alias(new_col_name)
         )

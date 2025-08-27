@@ -41,7 +41,6 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
     """Writes data to file filtered by the columns specified for the given data type in
     column_views."""
 
-
     def __init__(
         self,
         export_directory: str | pathlib.Path | None = None,
@@ -68,23 +67,28 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
             view=data_holder.data_type_internal
         )
         if self._exclude_missing_columns:
-            missing_columns = [col for col in column_list if col
-                               not in data_holder.columns]
+            missing_columns = [
+                col for col in column_list if col not in data_holder.columns
+            ]
             column_list = [col for col in column_list if col in data_holder.columns]
             if missing_columns:
                 missing_str = ", ".join(missing_columns)
-                self._log(f"The following missing columns are "
-                          f"not being included in the export: {missing_str}",
-                          level=adm_logger.WARNING)
+                self._log(
+                    f"The following missing columns are "
+                    f"not being included in the export: {missing_str}",
+                    level=adm_logger.WARNING,
+                )
         data = data_holder.data[column_list]
         if self._encoding == "utf8":
             data.write_csv(self.export_file_path, separator=self._separator)
         else:
             pdf = data.to_pandas()
-            pdf.to_csv(self.export_file_path,
-                       sep=self._separator,
-                       index=False,
-                       encoding=self._encoding)
+            pdf.to_csv(
+                self.export_file_path,
+                sep=self._separator,
+                index=False,
+                encoding=self._encoding,
+            )
 
 
 class SHARKdataTxtAsGiven(FileExporter):

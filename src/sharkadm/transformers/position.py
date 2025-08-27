@@ -270,14 +270,14 @@ class PolarsAddReportedPosition(PolarsTransformer):
                     pl.col("latitude_deg"),
                     pl.col("latitude_min"),
                 ],
-                separator="."
+                separator=".",
             ).alias("reported_latitude"),
             pl.concat_str(
                 [
                     pl.col("longitude_deg"),
                     pl.col("longitude_min"),
                 ],
-                separator="."
+                separator=".",
             ).alias("reported_longitude"),
         )
 

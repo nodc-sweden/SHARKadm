@@ -344,5 +344,7 @@ def get_polars_controller_with_data(
             holders.append(holder)
         c.set_data_holder(sum(holders))
         paths_string = "\n".join([str(p) for p in paths])
-        adm_logger.log_workflow(f"Combined data holder created with paths:\n{paths_string}")
+        adm_logger.log_workflow(
+            f"Combined data holder created with paths:\n{paths_string}"
+        )
     return c

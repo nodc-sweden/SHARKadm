@@ -42,4 +42,3 @@ class PolarsPhytoplanktonArchiveDataHolder(PolarsArchiveDataHolder):
     _data_type_internal = "phytoplankton"
     _data_type = "Phytoplankton"
     _data_format = "Phytoplankton"
-

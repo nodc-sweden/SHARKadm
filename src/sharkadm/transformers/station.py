@@ -183,7 +183,7 @@ class PolarsAddStationInfo(PolarsTransformer):
     reported_station_col = "reported_station_name"
     columns_to_set = (
         "station_name",
-        "reg_id_group",
+        "station_id",
         "sample_location_id",
         "station_viss_eu_id",
         "distance_to_matched_station",
@@ -215,8 +215,7 @@ class PolarsAddStationInfo(PolarsTransformer):
                     purpose=adm_logger.FEEDBACK,
                 )  # Ska kanske vara i validator istället
                 self._log(
-                    f"Missing {self.source_lat_column} "
-                    f"and/or {self.source_lon_column}",
+                    f"Missing {self.source_lat_column} and/or {self.source_lon_column}",
                     row_numbers=rows,
                     level=adm_logger.ERROR,
                 )
@@ -226,21 +225,23 @@ class PolarsAddStationInfo(PolarsTransformer):
             lon = float(lon_str)
 
             matching_stations = self._stations.get_matching_stations(
-                name=reported_station,
-                lat_dd=lat,
-                lon_dd=lon
+                name=reported_station, lat_dd=lat, lon_dd=lon
             )
             if not matching_stations:
-                self._log(f"No matching station found for station {reported_station} "
-                          f"at position {lat}:{lon}",
-                          level=adm_logger.WARNING)
+                self._log(
+                    f"No matching station found for station {reported_station} "
+                    f"at position {lat}:{lon}",
+                    level=adm_logger.WARNING,
+                )
                 continue
 
             accepted_station = matching_stations.get_accepted_station()
             if not accepted_station:
-                self._log(f"No accepted station found for station {reported_station} "
-                          f"at position {lat}:{lon}",
-                          level=adm_logger.WARNING)
+                self._log(
+                    f"No accepted station found for station {reported_station} "
+                    f"at position {lat}:{lon}",
+                    level=adm_logger.WARNING,
+                )
                 continue
 
             if reported_station != accepted_station.station:
@@ -251,23 +252,35 @@ class PolarsAddStationInfo(PolarsTransformer):
                 )
 
             condition = (
-                    (pl.col(self.reported_station_col) == reported_station)
-                    & (pl.col(self.source_lat_column) == lat_str)
-                    & (pl.col(self.source_lon_column) == lon_str)
+                (pl.col(self.reported_station_col) == reported_station)
+                & (pl.col(self.source_lat_column) == lat_str)
+                & (pl.col(self.source_lon_column) == lon_str)
             )
 
-            data_holder.data = data_holder.data.with_columns([
-                pl.when(condition).then(pl.lit(accepted_station.station)).otherwise(
-                    pl.col("station_name")).alias("station_name"),
-                pl.when(condition).then(pl.lit(accepted_station.reg_id_group)).otherwise(
-                    pl.col("reg_id_group")).alias("reg_id_group"),
-                pl.when(condition).then(pl.lit(accepted_station.reg_id)).otherwise(
-                    pl.col("sample_location_id")).alias("sample_location_id"),
-                pl.when(condition).then(pl.lit(accepted_station.eu_cd)).otherwise(
-                    pl.col("station_viss_eu_id")).alias("station_viss_eu_id"),
-                pl.when(condition).then(pl.lit(accepted_station.distance)).otherwise(
-                    pl.col("distance_to_matched_station")).alias("distance_to_matched_station"),
-            ])
+            data_holder.data = data_holder.data.with_columns(
+                [
+                    pl.when(condition)
+                    .then(pl.lit(accepted_station.station))
+                    .otherwise(pl.col("station_name"))
+                    .alias("station_name"),
+                    pl.when(condition)
+                    .then(pl.lit(accepted_station.reg_id_group))
+                    .otherwise(pl.col("station_id"))
+                    .alias("station_id"),
+                    pl.when(condition)
+                    .then(pl.lit(accepted_station.reg_id))
+                    .otherwise(pl.col("sample_location_id"))
+                    .alias("sample_location_id"),
+                    pl.when(condition)
+                    .then(pl.lit(accepted_station.eu_cd))
+                    .otherwise(pl.col("station_viss_eu_id"))
+                    .alias("station_viss_eu_id"),
+                    pl.when(condition)
+                    .then(pl.lit(accepted_station.distance))
+                    .otherwise(pl.col("distance_to_matched_station"))
+                    .alias("distance_to_matched_station"),
+                ]
+            )
 
     def _create_columns_if_missing(self, data_holder: PolarsDataHolder) -> None:
         for col in self.columns_to_set:

@@ -5,14 +5,14 @@ from .base import PolarsTransformer
 
 
 class PolarsSetBoundingBox(PolarsTransformer):
-
-    def __init__(self,
-                 lat_min: float | str = None,
-                 lat_max: float | str = None,
-                 lon_min: float | str = None,
-                 lon_max: float | str = None,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        lat_min: float | str | None = None,
+        lat_max: float | str | None = None,
+        lon_min: float | str | None = None,
+        lon_max: float | str | None = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self._lat_min = kwargs.get("min_lat", lat_min)
         self._lat_max = kwargs.get("max_lat", lat_max)

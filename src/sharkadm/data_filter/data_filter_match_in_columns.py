@@ -15,18 +15,6 @@ def _get_all_values(pattern: str, collection_values: set[str]):
 
 
 class PolarsDataFilterMatchInColumn(PolarsDataFilter):
-    def __init__(self, column: str, pattern: str, ignore_case: bool = False):
-        """pattern can be a regex"""
-        super().__init__(column=column, pattern=pattern)
-        self._column = column
-        self._pattern = pattern
-
-    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        all_values = _get_all_values(self._pattern, set(data_holder.data[self._column]))
-        return data_holder.data.select(pl.col(self._column).is_in(all_values)).to_series()
-
-
-class PolarsDataFilterMatchInColumn(PolarsDataFilter):
     def __init__(self, column: str, *patterns: str, ignore_case: bool = False):
         """pattern can be a regex"""
         super().__init__(column=column, pattern=patterns)

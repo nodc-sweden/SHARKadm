@@ -231,14 +231,17 @@ class PolarsAddLocationWaterCategory(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col("location_wb") != "0")
             .then(pl.lit("Havsområde innanför 1 NM"))
-            .otherwise(pl.col(self.col_to_set)))
+            .otherwise(pl.col(self.col_to_set))
+        )
 
         data_holder.data = data_holder.data.with_columns(
-            pl.when(pl.col("location_wb") == "0",
+            pl.when(
+                pl.col("location_wb") == "0",
                 pl.col("location_typ_nfs06") == "Y",
             )
             .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
-            .otherwise(pl.col(self.col_to_set)))
+            .otherwise(pl.col(self.col_to_set))
+        )
 
         data_holder.data = data_holder.data.with_columns(
             pl.when(
@@ -246,7 +249,8 @@ class PolarsAddLocationWaterCategory(PolarsTransformer):
                 pl.col("location_typ_nfs06") == "P",
             )
             .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
-            .otherwise(pl.col(self.col_to_set)))
+            .otherwise(pl.col(self.col_to_set))
+        )
 
         data_holder.data = data_holder.data.with_columns(
             pl.when(
@@ -255,7 +259,8 @@ class PolarsAddLocationWaterCategory(PolarsTransformer):
                 (pl.col("location_typ_nfs06") != "P"),
             )
             .then(pl.lit("Havsområde mellan 1 NM och 12 NM"))
-            .otherwise(pl.col(self.col_to_set)))
+            .otherwise(pl.col(self.col_to_set))
+        )
 
 
 class PolarsAddLocationWaterDistrict(_PolarsAddLocationBase):

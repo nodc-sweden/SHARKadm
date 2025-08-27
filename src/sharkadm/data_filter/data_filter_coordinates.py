@@ -8,12 +8,13 @@ class PolarsDataFilterBoundingBox(PolarsDataFilter):
     lat_col = "sample_latitude_dd"
     lon_col = "sample_longitude_dd"
 
-    def __init__(self,
-                 lat_min: float | str = None,
-                 lat_max: float | str = None,
-                 lon_min: float | str = None,
-                 lon_max: float | str = None,
-                 ):
+    def __init__(
+        self,
+        lat_min: float | str | None = None,
+        lat_max: float | str | None = None,
+        lon_min: float | str | None = None,
+        lon_max: float | str | None = None,
+    ):
         super().__init__(
             lat_min=lat_min,
             lat_max=lat_max,
@@ -29,8 +30,9 @@ class PolarsDataFilterBoundingBox(PolarsDataFilter):
         self,
         data_holder: PolarsDataHolder,
     ) -> pl.Series:
-        boolean = pl.Series([True for _ in range(len(data_holder.data))],
-                            dtype=pl.Boolean)
+        boolean = pl.Series(
+            [True for _ in range(len(data_holder.data))], dtype=pl.Boolean
+        )
         if self._lat_min is not None:
             boolean = boolean & (data_holder.data[self.lat_col] >= self._lat_min)
         if self._lat_max is not None:

@@ -157,7 +157,7 @@ class PolarsHtmlMap(FileExporter):
         m = folium.Map(
             # location=(lat_mid, lon_mid),
             zoom_start=6,
-            tiles="Cartodb Positron"
+            tiles="Cartodb Positron",
         )
         m.fit_bounds(
             (
@@ -379,7 +379,6 @@ class PolarsHtmlMap(FileExporter):
     def _add_markers(self, m: "folium.Map") -> None:
         fg = folium.FeatureGroup(name="Stations", show=True)
         for info in self._station_info:
-            print(f"{info=}")
             color = MarkerColor.NOT_ACCEPTED
             if info.get("location_on_land"):
                 color = MarkerColor.ON_LAND
