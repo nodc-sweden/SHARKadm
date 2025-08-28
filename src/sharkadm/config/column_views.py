@@ -9,7 +9,7 @@ class ColumnViews:
 
     def _load_config(self) -> None:
         header = list()
-        with open((self)._path) as fid:
+        with open(self._path) as fid:
             for r, line in enumerate(fid):
                 if not line.strip():
                     continue

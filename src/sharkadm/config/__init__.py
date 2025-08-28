@@ -10,6 +10,7 @@ from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
 from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.config.translate_headers import TranslateHeaders
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,13 @@ class DataHolderProtocol(Protocol):
 def get_column_views_config(path: str | pathlib.Path | None = None) -> ColumnViews:
     path = path or DEFAULT_COLUMN_VIEWS_PATH
     return ColumnViews(path)
+
+
+def get_translate_headers_config(
+    path: str | pathlib.Path | None = None,
+) -> TranslateHeaders:
+    path = path or DEFAULT_TRANSLATE_HEADERS_PATH
+    return TranslateHeaders(path)
 
 
 def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
@@ -170,6 +178,9 @@ def get_import_matrix_config_paths(
 
 DEFAULT_COLUMN_VIEWS_PATH = (
     CONFIG_DIRECTORY / "column_views.txt" if CONFIG_DIRECTORY else None
+)
+DEFAULT_TRANSLATE_HEADERS_PATH = (
+    CONFIG_DIRECTORY / "translate_headers.txt" if CONFIG_DIRECTORY else None
 )
 adm_config_paths = get_adm_config_paths(CONFIG_DIRECTORY)
 import_matrix_paths = get_import_matrix_config_paths(CONFIG_DIRECTORY)

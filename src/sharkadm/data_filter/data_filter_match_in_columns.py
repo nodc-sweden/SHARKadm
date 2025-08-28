@@ -9,7 +9,7 @@ from sharkadm.data_filter.base import PolarsDataFilter
 def _get_all_values(pattern: str, collection_values: set[str]):
     all_values = []
     for value in set(collection_values):
-        if re.match(pattern, value):
+        if re.search(pattern, value):
             all_values.append(value)
     return all_values
 

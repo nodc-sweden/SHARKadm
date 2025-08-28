@@ -6,6 +6,8 @@ from sharkadm.transformers.base import PolarsTransformer
 
 from ..utils import add_column
 
+CALC_BY_DC_MARKER = "Y"
+
 COL_COUNTED = "COPY_VARIABLE.# counted.ind/analysed sample fraction"
 COL_COUNTED_REPORTED = "count_reported"
 COL_COUNTED_REPORTED_FLOAT = "count_reported_float"
@@ -76,10 +78,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Calculating abundance. "
-            f"Setting value to column {PolarsCalculateAbundance.col_to_set}"
-        )
+        return f"Calculating abundance. Setting value to column {COL_ABUNDANCE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
@@ -123,7 +122,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
             .otherwise(pl.col(COL_ABUNDANCE_REPORTED_FLOAT))
             .alias(COL_ABUNDANCE_COMBINED_FLOAT),
             pl.when(out_of_range_boolean)
-            .then(pl.lit("Y"))
+            .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.lit(""))
             .alias("calc_by_dc_abundance"),
         )
@@ -159,10 +158,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Calculating biovolume. "
-            f"Setting value to column {COL_BIOVOLUME_CALCULATED_FLOAT}"
-        )
+        return f"Calculating biovolume. Setting value to column {COL_BIOVOLUME}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_empty_col(data_holder, COL_BIOVOLUME)
@@ -198,7 +194,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
             pl.when(pl.col(COL_CELL_VOLUME_CALCULATED_FLOAT).is_not_null())
             .then(pl.col(COL_CELL_VOLUME_CALCULATED_FLOAT) * 10e-9)
             .when(pl.col(COL_BIOVOLUME_REPORTED_FLOAT).is_not_null())
-            .then(pl.col(COL_BIOVOLUME_REPORTED_FLOAT) * 10e-9)
+            .then(pl.col(COL_BIOVOLUME_REPORTED_FLOAT))
             .otherwise(pl.lit(None))
             .alias(COL_CELL_VOLUME_COMBINED)
         )
@@ -225,13 +221,18 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
         out_of_range_boolean = max_boolean | min_boolean
 
+        out_of_range_boolean = (
+            out_of_range_boolean
+            | data_holder.data[COL_BIOVOLUME_REPORTED_FLOAT].is_null()
+        )
+
         data_holder.data = data_holder.data.with_columns(
             pl.when(out_of_range_boolean)
             .then(pl.col(COL_BIOVOLUME_CALCULATED_FLOAT))
             .otherwise(pl.col(COL_BIOVOLUME_REPORTED_FLOAT))
             .alias(COL_BIOVOLUME_COMBINED_FLOAT),
             pl.when(out_of_range_boolean)
-            .then(pl.lit("Y"))
+            .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.lit(""))
             .alias(COL_CALC_BY_DC_BIOVOLUME),
         )
@@ -327,7 +328,7 @@ class PolarsCalculateCarbon(PolarsTransformer):
             .otherwise(pl.col(COL_CARBON_REPORTED_FLOAT))
             .alias(COL_CARBON_COMBINED),
             pl.when(out_of_range_boolean)
-            .then(pl.lit("Y"))
+            .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.lit(""))
             .alias(COL_CALC_BY_DC_CARBON),
         )
@@ -346,3 +347,34 @@ class PolarsCalculateCarbon(PolarsTransformer):
         #     COL_CARBON_PER_VOLUME_CALCULATED,
         #     column_name=COL_CARBON_PER_VOLUME_CALCULATED_FLOAT
         # )
+
+
+class PolarsFixCalcByDc(PolarsTransformer):
+    valid_data_structures = ("row",)
+    col_to_set = "calc_by_dc"
+    check_columns = (
+        ("Abundance", "calc_by_dc_abundance"),
+        ("Biovolume concentration", "calc_by_dc_biovolume"),
+        ("Carbon concentration", "calc_by_dc_carbon"),
+    )
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Arranging calc_by_dc from calculated variables"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
+        for par, source_col in self.check_columns:
+            boolean = (pl.col(source_col) == CALC_BY_DC_MARKER) & (
+                pl.col("parameter") == par
+            )
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(boolean)
+                .then(pl.lit(CALC_BY_DC_MARKER))
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set),
+                pl.when(boolean)
+                .then(pl.lit(par))
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set),
+            )

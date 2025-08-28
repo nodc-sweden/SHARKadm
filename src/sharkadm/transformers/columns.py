@@ -68,7 +68,7 @@ class RemoveColumns(Transformer):
         exclude_columns = []
         for col in data_holder.data.columns:
             for arg in self._args:
-                if re.match(arg, col):
+                if re.search(arg, col):
                     exclude_columns.append(col)
                     break
         keep_columns = [
@@ -90,7 +90,7 @@ class PolarsRemoveColumns(PolarsTransformer):
         columns_to_remove = set()
         for arg in self._args:
             columns_to_remove |= set(
-                filter(lambda x: re.match(arg, x), data_holder.data.columns)
+                filter(lambda x: re.search(arg, x), data_holder.data.columns)
             )
         data_holder.data = data_holder.data.drop(columns_to_remove)
 

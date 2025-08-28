@@ -33,6 +33,7 @@ from sharkadm.transformers.calculate import (
     PolarsCalculateAbundance,
     PolarsCalculateBiovolume,
     PolarsCalculateCarbon,
+    PolarsFixCalcByDc,
 )
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,

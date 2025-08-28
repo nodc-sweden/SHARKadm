@@ -15,21 +15,54 @@ class PolarsAddEmodnetBathymetryDepth(PolarsTransformer):
             f"to column {PolarsAddEmodnetBathymetryDepth.col_to_set}"
         )
 
+    # def _transform(self, data_holder: PolarsDataHolder) -> None:
+    #     lat_col = "sample_latitude_dd"
+    #     lon_col = "sample_longitude_dd"
+    #     self._add_empty_col_to_set(data_holder)
+    #     for (lat, lon), df in data_holder.data.group_by([lat_col, lon_col]):
+    #         try:
+    #             emodnet_depth = nodc_geography.get_bathymetry_depth_at_position(
+    #                 float(lat), float(lon)
+    #             )
+    #             data_holder.data = data_holder.data.with_columns(
+    #                 pl.when(pl.col(lat_col) == lat, pl.col(lon_col) == lon)
+    #                 .then(pl.lit(emodnet_depth))
+    #                 .otherwise(pl.col(self.col_to_set))
+    #                 .alias(self.col_to_set)
+    #             )
+    #         except FileNotFoundError:
+    #             self._log(f"Could not find EMODnet depth for {lat}, {lon}")
+    #             continue
+
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         lat_col = "sample_latitude_dd"
         lon_col = "sample_longitude_dd"
-        self._add_empty_col_to_set(data_holder)
+        cols_are_set = False
+        # self._add_empty_col_to_set(data_holder)
         for (lat, lon), df in data_holder.data.group_by([lat_col, lon_col]):
             try:
-                emodnet_depth = nodc_geography.get_bathymetry_depth_at_position(
+                emodnet_info = nodc_geography.get_bathymetry_depth_at_position(
                     float(lat), float(lon)
                 )
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(pl.col(lat_col) == lat, pl.col(lon_col) == lon)
-                    .then(pl.lit(emodnet_depth))
-                    .otherwise(pl.col(self.col_to_set))
-                    .alias(self.col_to_set)
-                )
+                # print("=" * 50)
+                # print(f"{emodnet_info=}")
+                boolean = (pl.col(lat_col) == lat) & (pl.col(lon_col) == lon)
+                # print("-"*50)
+                # print(data_holder.data.filter(boolean))
+                for key, value in emodnet_info.items():
+                    if key == "z":
+                        key = "depth"
+                        value = -value
+                    col = f"emodnet_bathymetry_{key}"
+                    if not cols_are_set:
+                        self._add_empty_col(data_holder, col)
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.when(boolean)
+                        .then(pl.lit(value))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                    )
+                cols_are_set = True
             except FileNotFoundError:
                 self._log(f"Could not find EMODnet depth for {lat}, {lon}")
                 continue
