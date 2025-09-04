@@ -303,7 +303,7 @@ class PolarsAddDatetime(PolarsTransformer):
                 ).alias("datetime_str")
             )
         data_holder.data = data_holder.data.with_columns(
-            datetime=pl.col("datetime_str").str.to_datetime()
+            datetime=pl.col("datetime_str").str.strip_chars().str.to_datetime()
         )
 
 

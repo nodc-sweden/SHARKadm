@@ -447,7 +447,7 @@ def test_validate_add_uncertainty(
         given_data_holder.data_type,
     )
 
-    # There should be no column "LMQNT_VAL" in the dataframe
+    # There should be no column "UNCERT_VAL" in the dataframe
     # before application of transformer
     assert "UNCERT_VAL" not in given_data_holder.data.columns, (
         "The column UNCERT_VAL already exist."
@@ -456,13 +456,13 @@ def test_validate_add_uncertainty(
     # Transforming the data
     AddUncertainty().transform(given_data_holder)
 
-    # After transformation there should be no nan values
-    # in the dataframe
+    # There should be a column "UNCERT_VAL" in the dataframe
+    # after application of transformer
     assert "UNCERT_VAL" in given_data_holder.data.columns, (
         "The column UNCERT_VAL was not added to the dataframe"
     )
 
-    # The value in the kolumn LMQNT_VAL should match the expected value
+    # The value in the column UNCERT_VAL should match the expected value
     if given_data_holder.data["UNCERT_VAL"][0] and not np.isnan(
         given_data_holder.data["UNCERT_VAL"][0]
     ):
@@ -918,7 +918,7 @@ def test_validate_polars_add_uncertainty(
         given_data_holder.data_type,
     )
 
-    # There should be no column "LMQNT_VAL" in the dataframe
+    # There should be no column "UNCERT_VAL" in the dataframe
     # before application of transformer
     assert "UNCERT_VAL" not in given_data_holder.data.columns, (
         "The column UNCERT_VAL already exist."
@@ -927,15 +927,15 @@ def test_validate_polars_add_uncertainty(
     # Transforming the data
     PolarsAddUncertainty().transform(given_data_holder)
 
-    # After transformation there should be no nan values
-    # in the dataframe
+    # There should be a column "UNCERT_VAL" in the dataframe
+    # after application of transformer
     assert "UNCERT_VAL" in given_data_holder.data.columns, (
         "The column UNCERT_VAL was not added to the dataframe"
     )
 
     uncert_val = given_data_holder.data.select("UNCERT_VAL").to_series()[0]
 
-    # The value in the kolumn UNCERT_VAL should match the expected value
+    # The value in the column UNCERT_VAL should match the expected value
     if uncert_val is not None:
         assert round(uncert_val, 4) == round(expected_value, 4), (
             "The added value to the column UNCERT_VAL differs from the expected value"

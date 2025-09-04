@@ -597,14 +597,15 @@ def test_validate_polars_add_lmqnt(
     # Transforming the data
     PolarsAddLmqnt().transform(given_data_holder)
 
-    # After transformation there should be no nan values
-    # in the dataframe
+    # There should be a column "LMQNT_VAL" in the dataframe
+    # after application of transformer
     assert "LMQNT_VAL" in given_data_holder.data.columns, (
         "The column LMQNT_VAL was not added to the dataframe"
     )
 
     lmqnt_val = given_data_holder.data.select("LMQNT_VAL").to_series()[0]
-    # The value in the kolumn LMQNT_VAL should match the expected value
+
+    # The value in the column LMQNT_VAL should match the expected value
     if lmqnt_val is not None:
         assert round(lmqnt_val, 5) == round(expected_value, 5), (
             "The added value to the column LMQNT_VAL differs from the expected value"
