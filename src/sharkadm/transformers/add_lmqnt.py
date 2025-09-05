@@ -256,3 +256,11 @@ class PolarsAddLmqnt(Transformer):
         data_holder.data = data_holder.data.join(
             unique_lmqnt_df, on=["quantification_limit", "parameter", "unit"], how="left"
         )
+
+        if "LMQNT_VAL_right" in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(pl.col("LMQNT_VAL_right").is_not_null())
+                .then(pl.col("LMQNT_VAL_right"))
+                .otherwise(pl.col("LMQNT_VAL"))
+                .alias("LMQNT_VAL")
+            ).drop("LMQNT_VAL_right")

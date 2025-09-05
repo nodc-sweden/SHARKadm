@@ -761,3 +761,11 @@ class PolarsAddUncertainty(Transformer):
                 on=["parameter", "unit", "estimation_uncertainty", "value"],
                 how="left",
             )
+
+            if "UNCERT_VAL_right" in data_holder.data.columns:
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(pl.col("UNCERT_VAL_right").is_not_null())
+                    .then(pl.col("UNCERT_VAL_right"))
+                    .otherwise(pl.col("UNCERT_VAL"))
+                    .alias("UNCERT_VAL")
+                ).drop("UNCERT_VAL_right")
