@@ -46,7 +46,7 @@ def test_validate_add_density_wide(
     # There should be no column with in situ density
     # before application of transformer
     assert "in_situ_density" not in given_data_holder.data.columns, (
-        "Density column not added yet"
+        "Density column already exist"
     )
 
     # Transforming the data
@@ -123,7 +123,7 @@ def test_validate_add_density(
     # There should be no column with in situ density
     # before application of the transformer
     assert "in_situ_density" not in given_data_holder.data.columns, (
-        "Density column not added yet"
+        "Density column already exist"
     )
 
     # Transforming the data
