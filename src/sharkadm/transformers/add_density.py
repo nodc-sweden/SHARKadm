@@ -28,8 +28,8 @@ class PolarsAddDensityWide(PolarsTransformer):
     practical_salinity = "Salinity CTD"
     temperature = "Temperature CTD"
     depth_col = "sample_depth_m"
-    longitude_col = "sample_latitude_dd"
-    latitude_col = "sample_longitude_dd"
+    longitude_col = "sample_longitude_dd"
+    latitude_col = "sample_latitude_dd"
     col_to_set = "in_situ_density"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
 
@@ -103,8 +103,8 @@ class PolarsAddDensity(PolarsTransformer):
     practical_salinity = "Salinity CTD"
     temperature = "Temperature CTD"
     depth_col = "sample_depth_m"
-    longitude_col = "sample_latitude_dd"
-    latitude_col = "sample_longitude_dd"
+    longitude_col = "sample_longitude_dd"
+    latitude_col = "sample_latitude_dd"
     col_to_set = "in_situ_density"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
 
