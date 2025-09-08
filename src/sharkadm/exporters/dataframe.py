@@ -123,8 +123,7 @@ class PolarsDataFrame(PolarsExporter):
                                 item=col,
                                 level=adm_logger.WARNING,
                             )
-                        print(f"{value=}")
-                        print(f"{new_value=}")
+
                         df = df.with_columns(
                             pl.when(pl.col(col) == value)
                             .then(pl.lit(new_value))
