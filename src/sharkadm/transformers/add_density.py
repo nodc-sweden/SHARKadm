@@ -133,7 +133,7 @@ class PolarsAddDensity(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-        elif (
+        if (
             data_holder.data["parameter"]
             .is_in([self.practical_salinity, self.temperature])
             .sum()
@@ -144,7 +144,7 @@ class PolarsAddDensity(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-        elif (
+        if (
             data_holder.data["parameter"].is_in(
                 [self.practical_salinity, self.temperature]
             )

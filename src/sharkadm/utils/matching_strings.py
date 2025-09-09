@@ -12,6 +12,6 @@ def get_matching_strings(strings, match_strings):
             matching[item] = True
             continue
         for col in strings:
-            if re.match(item, col):
+            if re.search(item, col):
                 matching[col] = True
     return list(matching)

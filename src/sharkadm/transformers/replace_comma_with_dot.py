@@ -53,17 +53,17 @@ class ReplaceCommaWithDot(Transformer):
 
 class PolarsReplaceCommaWithDot(PolarsTransformer):
     apply_on_columns = (
-        ".*latitude.*",
-        ".*longitude.*",
-        "water_depth_m",
-        ".*DIVIDE.*",
-        ".*MULTIPLY.*",
-        ".*COPY_VARIABLE.*",
-        "sampled_volume.*",
-        "sampler_area.*",
-        ".*wind.*",
-        ".*pressure.*",
-        ".*temperature.*",
+        "latitude",
+        "longitude",
+        "depth",
+        "DIVIDE",
+        "MULTIPLY",
+        "COPY_VARIABLE",
+        "sampled_volume",
+        "sampler_area",
+        "wind",
+        "pressure",
+        "temperature",
     )
 
     def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
