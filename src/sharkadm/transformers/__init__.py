@@ -6,6 +6,7 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.transformers.add_density import PolarsAddDensityWide, PolarsAddDensity
 from sharkadm.transformers.add_lmqnt import AddLmqnt, PolarsAddLmqnt
+from sharkadm.transformers.add_oxygen_saturation import PolarsAddOxygenSaturation
 from sharkadm.transformers.add_pressure import PolarsAddPressure
 from sharkadm.transformers.add_uncertainty import AddUncertainty, PolarsAddUncertainty
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
