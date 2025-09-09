@@ -480,11 +480,12 @@ def test_validate_add_uncertainty(
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_latitude, given_longitude, given_depth, "
+    "given_row_number, given_visit_key, given_latitude, given_longitude, given_depth, "
     "given_parameter, given_value, given_unit, given_estimation_uncertainty, "
     "expected_value",
     (
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -496,6 +497,7 @@ def test_validate_add_uncertainty(
             None,
         ),  # example TEMP_BTL from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -507,6 +509,7 @@ def test_validate_add_uncertainty(
             0.01,
         ),  # example TEMP_CTD from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -518,6 +521,7 @@ def test_validate_add_uncertainty(
             0.002912,
         ),  # example SALT_BTL from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -529,6 +533,7 @@ def test_validate_add_uncertainty(
             0.014,
         ),  # example SALT_CTD from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -540,6 +545,7 @@ def test_validate_add_uncertainty(
             0.052,
         ),  # example DOXY_BTL from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -551,6 +557,7 @@ def test_validate_add_uncertainty(
             None,
         ),  # example DOXY_CTD from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -561,8 +568,20 @@ def test_validate_add_uncertainty(
             None,
             None,
         ),  # example DOXY_CTD from UMSC
-        ("ABC123", 57.3, 10.1, 5.0, "pH", 7.82, "", "0.05", 0.05),  # example PH from UMSC
         (
+            1,
+            "ABC123",
+            57.3,
+            10.1,
+            5.0,
+            "pH",
+            7.82,
+            "",
+            "0.05",
+            0.05,
+        ),  # example PH from UMSC
+        (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -574,6 +593,7 @@ def test_validate_add_uncertainty(
             0.018408,
         ),  # example ALKY from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -585,6 +605,7 @@ def test_validate_add_uncertainty(
             0.0475,
         ),  # example PHOS from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -596,6 +617,7 @@ def test_validate_add_uncertainty(
             None,
         ),  # example PTOT from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -607,6 +629,7 @@ def test_validate_add_uncertainty(
             0.0135,
         ),  # example NTRI from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -618,6 +641,7 @@ def test_validate_add_uncertainty(
             0.2268,
         ),  # example NTRA from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -629,6 +653,7 @@ def test_validate_add_uncertainty(
             0.462,
         ),  # example AMON from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -640,6 +665,7 @@ def test_validate_add_uncertainty(
             0.3102,
         ),  # example NTOT from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -651,6 +677,7 @@ def test_validate_add_uncertainty(
             0.6164,
         ),  # example SIO2 from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -662,6 +689,7 @@ def test_validate_add_uncertainty(
             None,
         ),  # example SIO2 extreme
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -673,6 +701,7 @@ def test_validate_add_uncertainty(
             0.224,
         ),  # example HUMUS from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -684,6 +713,7 @@ def test_validate_add_uncertainty(
             5.148,
         ),  # example DOC from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -695,6 +725,7 @@ def test_validate_add_uncertainty(
             0.893,
         ),  # example CPHL from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -706,6 +737,7 @@ def test_validate_add_uncertainty(
             0.16,
         ),  # example CDOM from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -717,6 +749,7 @@ def test_validate_add_uncertainty(
             None,
         ),  # example CDOM from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -728,6 +761,7 @@ def test_validate_add_uncertainty(
             0.462,
         ),  # example TURB from UMSC
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -739,6 +773,7 @@ def test_validate_add_uncertainty(
             0.21,
         ),  # example DOXY_BTL from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -750,6 +785,7 @@ def test_validate_add_uncertainty(
             0.49,
         ),  # example DOXY_CTD from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -761,6 +797,7 @@ def test_validate_add_uncertainty(
             2.9342,
         ),  # example DOXY_CTD from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -772,6 +809,7 @@ def test_validate_add_uncertainty(
             0.09204,
         ),  # example ALKY from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -783,6 +821,7 @@ def test_validate_add_uncertainty(
             0.032285,
         ),  # example PHOS from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -794,6 +833,7 @@ def test_validate_add_uncertainty(
             0.084,
         ),  # example PTOT from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -805,6 +845,7 @@ def test_validate_add_uncertainty(
             0.0928122,
         ),  # example NTRZ from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -816,6 +857,7 @@ def test_validate_add_uncertainty(
             0.11,
         ),  # example AMON from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -827,6 +869,7 @@ def test_validate_add_uncertainty(
             0.297,
         ),  # example NTOT from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -838,6 +881,7 @@ def test_validate_add_uncertainty(
             0.089015,
         ),  # example SIO2 from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -849,6 +893,7 @@ def test_validate_add_uncertainty(
             1.645,
         ),  # example CPHL from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -860,6 +905,7 @@ def test_validate_add_uncertainty(
             0.7,
         ),  # example CPHL from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -871,6 +917,7 @@ def test_validate_add_uncertainty(
             0.04,
         ),  # example TEMP_CTD from DEEP
         (
+            1,
             "ABC123",
             57.3,
             10.1,
@@ -887,6 +934,7 @@ def test_validate_add_uncertainty(
 def test_validate_polars_add_uncertainty(
     mocked_data_types,
     polars_data_frame_holder_class,
+    given_row_number,
     given_visit_key,
     given_latitude,
     given_longitude,
@@ -900,6 +948,7 @@ def test_validate_polars_add_uncertainty(
     # Arrange
     given_data = pl.DataFrame(
         {
+            "row_number": [given_row_number],
             "visit_key": [given_visit_key],
             "sample_latitude_dd": [given_latitude],
             "sample_longitude_dd": [given_longitude],
