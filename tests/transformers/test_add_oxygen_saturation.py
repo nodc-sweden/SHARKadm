@@ -3,7 +3,7 @@ from unittest.mock import patch
 import polars as pl
 import pytest
 
-from sharkadm.transformers.add_oxygen_saturation import PolarsAddOxygenSaturation
+from sharkadm.transformers.add_gsw_parameters import PolarsAddOxygenSaturation
 
 
 @pytest.mark.parametrize(

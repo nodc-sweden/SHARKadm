@@ -3,7 +3,7 @@ from unittest.mock import patch
 import polars as pl
 import pytest
 
-from sharkadm.transformers.add_pressure import PolarsAddPressure
+from sharkadm.transformers.add_gsw_parameters import PolarsAddPressure
 
 
 @pytest.mark.parametrize(
