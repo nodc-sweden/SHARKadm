@@ -11,9 +11,9 @@ from sharkadm import (
     validators,
 )
 from sharkadm.config import adm_config_paths
-from sharkadm.controller import SHARKadmController
-from sharkadm.data import get_data_holder
-from sharkadm.exporters.base import FileExporter
+from sharkadm.controller import SHARKadmPolarsController
+from sharkadm.data import get_polars_data_holder
+from sharkadm.exporters.base import PolarsFileExporter
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
 
 VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
@@ -33,7 +33,7 @@ class SHARKadmWorkflow:
         adm_logger_config: dict[str, str | list] | None = None,
         **kwargs,
     ) -> None:
-        self._controller = SHARKadmController()
+        self._controller = SHARKadmPolarsController()
         self._data_sources = data_sources or []
         self._validators_before = validators_before or []
         self._transformers = transformers or []
@@ -109,7 +109,7 @@ class SHARKadmWorkflow:
             if not exp.get("active", True):
                 continue
             exporter = exporters.get_exporter_object(**exp)
-            if isinstance(exporter, FileExporter):
+            if isinstance(exporter, PolarsFileExporter):
                 self.export_paths[exporter.name] = dict(
                     directory=exporter.export_directory,
                     file_name=exporter.export_file_name,
@@ -123,7 +123,7 @@ class SHARKadmWorkflow:
         self._initiate_workflow()
         for data_source in self._data_sources:
             adm_logger.reset_log()
-            d_holder = get_data_holder(**data_source)
+            d_holder = get_polars_data_holder(**data_source)
             self._controller.set_data_holder(d_holder)
             self._controller.start_data_handling()
             self._do_adm_logger_stuff()
@@ -229,6 +229,8 @@ class SHARKadmWorkflow:
         }
 
     def get_exporter_descriptions(self) -> dict[str, str]:
+        print(f"{self._exporters=}")
+        print(f"{EXPORTER_DESCRIPTIONS.keys()=}")
         return {
             exp["name"]: EXPORTER_DESCRIPTIONS[exp["name"]] for exp in self._exporters
         }

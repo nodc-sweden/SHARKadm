@@ -281,3 +281,74 @@ class PolarsAddBvolRefList(PolarsTransformer):
     #             f"Adding Bvol ref list: {from_name} -> {to_name} ({len(df)} places)",
     #             level=adm_logger.INFO,
     #         )
+
+
+COL_JOINED_APHIA_ID_AND_SIZE_CLASS = "aphia_id_and_size_class"
+
+
+class _PolarsAddBvolMapper(PolarsTransformer):
+    valid_data_types = ("Phytoplankton",)
+    col_to_set = ""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder = self._add_help_columns(data_holder)
+        volume_mapper = self._get_mapper()
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.col(COL_JOINED_APHIA_ID_AND_SIZE_CLASS)
+            .replace_strict(volume_mapper, default=None)
+            .cast(float)
+            .alias(self.col_to_set)
+        )
+
+    def _get_mapper(self) -> dict:
+        return {}
+
+    def _add_help_columns(self, data_holder: PolarsDataHolder) -> PolarsDataHolder:
+        if COL_JOINED_APHIA_ID_AND_SIZE_CLASS in data_holder.data:
+            return data_holder
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col("bvol_aphia_id"),
+                    pl.col("bvol_size_class"),
+                ],
+                separator=":",
+            ).alias(COL_JOINED_APHIA_ID_AND_SIZE_CLASS),
+            pl.lit(None).alias(self.col_to_set)
+        )
+        return data_holder
+
+
+class PolarsAddBvolCellVolume(_PolarsAddBvolMapper):
+    valid_data_types = ("Phytoplankton",)
+    col_to_set = "bvol_cell_volume_um3_float"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddBvolCellVolume.col_to_set}"
+        )
+
+    def _get_mapper(self) -> dict:
+        _nomp = nodc_bvol.get_bvol_nomp_object()
+        return _nomp.get_calculated_volume_mapper()
+
+
+class PolarsAddBvolCarbonVolume(_PolarsAddBvolMapper):
+    valid_data_types = ("Phytoplankton",)
+    col_to_set = "bvol_carbon_per_unit_float"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds {PolarsAddBvolCarbonVolume.col_to_set}"
+        )
+
+    def _get_mapper(self) -> dict:
+        _nomp = nodc_bvol.get_bvol_nomp_object()
+        return _nomp.get_carbon_per_volume_mapper()
+

@@ -23,6 +23,8 @@ class BvolPolars(PolarsMultiTransformer):
         transformers.PolarsAddBvolScientificNameAndSizeClass,
         transformers.PolarsAddBvolAphiaId,
         transformers.PolarsAddBvolRefList,
+        transformers.PolarsAddBvolCellVolume,
+        transformers.PolarsAddBvolCarbonVolume,
     )
 
     @staticmethod

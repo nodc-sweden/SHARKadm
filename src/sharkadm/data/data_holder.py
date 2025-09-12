@@ -24,6 +24,7 @@ class DataHolder(ABC):
         self._header_mapper = None
         self._qf_column_prefix = None
         self._data_structure = "column"
+        self._data = pl.DataFrame()
 
     def __repr__(self) -> str:
         return (
@@ -280,6 +281,38 @@ class PolarsDataHolder(DataHolder, ABC):
     @property
     def columns(self) -> list[str]:
         return sorted(self.data.columns)
+
+    @property
+    def min_year(self) -> str:
+        return str(min(self.data["datetime"]).year)
+
+    @property
+    def max_year(self) -> str:
+        return str(max(self.data["datetime"]).year)
+
+    @property
+    def min_date(self) -> str:
+        return min(self.data["datetime"]).strftime("%Y-%m-%d")
+
+    @property
+    def max_date(self) -> str:
+        return max(self.data["datetime"]).strftime("%Y-%m-%d")
+
+    @property
+    def min_longitude(self) -> str:
+        return str(min(self.data["sample_reported_longitude"].cast(float)))
+
+    @property
+    def max_longitude(self) -> str:
+        return str(max(self.data["sample_reported_longitude"].cast(float)))
+
+    @property
+    def min_latitude(self) -> str:
+        return str(min(self.data["sample_reported_latitude"].cast(float)))
+
+    @property
+    def max_latitude(self) -> str:
+        return str(max(self.data["sample_reported_latitude"].cast(float)))
 
     @property
     def is_filtered(self) -> bool:

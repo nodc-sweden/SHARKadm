@@ -64,6 +64,12 @@ class PolarsAddSamplingInfo(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        if not hasattr(data_holder, "sampling_info") or data_holder.sampling_info is None:
+            self._log(
+                "Can not add sampling info. No sampling_info found",
+                level=adm_logger.WARNING,
+            )
+            return
         pars = data_holder.sampling_info.parameters
         i = 0
         for (par, dtime), df in data_holder.data.group_by(["parameter", "datetime"]):

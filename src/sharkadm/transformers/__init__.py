@@ -22,6 +22,8 @@ from sharkadm.transformers.bvol import (
     PolarsAddBvolAphiaId,
     PolarsAddBvolRefList,
     PolarsAddBvolScientificNameAndSizeClass,
+    PolarsAddBvolCellVolume,
+    PolarsAddBvolCarbonVolume,
     # AddBvolAphiaId,
     # AddBvolRefList,
     # AddBvolScientificNameAndSizeClass,
@@ -34,6 +36,7 @@ from sharkadm.transformers.calculate import (
     PolarsCalculateBiovolume,
     PolarsCalculateCarbon,
     PolarsFixCalcByDc,
+    PolarsOnlyKeepReportedIfCalcByDc,
 )
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,
@@ -290,16 +293,16 @@ from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 @functools.cache
 def get_transformer_list() -> list[str]:
     """Returns a sorted list of name of all available transformers"""
-    return sorted(utils.get_all_class_children_names(Transformer))
+    return sorted(utils.get_all_class_children_names(PolarsTransformer))
 
 
-def get_transformers() -> dict[str, Type[Transformer]]:
+def get_transformers() -> dict[str, Type[PolarsTransformer]]:
     """Returns a dictionary with transformers"""
-    return utils.get_all_class_children(Transformer)
+    return utils.get_all_class_children(PolarsTransformer)
 
 
-def get_transformer_object(name: str, **kwargs) -> Transformer | None:
-    """Returns Transformer object that matches the given transformer names"""
+def get_transformer_object(name: str, **kwargs) -> PolarsTransformer | None:
+    """Returns PolarsTransformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
     if not tran:
@@ -352,7 +355,7 @@ def write_transformers_description_to_file(path: str | pathlib.Path) -> None:
         fid.write(get_transformers_description_text())
 
 
-def get_physical_chemical_transformer_objects() -> list[Transformer]:
+def get_physical_chemical_transformer_objects() -> list[PolarsTransformer]:
     return [
         AddDEPHqcColumn(),
         # AddSamplePosition(),

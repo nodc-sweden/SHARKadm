@@ -2,7 +2,7 @@ import pathlib
 
 from sharkadm.config import get_header_mapper_from_data_holder
 from sharkadm.data import PolarsDataHolder
-from sharkadm.exporters.base import DataHolderProtocol, FileExporter
+from sharkadm.exporters.base import DataHolderProtocol, FileExporter, PolarsFileExporter
 from sharkadm.utils.paths import get_next_incremented_file_path
 
 
@@ -54,7 +54,7 @@ class TxtAsIs(FileExporter):
             )
 
 
-class PolarsTxtAsIs(FileExporter):
+class PolarsTxtAsIs(PolarsFileExporter):
     """Test class to export data 'as is' to a text file"""
 
     def __init__(

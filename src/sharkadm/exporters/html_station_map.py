@@ -7,15 +7,17 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from .base import FileExporter
+from .base import FileExporter, PolarsFileExporter
 
-POPUP_WIDTH = 300
+POPUP_WIDTH = 400
 POPUP_HEIGHT = 300
 
 
 class MarkerColor(StrEnum):
+    # NOT_ACCEPTED = "orange"
     NOT_ACCEPTED = "orange"
-    ACCEPTED = "green"
+    # ACCEPTED = "green"
+    ACCEPTED = "orange"
     MASTER = "blue"
     MASTER_MATCH = "darkblue"
     IN_SHAPE = "pink"
@@ -98,7 +100,7 @@ def get_popup_html_table(title: str, data: dict) -> str:
     return html
 
 
-class PolarsHtmlMap(FileExporter):
+class PolarsHtmlMap(PolarsFileExporter):
     shape_layers: tuple[str, ...] = ()
 
     def __init__(
@@ -262,7 +264,9 @@ class PolarsHtmlMap(FileExporter):
             popup_data = {}
             if self._show_accepted:
                 all_matching = self._master.get_matching_stations(
-                    info["reported_station_name"],
+                    info.get("reported_station_name",
+                             info.get("station_name",
+                                      "")),
                     info["sample_latitude_dd"],
                     info["sample_longitude_dd"],
                 )
@@ -304,7 +308,10 @@ class PolarsHtmlMap(FileExporter):
                 popup_data[col] = info[col]
 
             html = get_popup_html_table(
-                title=info["reported_station_name"], data=popup_data
+                title=info.get("reported_station_name",
+                             info.get("station_name",
+                                      "")),
+                data=popup_data
             )
 
             self._station_info.append(
@@ -313,7 +320,9 @@ class PolarsHtmlMap(FileExporter):
                     lon_dd=float(info["sample_longitude_dd"]),
                     sweref99tm_x=x,
                     sweref99tm_y=y,
-                    station_name=info["reported_station_name"],
+                    station_name=info.get("reported_station_name",
+                             info.get("station_name",
+                                      "")),
                     popup_html=html,
                     in_areas=False,
                     accepted=accepted,

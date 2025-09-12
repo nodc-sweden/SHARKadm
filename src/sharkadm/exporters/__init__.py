@@ -4,7 +4,7 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
-from sharkadm.exporters.base import Exporter
+from sharkadm.exporters.base import Exporter, PolarsExporter
 from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
 from sharkadm.exporters.dataframe import DataFrame, PolarsDataFrame
 from sharkadm.exporters.html_station_map import (
@@ -21,7 +21,10 @@ from sharkadm.exporters.shark_data_txt_file import (
     SHARKdataTxtAsGiven,
     PolarsSHARKdataTxt,
 )
-from sharkadm.exporters.shark_metadata_auto import SHARKMetadataAuto
+from sharkadm.exporters.shark_metadata_auto import (
+    SHARKMetadataAuto,
+    PolarsSHARKMetadataAuto
+)
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 from sharkadm.exporters.standard_format import StandardFormat
 from sharkadm.exporters.statistics import PrintStatistics, StatisticsToTxt
@@ -38,21 +41,21 @@ from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 @functools.cache
 def get_exporter_list() -> list[str]:
     """Returns a sorted list of name of all available exporters"""
-    return sorted(utils.get_all_class_children_names(Exporter))
+    return sorted(utils.get_all_class_children_names(PolarsExporter))
 
 
 @functools.cache
-def get_exporters() -> dict[str, Type[Exporter]]:
+def get_exporters() -> dict[str, Type[PolarsExporter]]:
     """Returns a dictionary with exporters"""
-    return utils.get_all_class_children(Exporter)
+    return utils.get_all_class_children(PolarsExporter)
     # exporters = {}
-    # for cls in Exporter.__subclasses__():
+    # for cls in PolarsExporter.__subclasses__():
     #     exporters[cls.__name__] = cls
     # return exporters
 
 
-def get_exporter_object(name: str, **kwargs) -> Exporter:
-    """Returns Exporter object that matches the given exporter name"""
+def get_exporter_object(name: str, **kwargs) -> PolarsExporter:
+    """Returns PolarsExporter object that matches the given exporter name"""
     all_exporters = get_exporters()
     exporter = all_exporters[name]
     return exporter(**kwargs)

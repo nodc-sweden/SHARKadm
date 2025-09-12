@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import get_valid_data_holders, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer
+from sharkadm.transformers import Transformer, PolarsTransformer
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PolarsDataHolder
@@ -118,7 +118,7 @@ class MultiTransformer(Transformer):
         pass
 
 
-class PolarsMultiTransformer(Transformer):
+class PolarsMultiTransformer(PolarsTransformer):
     """Abstract base class used as a blueprint for doing multiple changes in data
     in a DataHolder"""
 
@@ -132,9 +132,6 @@ class PolarsMultiTransformer(Transformer):
     invalid_data_structures: tuple[str, ...] = ()
 
     _transformers: tuple[Type[Transformer], ...] = ()
-
-    def __init__(self, **kwargs):
-        self._kwargs = kwargs
 
     def __repr__(self) -> str:
         return f"Multi transformer: {self.__class__.__name__}"

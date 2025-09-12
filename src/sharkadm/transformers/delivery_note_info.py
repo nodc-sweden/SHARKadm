@@ -5,7 +5,7 @@ from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers.base import Transformer
+from sharkadm.transformers.base import Transformer, PolarsTransformer
 from sharkadm.utils import yaml_data
 
 
@@ -126,7 +126,7 @@ class AddStatus(Transformer):
         data_holder.data["data_checked_by_en"] = data["data_checked_by_en"]
 
 
-class PolarsAddDeliveryNoteInfo(Transformer):
+class PolarsAddDeliveryNoteInfo(PolarsTransformer):
     physical_chemical_keys = (
         "PhysicalChemical".lower(),
         "Physical and Chemical".lower(),

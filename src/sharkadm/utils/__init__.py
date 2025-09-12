@@ -7,6 +7,8 @@ import subprocess
 import sys
 import zipfile
 
+from sharkadm.utils.svn import SvnInfo
+
 SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
 
@@ -200,3 +202,7 @@ def unzip_file(path: pathlib.Path, export_directory: pathlib.Path, delete_old=Fa
     with zipfile.ZipFile(path, "r") as zip_ref:
         zip_ref.extractall(sub_export_dir)
     return sub_export_dir
+
+
+def get_svn_info(path: str | pathlib.Path):
+    return SvnInfo.from_subprocess(path)

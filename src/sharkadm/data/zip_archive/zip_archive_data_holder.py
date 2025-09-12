@@ -129,38 +129,6 @@ class ZipArchiveDataHolder(PandasDataHolder, ABC):
     def import_matrix_mapper(self) -> ImportMatrixMapper:
         return self._import_matrix_mapper
 
-    @property
-    def min_year(self) -> str:
-        return str(min(self.data["datetime"]).year)
-
-    @property
-    def max_year(self) -> str:
-        return str(max(self.data["datetime"]).year)
-
-    @property
-    def min_date(self) -> str:
-        return min(self.data["datetime"]).strftime(self._date_str_format)
-
-    @property
-    def max_date(self) -> str:
-        return max(self.data["datetime"]).strftime(self._date_str_format)
-
-    @property
-    def min_longitude(self) -> str:
-        return str(min(self.data["sample_reported_longitude"].astype(float)))
-
-    @property
-    def max_longitude(self) -> str:
-        return str(max(self.data["sample_reported_longitude"].astype(float)))
-
-    @property
-    def min_latitude(self) -> str:
-        return str(min(self.data["sample_reported_latitude"].astype(float)))
-
-    @property
-    def max_latitude(self) -> str:
-        return str(max(self.data["sample_reported_latitude"].astype(float)))
-
     def _unzip_archive(self):
         self._unzipped_archive_directory = utils.unzip_file(
             self._zip_archive_path, utils.get_temp_directory("zip"), delete_old=True

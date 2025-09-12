@@ -357,7 +357,7 @@ class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
             # )
 
 
-class PolarsAddDyntaxaScientificName(PolarsTransformer):
+class  PolarsAddDyntaxaScientificName(PolarsTransformer):
     invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "dyntaxa_scientific_name"
@@ -409,7 +409,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                 else:
                     self._log(
                         f"No translation for: {name} ({len(df)} places)",
-                        level=adm_logger.WARNING,
+                        level=adm_logger.DEBUG,
                     )
                 new_name = name
 

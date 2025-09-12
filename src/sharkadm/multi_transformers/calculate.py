@@ -10,8 +10,8 @@ class CalculatePolars(PolarsMultiTransformer):
         #     ]
         # ),
         transformers.PolarsCalculateAbundance,
-        transformers.PolarsCalculateBiovolume,
-        transformers.PolarsCalculateCarbon,
+        # transformers.PolarsCalculateBiovolume,
+        # transformers.PolarsCalculateCarbon,
     )
 
     @staticmethod
