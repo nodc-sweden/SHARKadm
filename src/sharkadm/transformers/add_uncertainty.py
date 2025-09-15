@@ -680,7 +680,10 @@ class PolarsAddUncertainty(Transformer):
 
             param_uncert_df = pl.DataFrame(
                 {
-                    "row_number": data_holder.data.filter(uncert_bool)["row_number"],
+                    "visit_key": data_holder.data.filter(uncert_bool)["visit_key"],
+                    "sample_depth_m": data_holder.data.filter(uncert_bool)[
+                        "sample_depth_m"
+                    ],
                     "parameter": data_holder.data.filter(uncert_bool)["parameter"],
                     "unit": data_holder.data.filter(uncert_bool)["unit"],
                     "estimation_uncertainty": data_holder.data.filter(uncert_bool)[
@@ -756,8 +759,25 @@ class PolarsAddUncertainty(Transformer):
                 )
 
             data_holder.data = data_holder.data.join(
-                param_uncert_df.select(["row_number", "UNCERT_VAL"]),
-                on=["row_number"],
+                param_uncert_df.select(
+                    [
+                        "visit_key",
+                        "sample_depth_m",
+                        "parameter",
+                        "unit",
+                        "estimation_uncertainty",
+                        "value",
+                        "UNCERT_VAL",
+                    ]
+                ),
+                on=[
+                    "visit_key",
+                    "sample_depth_m",
+                    "parameter",
+                    "unit",
+                    "estimation_uncertainty",
+                    "value",
+                ],
                 how="left",
             )
 
