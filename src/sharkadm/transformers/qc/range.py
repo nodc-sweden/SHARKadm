@@ -34,7 +34,7 @@ class QCRange(Transformer):
             date = next(iter(set(vdata["visit_date"])))
             for col in self._columns:
                 ranges = qc_lib.Ranges()
-                low, high = ranges.get_ranges(par=col, lat=lat, lon=lon, date=date)
+                low, _ = ranges.get_ranges(par=col, lat=lat, lon=lon, date=date)
                 low_obj = qc_lib.CheckLowerRange(low)
                 low_obj.get_boolean()
 
