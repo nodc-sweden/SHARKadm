@@ -121,7 +121,7 @@ def test_validate_station_identity(
     stations_data = []
     for name, synonyms, longitude, latitude, radius in given_known_stations:
         sweref99_latitude, sweref99_longitude = transform_ref_system(
-            lat=latitude, lon=longitude
+            latitude=latitude, longitude=longitude
         )
         stations_data.append(
             {
