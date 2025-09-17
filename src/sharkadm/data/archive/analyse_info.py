@@ -282,7 +282,7 @@ class AnalyseInfo:
             num_format = ws[cell_name].number_format
             uncert = line_dict[uncert_col_name]
             if uncert and "%" in num_format:
-                uncert = convert_uncert_value_to_percent(uncert)
+                uncert = convert_uncert_value_to_percent(uncert, num_format)
             line_dict["original_uncert"] = line_dict[uncert_col_name]
             line_dict[uncert_col_name] = uncert
 
@@ -329,13 +329,22 @@ def _get_date(date_str: str) -> datetime.date | str:
     return ""
 
 
-def convert_uncert_value_to_percent(value: str) -> str:
+def convert_uncert_value_to_percent(value: str, num_format: str) -> str:
     if not value:
         return ""
     if "%" in value:
         return value
+    if "." in num_format:
+        decimals = num_format.split(".")[1]
+        decimals = decimals.split("%")[0]
+        decimals = sum(1 for c in decimals if c in ("0", "#"))
+    else:
+        decimals = 0
     try:
         float_val = float(value)
-        return f"{float_val * 100}%"
+        rounded = round(float_val * 100, decimals)
+        if decimals == 0:
+            rounded = int(rounded)
+        return f"{rounded}%"
     except ValueError:
         return value
