@@ -47,7 +47,6 @@ def test_sample_depth_is_validated_against_water_depth(
     validator_logs = [log for log in all_logs if log["log_type"] == adm_logger.VALIDATION]
     assert len(validator_logs) == 1
 
-    # And the validation status is as expected
     log_message = validator_logs[0]
     assert log_message["validation_success"] == expected_success
 
