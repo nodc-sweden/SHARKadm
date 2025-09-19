@@ -1,9 +1,13 @@
 import polars as pl
 
+from sharkadm import adm_logger
+from sharkadm.transformers.base import (
+    DataHolderProtocol,
+    PolarsDataHolderProtocol,
+    PolarsTransformer,
+    Transformer,
+)
 from sharkadm.utils import matching_strings
-
-from ..sharkadm_logger import adm_logger
-from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
 
 class ReplaceCommaWithDot(Transformer):
@@ -77,13 +81,32 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Replacing comma with dot in given columns"
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for col in self._get_matching_cols(data_holder):
-            data_holder.data = data_holder.data.with_columns(
-                **{col: pl.col(col).str.replace(r",", r".")}
+    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+        columns = self._get_matching_cols(data_holder)
+        transformed_data = data_holder.data.with_columns(
+            [pl.col(column).str.replace(",", ".").alias(column) for column in columns]
+        )
+
+        if columns:
+            unchanged_rows = data_holder.data.join(
+                transformed_data, on=columns, how="semi"
             )
 
-    def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
+            changed_rows = list(
+                data_holder.data.filter(
+                    ~pl.col("row_number").is_in(unchanged_rows["row_number"])
+                )["row_number"]
+            )
+
+            if changed_rows:
+                self._log(
+                    f"Replaced comma with dot in {len(changed_rows)} rows.",
+                    row_numbers=changed_rows,
+                )
+
+        data_holder.data = transformed_data
+
+    def _get_matching_cols(self, data_holder: PolarsDataHolderProtocol) -> list[str]:
         return matching_strings.get_matching_strings(
             strings=data_holder.data.columns, match_strings=self.apply_on_columns
         )
