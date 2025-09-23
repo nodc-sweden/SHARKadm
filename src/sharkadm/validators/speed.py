@@ -12,12 +12,11 @@ ONE_KILOMETER = 1000
 class ValidateSpeed(Validator):
     _display_name = "Speed between visits"
 
+    _ship_column = "platform_code"
+    _datetime_column = "datetime"
     _latitude_column = "sample_latitude_dd"
     _longitude_column = "sample_longitude_dd"
-    _datetime_column = "datetime"
-    _serial_number_column = "SERNO"
 
-    MIN_SPEED = 3.704  # 2 kn in km/h
     MAX_SPEED = 55.56  # 30 kn in km/h
 
     @staticmethod
@@ -29,12 +28,12 @@ class ValidateSpeed(Validator):
             approximate_distance(
                 data_holder.data.unique(
                     [
-                        self._serial_number_column,
+                        self._ship_column,
                         self._longitude_column,
                         self._latitude_column,
                         self._datetime_column,
                     ]
-                ).sort(self._serial_number_column)
+                ).sort([self._ship_column, self._datetime_column])
             )
             .with_columns(
                 (
@@ -43,29 +42,24 @@ class ValidateSpeed(Validator):
                         - pl.col(self._datetime_column).shift(1)
                     ).cast(pl.Float64)
                     / MICROSECONDS_IN_AN_HOUR
-                ).alias("duration"),
+                )
+                .over(self._ship_column)
+                .alias("duration"),
             )
             .with_columns((pl.col("distance") / 1000 / pl.col("duration")).alias("speed"))
         )
 
-        too_slow = speed.filter(pl.col("speed").fill_nan(0) < self.MIN_SPEED)
         too_fast = speed.filter(pl.col("speed").fill_nan(0) > self.MAX_SPEED)
 
-        if too_slow.is_empty() and too_fast.is_empty():
+        if too_fast.is_empty():
             self._log_success(
                 "All visits are realistically spaced in time.",
             )
         else:
-            if not too_slow.is_empty():
-                self._log_fail(
-                    "The speed between some visits is too slow.",
-                    row_numbers=list(too_slow["row_number"]),
-                )
-            if not too_fast.is_empty():
-                self._log_fail(
-                    "The speed between some visits is too high.",
-                    row_numbers=list(too_fast["row_number"]),
-                )
+            self._log_fail(
+                "The speed between some visits is too high.",
+                row_numbers=list(too_fast["row_number"]),
+            )
 
 
 def approximate_distance(df: pl.DataFrame) -> pl.DataFrame:
