@@ -226,6 +226,7 @@ from sharkadm.transformers.reporting_institute import (
     PolarsAddSwedishReportingInstitute,
 )
 from sharkadm.transformers.row import AddRowNumber, PolarsAddRowNumber
+from sharkadm.transformers.serial_number import FormatSerialNumber
 from sharkadm.transformers.sampler_area import AddCalculatedSamplerArea
 from sharkadm.transformers.sampling_info import AddSamplingInfo
 from sharkadm.transformers.scientific_name import (
