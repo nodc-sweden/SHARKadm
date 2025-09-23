@@ -5,7 +5,7 @@ from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers.base import Transformer, PolarsTransformer
+from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.utils import yaml_data
 
 

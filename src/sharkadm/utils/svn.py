@@ -1,5 +1,4 @@
 import pathlib
-import re
 import subprocess
 from dataclasses import dataclass
 
@@ -27,14 +26,15 @@ class SvnInfo:
         if not pathlib.Path(path).exists():
             return
         try:
-            svn_info = subprocess.check_output('svn info ' + str(path))
+            svn_info = subprocess.check_output("svn info " + str(path))
             info = {}
             for line in svn_info.decode().split("\r\n"):
                 if not line.strip():
                     continue
                 split_line = line.split(":", 1)
-                info[split_line[0].strip().lower().replace(" ", "_")] = split_line[1].strip()
+                info[split_line[0].strip().lower().replace(" ", "_")] = split_line[
+                    1
+                ].strip()
             return SvnInfo(**info)
         except subprocess.CalledProcessError:
             return
-

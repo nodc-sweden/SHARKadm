@@ -130,7 +130,7 @@ class Transformer(ABC):
 
         self._log_workflow(
             f"Applying transformer: {self.__class__.__name__}",
-            item=self.get_transformer_description(),
+            item=self.description,
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
@@ -215,7 +215,11 @@ class PolarsTransformer(ABC):
 
     @property
     def description(self) -> str:
-        return self.get_transformer_description()
+        # return self.get_transformer_description()
+        info_str = self.get_transformer_description()
+        if self._data_filter:
+            info_str = f"{info_str} (With filter {self._data_filter.description})"
+        return info_str
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
         if (
@@ -280,7 +284,9 @@ class PolarsTransformer(ABC):
             pl.lit("").alias(self.col_to_set)
         )
 
-    def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str, _float=False) -> None:
+    def _add_empty_col(
+        self, data_holder: "PolarsDataHolder", col: str, _float=False
+    ) -> None:
         val = None if _float else ""
         if col in data_holder.columns:
             return

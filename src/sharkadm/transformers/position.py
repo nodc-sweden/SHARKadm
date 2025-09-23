@@ -1,3 +1,5 @@
+import time
+
 import pandas as pd
 import polars as pl
 
@@ -150,28 +152,36 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
             pl.lit("").alias(self.x_column_to_set),
             pl.lit("").alias(self.y_column_to_set),
         )
+        mapper = geography.get_decdeg_to_sweref99tm_mapper(
+            data_holder.data["sample_latitude_dd"],
+            data_holder.data["sample_longitude_dd"],
+        )
+        nr = 0
+        t0 = time.time()
         for (lat, lon), df in data_holder.data.group_by(
             [self.lat_source_col, self.lon_source_col]
         ):
+            if not nr % 100:
+                print(f"{nr=} ({time.time() - t0}): {lat} {lon}")
+                t0 = time.time()
+            nr += 1
             if not all([lat, lon]):
                 self._log(
                     f"Missing position when trying to set {self.x_column_to_set} "
                     f"and {self.y_column_to_set}"
                 )
                 continue
-            x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
+            # x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
+            x, y = mapper.get((lat, lon))
+            boolean = (pl.col(self.lat_source_col) == lat) & (
+                pl.col(self.lon_source_col) == lon
+            )
             data_holder.data = data_holder.data.with_columns(
-                pl.when(
-                    (pl.col(self.lat_source_col) == lat)
-                    & (pl.col(self.lon_source_col) == lon)
-                )
+                pl.when(boolean)
                 .then(pl.lit(x))
                 .otherwise(pl.col(self.x_column_to_set))
                 .alias(self.x_column_to_set),
-                pl.when(
-                    (pl.col(self.lat_source_col) == lat)
-                    & (pl.col(self.lon_source_col) == lon)
-                )
+                pl.when(boolean)
                 .then(pl.lit(y))
                 .otherwise(pl.col(self.y_column_to_set))
                 .alias(self.y_column_to_set),

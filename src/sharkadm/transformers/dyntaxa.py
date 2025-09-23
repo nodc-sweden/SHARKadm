@@ -357,7 +357,7 @@ class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
             # )
 
 
-class  PolarsAddDyntaxaScientificName(PolarsTransformer):
+class PolarsAddDyntaxaScientificName(PolarsTransformer):
     invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "dyntaxa_scientific_name"

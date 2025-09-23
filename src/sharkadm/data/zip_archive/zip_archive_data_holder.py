@@ -247,9 +247,15 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, zip_archive_path: str | pathlib.Path | None = None, **kwargs):
+    def __init__(
+        self,
+        zip_archive_path: str | pathlib.Path | None = None,
+        load_from_temp_folder: bool = False,
+        **kwargs,
+    ):
         super().__init__()
         self._zip_archive_path = pathlib.Path(zip_archive_path)
+        self._load_from_temp_folder = load_from_temp_folder
 
         self._data: pd.DataFrame = pd.DataFrame()
         self._dataset_name: str | None = None
@@ -379,6 +385,17 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         return str(max(self.data["sample_reported_latitude"].cast(float)))
 
     def _unzip_archive(self):
+        temp_dir = utils.get_temp_directory("zip")
+        temp_unzipped_archive = temp_dir / self._zip_archive_path.stem
+        if self._load_from_temp_folder and temp_unzipped_archive.exists():
+            self._unzipped_archive_directory = temp_unzipped_archive
+            adm_logger.log_workflow(
+                f"Zip archive loaded "
+                f"directly from unpacked archive in temp folder"
+                f"...{temp_unzipped_archive}",
+                level=adm_logger.WARNING,
+            )
+            return
         self._unzipped_archive_directory = utils.unzip_file(
             self._zip_archive_path, utils.get_temp_directory("zip"), delete_old=True
         )

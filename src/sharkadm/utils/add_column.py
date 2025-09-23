@@ -9,11 +9,7 @@ def add_float_column(
         suffix = suffix.strip("_")
         new_column_name = f"{column}_{suffix}"
     if column not in data.columns:
-        return data.with_columns(
-            pl.lit(None)
-            .cast(float)
-            .alias(new_column_name)
-        )
+        return data.with_columns(pl.lit(None).cast(float).alias(new_column_name))
     return data.with_columns(
         pl.when(pl.col(column).str.len_chars() == 0)
         .then(None)

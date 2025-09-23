@@ -2,7 +2,7 @@ import polars as pl
 
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 
-from .base import Transformer, PolarsTransformer
+from .base import PolarsTransformer, Transformer
 
 
 class AddDatasetName(Transformer):

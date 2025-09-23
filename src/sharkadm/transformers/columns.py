@@ -116,7 +116,7 @@ class PolarsAddApprovedKeyColumn(PolarsTransformer):
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         data_holder.data = approved_data.add_concatenated_column(
-            data_holder.data, column_name="approved_key"
+            data_holder.data,
         )
 
 

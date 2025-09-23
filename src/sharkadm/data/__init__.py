@@ -151,7 +151,7 @@ def get_polars_data_holder(
         if path.suffix == ".xlsx":
             return get_polars_dv_template_data_holder(path)
         if path_is_zip_archive(path):
-            return get_polars_zip_archive_data_holder(path)
+            return get_polars_zip_archive_data_holder(path, **kwargs)
         if lims_directory := is_lims_directory(path):
             return get_polars_lims_data_holder(lims_directory, **kwargs)
         if path.is_file():

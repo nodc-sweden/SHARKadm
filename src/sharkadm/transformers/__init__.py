@@ -143,21 +143,13 @@ from sharkadm.transformers.lims import (
     PolarsKeepOnlyJellyfishLines,
 )
 from sharkadm.transformers.location import (
-    AddLocationCounty,
-    AddLocationHelcomOsparArea,
-    AddLocationMunicipality,
-    AddLocationNation,
-    AddLocationSeaBasin,
-    AddLocationTypeArea,
-    AddLocationTYPNFS06,
-    AddLocationWaterCategory,
-    AddLocationWaterDistrict,
-    AddLocationWB,
     PolarsAddLocationHelcomOsparArea,
     PolarsAddLocationMunicipality,
     PolarsAddLocationNation,
     PolarsAddLocationSeaBasin,
     PolarsAddLocationTypeArea,
+    PolarsAddLocationSeaAreaCode,
+    PolarsAddLocationSeaAreaName,
     PolarsAddLocationTYPNFS06,
     PolarsAddLocationWaterCategory,
     PolarsAddLocationWaterDistrict,
@@ -171,6 +163,7 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRH,
     PolarsAddLocationRO,
     PolarsAddLocationOnLand,
+    PolarsAddLocations,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import (
@@ -252,7 +245,11 @@ from sharkadm.transformers.scientific_name import (
     PolarsSetScientificNameFromReportedScientificName,
 )
 from sharkadm.transformers.shark_id import AddSharkId, PolarsAddSharkId
-from sharkadm.transformers.sort_data import SortData, SortDataPlanktonImaging
+from sharkadm.transformers.sort_data import (
+    SortData,
+    PolarsSortData,
+    SortDataPlanktonImaging,
+)
 from sharkadm.transformers.static_data_holding_center import (
     AddStaticDataHoldingCenterEnglish,
     AddStaticDataHoldingCenterSwedish,

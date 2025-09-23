@@ -5,7 +5,7 @@ from sharkadm.data_filter.base import PolarsDataFilter
 
 
 class PolarsDataFilterYears(PolarsDataFilter):
-    def __init__(self, years: list[str | int]):
+    def __init__(self, *years: str):
         super().__init__(years=years)
         self._str_years = [str(y) for y in years]
 

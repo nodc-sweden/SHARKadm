@@ -1,7 +1,7 @@
 from sharkadm import transformers
 from sharkadm.multi_transformers.base import MultiTransformer
-from sharkadm.multi_transformers.dyntaxa import Dyntaxa
-from sharkadm.multi_transformers.location import Location
+from sharkadm.multi_transformers.dyntaxa import DyntaxaPolars
+from sharkadm.multi_transformers.location import LocationPolars
 from sharkadm.multi_transformers.translate import TranslatePolars
 
 
@@ -17,10 +17,10 @@ class GeneralDVPolars(MultiTransformer):
         TranslatePolars,
         transformers.PolarsAddStaticInternetAccessInfo,
         transformers.PolarsAddStaticDataHoldingCenterSwedish,
-        Location,
+        LocationPolars,
         transformers.PolarsMultiply,
         transformers.PolarsDivide,
-        Dyntaxa,
+        DyntaxaPolars,
         # transformers.PolarsSetBacteriaAsReportedScientificName,
         # transformers.PolarsAddReportedScientificName,
         # transformers.PolarsAddTranslatedDyntaxaScientificName,

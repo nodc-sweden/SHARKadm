@@ -1,8 +1,7 @@
 import subprocess
 
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import get_nodc_config_directory, get_svn_info
-from sharkadm.utils import svn
+from sharkadm.utils import get_nodc_config_directory, get_svn_info, svn
 
 
 def update_nodc_config_directory_from_svn() -> None:

@@ -1,54 +1,10 @@
 import polars as pl
 
 from sharkadm.data import PolarsDataHolder
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
-
-from ..utils import add_column
+from sharkadm.utils import add_column
 
 CALC_BY_DC_MARKER = "Y"
-
-# COL_COUNTED = "COPY_VARIABLE.# counted.ind/analysed sample fraction"
-# COL_COUNTED_REPORTED = "count_reported"
-# COL_COUNTED_REPORTED_FLOAT = "count_reported_float"
-#
-# COL_ABUNDANCE = "COPY_VARIABLE.Abundance.ind/l or 100 um pieces/l"
-# COL_ABUNDANCE_REPORTED = "abundance_reported"
-# COL_ABUNDANCE_REPORTED_FLOAT = "abundance_reported_float"
-# COL_ABUNDANCE_CALCULATED = "calculated_abundance"
-# COL_ABUNDANCE_COMBINED_FLOAT = "combined_abundance"
-#
-# COL_BIOVOLUME = "COPY_VARIABLE.Biovolume concentration.mm3/l"
-# COL_BIOVOLUME_REPORTED = "biovolume_reported"
-# COL_BIOVOLUME_REPORTED_FLOAT = "biovolume_reported_float"
-# COL_BIOVOLUME_CALCULATED_FLOAT = "calculated_biovolume"
-# COL_BIOVOLUME_COMBINED_FLOAT = "combined_biovolume"
-#
-# COL_COEFFICIENT = "coefficient"
-# COL_COEFFICIENT_FLOAT = "coefficient_reported"
-#
-# # COL_CELL_VOLUME_CALCULATED = "calculated_cell_volume_um3"
-# COL_CELL_VOLUME_CALCULATED_FLOAT = "calculated_cell_volume_um3_float"
-# COL_CELL_VOLUME_COMBINED = "combined_cell_volume"
-#
-# COL_CARBON = "COPY_VARIABLE.Carbon concentration.ugC/l"
-# COL_CARBON_REPORTED = "carbon_reported_float"
-# COL_CARBON_REPORTED_FLOAT = "carbon_reported_float"
-# COL_CARBON_PER_VOLUME = "bvol_carbon_per_volume"
-# COL_CARBON_PER_VOLUME_FLOAT = "bvol_carbon_per_volume_float"
-# # COL_CARBON_PER_VOLUME_CALCULATED = "calculated_bvol_carbon_per_volume"
-# COL_CARBON_PER_VOLUME_CALCULATED_FLOAT = "calculated_bvol_carbon_per_volume_float"
-# COL_CARBON_PER_VOLUME_COMBINED = "combined_carbon_per_volume"
-# COL_CARBON_CALCULATED_FLOAT = "calculated_carbon"
-# COL_CARBON_COMBINED = "combined_carbon"
-#
-#
-#
-# COL_JOINED_APHIA_ID_AND_SIZE_CLASS = "aphia_id_and_size_class"
-#
-# COL_CALC_BY_DC_BIOVOLUME = "calc_by_dc_biovolume"
-# COL_CALC_BY_DC_CARBON = "calc_by_dc_carbon"
-
 
 COL_CALC_BY_DC = "calc_by_dc"
 COL_CELL_VOLUME_REPORTED = "reported_cell_volume_um3"
@@ -99,17 +55,6 @@ PAR_CARBON = "Carbon concentration"
 PAR_COUNTED = "# counted"
 
 
-try:
-    from nodc_bvol import get_bvol_nomp_object
-except ModuleNotFoundError as e:
-    module_name = str(e).split("'")[-2]
-    adm_logger.log_workflow(
-        f"Could not import package '{module_name}' in module {__name__}. "
-        f"You need to install this dependency if you want to use this module.",
-        level=adm_logger.WARNING,
-    )
-
-
 def add_calculate_columns(data_holder: PolarsDataHolder) -> PolarsDataHolder:
     if FLOAT_COL_VALUE in data_holder.data.columns:
         return data_holder
@@ -117,27 +62,24 @@ def add_calculate_columns(data_holder: PolarsDataHolder) -> PolarsDataHolder:
         data_holder.data, COL_VALUE, column_name=FLOAT_COL_VALUE
     )
     data_holder.data = add_column.add_float_column(
-        data_holder.data, GIVEN_COL_COUNTED,
-        column_name=FLOAT_COL_COUNTED
+        data_holder.data, GIVEN_COL_COUNTED, column_name=FLOAT_COL_COUNTED
     )
     data_holder.data = add_column.add_float_column(
         data_holder.data, GIVEN_COL_COEFFICIENT, column_name=FLOAT_COL_COEFFICIENT
     )
     data_holder.data = add_column.add_float_column(
-        data_holder.data, COL_CELL_VOLUME_REPORTED,
-        column_name=FLOAT_COL_CELL_VOLUME_REPORTED
+        data_holder.data,
+        COL_CELL_VOLUME_REPORTED,
+        column_name=FLOAT_COL_CELL_VOLUME_REPORTED,
     )
     data_holder.data = add_column.add_float_column(
-        data_holder.data, GIVEN_COL_ABUNDANCE,
-        column_name=FLOAT_COL_ABUNDANCE_REPORTED
+        data_holder.data, GIVEN_COL_ABUNDANCE, column_name=FLOAT_COL_ABUNDANCE_REPORTED
     )
     data_holder.data = add_column.add_float_column(
-        data_holder.data, GIVEN_COL_BIOVOLUME,
-        column_name=FLOAT_COL_BIOVOLUME_REPORTED
+        data_holder.data, GIVEN_COL_BIOVOLUME, column_name=FLOAT_COL_BIOVOLUME_REPORTED
     )
     data_holder.data = add_column.add_float_column(
-        data_holder.data, GIVEN_COL_CARBON,
-        column_name=FLOAT_COL_CARBON_REPORTED
+        data_holder.data, GIVEN_COL_CARBON, column_name=FLOAT_COL_CARBON_REPORTED
     )
 
     data_holder.data = data_holder.data.with_columns(
@@ -158,8 +100,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating abundance. "
-                f"Setting value to column {COL_VALUE}")
+        return f"Calculating abundance. Setting value to column {COL_VALUE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         add_calculate_columns(data_holder)
@@ -168,14 +109,9 @@ class PolarsCalculateAbundance(PolarsTransformer):
         self._add_to_parameter_column(data_holder)
 
     def _calc_abundance(self, data_holder: PolarsDataHolder):
-
         data_holder.data = data_holder.data.with_columns(
             pl.when(self._get_not_null_boolean(data_holder))
-            .then(
-                (
-                    pl.col(FLOAT_COL_COUNTED) * pl.col(FLOAT_COL_COEFFICIENT)
-                ).round(1)
-            )
+            .then((pl.col(FLOAT_COL_COUNTED) * pl.col(FLOAT_COL_COEFFICIENT)).round(1))
             .otherwise(pl.col(FLOAT_COL_ABUNDANCE_CALCULATED))
             .alias(FLOAT_COL_ABUNDANCE_CALCULATED)
         )
@@ -183,7 +119,6 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     def _add_combined_abundance(self, data_holder: PolarsDataHolder):
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(self._get_out_of_range_boolean(data_holder))
             .then(pl.col(FLOAT_COL_ABUNDANCE_CALCULATED))
             .otherwise(pl.col(FLOAT_COL_ABUNDANCE_REPORTED))
@@ -191,27 +126,24 @@ class PolarsCalculateAbundance(PolarsTransformer):
         )
 
     def _add_to_parameter_column(self, data_holder: PolarsDataHolder):
-
-        out_of_range_boolean_for_par = (self._get_out_of_range_boolean(data_holder) &
-                                        self._get_par_boolean(data_holder)
-                                        # |
-                                        # (self._get_out_of_range_boolean(data_holder) &
-                                        #  self._get_par_boolean())
-                                        )
+        out_of_range_boolean_for_par = (
+            self._get_out_of_range_boolean(data_holder)
+            & self._get_par_boolean(data_holder)
+            # |
+            # (self._get_out_of_range_boolean(data_holder) &
+            #  self._get_par_boolean())
+        )
 
         # Setting to value_float column
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_ABUNDANCE_COMBINED))
             .otherwise(pl.col(FLOAT_COL_VALUE))
             .alias(FLOAT_COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_ABUNDANCE_COMBINED).cast(str))
             .otherwise(pl.col(COL_VALUE))
             .alias(COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.col(COL_CALC_BY_DC))
@@ -223,24 +155,23 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
     def _get_not_null_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
         not_null_boolean = (
-            data_holder.data[FLOAT_COL_COUNTED].is_not_null() &
-            data_holder.data[FLOAT_COL_COEFFICIENT].is_not_null()
+            data_holder.data[FLOAT_COL_COUNTED].is_not_null()
+            & data_holder.data[FLOAT_COL_COEFFICIENT].is_not_null()
         )
         return not_null_boolean
 
     def _get_out_of_range_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
-        max_boolean = (
-            data_holder.data[FLOAT_COL_ABUNDANCE_CALCULATED]
-            > (data_holder.data[FLOAT_COL_ABUNDANCE_REPORTED] * 2)
+        max_boolean = data_holder.data[FLOAT_COL_ABUNDANCE_CALCULATED] > (
+            data_holder.data[FLOAT_COL_ABUNDANCE_REPORTED] * 2
         )
 
-        min_boolean = (
-            data_holder.data[FLOAT_COL_ABUNDANCE_CALCULATED]
-            < (data_holder.data[FLOAT_COL_ABUNDANCE_REPORTED] * 0.5)
+        min_boolean = data_holder.data[FLOAT_COL_ABUNDANCE_CALCULATED] < (
+            data_holder.data[FLOAT_COL_ABUNDANCE_REPORTED] * 0.5
         )
 
-        out_of_range_boolean = ((max_boolean | min_boolean) &
-                                self._get_not_null_boolean(data_holder))
+        out_of_range_boolean = (max_boolean | min_boolean) & self._get_not_null_boolean(
+            data_holder
+        )
         return out_of_range_boolean
 
 
@@ -249,8 +180,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating biovolume. "
-                f"Setting value to column {COL_VALUE}")
+        return f"Calculating biovolume. Setting value to column {COL_VALUE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         add_calculate_columns(data_holder)
@@ -269,11 +199,12 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         )
 
     def _calc_biovolume(self, data_holder: PolarsDataHolder):
-
         data_holder.data = data_holder.data.with_columns(
             pl.when(self._get_not_null_boolean(data_holder))
-            .then(pl.col(FLOAT_COL_ABUNDANCE_COMBINED) * pl.col(
-                FLOAT_COL_CELL_VOLUME_COMBINED))
+            .then(
+                pl.col(FLOAT_COL_ABUNDANCE_COMBINED)
+                * pl.col(FLOAT_COL_CELL_VOLUME_COMBINED)
+            )
             .otherwise(pl.lit(None))
             .alias(FLOAT_COL_BIOVOLUME_CALCULATED)
         )
@@ -281,7 +212,6 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
     def _add_combined_biovolume(self, data_holder: PolarsDataHolder):
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(self._get_out_of_range_boolean(data_holder))
             .then(pl.col(FLOAT_COL_BIOVOLUME_CALCULATED))
             .otherwise(pl.col(FLOAT_COL_BIOVOLUME_REPORTED))
@@ -289,22 +219,20 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         )
 
     def _add_to_parameter_column(self, data_holder: PolarsDataHolder):
-        out_of_range_boolean_for_par = (self._get_out_of_range_boolean(data_holder) &
-                                        self._get_par_boolean())
+        out_of_range_boolean_for_par = (
+            self._get_out_of_range_boolean(data_holder) & self._get_par_boolean()
+        )
 
         # Setting to value_float column
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_BIOVOLUME_COMBINED))
             .otherwise(pl.col(FLOAT_COL_VALUE))
             .alias(FLOAT_COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_BIOVOLUME_COMBINED).cast(str))
             .otherwise(pl.col(COL_VALUE))
             .alias(COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.col(COL_CALC_BY_DC))
@@ -315,24 +243,23 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         return pl.col("parameter") == PAR_BIOVOLUME
 
     def _get_not_null_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
-        not_null_boolean = (data_holder.data[FLOAT_COL_ABUNDANCE_COMBINED].is_not_null()) & (
-            data_holder.data[FLOAT_COL_CELL_VOLUME_COMBINED].is_not_null()
-        )
+        not_null_boolean = (
+            data_holder.data[FLOAT_COL_ABUNDANCE_COMBINED].is_not_null()
+        ) & (data_holder.data[FLOAT_COL_CELL_VOLUME_COMBINED].is_not_null())
         return not_null_boolean
 
     def _get_out_of_range_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
-        max_boolean = (
-                data_holder.data[FLOAT_COL_BIOVOLUME_CALCULATED]
-                > (data_holder.data[FLOAT_COL_BIOVOLUME_REPORTED] * 2)
+        max_boolean = data_holder.data[FLOAT_COL_BIOVOLUME_CALCULATED] > (
+            data_holder.data[FLOAT_COL_BIOVOLUME_REPORTED] * 2
         )
 
-        min_boolean = (
-                data_holder.data[FLOAT_COL_BIOVOLUME_CALCULATED]
-                < (data_holder.data[FLOAT_COL_BIOVOLUME_REPORTED] * 0.5)
+        min_boolean = data_holder.data[FLOAT_COL_BIOVOLUME_CALCULATED] < (
+            data_holder.data[FLOAT_COL_BIOVOLUME_REPORTED] * 0.5
         )
 
-        out_of_range_boolean = ((max_boolean | min_boolean) &
-                                self._get_not_null_boolean(data_holder))
+        out_of_range_boolean = (max_boolean | min_boolean) & self._get_not_null_boolean(
+            data_holder
+        )
         return out_of_range_boolean
 
 
@@ -341,8 +268,7 @@ class PolarsCalculateCarbon(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (f"Calculating carbon. "
-                f"Setting value to column {COL_VALUE}")
+        return f"Calculating carbon. Setting value to column {COL_VALUE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         add_calculate_columns(data_holder)
@@ -364,7 +290,6 @@ class PolarsCalculateCarbon(PolarsTransformer):
 
     def _add_combined_carbon(self, data_holder: PolarsDataHolder):
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(self._get_out_of_range_boolean(data_holder))
             .then(pl.col(FLOAT_COL_CARBON_CALCULATED))
             .otherwise(pl.col(FLOAT_COL_CARBON_REPORTED))
@@ -372,22 +297,20 @@ class PolarsCalculateCarbon(PolarsTransformer):
         )
 
     def _add_to_parameter_column(self, data_holder: PolarsDataHolder):
-        out_of_range_boolean_for_par = (self._get_out_of_range_boolean(data_holder) &
-                                        self._get_par_boolean())
+        out_of_range_boolean_for_par = (
+            self._get_out_of_range_boolean(data_holder) & self._get_par_boolean()
+        )
 
         # Setting to value_float column
         data_holder.data = data_holder.data.with_columns(
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_CARBON_COMBINED))
             .otherwise(pl.col(FLOAT_COL_VALUE))
             .alias(FLOAT_COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.col(FLOAT_COL_CARBON_COMBINED).cast(str))
             .otherwise(pl.col(COL_VALUE))
             .alias(COL_VALUE),
-
             pl.when(out_of_range_boolean_for_par)
             .then(pl.lit(CALC_BY_DC_MARKER))
             .otherwise(pl.col(COL_CALC_BY_DC))
@@ -399,24 +322,22 @@ class PolarsCalculateCarbon(PolarsTransformer):
 
     def _get_not_null_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
         not_null_boolean = (
-            data_holder.data[FLOAT_COL_ABUNDANCE_COMBINED].is_not_null()) & (
-            data_holder.data[FLOAT_COL_CARBON_PER_UNIT_COMBINED].is_not_null()
-        )
+            data_holder.data[FLOAT_COL_ABUNDANCE_COMBINED].is_not_null()
+        ) & (data_holder.data[FLOAT_COL_CARBON_PER_UNIT_COMBINED].is_not_null())
         return not_null_boolean
 
     def _get_out_of_range_boolean(self, data_holder: PolarsDataHolder) -> pl.Series:
-        max_boolean = (
-                data_holder.data[FLOAT_COL_CARBON_CALCULATED]
-                > (data_holder.data[FLOAT_COL_CARBON_REPORTED] * 2)
+        max_boolean = data_holder.data[FLOAT_COL_CARBON_CALCULATED] > (
+            data_holder.data[FLOAT_COL_CARBON_REPORTED] * 2
         )
 
-        min_boolean = (
-                data_holder.data[FLOAT_COL_CARBON_CALCULATED]
-                < (data_holder.data[FLOAT_COL_CARBON_REPORTED] * 0.5)
+        min_boolean = data_holder.data[FLOAT_COL_CARBON_CALCULATED] < (
+            data_holder.data[FLOAT_COL_CARBON_REPORTED] * 0.5
         )
 
-        out_of_range_boolean = ((max_boolean | min_boolean) &
-                                self._get_not_null_boolean(data_holder))
+        out_of_range_boolean = (max_boolean | min_boolean) & self._get_not_null_boolean(
+            data_holder
+        )
         return out_of_range_boolean
 
 
@@ -434,16 +355,14 @@ class PolarsOnlyKeepReportedIfCalcByDc(PolarsTransformer):
             .then(pl.lit(""))
             .otherwise(pl.col(COL_PARAMETER_REPORTED))
             .alias(COL_PARAMETER_REPORTED),
-
             pl.when(boolean)
             .then(pl.lit(""))
             .otherwise(pl.col(COL_VALUE_REPORTED))
             .alias(COL_VALUE_REPORTED),
-
             pl.when(boolean)
             .then(pl.lit(""))
             .otherwise(pl.col(COL_UNIT_REPORTED))
-            .alias(COL_UNIT_REPORTED)
+            .alias(COL_UNIT_REPORTED),
         )
 
 

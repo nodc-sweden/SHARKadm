@@ -7,7 +7,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from .base import FileExporter, PolarsFileExporter
+from .base import PolarsFileExporter
 
 POPUP_WIDTH = 400
 POPUP_HEIGHT = 300
@@ -107,12 +107,12 @@ class PolarsHtmlMap(PolarsFileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        shape_layers: list[str | pathlib.Path] | None = None,
+        shape_layers: list[str] | None = None,
         shape_files: list[str | pathlib.Path] | None = None,
         highlight_stations_in_areas: bool = False,
         columns_to_show: list[str] | None = None,
-        show_master_stations_within_radius: int | bool = 10_000,
-        show_accepted: bool = True,
+        show_master_stations_within_radius: int | bool = False,
+        show_accepted: bool = False,
         show_stations: list[str] | None = None,
         show_custom_positions: list[dict] | None = None,
         **kwargs,
@@ -140,7 +140,10 @@ class PolarsHtmlMap(PolarsFileExporter):
 
     def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
         if not self._export_file_name:
-            self._export_file_name = f"station_map_{data_holder.dataset_name}.html"
+            name = data_holder.dataset_name
+            if " " in name:
+                name = f"{name.split()[0]}___"
+            self._export_file_name = f"station_map_{name}.html"
         path = pathlib.Path(self._export_directory, self._export_file_name)
         if path.suffix != ".html":
             path = pathlib.Path(str(path) + ".html")
@@ -264,9 +267,7 @@ class PolarsHtmlMap(PolarsFileExporter):
             popup_data = {}
             if self._show_accepted:
                 all_matching = self._master.get_matching_stations(
-                    info.get("reported_station_name",
-                             info.get("station_name",
-                                      "")),
+                    info.get("reported_station_name", info.get("station_name", "")),
                     info["sample_latitude_dd"],
                     info["sample_longitude_dd"],
                 )
@@ -308,10 +309,8 @@ class PolarsHtmlMap(PolarsFileExporter):
                 popup_data[col] = info[col]
 
             html = get_popup_html_table(
-                title=info.get("reported_station_name",
-                             info.get("station_name",
-                                      "")),
-                data=popup_data
+                title=info.get("reported_station_name", info.get("station_name", "")),
+                data=popup_data,
             )
 
             self._station_info.append(
@@ -320,9 +319,9 @@ class PolarsHtmlMap(PolarsFileExporter):
                     lon_dd=float(info["sample_longitude_dd"]),
                     sweref99tm_x=x,
                     sweref99tm_y=y,
-                    station_name=info.get("reported_station_name",
-                             info.get("station_name",
-                                      "")),
+                    station_name=info.get(
+                        "reported_station_name", info.get("station_name", "")
+                    ),
                     popup_html=html,
                     in_areas=False,
                     accepted=accepted,

@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import get_valid_data_holders, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer, PolarsTransformer
+from sharkadm.transformers import PolarsTransformer, Transformer
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PolarsDataHolder

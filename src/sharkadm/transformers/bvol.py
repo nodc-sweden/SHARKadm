@@ -318,7 +318,7 @@ class _PolarsAddBvolMapper(PolarsTransformer):
                 ],
                 separator=":",
             ).alias(COL_JOINED_APHIA_ID_AND_SIZE_CLASS),
-            pl.lit(None).alias(self.col_to_set)
+            pl.lit(None).alias(self.col_to_set),
         )
         return data_holder
 
@@ -329,9 +329,7 @@ class PolarsAddBvolCellVolume(_PolarsAddBvolMapper):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Adds {PolarsAddBvolCellVolume.col_to_set}"
-        )
+        return f"Adds {PolarsAddBvolCellVolume.col_to_set}"
 
     def _get_mapper(self) -> dict:
         _nomp = nodc_bvol.get_bvol_nomp_object()
@@ -344,11 +342,8 @@ class PolarsAddBvolCarbonVolume(_PolarsAddBvolMapper):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Adds {PolarsAddBvolCarbonVolume.col_to_set}"
-        )
+        return f"Adds {PolarsAddBvolCarbonVolume.col_to_set}"
 
     def _get_mapper(self) -> dict:
         _nomp = nodc_bvol.get_bvol_nomp_object()
         return _nomp.get_carbon_per_volume_mapper()
-

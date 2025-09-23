@@ -1,3 +1,4 @@
+from sharkadm.data_filter.data_filter_1nm import PolarsDataFilterInside1nm
 from sharkadm.data_filter.data_filter_12nm import PolarsDataFilterInside12nm
 from sharkadm.data_filter.data_filter_approved import PolarsDataFilterApprovedData
 from sharkadm.data_filter.data_filter_combined import (

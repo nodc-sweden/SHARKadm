@@ -9,7 +9,6 @@ from sharkadm import (
     exporters,
     sharkadm_exceptions,
     transformers,
-    utils,
     validators,
 )
 from sharkadm.data import get_data_holder, get_polars_data_holder
@@ -32,8 +31,8 @@ class BaseSHARKadmController:
         self._validators_after: list[Validator] = []
         self._exporters: list[Exporter] = []
 
-        utils.clear_temp_directory(7)
-        utils.clear_export_directory(7)
+        # utils.clear_temp_directory(7)
+        # utils.clear_export_directory(7)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}"
@@ -340,6 +339,9 @@ def get_polars_controller_with_data(
     else:
         holders = []
         for p in paths:
+            adm_logger.log_workflow(
+                f"Creating data_handler with data in: {p}", level=adm_logger.DEBUG
+            )
             holder = get_polars_data_holder(p, **kwargs)
             holders.append(holder)
         c.set_data_holder(sum(holders))
