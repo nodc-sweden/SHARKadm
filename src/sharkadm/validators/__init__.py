@@ -25,6 +25,7 @@ from sharkadm.validators.mandatory import (
 from sharkadm.validators.occurrence_id import ValidateOccurrenceId
 from sharkadm.validators.position import CheckIfLatLonIsSwitched
 from sharkadm.validators.positive import ValidatePositiveValues
+from sharkadm.validators.serial_number import ValidateSerialNumber
 from sharkadm.validators.speed import ValidateSpeed
 from sharkadm.validators.station import (
     ValidateCoordinatesDm,
