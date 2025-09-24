@@ -10,12 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class ValidateSerialNumber(Validator):
+    _display_name = "Validate serial numbers"
+
     _datetime_column = "datetime"
     _serial_number_column = "visit_id"
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Check if data in chronological"
+        return "Check if serial numbers are chronological"
 
     def _validate(self, data_holder: PolarsDataHolderProtocol) -> None:
         validated_data = data_holder.data.sort(
@@ -56,21 +58,25 @@ class ValidateSerialNumber(Validator):
         error_found = False
         if not validated_data["chronological_visit_id"].drop_nans().all():
             error_found |= True
-            adm_logger.log_validation_failed(
-                "Not all serial numbers are strictly chronological.",
-                row_numbers=list(
-                    validated_data.filter(~pl.col("chronological_visit_id"))["row_number"]
-                ),
-            )
+            for row in validated_data.filter(~pl.col("chronological_visit_id")).iter_rows(
+                named=True
+            ):
+                adm_logger.log_validation_failed(
+                    f"Serial numbers '{row[self._serial_number_column]}' "
+                    f"is not chronological.",
+                    row_number=row["row_number"],
+                )
 
         if not validated_data["formatted_visit_id"].all():
             error_found |= True
-            adm_logger.log_validation_failed(
-                "Not all serial numbers are correctly formatted.",
-                row_numbers=list(
-                    validated_data.filter(~pl.col("formatted_visit_id"))["row_number"]
-                ),
-            )
+            for row in validated_data.filter(~pl.col("formatted_visit_id")).iter_rows(
+                named=True
+            ):
+                adm_logger.log_validation_failed(
+                    f"Serial number '{row[self._serial_number_column]}' "
+                    f"is not correctly formatted.",
+                    row_number=row["row_number"],
+                )
 
         if not error_found:
             adm_logger.log_validation_succeeded(
