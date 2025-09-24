@@ -7,6 +7,7 @@ from sharkadm.validators.base import DataHolderProtocol
 
 MICROSECONDS_IN_AN_HOUR = 3_600_000_000
 ONE_KILOMETER = 1000
+KNOTS_PER_KM = 1.852
 
 
 class ValidateSpeed(Validator):
@@ -56,10 +57,13 @@ class ValidateSpeed(Validator):
                 "All visits are realistically spaced in time.",
             )
         else:
-            self._log_fail(
-                "The speed between some visits is too high.",
-                row_numbers=list(too_fast["row_number"]),
-            )
+            for row in too_fast.iter_rows(named=True):
+                self._log_fail(
+                    f"The speed to {row[self._latitude_column]}, "
+                    f"{row[self._longitude_column]} "
+                    f"is at least {row['speed'] / KNOTS_PER_KM:.1f} knots.",
+                    row_numbers=row["row_number"],
+                )
 
 
 def approximate_distance(df: pl.DataFrame) -> pl.DataFrame:
