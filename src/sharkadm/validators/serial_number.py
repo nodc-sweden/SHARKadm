@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class ValidateSerialNumber(Validator):
-    _display_name = "Validate serial numbers"
+    _display_name = "Serial numbers"
 
     _datetime_column = "datetime"
     _serial_number_column = "visit_id"
@@ -62,7 +62,7 @@ class ValidateSerialNumber(Validator):
                 named=True
             ):
                 adm_logger.log_validation_failed(
-                    f"Serial numbers '{row[self._serial_number_column]}' "
+                    f"Serial number '{row[self._serial_number_column]}' "
                     f"is not chronological.",
                     row_number=row["row_number"],
                 )
