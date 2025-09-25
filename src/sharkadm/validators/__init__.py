@@ -35,6 +35,7 @@ from sharkadm.validators.station import (
     ValidateStationIdentity,
     ValidateSynonymsInMaster,
 )
+from sharkadm.validators.weather import ValidateWeath
 from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
 from sharkadm.validators.year import ValidateYearNrDigits
 
