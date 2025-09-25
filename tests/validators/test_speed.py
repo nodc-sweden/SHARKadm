@@ -176,10 +176,12 @@ def test_speed_between_positions_are_validated_with_simple_data(
     given_values = [
         {
             "row_number": n,
-            "datetime": datetime.datetime.fromisoformat(given_datetime),
+            "datetime": (parsed_date := datetime.datetime.fromisoformat(given_datetime)),
             "sample_latitude_dd": given_latitude,
             "sample_longitude_dd": given_longitude,
             "platform_code": given_shipc,
+            "visit_key": parsed_date.strftime("%Y%m%d_%H%M")
+            + f"_{given_shipc}_SOMEPLACE",
         }
         for n, (
             given_datetime,
@@ -223,6 +225,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "0.5",
             "DEPH": "1.0",
             "platform_code": "10",
+            "visit_key": "20250915_1200_SOMEPLACE",
         },
         {
             "row_number": 1,
@@ -233,6 +236,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "4.5",
             "DEPH": "1.0",
             "platform_code": "10",
+            "visit_key": "20250915_1200_10_SOMEPLACE",
         },
         {
             "row_number": 2,
@@ -243,6 +247,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "1.0",
             "DEPH": "5.0",
             "platform_code": "10",
+            "visit_key": "20250915_1200_10_SOMEPLACE",
         },
         {
             "row_number": 2,
@@ -253,6 +258,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "5.0",
             "DEPH": "5.0",
             "platform_code": "10",
+            "visit_key": "20250915_1200_10_SOMEPLACE",
         },
         {
             "row_number": 3,
@@ -263,6 +269,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "0.5",
             "DEPH": "1.0",
             "platform_code": "10",
+            "visit_key": "20250915_1300_10_SOMEPLACE_ELSE",
         },
         {
             "row_number": 3,
@@ -273,6 +280,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "4.5",
             "DEPH": "1.0",
             "platform_code": "10",
+            "visit_key": "20250915_1300_10_SOMEPLACE_ELSE",
         },
         {
             "row_number": 4,
@@ -283,6 +291,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "1.0",
             "DEPH": "5.0",
             "platform_code": "10",
+            "visit_key": "20250915_1300_10_SOMEPLACE_ELSE",
         },
         {
             "row_number": 4,
@@ -293,6 +302,7 @@ def test_speed_between_positions_with_valid_detailed_data(
             "value": "5.0",
             "DEPH": "5.0",
             "platform_code": "10",
+            "visit_key": "20250915_1300_10_SOMEPLACE_ELSE",
         },
     ]
     given_data = pl.DataFrame(given_values)
@@ -341,7 +351,7 @@ def test_approximate_distance_against_pyproj_within_one_percent(
     )
 
     data_with_distances = approximate_distance(data)
-    distance_from_haversine = data_with_distances["distance"].last()
+    distance_from_haversine = data_with_distances["_distance"].last()
     relative_error = (
         distance_from_haversine - distance_from_pyproj
     ) / distance_from_pyproj
