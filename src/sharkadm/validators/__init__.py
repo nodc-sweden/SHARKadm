@@ -10,6 +10,7 @@ from sharkadm.validators.aphia_id import (
     ValidateReportedVsBvolAphiaId,
 )
 from sharkadm.validators.base import Validator
+from sharkadm.validators.cloud import ValidateCloud
 from sharkadm.validators.column_combination import (
     AssertCombination,
     AssertMinMaxDepthCombination,
