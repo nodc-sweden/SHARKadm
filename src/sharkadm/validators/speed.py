@@ -17,6 +17,8 @@ class ValidateSpeed(Validator):
     _datetime_column = "datetime"
     _latitude_column = "sample_latitude_dd"
     _longitude_column = "sample_longitude_dd"
+    _visit_key_column = "visit_key"
+    _row_number_column = "row_number"
 
     MAX_SPEED = 55.56  # 30 kn in km/h
 
@@ -45,12 +47,14 @@ class ValidateSpeed(Validator):
                     / MICROSECONDS_IN_AN_HOUR
                 )
                 .over(self._ship_column)
-                .alias("duration"),
+                .alias("_duration"),
             )
-            .with_columns((pl.col("distance") / 1000 / pl.col("duration")).alias("speed"))
+            .with_columns(
+                (pl.col("_distance") / 1000 / pl.col("_duration")).alias("_speed")
+            )
         )
 
-        too_fast = speed.filter(pl.col("speed").fill_nan(0) > self.MAX_SPEED)
+        too_fast = speed.filter(pl.col("_speed").fill_nan(0) > self.MAX_SPEED)
 
         if too_fast.is_empty():
             self._log_success(
@@ -59,10 +63,10 @@ class ValidateSpeed(Validator):
         else:
             for row in too_fast.iter_rows(named=True):
                 self._log_fail(
-                    f"The speed to {row[self._latitude_column]}, "
-                    f"{row[self._longitude_column]} "
-                    f"is at least {row['speed'] / KNOTS_PER_KM:.1f} knots.",
-                    row_numbers=row["row_number"],
+                    f"The speed to reach '{row[self._visit_key_column]}' "
+                    f"is at least {row['_speed'] / KNOTS_PER_KM:.1f} knots "
+                    f"({row['_distance'] / 1000:.1f} km in {row['_duration']:.1f} h).",
+                    row_numbers=row[self._row_number_column],
                 )
 
 
@@ -86,6 +90,6 @@ def approximate_distance(df: pl.DataFrame) -> pl.DataFrame:
         * latitude.cos()
         * ((longitude - previous_longitude) / 2).sin() ** 2
     )
-    distance = (2 * earth_radius * haversine.sqrt().arcsin()).alias("distance")
+    distance = (2 * earth_radius * haversine.sqrt().arcsin()).alias("_distance")
 
     return df.with_columns(distance)
