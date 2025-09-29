@@ -21,6 +21,7 @@ from sharkadm.validators.columns import ValidateColumnViewColumnsNotInDataset
 from sharkadm.validators.common_values import ValidateCommonValuesByVisit
 from sharkadm.validators.date_and_time import MissingTime, ValidateDateAndTime
 from sharkadm.validators.depth import ValidateSampleDepth, ValidateSecchiDepth
+from sharkadm.validators.ice import ValidateIceob
 from sharkadm.validators.mandatory import (
     ValidateValuesInMandatoryNatColumns,
     ValidateValuesInMandatoryRegColumns,
