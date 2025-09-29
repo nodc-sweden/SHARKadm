@@ -40,7 +40,7 @@ from sharkadm.validators.station import (
     ValidateSynonymsInMaster,
 )
 from sharkadm.validators.waves import ValidateWaves
-from sharkadm.validators.weather import ValidateWeath
+from sharkadm.validators.weather import ValidateWeath, ValidateWeatherConsistency
 from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
 from sharkadm.validators.year import ValidateYearNrDigits
 
