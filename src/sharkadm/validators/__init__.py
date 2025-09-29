@@ -4,12 +4,15 @@ from typing import Type
 
 from sharkadm import utils
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
+from sharkadm.validators.air_pressure import ValidateAirpres
+from sharkadm.validators.air_temperature import ValidateAirtemp
 from sharkadm.validators.aphia_id import (
     ValidateAphiaIdVsBvolAphiaId,
     ValidateReportedVsAphiaId,
     ValidateReportedVsBvolAphiaId,
 )
 from sharkadm.validators.base import Validator
+from sharkadm.validators.cloud import ValidateCloud
 from sharkadm.validators.column_combination import (
     AssertCombination,
     AssertMinMaxDepthCombination,
@@ -36,6 +39,7 @@ from sharkadm.validators.station import (
     ValidateSynonymsInMaster,
 )
 from sharkadm.validators.waves import ValidateWaves
+from sharkadm.validators.weather import ValidateWeath
 from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
 from sharkadm.validators.year import ValidateYearNrDigits
 

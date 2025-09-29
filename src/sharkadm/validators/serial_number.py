@@ -58,12 +58,21 @@ class ValidateSerialNumber(Validator):
         error_found = False
         if not validated_data["chronological_visit_id"].drop_nans().all():
             error_found |= True
-            for row in validated_data.filter(~pl.col("chronological_visit_id")).iter_rows(
-                named=True
+            for row in (
+                validated_data.with_columns(
+                    pl.col(self._serial_number_column)
+                    .shift(1)
+                    .alias("_previous_serial_number"),
+                    pl.col(self._datetime_column).shift(1).alias("_previous_datetime"),
+                )
+                .filter(~pl.col("chronological_visit_id"))
+                .iter_rows(named=True)
             ):
-                adm_logger.log_validation_failed(
+                self._log_fail(
                     f"Serial number '{row[self._serial_number_column]}' "
-                    f"is not chronological.",
+                    f"({row[self._datetime_column]}) is not chronological. "
+                    f"Preceeded by '{row['_previous_serial_number']}' "
+                    f"({row['_previous_datetime']})",
                     row_number=row["row_number"],
                 )
 
@@ -72,7 +81,7 @@ class ValidateSerialNumber(Validator):
             for row in validated_data.filter(~pl.col("formatted_visit_id")).iter_rows(
                 named=True
             ):
-                adm_logger.log_validation_failed(
+                self._log_fail(
                     f"Serial number '{row[self._serial_number_column]}' "
                     f"is not correctly formatted.",
                     row_number=row["row_number"],
