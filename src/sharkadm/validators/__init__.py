@@ -5,6 +5,7 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 from sharkadm.validators.air_pressure import ValidateAirpres
+from sharkadm.validators.air_temperature import ValidateAirtemp
 from sharkadm.validators.aphia_id import (
     ValidateAphiaIdVsBvolAphiaId,
     ValidateReportedVsAphiaId,
