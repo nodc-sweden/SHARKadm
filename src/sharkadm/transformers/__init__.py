@@ -44,6 +44,7 @@ from sharkadm.transformers.columns import (
     PolarsAddApprovedKeyColumn,
     PolarsAddColumnViewsColumns,
     PolarsRemoveColumns,
+    PolarsClearColumns,
     RemoveColumns,
     SortColumns,
     PolarsSortColumns,
@@ -178,6 +179,7 @@ from sharkadm.transformers.map_parameter_column import (
     MapperParameterColumn,
     PolarsMapperParameterColumn,
 )
+from sharkadm.transformers.metadata import PolarsAddFromMetadata
 from sharkadm.transformers.occurrence_id import AddOccurrenceId
 from sharkadm.transformers.orderer import (
     AddEnglishSampleOrderer,

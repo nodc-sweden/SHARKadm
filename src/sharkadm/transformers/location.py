@@ -59,7 +59,7 @@ class _PolarsAddLocationBase(PolarsTransformer):
         t0 = time.time()
         for (x, y), df in data_holder.data.group_by([self.x_pos_col, self.y_pos_col]):
             if not nr % 100:
-                print(f"{nr}: {(time.time() - t0)=}")
+                # print(f"{nr}: {(time.time() - t0)=}")
                 t0 = time.time()
             nr += 1
             info = nodc_geography.get_shape_file_info_at_position(
@@ -125,7 +125,7 @@ class PolarsAddLocations(PolarsTransformer):
         t0 = time.time()
         for (x, y), df in data_holder.data.group_by([self.x_pos_col, self.y_pos_col]):
             if not nr % 100:
-                print(f"{nr}: {(time.time() - t0)=}")
+                # print(f"{nr}: {(time.time() - t0)=}")
                 t0 = time.time()
             nr += 1
             info = dict()

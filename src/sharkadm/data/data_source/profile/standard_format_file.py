@@ -2,7 +2,7 @@ import logging
 
 import polars as pl
 
-from .base import PolarsDataFile
+from sharkadm.data.data_source.base import PolarsDataFile
 
 logger = logging.getLogger(__name__)
 

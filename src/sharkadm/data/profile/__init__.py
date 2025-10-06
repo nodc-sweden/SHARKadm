@@ -3,7 +3,16 @@ from typing import Union
 
 from sharkadm import config
 
-from .profile_data_holder import PolarsProfileStandardFormatDataHolder
+from sharkadm.data.profile.standard_format_data_holder import (
+    PolarsProfileStandardFormatDataHolder)
+from sharkadm.data.profile.cnv_data_holder import PolarsCnvDataHolder
+from sharkadm.data.archive import metadata
+
+
+def _get_metadata_path(directory: pathlib.Path) -> pathlib.Path | None:
+    for path in directory.iterdir():
+        if path.name == "metadata.txt":
+            return path
 
 
 def get_polars_profile_standard_format_data_holder(
@@ -41,3 +50,14 @@ def path_has_or_is_standard_format_profile_data(
         if p.suffix == ".txt" and p.name.lower().startswith("ctd_profile"):
             return True
     return False
+
+
+def get_polars_profile_cnv_data_holder(
+    path: str | pathlib.Path, **kwargs
+) -> PolarsCnvDataHolder:
+    path = pathlib.Path(path)
+    mapper = config.get_import_matrix_mapper(data_type="profile", import_column="PROFILE")
+
+    return PolarsCnvDataHolder(
+        path=path, header_mapper=mapper, **kwargs
+    )

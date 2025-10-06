@@ -27,7 +27,7 @@ from sharkadm.exporters.shark_metadata_auto import (
 )
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 from sharkadm.exporters.standard_format import StandardFormat
-from sharkadm.exporters.statistics import PrintStatistics, StatisticsToTxt
+from sharkadm.exporters.statistics import PolarsPrintStatistics, PolarsStatisticsToTxt
 from sharkadm.exporters.system import (
     ExportersSummaryFile,
     TransformersSummaryFile,

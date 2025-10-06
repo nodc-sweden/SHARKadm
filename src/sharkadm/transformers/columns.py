@@ -95,6 +95,27 @@ class PolarsRemoveColumns(PolarsTransformer):
         data_holder.data = data_holder.data.drop(columns_to_remove)
 
 
+class PolarsClearColumns(PolarsTransformer):
+    def __init__(self, *args, **kwargs):
+        self._args = args
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Clears columns matching given strings in args"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        columns_to_clear = set()
+        for arg in self._args:
+            columns_to_clear |= set(
+                filter(lambda x: re.search(arg, x), data_holder.data.columns)
+            )
+        for col in columns_to_clear:
+            data_holder.data = data_holder.data.with_columns(
+                pl.lit("").alias(col)
+            )
+
+
 class SortColumns(Transformer):
     def __init__(self, key=None, **kwargs):
         self._key = key

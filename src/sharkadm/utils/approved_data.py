@@ -18,7 +18,7 @@ def add_concatenated_column(
     return df.with_columns(
         pl.concat_str(
             [
-                pl.col("delivery_datatype"),
+                # pl.col("delivery_datatype"),
                 pl.col(lat_col).cast(str),
                 pl.col(lon_col).cast(str),
                 # pl.col("dataset_name"),

@@ -217,8 +217,8 @@ class PolarsTransformer(ABC):
     def description(self) -> str:
         # return self.get_transformer_description()
         info_str = self.get_transformer_description()
-        if self._data_filter:
-            info_str = f"{info_str} (With filter {self._data_filter.description})"
+        # if self._data_filter:
+        #     info_str = f"{info_str} (With filter {self._data_filter.description})"
         return info_str
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:

@@ -157,13 +157,13 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
             data_holder.data["sample_longitude_dd"],
         )
         nr = 0
-        t0 = time.time()
+        # t0 = time.time()
         for (lat, lon), df in data_holder.data.group_by(
             [self.lat_source_col, self.lon_source_col]
         ):
-            if not nr % 100:
-                print(f"{nr=} ({time.time() - t0}): {lat} {lon}")
-                t0 = time.time()
+            # if not nr % 100:
+            #     print(f"{nr=} ({time.time() - t0}): {lat} {lon}")
+            #     t0 = time.time()
             nr += 1
             if not all([lat, lon]):
                 self._log(

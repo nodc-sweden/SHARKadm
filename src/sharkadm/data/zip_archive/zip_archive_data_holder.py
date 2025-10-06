@@ -7,10 +7,10 @@ from typing import Callable
 
 import pandas as pd
 
-from sharkadm import utils
+from sharkadm import utils, config
 from sharkadm.config import mapper_data_type_to_internal
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
-from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
+from sharkadm.data.archive import analyse_info, delivery_note, sampling_info, metadata
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile, PolarsDataFile
 from sharkadm.data.data_source.txt_file import (
@@ -263,6 +263,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         self._delivery_note: delivery_note.DeliveryNote | None = None
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
+        self._metadata: metadata.Metadata | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -272,8 +273,10 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         self._initiate()
         self._unzip_archive()
         self._load_delivery_note()
+        self._load_import_matrix()
         self._load_sampling_info()
         self._load_analyse_info()
+        self._load_metadata()
         self._load_data()
 
     @staticmethod
@@ -307,6 +310,10 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
     @property
     def analyse_info(self) -> analyse_info.AnalyseInfo:
         return self._analyse_info
+
+    @property
+    def metadata(self) -> metadata.Metadata:
+        return self._metadata
 
     @property
     def dataset_name(self) -> str:
@@ -347,6 +354,10 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
     @property
     def analyse_info_path(self) -> pathlib.Path:
         return self.processed_data_directory / "analyse_info.txt"
+
+    @property
+    def metadata_path(self) -> pathlib.Path:
+        return self.processed_data_directory / "metadata.txt"
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:
@@ -400,6 +411,20 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             self._zip_archive_path, utils.get_temp_directory("zip"), delete_old=True
         )
 
+    def _load_import_matrix(self) -> None:
+        """Loads the import matrix for the given data type and provider found in
+        delivery note"""
+        self._import_matrix = config.get_import_matrix_config(
+            data_type=self.data_type_internal
+        )
+        # if not self._import_matrix:
+        #     self._import_matrix = config.get_import_matrix_config(
+        #         data_type=self.delivery_note.data_format
+        #     )
+        self._import_matrix_mapper = self._import_matrix.get_mapper(
+            self.delivery_note.import_matrix_key
+        )
+
     def _load_delivery_note(self) -> None:
         if not self.delivery_note_path.exists():
             adm_logger.log_workflow(
@@ -429,6 +454,16 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             return
         self._analyse_info = analyse_info.AnalyseInfo.from_txt_file(
             self.analyse_info_path
+        )
+
+    def _load_metadata(self) -> None:
+        if not self.metadata_path.exists():
+            adm_logger.log_workflow(
+                f"No metadata file for {self.dataset_name}", level=adm_logger.INFO
+            )
+            return
+        self._metadata = metadata.Metadata.from_txt_file(
+            self.metadata_path, mapper=self._import_matrix_mapper
         )
 
     def _check_data_source(self, data_source: PolarsDataFile) -> None:

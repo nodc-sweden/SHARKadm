@@ -1,5 +1,6 @@
 import pathlib
 from enum import StrEnum
+from typing import Sequence
 
 import numpy as np
 import polars as pl
@@ -114,7 +115,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         show_master_stations_within_radius: int | bool = False,
         show_accepted: bool = False,
         show_stations: list[str] | None = None,
-        show_custom_positions: list[dict] | None = None,
+        show_custom_positions: dict[str, list[dict]] | Sequence[dict] | None = None,
         **kwargs,
     ):
         self._shape_layers = self.shape_layers or shape_layers or []
@@ -364,8 +365,9 @@ class PolarsHtmlMap(PolarsFileExporter):
         if not self._show_stations:
             return
         df = self._master.get_stations_by_name(self._show_stations)
-        station_infos = df.to_dict(orient="records")
-        for info in station_infos:
+        # station_infos = df.to_dict(orient="records")
+        # for info in station_infos:
+        for info in df.to_dicts():
             html = get_popup_html_table(
                 title=info["station_name"],
                 data={
@@ -435,16 +437,38 @@ class PolarsHtmlMap(PolarsFileExporter):
     def _add_custom_positions(self, m: "folium.Map") -> None:
         if not self._show_custom_positions:
             return
-        fg = folium.FeatureGroup(name="Custom positions", show=True)
-        color = "black"
-        for info in self._show_custom_positions:
-            folium.Marker(
-                location=[info["lat_dd"], info["lon_dd"]],
-                popup=info.get("popup", None),
-                tooltip=info.get("tooltip", None),
-                icon=folium.Icon(color=color, icon="glyphicon-remove-sign"),
-            ).add_to(fg)
-        fg.add_to(m)
+        if not isinstance(self._show_custom_positions, dict):
+            self._show_custom_positions = {"Custom positions": self._show_custom_positions}
+        for name, data in self._show_custom_positions.items():
+            fg = folium.FeatureGroup(name=name, show=True)
+            rad_fg = folium.FeatureGroup(name=f"{name} radius", show=True)
+            rad_info_present = False
+            color = "black"
+            for info in data:
+                folium.Marker(
+                    location=[info["lat_dd"], info["lon_dd"]],
+                    popup=info.get("popup", None),
+                    tooltip=info.get("tooltip", None),
+                    icon=folium.Icon(color=info.get("color", color), icon="glyphicon-remove-sign"),
+                ).add_to(fg)
+                if info.get("radius"):
+                    rad_info_present = True
+                    folium.Circle(
+                        location=[info["lat_dd"], info["lon_dd"]],
+                        radius=info.get("radius"),
+                        color=info.get("color", color),
+                        weight=1,
+                        fill_opacity=0.6,
+                        opacity=1,
+                        fill_color=info.get("color", color),
+                        fill=False,  # gets overridden by fill_color
+                        # popup=info.get("popup", None),
+                        # tooltip=info.get("tooltip", None),
+                    ).add_to(rad_fg)
+
+            fg.add_to(m)
+            if rad_info_present:
+                rad_fg.add_to(m)
         # radius = 50
         # folium.Circle(
         #     location=[info["lat_dd"], info["lon_dd"]],

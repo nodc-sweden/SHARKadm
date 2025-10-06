@@ -17,13 +17,14 @@ from sharkadm.sharkadm_logger import adm_logger
 class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the
     add_data_source method"""
+    _data_structure = "row"
 
     def __init__(self, *args, **kwargs):
         self._data_sources: dict[str, DataSource | PolarsDataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_structure = "column"
+        # self._data_structure = "column"
         self._data = pl.DataFrame()
 
     def __repr__(self) -> str:
@@ -53,6 +54,10 @@ class DataHolder(ABC):
     @property
     def data(self) -> pd.DataFrame:
         return self._data
+
+    @property
+    def data_sources(self) -> dict:
+        return self._data_sources
 
     @data.setter
     def data(self, df: pd.DataFrame | pl.DataFrame) -> None:
@@ -326,7 +331,7 @@ class PolarsDataHolder(DataHolder, ABC):
                 level=adm_logger.WARNING,
             )
             return
-        self._filtered_data = self.data.remove(mask)
+        self._filtered_data = self.data.remove(~mask)
 
     def reset_filter(self):
         self._filtered_data = pl.DataFrame()
