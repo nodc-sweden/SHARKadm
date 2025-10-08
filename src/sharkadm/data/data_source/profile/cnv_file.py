@@ -44,11 +44,13 @@ class CnvDataFile(PolarsDataFile):
                     dtime = datetime.datetime.strptime(line.split("=", 1)[-1].strip(),
                                                        "%b %d %Y %H:%M:%S")
                     metadata["SDATE"] = dtime.strftime("%Y-%m-%d")
-                    metadata["STIME"] = dtime.strftime("%H:%M")
+                    metadata["STIME"] = dtime.strftime("%H:%M:%S")
                 elif line.startswith("** Station:"):
                     metadata["STATN"] = line.split(":", 1)[-1].strip()
                 if line.startswith("# name"):
                     name = line.split("=", 1)[-1].strip()
+                    if ", lat =" in name:
+                        name = name.split(", lat =")[0]
                     header.append(mapper.get(name, name))
                 elif line.startswith("*END*"):
                     is_data_line = True
@@ -64,34 +66,3 @@ class CnvDataFile(PolarsDataFile):
                 pl.lit(val).alias(col)
             )
 
-    def add_metadata(self, data: metadata.Metadata) -> None:
-        kw = {
-            "SDATE": self.data[0, "SDATE"],
-            "STIME": self.data[0, "STIME"]
-        }
-        meta = data.get_info(**kw)
-        if len(meta) != 1:
-            raise Exception("Metadata error")
-        for col, value in meta[0].items():
-            self._data = self._data.with_columns(
-                pl.lit(value).alias(col)
-            )
-
-
-if __name__ == "__main__":
-
-    csv = CnvDataFile(r"C:\mw\data\input_sharkadm\new_profile\SHARK_Profile_2023_BAS_SMHI_version_2025-09-29\received_data\SBE09_1044_20230110_1036_77SE_01_0001.cnv")
-    meta = metadata.Metadata.from_txt_file(r"C:\mw\data\input_sharkadm\new_profile\SHARK_Profile_2023_BAS_SMHI_version_2025-09-29\received_data\metadata.txt")
-
-    csv.add_metadata(meta)
-    # import json
-    # import yaml
-    #
-    # with open(r"C:\mw\git\nodc_config\sharkadm\ctd_parameter_mapping.json", encoding="utf8") as fid:
-    #     data = json.load(fid)
-    # new_data = {}
-    # for key, values in data["mapping_parameter"].items():
-    #     for value in values:
-    #         new_data[value] = key
-    # with open(r"C:\mw\git\nodc_config\sharkadm\ctd_parameter_mapping.yaml", "w", encoding="utf8") as fid:
-    #     yaml.safe_dump(new_data, fid)

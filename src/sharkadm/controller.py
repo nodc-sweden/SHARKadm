@@ -342,6 +342,7 @@ def get_polars_controller_with_data(
             adm_logger.log_workflow(
                 f"Creating data_handler with data in: {p}", level=adm_logger.DEBUG
             )
+            print(f"{p=}")
             holder = get_polars_data_holder(p, **kwargs)
             holders.append(holder)
         c.set_data_holder(sum(holders))

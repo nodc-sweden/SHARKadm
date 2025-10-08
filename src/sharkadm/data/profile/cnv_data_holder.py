@@ -3,19 +3,18 @@ from typing import Protocol
 
 import polars as pl
 
+from sharkadm.data.archive import metadata
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.data_source.profile.cnv_file import CnvDataFile
+from sharkadm.data.profile.base import PolarsProfileDataHolder
 
 
 class HeaderMapper(Protocol):
     def get_internal_name(self, external_par: str) -> str: ...
 
 
-class PolarsCnvDataHolder(PolarsDataHolder):
-    _data_type_internal = "physicalchemical"
-    _data_type = "Physical and Chemical"
+class PolarsCnvDataHolder(PolarsProfileDataHolder):
     _data_format = "cnv"
-    _data_structure = "profile"
 
     def __init__(
         self,
@@ -34,6 +33,7 @@ class PolarsCnvDataHolder(PolarsDataHolder):
             self.parent_directory = root_path.parent
         else:
             self._paths = [p for p in root_path.iterdir() if p.suffix == ".cnv"]
+            self._paths = [path for path in self._paths if path.name[0] != "u"]
             self.parent_directory = root_path
 
         self._header_mapper = header_mapper
@@ -95,40 +95,31 @@ class PolarsCnvDataHolder(PolarsDataHolder):
         self._data = pl.concat(dfs, how="vertical_relaxed")
         self._data.fill_nan("")
 
-    # def _load_sampling_info(self) -> None:
-    #     #TODO: To be added
-    #     if not self.sampling_info_path.exists():
-    #         adm_logger.log_workflow(
-    #             f"No sampling info file for {self.dataset_name}", level=adm_logger.INFO
-    #         )
-    #         return
-    #     self._sampling_info = sampling_info.SamplingInfo.from_txt_file(
-    #         self.sampling_info_path, mapper=self._header_mapper
-    #     )
-    #
-    # def _load_analyse_info(self) -> None:
-    #     # TODO: To be added
-    #     if not self.analyse_info_path.exists():
-    #         adm_logger.log_workflow(
-    #             f"No analyse info file for {self.dataset_name}", level=adm_logger.INFO
-    #         )
-    #         return
-    #     self._analyse_info = analyse_info.AnalyseInfo.from_lims_txt_file(
-    #         self.analyse_info_path, mapper=self._header_mapper
-    #     )
+    def add_metadata(self, data: metadata.Metadata) -> None:
 
-    @property
-    def data_type(self) -> str:
-        return self._data_type
+        for (date, time), df in self._data.group_by(self.date_column,
+                                                    self.time_column):
+            boolean = ((pl.col(self.date_column) == date) &
+                       (pl.col(self.time_column) == time))
+            kw = {
+                self.date_column: date,
+                self.time_column: time[:5]
+            }
+            print(f"{kw=}")
+            meta = data.get_info(**kw)
+            print(f"{meta=}")
+            if len(meta) != 1:
+                raise Exception("Metadata error")
+            for col, value in meta[0].items():
+                if col not in self._data.columns:
+                    self._data = self._data.with_columns(
+                        pl.lit("").alias(col)
+                    )
+                self._data = self._data.with_columns(
+                    pl.when(boolean)
+                    .then(pl.lit(value))
+                    .otherwise(pl.col(col))
+                    .alias(col)
 
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type_internal
+                )
 
-    @property
-    def dataset_name(self) -> str:
-        return self._dataset_name
-
-    @property
-    def columns(self) -> list[str]:
-        return sorted(self.data.columns)

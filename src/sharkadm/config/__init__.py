@@ -14,7 +14,7 @@ from sharkadm.config.translate_headers import TranslateHeaders
 
 logger = logging.getLogger(__name__)
 
-DATA_STRUCTURES = ["row", "column"]
+DATA_STRUCTURES = ["row", "column", "profile"]
 
 CONFIG_ENV = "NODC_CONFIG"
 

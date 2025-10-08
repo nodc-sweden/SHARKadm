@@ -1,14 +1,18 @@
 import pathlib
+import re
 
-import pandas as pd
+import polars as pl
 
 from sharkadm import utils
 
-from .base import DataHolderProtocol, Exporter
+from .base import DataHolderProtocol, PolarsExporter, PolarsFileExporter
+from ..data import PolarsDataHolder
+from ..data.profile.base import PolarsProfileDataHolder
+from ..utils.paths import get_next_incremented_file_path
 
 
-class StandardFormat(Exporter):
-    valid_data_types = ("physicalchemical",)
+class PolarsStandardFormat(PolarsFileExporter):
+    valid_data_structures = ("profile",)
 
     def __init__(
         self,
@@ -34,24 +38,123 @@ class StandardFormat(Exporter):
     def get_exporter_description() -> str:
         return ""
 
-    def _export(self, data_holder: DataHolderProtocol) -> None:
-        groups = data_holder.data.groupby("visit_key")
-        data_cols = self._get_data_columns(data_holder.data.columns)
-        metadata_cols = [col for col in data_holder.data.columns if col not in data_cols]
-        ordered_cols = self._get_reordered_columns(data_cols)
-        for _id, data in groups:
-            meta_rows = self._get_metadata_rows(data, metadata_cols)
-            d_data = self._get_data(data=data, data_cols=ordered_cols)
-            path = self._export_directory / f"{_id}.txt"
+    def _export(self, data_holder: PolarsProfileDataHolder) -> None:
+        metadata = data_holder.metadata_original_columns
+        for (date, time), data in data_holder.data.group_by("visit_date",
+                                                            "sample_time"):
+            stem = pathlib.Path(data[0, "source"]).stem
+            meta = metadata[(date, time)]
+            data_cols = [col for col in data_holder.data.columns if not meta.get(col)]
+            meta_rows = self._get_metadata_rows(meta)
+
+            data = self._add_columns(data)
+            data = self._remove_columns(data)
+            data = self._add_qf_columns(data, data_cols)
+            data = self._reorder_data(data, data_cols)
+
+            # d_data = self._get_data(data=data, data_cols=data_cols, data_holder=data_holder)
+            # d_data = self._get_data(data=data, data_holder=data_holder)
+            # d_data = self._get_data(data=data, data_cols=ordered_cols)
+
+            path = self._export_directory / f"{stem}.txt"
+            if path.exists():
+                path = get_next_incremented_file_path(path)
             header_lines = self._initial_rows + meta_rows
-            with open(path, "w") as fid:
+            with open(path, "w", encoding="cp1252") as fid:
                 fid.write("\n".join(header_lines))
                 fid.write("\n")
-            d_data.to_csv(path, mode="a", sep="\t", index=False)
+            data.to_pandas().to_csv(path, mode="a", sep="\t", index=False, encoding="cp1252")
 
-    def _get_data(self, data: pd.DataFrame, data_cols: list[str]) -> pd.DataFrame:
-        d_data = data[data_cols]
-        d_data.columns = self._get_translated_columns(data_cols)
+    def _add_columns(self, data: pl.DataFrame) -> pl.DataFrame:
+        data = data.with_columns(
+            YEAR=pl.col("visit_date").str.slice(0, length=4),
+            MONTH=pl.col("visit_date").str.slice(5, length=2),
+            DAY=pl.col("visit_date").str.slice(8, length=2),
+            HOUR=pl.col("sample_time").str.slice(0, length=2),
+            MINUTE=pl.col("sample_time").str.slice(3, length=2),
+            SECOND=pl.col("sample_time").str.slice(6, length=2),
+            STATION=pl.col("reported_station_name"),
+            LATITUDE_DD=pl.col("visit_reported_latitude"),
+            LONGITUDE_DD=pl.col("visit_reported_longitude"),
+            CRUISE=pl.lit(""),
+            FILE_NAME=pl.col("source").str.split('\\').list.last()
+        )
+        if "cruise_id" in data.columns:
+            data = data.with_columns(
+                CRUISE=pl.col("cruise_id"),
+            )
+        return data
+
+    def _remove_columns(self, data: pl.DataFrame) -> pl.DataFrame:
+        drop_columns = [
+            "source",
+            "reported_station_name",
+            "visit_reported_latitude",
+            "visit_reported_longitude",
+        ]
+        data = data.drop(*drop_columns)
+        return data
+
+    def _add_qf_columns(self, data: pl.DataFrame, columns: list[str]) -> pl.DataFrame:
+        args = []
+        for col in columns:
+            args.extend([
+                pl.lit("").alias(self._get_qcol_name(col)),
+                pl.lit("").alias(self._get_q0col_name(col)),
+            ])
+        data = data.with_columns(args)
+        return data
+
+    def _reorder_data(self, data: pl.DataFrame, data_columns: list[str]) -> pl.DataFrame:
+        initial_columns = [
+            "YEAR",
+            "MONTH",
+            "DAY",
+            "HOUR",
+            "MINUTE",
+            "SECOND",
+            "CRUISE",
+            "STATION",
+            "LATITUDE_DD",
+            "LONGITUDE_DD"
+            ]
+        pres_cols = []
+        depth_cols = []
+        exclude_cols = []
+        for col in data.columns:
+            if "QV:" in col:
+                exclude_cols.append(col)
+            if "CTD" in col:
+                continue
+            if "PRES" in col:
+                pres_cols.append(col)
+                pres_cols.append(self._get_qcol_name(col))
+                pres_cols.append(self._get_q0col_name(col))
+            elif "DEPH" in col:
+                depth_cols.append(col)
+                depth_cols.append(self._get_qcol_name(col))
+                depth_cols.append(self._get_q0col_name(col))
+        exclude_cols = initial_columns + pres_cols + depth_cols
+        new_order = exclude_cols
+        for col in [c for c in data_columns if c in data.columns]:
+            if col in exclude_cols:
+                continue
+            new_order.append(col)
+            new_order.append(self._get_qcol_name(col))
+            new_order.append(self._get_q0col_name(col))
+        return data[new_order]
+
+    def _get_qcol_name(self, col: str) -> str:
+        return f"QV:SMHI:{col}"
+
+    def _get_q0col_name(self, col: str) -> str:
+        return f"QV:SMHI:Q0_{col}"
+
+    def _get_data(self, data: pl.DataFrame, data_cols: list[str], data_holder: PolarsDataHolder) -> pl.DataFrame:
+
+        ordered_cols = self._get_reordered_columns(data_cols)
+        d_data = data[ordered_cols]
+        d_data.columns = self._get_translated_columns(ordered_cols)
         new_data = dict(
             YEAR=data["datetime"].apply(lambda x: str(x.year)),
             MONTH=data["datetime"].apply(lambda x: str(x.month).zfill(2)),
@@ -98,52 +201,58 @@ class StandardFormat(Exporter):
         # print(f'3::: {d_data.columns[:15]=}')
         return d_data
 
-    @staticmethod
-    def _get_reordered_columns(columns: list[str]) -> list[str]:
-        pres_cols = []
-        depth_cols = []
-        for col in columns:
-            if "CTD" in col:
-                continue
-            if "PRES" in col:
-                pres_cols.append(col)
-            elif "DEPH" in col:
-                depth_cols.append(col)
-        exclude_cols = pres_cols + depth_cols
-        new_order = (
-            pres_cols + depth_cols + [col for col in columns if col not in exclude_cols]
-        )
-        return new_order
+    # @staticmethod
+    # def _get_reordered_columns(columns: list[str]) -> list[str]:
+    #     pres_cols = []
+    #     depth_cols = []
+    #     exclude_cols = []
+    #     for col in columns:
+    #         if "QV:" in col:
+    #             exclude_cols.append(col)
+    #         if "CTD" in col:
+    #             continue
+    #         if "PRES" in col:
+    #             pres_cols.append(col)
+    #         elif "DEPH" in col:
+    #             depth_cols.append(col)
+    #     exclude_cols = pres_cols + depth_cols
+    #     new_order = []
+    #     for col in columns:
+    #         if col in exclude_cols:
+    #             return
+    #     new_order = (
+    #         pres_cols + depth_cols + [col for col in columns if col not in exclude_cols]
+    #     )
+    #     return new_order
 
     @staticmethod
-    def _get_metadata_rows(data: pd.DataFrame, columns: list[str]) -> list[str]:
+    def _get_metadata_rows(metadata: dict[str, str]) -> list[str]:
         meta_rows = []
-        for col in columns:
-            meta_value = ", ".join(set(data[col].astype(str)))
-            meta = f"//METADATA;{col};{meta_value}"
+        for col, value in metadata.items():
+            meta = f"//METADATA;{col};{value}"
             meta_rows.append(meta)
         return meta_rows
 
-    @staticmethod
-    def _get_data_columns(columns: list[str]) -> list[str]:
-        q_columns = []
-        for col in columns[:]:
-            if col.startswith("Q_"):
-                q_columns.append(col)
-            elif col.startswith("Q0_"):
-                q_columns.append(col)
-            elif f"Q_{col}" in columns:
-                q_columns.append(col)
-        return q_columns
+    # @staticmethod
+    # def _get_data_columns(columns: list[str]) -> list[str]:
+    #     q_columns = []
+    #     for col in columns[:]:
+    #         if col.startswith("Q_"):
+    #             q_columns.append(col)
+    #         elif col.startswith("Q0_"):
+    #             q_columns.append(col)
+    #         elif f"Q_{col}" in columns:
+    #             q_columns.append(col)
+    #     return q_columns
 
-    @staticmethod
-    def _get_translated_columns(columns: list[str]) -> list[str]:
-        new_columns = []
-        for col in columns:
-            if col.startswith("Q_"):
-                new_columns.append(f"QV:SMHI:{col[2:]}")
-            elif col.startswith("Q0_"):
-                new_columns.append(f"QV:SMHI:{col}")
-            else:
-                new_columns.append(col)
-        return new_columns
+    # @staticmethod
+    # def _get_translated_columns(columns: list[str]) -> list[str]:
+    #     new_columns = []
+    #     for col in columns:
+    #         if col.startswith("Q_"):
+    #             new_columns.append(f"QV:SMHI:{col[2:]}")
+    #         elif col.startswith("Q0_"):
+    #             new_columns.append(f"QV:SMHI:{col}")
+    #         else:
+    #             new_columns.append(col)
+    #     return new_columns

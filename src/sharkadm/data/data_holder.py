@@ -112,14 +112,14 @@ class DataHolder(ABC):
 
     @property
     def header_mapper(self):
-        mappers = []
+        mappers = set()
         for source in self._data_sources.values():
             if not source.header_mapper:
                 continue
-            mappers.append(source.header_mapper)
+            mappers.add(source.header_mapper)
         if len(mappers) != 1:
             return None
-        return mappers[0]
+        return mappers.pop()
 
     @property
     def qf_column_prefixes(self) -> list[str]:

@@ -121,6 +121,7 @@ from sharkadm.transformers.dyntaxa import (
     PolarsAddReportedScientificNameDyntaxaId,
     PolarsAddTaxonRanks,
 )
+from sharkadm.transformers.profile import PolarsAddMetadataToProfileData
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
 from sharkadm.transformers.laboratory import (
