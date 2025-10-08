@@ -217,25 +217,24 @@ class PolarsAddDensity(PolarsTransformer):
             )
             return
         if (
-            data_holder.data["parameter"]
-            .is_in([self.practical_salinity, self.temperature])
-            .sum()
+            sum(
+                [
+                    data_holder.data.filter(
+                        (pl.col("parameter") == self.practical_salinity)
+                        & pl.col("value").is_not_null()
+                    ).height
+                    > 0,
+                    data_holder.data.filter(
+                        (pl.col("parameter") == self.temperature)
+                        & pl.col("value").is_not_null()
+                    ).height
+                    > 0,
+                ]
+            )
             < 2
         ):
             adm_logger.log_transformation(
-                f"Missing required {self.practical_salinity} and/or {self.temperature}.",
-                level=adm_logger.WARNING,
-            )
-            return
-        if (
-            data_holder.data["parameter"].is_in(
-                [self.practical_salinity, self.temperature]
-            )
-            & (data_holder.data["value"].is_not_null())
-        ).sum() == 0:
-            adm_logger.log_transformation(
-                f"Not enough {self.practical_salinity} and "
-                f"{self.temperature} data to calculate from.",
+                f"Missing required {self.practical_salinity}, and/or {self.temperature}.",
                 level=adm_logger.WARNING,
             )
             return
@@ -349,27 +348,32 @@ class PolarsAddOxygenSaturation(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
+
         if (
-            data_holder.data["parameter"]
-            .is_in([self.practical_salinity, self.temperature, self.oxygen])
-            .sum()
+            sum(
+                [
+                    data_holder.data.filter(
+                        (pl.col("parameter") == self.practical_salinity)
+                        & pl.col("value").is_not_null()
+                    ).height
+                    > 0,
+                    data_holder.data.filter(
+                        (pl.col("parameter") == self.temperature)
+                        & pl.col("value").is_not_null()
+                    ).height
+                    > 0,
+                    data_holder.data.filter(
+                        (pl.col("parameter") == self.oxygen)
+                        & pl.col("value").is_not_null()
+                    ).height
+                    > 0,
+                ]
+            )
             < 3
         ):
             adm_logger.log_transformation(
                 f"Missing required {self.practical_salinity}, "
                 f"{self.temperature} and/or {self.oxygen}.",
-                level=adm_logger.WARNING,
-            )
-            return
-        if (
-            data_holder.data["parameter"].is_in(
-                [self.practical_salinity, self.temperature, self.oxygen]
-            )
-            & (data_holder.data["value"].is_not_null())
-        ).sum() < 3:
-            adm_logger.log_transformation(
-                f"Not enough {self.practical_salinity} and "
-                f"{self.temperature} data to calculate from.",
                 level=adm_logger.WARNING,
             )
             return
