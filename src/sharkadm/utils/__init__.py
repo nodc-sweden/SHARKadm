@@ -2,6 +2,8 @@ import datetime
 import os
 import pathlib
 import platform
+import posixpath
+import re
 import shutil
 import subprocess
 import sys
@@ -197,6 +199,37 @@ def unzip_file(path: pathlib.Path, export_directory: pathlib.Path, delete_old=Fa
     sub_export_dir = export_directory / path.stem
     if sub_export_dir.exists() and not delete_old:
         raise IsADirectoryError(f"Already exist: {sub_export_dir}")
-    with zipfile.ZipFile(path, "r") as zip_ref:
-        zip_ref.extractall(sub_export_dir)
+    with zipfile.ZipFile(path) as zip_reference:
+        members = _normalize_zip_content(zip_reference)
+        zip_reference.extractall(sub_export_dir, members=members)
     return sub_export_dir
+
+
+def _normalize_zip_content(zip_reference: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
+    """Normalize file paths in opened zip file
+
+    Older Windows tools can create zip files that violates the zip standard. This function
+    makes any absolute paths inside the archive relative and translates Windows path
+    separators to POSIX."""
+    members = []
+    seen = set()
+    for info in zip_reference.infolist():
+        is_dir = info.is_dir() or info.filename.endswith("/")
+        relative_path = re.sub(
+            r"^[A-Za-z]:", "", info.filename.replace("\\", "/")
+        ).lstrip("/")
+        normalized_relative_path = posixpath.normpath(relative_path)
+        if (
+            normalized_relative_path in ("", ".")
+            or normalized_relative_path.startswith("..")
+            or normalized_relative_path in seen
+        ):
+            continue
+
+        if is_dir and not normalized_relative_path.endswith("/"):
+            normalized_relative_path += "/"
+
+        seen.add(normalized_relative_path)
+        info.filename = normalized_relative_path
+        members.append(info)
+    return members
