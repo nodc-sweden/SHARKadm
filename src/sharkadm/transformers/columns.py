@@ -4,6 +4,7 @@ import polars as pl
 
 from sharkadm.config import get_column_views_config
 from sharkadm.utils import add_column, approved_data, matching_strings
+from .. import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import (
@@ -270,3 +271,56 @@ class PolarsAddBooleanLargerThan(PolarsTransformer):
         )
 
         data_holder.data = data_holder.data.drop([float_col1, float_col2])
+
+
+class PolarsFixDuplicateColumns(PolarsTransformer):
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return ("Trying to fix duplicate columns in data. "
+                "Logs warning if column with no values or values are the same. "
+                "Columns are then removed. "
+                "Logs error if conflict is found")
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        mapper = dict()
+        for col in data_holder.data.columns:
+            if "__duplicate" not in col:
+                continue
+            orig_col = col.split("__duplicate")[0]
+            mapper.setdefault(orig_col, set())
+            mapper[orig_col].add(orig_col)
+            mapper[orig_col].add(col)
+        if not mapper:
+            return
+        for key, cols in mapper.items():
+            if len(cols) > 2:
+                self._log(f"Cant handle more than two duplicated columns: {key}",
+                          level=adm_logger.ERROR)
+                continue
+            # Check if one of the columns are empty
+            valid_col = None
+            for col in cols:
+                if set(data_holder.data[col]) != {""}:
+                    valid_col = col
+                    continue
+                if set(data_holder.data[col]) != {""} and valid_col:
+                    valid_col = None
+            if valid_col:
+                self._log(f"No values in duplicated column {key}. "
+                          f"Will keep the one with values.",
+                          level=adm_logger.WARNING)
+                if "__duplicate" in valid_col:
+                    data_holder.data = data_holder.data.drop(key)
+                    data_holder.data = data_holder.data.rename({valid_col: key})
+                else:
+                    data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
+                continue
+            columns = list[cols]
+            if len(data_holder.data.filter(pl.col(columns[0]) == pl.col(columns[1]))) == len(data_holder.data):
+                self._log(f"Duplicated column {key} has the same values. "
+                          f"Will remove one of them.",
+                          level=adm_logger.WARNING)
+                data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
+
+

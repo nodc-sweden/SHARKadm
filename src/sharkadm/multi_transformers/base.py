@@ -199,7 +199,7 @@ class PolarsMultiTransformer(PolarsTransformer):
         )
         t0 = time.time()
         for trans in self._transformers:
-            trans().transform(data_holder=data_holder)
+            trans(**self._kwargs).transform(data_holder=data_holder)
         adm_logger.log_workflow(
             f"Multi transformer {self.__class__.__name__} executed "
             f"in {time.time() - t0} seconds",

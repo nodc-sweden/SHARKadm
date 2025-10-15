@@ -52,6 +52,7 @@ from sharkadm.transformers.columns import (
     PolarsAddFloatColumns,
     PolarsAddColumnDiff,
     PolarsAddBooleanLargerThan,
+    PolarsFixDuplicateColumns,
 )
 from sharkadm.transformers.coordinates import PolarsSetBoundingBox
 from sharkadm.transformers.cruise import AddCruiseId, PolarsAddCruiseId

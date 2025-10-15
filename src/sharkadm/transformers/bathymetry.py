@@ -1,8 +1,20 @@
-import nodc_geography
+
+
 import polars as pl
 
 from sharkadm.data import PolarsDataHolder
 from sharkadm.transformers.base import PolarsTransformer
+from sharkadm.sharkadm_logger import adm_logger
+
+try:
+    import nodc_geography
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. '
+        f"You need to install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
 
 
 class PolarsAddEmodnetBathymetryDepth(PolarsTransformer):

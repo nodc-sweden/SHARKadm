@@ -271,6 +271,7 @@ class SHARKadmPolarsController(BaseSHARKadmController):
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
         self.transform(transformers.PolarsAddRowNumber())
+        self.transform(transformers.PolarsFixDuplicateColumns())
         return self
 
     def transform_all(self) -> Self:
