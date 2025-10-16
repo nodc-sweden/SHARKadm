@@ -2,7 +2,7 @@ import polars as pl
 
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 
-from .base import Transformer
+from .base import PolarsTransformer, Transformer
 
 
 class AddDatasetName(Transformer):
@@ -29,7 +29,7 @@ class AddDatasetFileName(Transformer):
         )
 
 
-class PolarsAddDatasetName(Transformer):
+class PolarsAddDatasetName(PolarsTransformer):
     col_to_set = "dataset_name"
 
     @staticmethod
@@ -42,7 +42,7 @@ class PolarsAddDatasetName(Transformer):
         )
 
 
-class PolarsAddDatasetFileName(Transformer):
+class PolarsAddDatasetFileName(PolarsTransformer):
     col_to_set = "dataset_file_name"
 
     @staticmethod

@@ -31,6 +31,10 @@ class DeliveryNote:
         self._import_matrix_key = data.get("import_matrix_key", None)
         self._mapper = mapper
 
+        # TODO: Fullhack
+        if self._data["DTYPE"] == "Physical and Chemical":
+            self._data["DTYPE"] = "PhysicalChemical"
+
         dtype = self.translate_codes.get_translation(
             field="delivery_datatype",
             synonym=self._data["DTYPE"],
@@ -45,10 +49,6 @@ class DeliveryNote:
             )
 
         self._data["DTYPE"] = dtype
-
-        # TODO: Fullhack
-        if self._data["DTYPE"] == "Physical and Chemical":
-            self._data["DTYPE"] = "PhysicalChemical"
 
         if self._mapper:
             self._map_data()

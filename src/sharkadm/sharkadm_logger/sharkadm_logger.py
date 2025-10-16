@@ -388,6 +388,7 @@ class SHARKadmLogger:
         levels = self._get_levels(*args, levels=levels)
         purposes = self._get_purposes(*args, purposes=purposes)
 
+        print(f"{levels=}")
         self._filtered_levels = levels
         self._filtered_purposes = purposes
         self._filtered_log_types = log_types

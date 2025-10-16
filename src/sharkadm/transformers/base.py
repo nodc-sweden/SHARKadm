@@ -130,7 +130,7 @@ class Transformer(ABC):
 
         self._log_workflow(
             f"Applying transformer: {self.__class__.__name__}",
-            item=self.get_transformer_description(),
+            item=self.description,
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
@@ -215,7 +215,11 @@ class PolarsTransformer(ABC):
 
     @property
     def description(self) -> str:
-        return self.get_transformer_description()
+        # return self.get_transformer_description()
+        info_str = self.get_transformer_description()
+        # if self._data_filter:
+        #     info_str = f"{info_str} (With filter {self._data_filter.description})"
+        return info_str
 
     def transform(self, data_holder: "PolarsDataHolder") -> None:
         if (
@@ -242,11 +246,11 @@ class PolarsTransformer(ABC):
             )
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
-            valid=self.invalid_data_structures, invalid=self.invalid_data_structures
+            valid=self.valid_data_structures, invalid=self.invalid_data_structures
         ):
             self._log_workflow(
-                f"Invalid data_format {data_holder.data_structure} for transformer"
-                f" {self.name}",
+                f"Invalid data structure {data_holder.data_structure} "
+                f"for transformer {self.name}",
                 level=adm_logger.DEBUG,
             )
             return
@@ -280,8 +284,13 @@ class PolarsTransformer(ABC):
             pl.lit("").alias(self.col_to_set)
         )
 
-    def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
-        data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
+    def _add_empty_col(
+        self, data_holder: "PolarsDataHolder", col: str, _float=False
+    ) -> None:
+        val = None if _float else ""
+        if col in data_holder.columns:
+            return
+        data_holder.data = data_holder.data.with_columns(pl.lit(val).alias(col))
 
     def _add_to_col_to_set(
         self, data_holder: "PolarsDataHolder", lookup_name, new_name: str

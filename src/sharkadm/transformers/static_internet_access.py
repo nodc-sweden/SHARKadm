@@ -19,7 +19,7 @@ class AddStaticInternetAccessInfo(Transformer):
 
 
 class PolarsAddStaticInternetAccessInfo(Transformer):
-    valid_data_holders = get_archive_data_holder_names()
+    # valid_data_holders = get_archive_data_holder_names()
     col_to_set = "internet_access"
     text_to_set = "https://shark.smhi.se"
 

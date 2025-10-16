@@ -28,7 +28,9 @@ from sharkadm.data.odv import (
     path_has_or_is_odv_data,
 )
 from sharkadm.data.profile import (
+    get_polars_profile_cnv_data_holder,
     get_polars_profile_standard_format_data_holder,
+    path_has_or_is_cnv_profile_data,
     path_has_or_is_standard_format_profile_data,
 )
 from sharkadm.data.shark import (
@@ -151,20 +153,24 @@ def get_polars_data_holder(
         if path.suffix == ".xlsx":
             return get_polars_dv_template_data_holder(path)
         if path_is_zip_archive(path):
-            return get_polars_zip_archive_data_holder(path)
+            return get_polars_zip_archive_data_holder(path, **kwargs)
         if lims_directory := is_lims_directory(path):
             return get_polars_lims_data_holder(lims_directory, **kwargs)
         if path.is_file():
             if file_is_from_shark(path):
                 return get_polars_shark_data_holder(path, **kwargs)
         if path.is_dir():
+            if path_has_or_is_standard_format_profile_data(path):
+                return get_polars_profile_standard_format_data_holder(path, **kwargs)
+            if path_has_or_is_cnv_profile_data(path):
+                return get_polars_profile_cnv_data_holder(path, **kwargs)
             archive_directory = directory_is_archive(path)
             if archive_directory:
                 return get_polars_archive_data_holder(archive_directory)
-            if path_has_or_is_standard_format_profile_data(path):
-                return get_polars_profile_standard_format_data_holder(path, **kwargs)
         if path_has_or_is_standard_format_profile_data(path):
             return get_polars_profile_standard_format_data_holder(path, **kwargs)
+        if path_has_or_is_cnv_profile_data(path):
+            return get_polars_profile_cnv_data_holder(path, **kwargs)
         if path_has_or_is_odv_data(path):
             return get_polars_odv_data_holder(path, **kwargs)
     # if sharkweb:
