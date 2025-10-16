@@ -4,6 +4,7 @@ import re
 from sharkadm.sharkadm_logger import adm_logger
 
 from .base import DataHolderProtocol, Validator
+from ..data import PolarsDataHolder
 
 
 class MissingTime(Validator):
@@ -49,25 +50,29 @@ class ValidateDateAndTime(Validator):
     def get_validator_description() -> str:
         return "Checks that visit date and sample time are valid."
 
-    def _validate(self, data_holder: DataHolderProtocol) -> None:
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
         self._log_workflow(
             "Checking that visit date and sample time.",
         )
 
         error = False
+        date_col = "visit_date"
+        time_col = "sample_time"
+        if date_col not in data_holder.data.columns:
+            date_col = "sample_date"
         for (visit_date, sample_time), df in data_holder.data.group_by(
-            ["visit_date", "sample_time"]
+                [date_col, time_col]
         ):
             if not (time_component := self._time_component(sample_time)):
                 self._log_fail(
-                    f"Sample time not valid: '{sample_time}'",
+                    f"Sample time ({time_col}) not valid: '{sample_time}'",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True
 
             if not (date_component := self._date_component(visit_date)):
                 self._log_fail(
-                    f"Visit date not valid: '{visit_date}'",
+                    f"Visit date {date_col} not valid: '{visit_date}'",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True

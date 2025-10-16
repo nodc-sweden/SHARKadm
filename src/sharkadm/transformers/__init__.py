@@ -13,7 +13,12 @@ from sharkadm.transformers.add_gsw_parameters import (
 from sharkadm.transformers.add_lmqnt import AddLmqnt, PolarsAddLmqnt
 from sharkadm.transformers.add_uncertainty import AddUncertainty, PolarsAddUncertainty
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
-from sharkadm.transformers.arithmetic import Divide, Multiply
+from sharkadm.transformers.arithmetic import (
+    Divide,
+    Multiply,
+    PolarsMultiply,
+    PolarsDivide,
+)
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
 from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.transformers.boolean import FixYesNo
@@ -21,18 +26,14 @@ from sharkadm.transformers.bvol import (
     PolarsAddBvolAphiaId,
     PolarsAddBvolRefList,
     PolarsAddBvolScientificNameAndSizeClass,
-    # AddBvolAphiaId,
-    # AddBvolRefList,
-    # AddBvolScientificNameAndSizeClass,
-    # AddBvolScientificNameAndSizeClass,
-    # AddBvolScientificNameOriginal,
     PolarsAddBvolScientificNameOriginal,
 )
 from sharkadm.transformers.calculate import (
-    # CalculateAbundance,
-    # CalculateBiovolume,
-    # CalculateCarbon,
     PolarsCalculateAbundance,
+    PolarsCalculateBiovolume,
+    PolarsCalculateCarbon,
+    PolarsFixCalcByDc,
+    PolarsOnlyKeepReportedIfCalcByDc,
 )
 from sharkadm.transformers.columns import (
     AddColumnViewsColumns,
@@ -40,10 +41,17 @@ from sharkadm.transformers.columns import (
     PolarsAddApprovedKeyColumn,
     PolarsAddColumnViewsColumns,
     PolarsRemoveColumns,
+    PolarsClearColumns,
     RemoveColumns,
     SortColumns,
-    AddColumnsWithPrefix,
+    PolarsSortColumns,
+    PolarsAddDEPHqcColumn,
+    PolarsAddFloatColumns,
+    PolarsAddColumnDiff,
+    PolarsAddBooleanLargerThan,
+    PolarsFixDuplicateColumns,
 )
+from sharkadm.transformers.coordinates import PolarsSetBoundingBox
 from sharkadm.transformers.cruise import AddCruiseId, PolarsAddCruiseId
 from sharkadm.transformers.custom_id import (
     AddCustomId,
@@ -111,6 +119,7 @@ from sharkadm.transformers.dyntaxa import (
     PolarsAddReportedScientificNameDyntaxaId,
     PolarsAddTaxonRanks,
 )
+from sharkadm.transformers.profile import PolarsAddMetadataToProfileData
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import ConvertFlagsToSDN, PolarsConvertFlagsToSDN
 from sharkadm.transformers.laboratory import (
@@ -134,16 +143,17 @@ from sharkadm.transformers.lims import (
     PolarsKeepOnlyJellyfishLines,
 )
 from sharkadm.transformers.location import (
-    AddLocationCounty,
-    AddLocationHelcomOsparArea,
-    AddLocationMunicipality,
-    AddLocationNation,
-    AddLocationSeaBasin,
-    AddLocationTypeArea,
-    AddLocationTYPNFS06,
-    AddLocationWaterCategory,
-    AddLocationWaterDistrict,
-    AddLocationWB,
+    PolarsAddLocationHelcomOsparArea,
+    PolarsAddLocationMunicipality,
+    PolarsAddLocationNation,
+    PolarsAddLocationSeaBasin,
+    PolarsAddLocationTypeArea,
+    PolarsAddLocationSeaAreaCode,
+    PolarsAddLocationSeaAreaName,
+    PolarsAddLocationTYPNFS06,
+    PolarsAddLocationWaterCategory,
+    PolarsAddLocationWaterDistrict,
+    PolarsAddLocationWB,
     PolarsAddLocationCounty,
     PolarsAddLocationR,
     PolarsAddLocationRA,
@@ -152,9 +162,8 @@ from sharkadm.transformers.location import (
     PolarsAddLocationRG,
     PolarsAddLocationRH,
     PolarsAddLocationRO,
-    PolarsAddLocationTypeArea,
-    PolarsAddLocationWB,
     PolarsAddLocationOnLand,
+    PolarsAddLocations,
 )
 from sharkadm.transformers.long_to_wide import LongToWide
 from sharkadm.transformers.manual import (
@@ -169,6 +178,7 @@ from sharkadm.transformers.map_parameter_column import (
     MapperParameterColumn,
     PolarsMapperParameterColumn,
 )
+from sharkadm.transformers.metadata import PolarsAddFromMetadata
 from sharkadm.transformers.occurrence_id import AddOccurrenceId
 from sharkadm.transformers.orderer import (
     AddEnglishSampleOrderer,
@@ -228,13 +238,19 @@ from sharkadm.transformers.reporting_institute import (
 from sharkadm.transformers.row import AddRowNumber, PolarsAddRowNumber
 from sharkadm.transformers.serial_number import FormatSerialNumber
 from sharkadm.transformers.sampler_area import AddCalculatedSamplerArea
-from sharkadm.transformers.sampling_info import AddSamplingInfo
+from sharkadm.transformers.sampling_info import AddSamplingInfo, PolarsAddSamplingInfo
 from sharkadm.transformers.scientific_name import (
     SetScientificNameFromDyntaxaScientificName,
     SetScientificNameFromReportedScientificName,
+    PolarsSetScientificNameFromDyntaxaScientificName,
+    PolarsSetScientificNameFromReportedScientificName,
 )
-from sharkadm.transformers.shark_id import AddSharkId
-from sharkadm.transformers.sort_data import SortData, SortDataPlanktonImaging
+from sharkadm.transformers.shark_id import AddSharkId, PolarsAddSharkId
+from sharkadm.transformers.sort_data import (
+    SortData,
+    PolarsSortData,
+    SortDataPlanktonImaging,
+)
 from sharkadm.transformers.static_data_holding_center import (
     AddStaticDataHoldingCenterEnglish,
     AddStaticDataHoldingCenterSwedish,
@@ -273,16 +289,16 @@ from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 @functools.cache
 def get_transformer_list() -> list[str]:
     """Returns a sorted list of name of all available transformers"""
-    return sorted(utils.get_all_class_children_names(Transformer))
+    return sorted(utils.get_all_class_children_names(PolarsTransformer))
 
 
-def get_transformers() -> dict[str, Type[Transformer]]:
+def get_transformers() -> dict[str, Type[PolarsTransformer]]:
     """Returns a dictionary with transformers"""
-    return utils.get_all_class_children(Transformer)
+    return utils.get_all_class_children(PolarsTransformer)
 
 
-def get_transformer_object(name: str, **kwargs) -> Transformer | None:
-    """Returns Transformer object that matches the given transformer names"""
+def get_transformer_object(name: str, **kwargs) -> PolarsTransformer | None:
+    """Returns PolarsTransformer object that matches the given transformer names"""
     all_trans = get_transformers()
     tran = all_trans.get(name)
     if not tran:
@@ -335,14 +351,10 @@ def write_transformers_description_to_file(path: str | pathlib.Path) -> None:
         fid.write(get_transformers_description_text())
 
 
-def get_physical_chemical_transformer_objects() -> list[Transformer]:
+def get_physical_chemical_transformer_objects() -> list[PolarsTransformer]:
     return [
-        AddDEPHqcColumn(),
-        # AddSamplePosition(),
-        # ChangeDateFormat(),
-        AddColumnsForAutomaticQC(),
-        AddCruiseId(),
-        AddVisitKey(),
-        # AddStatus(),
-        WideToLong(),
+        PolarsAddDEPHqcColumn(),
+        PolarsAddCruiseId(),
+        PolarsAddVisitKey(),
+        PolarsWideToLong(),
     ]

@@ -61,6 +61,12 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        if not hasattr(data_holder, "analyse_info") or data_holder.analyse_info is None:
+            self._log(
+                "Can not add analyse info. No analyse_info found",
+                level=adm_logger.WARNING,
+            )
+            return
 
         parameters = data_holder.analyse_info.parameters
         for (parameter, dtime), df in data_holder.data.group_by(

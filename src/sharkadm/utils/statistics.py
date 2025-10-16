@@ -1,16 +1,16 @@
 from typing import Any
 
-from sharkadm.data.data_holder import PandasDataHolder
+from sharkadm.data.data_holder import PolarsDataHolder
 
 
-def get_data_holder_statistics(data_holder: PandasDataHolder) -> dict[str, Any]:
+def get_data_holder_statistics(data_holder: PolarsDataHolder) -> dict[str, Any]:
     info = dict()
     if "datetime" in data_holder.columns:
         info["start_datetime"] = min(data_holder.data["datetime"])
         info["end_datetime"] = max(data_holder.data["datetime"])
 
     if "visit_key" in data_holder.columns:
-        info["nr_visits"] = len(data_holder.data.groupby("visit_key"))
+        info["nr_visits"] = len(set(data_holder.data["visit_key"]))
 
     info["nr_stations"] = len(set(data_holder.data["reported_station_name"]))
     info["nr_rows"] = len(data_holder.data)

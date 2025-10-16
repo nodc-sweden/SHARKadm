@@ -108,7 +108,7 @@ class XlsxExporter(SharkadmLoggerExporter):
         # Make the columns wider for clarity.
         worksheet.set_column(0, 0, 40)
         worksheet.set_column(1, 1, 10)
-        worksheet.set_column(2, 2, 15)
+        worksheet.set_column(2, 2, 40)
         worksheet.set_column(3, 3, 20)
         worksheet.set_column(4, 4, 30)
         worksheet.set_column(5, 5, 110)

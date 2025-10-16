@@ -41,6 +41,10 @@ class ImportMatrixMapper:
         return sorted(self._data)
 
     @property
+    def mapper(self) -> dict:
+        return self._data
+
+    @property
     def reverse_mapper(self):
         return self._reverse_mapper
 

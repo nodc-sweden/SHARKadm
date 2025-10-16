@@ -5,7 +5,7 @@ from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers.base import Transformer
+from sharkadm.transformers.base import PolarsTransformer, Transformer
 from sharkadm.utils import yaml_data
 
 
@@ -126,7 +126,7 @@ class AddStatus(Transformer):
         data_holder.data["data_checked_by_en"] = data["data_checked_by_en"]
 
 
-class PolarsAddDeliveryNoteInfo(Transformer):
+class PolarsAddDeliveryNoteInfo(PolarsTransformer):
     physical_chemical_keys = (
         "PhysicalChemical".lower(),
         "Physical and Chemical".lower(),
@@ -182,7 +182,7 @@ class PolarsAddDeliveryNoteInfo(Transformer):
                 item=data_holder.dataset_name,
             )
             return
-        checked_by = data_holder.delivery_note["data kontrollerad av"]
+        checked_by = data_holder.delivery_note["DATA KONTROLLERAD AV"]
         if not checked_by:
             self._log(
                 'Could not set "status" and "checked". Missing information in '
@@ -203,7 +203,7 @@ class PolarsAddDeliveryNoteInfo(Transformer):
             [
                 pl.lit(data["check_status_sv"]).alias("check_status_sv"),
                 pl.lit(data["check_status_en"]).alias("check_status_en"),
-                pl.lit(data["check_status_sv"]).alias("check_status_sv"),
-                pl.lit(data["check_status_sv"]).alias("check_status_sv"),
+                pl.lit(data["data_checked_by_sv"]).alias("data_checked_by_sv"),
+                pl.lit(data["data_checked_by_en"]).alias("data_checked_by_en"),
             ]
         )

@@ -1,9 +1,12 @@
 from typing import Protocol
 
 import pandas as pd
+import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
+from ..data import PolarsDataHolder
+from ..utils.mandatory_columns import get_mandatory_columns
 from .base import Validator  # , DataHolderProtocol
 
 
@@ -19,6 +22,25 @@ class DataHolderProtocol(Protocol):
 
     @property
     def mandatory_nat_columns(self) -> list: ...
+
+
+class ValidateMandatoryColumns(Validator):
+    @staticmethod
+    def get_validator_description() -> str:
+        return "Checks if mandatory columns listed in sharkadm config have values."
+
+    def _validate(self, data_holder: PolarsDataHolder):
+        mandatory_columns = get_mandatory_columns(data_holder.data_type_internal)
+        for col in mandatory_columns:
+            if col not in data_holder.data.columns:
+                self._log_fail(f"Mandatory column {col} not in data")
+                continue
+            missing = data_holder.data.filter(pl.col(col) == "")
+            if not missing.is_empty():
+                self._log_fail(
+                    f"{len(missing)} missing value(s) in mandatory column {col}",
+                    row_numbers=list(missing["row_number"]),
+                )
 
 
 class ValidateValuesInMandatoryNatColumns(Validator):

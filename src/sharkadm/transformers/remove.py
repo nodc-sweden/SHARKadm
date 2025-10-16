@@ -74,7 +74,7 @@ class RemoveValuesInColumns(Transformer):
         columns = []
         for col in data_holder.data.columns:
             for arg in self.apply_on_columns:
-                if re.match(arg, col):
+                if re.search(arg, col):
                     columns.append(col)
                     break
         return columns
@@ -737,7 +737,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
         columns = []
         for col in data_holder.data.columns:
             for arg in self.apply_on_columns:
-                if re.match(arg, col):
+                if re.search(arg, col):
                     columns.append(col)
                     break
         return columns

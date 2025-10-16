@@ -126,11 +126,12 @@ class _PolarsReportingInstitute(PolarsTransformer):
             info = _translate_codes.get_info(
                 self.lookup_field, data_holder.reporting_institute
             )
-            self._log("Setting reporting_institute from data_holder")
+            self._log(
+                "Setting reporting_institute from data_holder", level=adm_logger.DEBUG
+            )
             data_holder.data = data_holder.data.with_columns(
                 pl.lit(info[self.lookup_key]).alias(self.col_to_set)
             )
-            # data_holder.data[self.col_to_set] = info[self.lookup_key]
             return True
         return False
 

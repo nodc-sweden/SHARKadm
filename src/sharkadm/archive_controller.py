@@ -113,7 +113,7 @@ class ArchiveController:
     def _filter_archive_name_in_list(self, string: str):
         new_archive_list = []
         for path in self.archive_list:
-            if not re.match(string, path.name):
+            if not re.search(string, path.name):
                 continue
             new_archive_list.append(path)
         self._archive_list = new_archive_list
