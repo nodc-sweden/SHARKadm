@@ -28,9 +28,10 @@ from sharkadm.data.odv import (
     path_has_or_is_odv_data,
 )
 from sharkadm.data.profile import (
-    get_polars_profile_standard_format_data_holder,
-    path_has_or_is_standard_format_profile_data, path_has_or_is_cnv_profile_data,
     get_polars_profile_cnv_data_holder,
+    get_polars_profile_standard_format_data_holder,
+    path_has_or_is_cnv_profile_data,
+    path_has_or_is_standard_format_profile_data,
 )
 from sharkadm.data.shark import (
     file_is_from_shark,

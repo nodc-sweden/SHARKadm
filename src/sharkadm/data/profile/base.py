@@ -1,11 +1,4 @@
-import pathlib
-from typing import Protocol
-
-import polars as pl
-
-from sharkadm.data.archive import metadata
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.profile.cnv_file import CnvDataFile
 
 
 class PolarsProfileDataHolder(PolarsDataHolder):
@@ -33,8 +26,7 @@ class PolarsProfileDataHolder(PolarsDataHolder):
     @property
     def metadata(self) -> dict:
         meta = {}
-        for (date, time), df in self.data.group_by(self.date_column,
-                                                   self.time_column):
+        for (date, time), df in self.data.group_by(self.date_column, self.time_column):
             key = (date, time)
             meta[key] = {}
             for col in df.columns:

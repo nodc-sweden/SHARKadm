@@ -70,9 +70,9 @@ class SharkadmLoggerExporter(ABC):
     def _open_file(self):
         if not self.kwargs.get(
             "open_report",
-            self.kwargs.get("open_file",
-                            self.kwargs.get("open_export_file",
-                                            self.kwargs.get("open"))),
+            self.kwargs.get(
+                "open_file", self.kwargs.get("open_export_file", self.kwargs.get("open"))
+            ),
         ):
             return
         if not self.file_path:

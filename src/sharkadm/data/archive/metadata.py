@@ -4,6 +4,7 @@ import datetime
 import logging
 import pathlib
 from typing import Protocol
+
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
@@ -18,9 +19,12 @@ class Mapper(Protocol):
 
 
 class Metadata:
-    def __init__(self, data: pl.DataFrame,
-                 mapper: Mapper = None,
-                 path: pathlib.Path = None) -> None:
+    def __init__(
+        self,
+        data: pl.DataFrame,
+        mapper: Mapper | None = None,
+        path: pathlib.Path | None = None,
+    ) -> None:
         self._data = data
         self._mapper = mapper
         self._path = path
@@ -34,8 +38,6 @@ class Metadata:
                 f"No mapper found when trying to map Metadata file: {self._path}"
             )
             return
-        # new_cols = {col: self._mapper.get_internal_name(col) for col in self._data.columns}
-        print(f"{self._mapper.mapper=}")
         self._data = self._data.rename(self._mapper.mapper, strict=False)
 
     def __str__(self):
@@ -58,48 +60,9 @@ class Metadata:
             separator="\t",
             infer_schema=False,
             missing_utf8_is_empty_string=True,
-            truncate_ragged_lines=True
+            truncate_ragged_lines=True,
         )
         return Metadata(data, mapper=mapper, path=path)
-
-    # @classmethod
-    # def from_dv_template(
-    #     cls, path: str | pathlib.Path, mapper: Mapper = None
-    # ) -> "Metadata":
-    #     wb = openpyxl.load_workbook(path)
-    #     sheet_name = None
-    #     for name in ["Provtagningsinfo"]:
-    #         if name in wb.sheetnames:
-    #             sheet_name = name
-    #             break
-    #     if not sheet_name:
-    #         adm_logger.log_workflow(
-    #             f"Could not find sampling_info sheet in file: {path}",
-    #             level=adm_logger.WARNING,
-    #         )
-    #         return
-    #         # raise Exception(f'Could not find analyse_info sheet in file: {path}')
-    #
-    #     ws = wb.get_sheet_by_name(sheet_name)
-    #     skip_nr_rows = 0
-    #     for r in range(1, 5):
-    #         if ws.cell(r, 1).value in ["Tabellhuvud:"]:
-    #             skip_nr_rows = r - 1
-    #             break
-    #     df = pd.read_excel(path, skiprows=skip_nr_rows, sheet_name=sheet_name, dtype=str)
-    #     df.fillna("", inplace=True)
-    #     data = dict()
-    #     data["path"] = path
-    #     for row in df.iterrows():
-    #         line_dict = row[1].to_dict()
-    #         if not line_dict["PARAM"]:
-    #             continue
-    #         line_dict["VALIDFR"] = _get_date(line_dict["VALIDFR"])
-    #         line_dict["VALIDTO"] = _get_date(line_dict["VALIDTO"])
-    #         par = line_dict["PARAM"]
-    #         data.setdefault(par, [])
-    #         data[par].append(line_dict)
-    #     return Metadata(data, mapper=mapper)
 
     @property
     def data(self) -> dict[str, str]:

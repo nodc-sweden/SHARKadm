@@ -9,10 +9,8 @@ from sharkadm.validators.aphia_id import (
     ValidateReportedVsAphiaId,
     ValidateReportedVsBvolAphiaId,
 )
-from sharkadm.validators.codes import (
-    ValidateProjectCodes,
-    ValidateLABOcodes)
 from sharkadm.validators.base import Validator
+from sharkadm.validators.codes import ValidateLABOcodes, ValidateProjectCodes
 from sharkadm.validators.column_combination import (
     AssertCombination,
     AssertMinMaxDepthCombination,

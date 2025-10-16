@@ -4,7 +4,7 @@ from sharkadm.data import PolarsDataHolder
 from sharkadm.utils import statistics
 
 from ..utils.paths import get_next_incremented_file_path
-from .base import PolarsFileExporter, PolarsExporter
+from .base import PolarsExporter, PolarsFileExporter
 
 
 class PolarsPrintStatistics(PolarsExporter):

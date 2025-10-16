@@ -2,10 +2,10 @@ import pathlib
 from typing import Union
 
 from sharkadm import config
-
-from sharkadm.data.profile.standard_format_data_holder import (
-    PolarsProfileStandardFormatDataHolder)
 from sharkadm.data.profile.cnv_data_holder import PolarsCnvDataHolder
+from sharkadm.data.profile.standard_format_data_holder import (
+    PolarsProfileStandardFormatDataHolder,
+)
 
 
 def get_polars_profile_standard_format_data_holder(
@@ -71,6 +71,4 @@ def get_polars_profile_cnv_data_holder(
 ) -> PolarsCnvDataHolder:
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(data_type="profile", import_column="PROFILE")
-    return PolarsCnvDataHolder(
-        path=path, header_mapper=mapper, **kwargs
-    )
+    return PolarsCnvDataHolder(path=path, header_mapper=mapper, **kwargs)

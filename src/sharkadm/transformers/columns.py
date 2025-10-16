@@ -4,8 +4,8 @@ import polars as pl
 
 from sharkadm.config import get_column_views_config
 from sharkadm.utils import add_column, approved_data, matching_strings
-from .. import adm_logger
 
+from .. import adm_logger
 from ..data import PolarsDataHolder
 from .base import (
     DataHolderProtocol,
@@ -112,9 +112,7 @@ class PolarsClearColumns(PolarsTransformer):
                 filter(lambda x: re.search(arg, x), data_holder.data.columns)
             )
         for col in columns_to_clear:
-            data_holder.data = data_holder.data.with_columns(
-                pl.lit("").alias(col)
-            )
+            data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
 
 
 class SortColumns(Transformer):
@@ -274,13 +272,14 @@ class PolarsAddBooleanLargerThan(PolarsTransformer):
 
 
 class PolarsFixDuplicateColumns(PolarsTransformer):
-
     @staticmethod
     def get_transformer_description() -> str:
-        return ("Trying to fix duplicate columns in data. "
-                "Logs warning if column with no values or values are the same. "
-                "Columns are then removed. "
-                "Logs error if conflict is found")
+        return (
+            "Trying to fix duplicate columns in data. "
+            "Logs warning if column with no values or values are the same. "
+            "Columns are then removed. "
+            "Logs error if conflict is found"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         mapper = dict()
@@ -295,8 +294,10 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
             return
         for key, cols in mapper.items():
             if len(cols) > 2:
-                self._log(f"Cant handle more than two duplicated columns: {key}",
-                          level=adm_logger.ERROR)
+                self._log(
+                    f"Cant handle more than two duplicated columns: {key}",
+                    level=adm_logger.ERROR,
+                )
                 continue
             # Check if one of the columns are empty
             valid_col = None
@@ -307,9 +308,11 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
                 if set(data_holder.data[col]) != {""} and valid_col:
                     valid_col = None
             if valid_col:
-                self._log(f"No values in duplicated column {key}. "
-                          f"Will keep the one with values.",
-                          level=adm_logger.WARNING)
+                self._log(
+                    f"No values in duplicated column {key}. "
+                    f"Will keep the one with values.",
+                    level=adm_logger.WARNING,
+                )
                 if "__duplicate" in valid_col:
                     data_holder.data = data_holder.data.drop(key)
                     data_holder.data = data_holder.data.rename({valid_col: key})
@@ -317,10 +320,12 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
                     data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
                 continue
             columns = list[cols]
-            if len(data_holder.data.filter(pl.col(columns[0]) == pl.col(columns[1]))) == len(data_holder.data):
-                self._log(f"Duplicated column {key} has the same values. "
-                          f"Will remove one of them.",
-                          level=adm_logger.WARNING)
+            if len(
+                data_holder.data.filter(pl.col(columns[0]) == pl.col(columns[1]))
+            ) == len(data_holder.data):
+                self._log(
+                    f"Duplicated column {key} has the same values. "
+                    f"Will remove one of them.",
+                    level=adm_logger.WARNING,
+                )
                 data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
-
-

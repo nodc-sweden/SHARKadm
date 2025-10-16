@@ -2,8 +2,8 @@ import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import Validator
 from ..data import PolarsDataHolder
+from .base import Validator
 
 try:
     from nodc_codes import get_translate_codes_object
@@ -32,7 +32,6 @@ class _ValidateCodes(Validator):
         return ""
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
-
         for col in self.columns:
             if col not in data_holder.data.columns:
                 self._log_fail(f"No column named {col} in data", level=adm_logger.DEBUG)
@@ -47,16 +46,15 @@ class _ValidateCodes(Validator):
                     if info is not None:
                         continue
                     df = data_holder.data.filter(pl.col(col) == part)
-                    self._log_fail(f'Invalid value(s) ({len(df)} rows) '
-                                   f'"{part}" in column {col}',
-                                   row_numbers=list(df["row_number"]))
+                    self._log_fail(
+                        f'Invalid value(s) ({len(df)} rows) "{part}" in column {col}',
+                        row_numbers=list(df["row_number"]),
+                    )
 
 
 class ValidateProjectCodes(_ValidateCodes):
     lookup_field = "project"
-    columns = (
-        "sample_project_code",
-    )
+    columns = ("sample_project_code",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -70,13 +68,9 @@ class ValidateLABOcodes(_ValidateCodes):
         "sampling_laboratory_code",
         "analytical_laboratory_code",
         "sample_orderer_code",
-
     )
 
     @staticmethod
     def get_validator_description() -> str:
         col_str = ", ".join(ValidateLABOcodes.columns)
         return f"Checks so that all codes are valid in columns: {col_str}"
-
-
-

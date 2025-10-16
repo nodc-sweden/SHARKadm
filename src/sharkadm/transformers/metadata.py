@@ -1,9 +1,8 @@
 import polars as pl
-from . import PolarsTransformer
-from ._codes import _AddCodesProj, _PolarsAddCodesProj
+
 from .. import adm_logger
-from ..data import PolarsDataHolder
 from ..data.zip_archive import PolarsZipArchiveDataHolder
+from . import PolarsTransformer
 
 
 class PolarsAddFromMetadata(PolarsTransformer):
@@ -23,26 +22,29 @@ class PolarsAddFromMetadata(PolarsTransformer):
         for col in self._columns:
             self._add_empty_col(data_holder, col)
 
-        for (statn, date, _id), df in data_holder.data.group_by("reported_station_name",
-                                                                "visit_date",
-                                                                "visit_id"):
+        for (statn, date, _id), df in data_holder.data.group_by(
+            "reported_station_name", "visit_date", "visit_id"
+        ):
             info = data_holder.metadata.get_info(
                 reported_station_name=statn,
                 visit_date=date,
                 visit_id=_id,
             )
             if not info:
-                self._log(f"No match in metadata to add project!",
-                          level=adm_logger.WARNING)
+                self._log(
+                    "No match in metadata to add project!", level=adm_logger.WARNING
+                )
                 return
             if len(info) > 1:
-                self._log(f"To many matches {len(info)} in metadata to add project",
-                          level=adm_logger.WARNING)
+                self._log(
+                    f"To many matches {len(info)} in metadata to add project",
+                    level=adm_logger.WARNING,
+                )
                 return
             visit_boolean = (
-                (pl.col("reported_station_name") == statn) &
-                (pl.col("visit_date") == date) &
-                (pl.col("visit_id") == _id)
+                (pl.col("reported_station_name") == statn)
+                & (pl.col("visit_date") == date)
+                & (pl.col("visit_id") == _id)
             )
             for col in self._columns:
                 data_holder.data = data_holder.data.with_columns(
@@ -51,8 +53,3 @@ class PolarsAddFromMetadata(PolarsTransformer):
                     .otherwise(pl.col(col))
                     .alias(col)
                 )
-
-
-
-
-

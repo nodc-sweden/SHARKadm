@@ -1,10 +1,8 @@
 import datetime
 import re
 
-from sharkadm.sharkadm_logger import adm_logger
-
-from .base import DataHolderProtocol, Validator
 from ..data import PolarsDataHolder
+from .base import Validator
 
 
 class ValidateDateAndTime(Validator):

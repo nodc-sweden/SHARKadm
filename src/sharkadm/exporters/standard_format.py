@@ -1,14 +1,14 @@
 import pathlib
-import re
 
+import pandas as pd
 import polars as pl
 
 from sharkadm import utils
 
-from .base import DataHolderProtocol, PolarsExporter, PolarsFileExporter
 from ..data import PolarsDataHolder
 from ..data.profile.base import PolarsProfileDataHolder
 from ..utils.paths import get_next_incremented_file_path
+from .base import PolarsFileExporter
 
 
 class PolarsStandardFormat(PolarsFileExporter):
@@ -40,8 +40,7 @@ class PolarsStandardFormat(PolarsFileExporter):
 
     def _export(self, data_holder: PolarsProfileDataHolder) -> None:
         metadata = data_holder.metadata_original_columns
-        for (date, time), data in data_holder.data.group_by("visit_date",
-                                                            "sample_time"):
+        for (date, time), data in data_holder.data.group_by("visit_date", "sample_time"):
             stem = pathlib.Path(data[0, "source"]).stem
             meta = metadata[(date, time)]
             data_cols = [col for col in data_holder.data.columns if not meta.get(col)]
@@ -52,10 +51,6 @@ class PolarsStandardFormat(PolarsFileExporter):
             data = self._add_qf_columns(data, data_cols)
             data = self._reorder_data(data, data_cols)
 
-            # d_data = self._get_data(data=data, data_cols=data_cols, data_holder=data_holder)
-            # d_data = self._get_data(data=data, data_holder=data_holder)
-            # d_data = self._get_data(data=data, data_cols=ordered_cols)
-
             path = self._export_directory / f"{stem}.txt"
             if path.exists():
                 path = get_next_incremented_file_path(path)
@@ -63,7 +58,9 @@ class PolarsStandardFormat(PolarsFileExporter):
             with open(path, "w", encoding="cp1252") as fid:
                 fid.write("\n".join(header_lines))
                 fid.write("\n")
-            data.to_pandas().to_csv(path, mode="a", sep="\t", index=False, encoding="cp1252")
+            data.to_pandas().to_csv(
+                path, mode="a", sep="\t", index=False, encoding="cp1252"
+            )
 
     def _add_columns(self, data: pl.DataFrame) -> pl.DataFrame:
         data = data.with_columns(
@@ -77,7 +74,7 @@ class PolarsStandardFormat(PolarsFileExporter):
             LATITUDE_DD=pl.col("visit_reported_latitude"),
             LONGITUDE_DD=pl.col("visit_reported_longitude"),
             CRUISE=pl.lit(""),
-            FILE_NAME=pl.col("source").str.split('\\').list.last()
+            FILE_NAME=pl.col("source").str.split("\\").list.last(),
         )
         if "cruise_id" in data.columns:
             data = data.with_columns(
@@ -98,10 +95,12 @@ class PolarsStandardFormat(PolarsFileExporter):
     def _add_qf_columns(self, data: pl.DataFrame, columns: list[str]) -> pl.DataFrame:
         args = []
         for col in columns:
-            args.extend([
-                pl.lit("").alias(self._get_qcol_name(col)),
-                pl.lit("").alias(self._get_q0col_name(col)),
-            ])
+            args.extend(
+                [
+                    pl.lit("").alias(self._get_qcol_name(col)),
+                    pl.lit("").alias(self._get_q0col_name(col)),
+                ]
+            )
         data = data.with_columns(args)
         return data
 
@@ -116,8 +115,8 @@ class PolarsStandardFormat(PolarsFileExporter):
             "CRUISE",
             "STATION",
             "LATITUDE_DD",
-            "LONGITUDE_DD"
-            ]
+            "LONGITUDE_DD",
+        ]
         pres_cols = []
         depth_cols = []
         exclude_cols = []
@@ -150,8 +149,9 @@ class PolarsStandardFormat(PolarsFileExporter):
     def _get_q0col_name(self, col: str) -> str:
         return f"QV:SMHI:Q0_{col}"
 
-    def _get_data(self, data: pl.DataFrame, data_cols: list[str], data_holder: PolarsDataHolder) -> pl.DataFrame:
-
+    def _get_data(
+        self, data: pl.DataFrame, data_cols: list[str], data_holder: PolarsDataHolder
+    ) -> pl.DataFrame:
         ordered_cols = self._get_reordered_columns(data_cols)
         d_data = data[ordered_cols]
         d_data.columns = self._get_translated_columns(ordered_cols)

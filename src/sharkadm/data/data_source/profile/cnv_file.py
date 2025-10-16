@@ -1,18 +1,14 @@
 import datetime
-import logging
 
 import polars as pl
 
-from sharkadm import utils
-from sharkadm.data.data_source.base import DataFile, PolarsDataFile
+from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.profile.mapper import get_ctd_parameter_mapper
-from sharkadm.data.archive import metadata
 
 mapper = get_ctd_parameter_mapper()
 
 
 class CnvDataFile(PolarsDataFile):
-
     def __init__(self, *args, **kwargs):
         self._metadata_lines: list[str] = []
         super().__init__(*args, **kwargs)
@@ -35,14 +31,17 @@ class CnvDataFile(PolarsDataFile):
                 if not is_data_line:
                     self._metadata_lines.append(line)
                 if line.startswith("* NMEA Latitude"):
-                    metadata["LATIT"] = "".join([c for c in line.split("=", 1)[-1] if
-                                                 c.isdigit() or c == "."])
+                    metadata["LATIT"] = "".join(
+                        [c for c in line.split("=", 1)[-1] if c.isdigit() or c == "."]
+                    )
                 elif line.startswith("* NMEA Longitude"):
-                    metadata["LONGI"] = "".join([c for c in line.split("=", 1)[-1] if
-                                                 c.isdigit() or c == "."]).lstrip("0")
+                    metadata["LONGI"] = "".join(
+                        [c for c in line.split("=", 1)[-1] if c.isdigit() or c == "."]
+                    ).lstrip("0")
                 elif line.startswith("* System UpLoad Time"):
-                    dtime = datetime.datetime.strptime(line.split("=", 1)[-1].strip(),
-                                                       "%b %d %Y %H:%M:%S")
+                    dtime = datetime.datetime.strptime(
+                        line.split("=", 1)[-1].strip(), "%b %d %Y %H:%M:%S"
+                    )
                     metadata["SDATE"] = dtime.strftime("%Y-%m-%d")
                     metadata["STIME"] = dtime.strftime("%H:%M:%S")
                 elif line.startswith("** Station:"):
@@ -62,7 +61,4 @@ class CnvDataFile(PolarsDataFile):
 
         # Add metadata
         for col, val in metadata.items():
-            self._data = self._data.with_columns(
-                pl.lit(val).alias(col)
-            )
-
+            self._data = self._data.with_columns(pl.lit(val).alias(col))

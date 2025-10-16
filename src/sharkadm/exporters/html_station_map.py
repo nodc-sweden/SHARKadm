@@ -438,7 +438,9 @@ class PolarsHtmlMap(PolarsFileExporter):
         if not self._show_custom_positions:
             return
         if not isinstance(self._show_custom_positions, dict):
-            self._show_custom_positions = {"Custom positions": self._show_custom_positions}
+            self._show_custom_positions = {
+                "Custom positions": self._show_custom_positions
+            }
         for name, data in self._show_custom_positions.items():
             fg = folium.FeatureGroup(name=name, show=True)
             rad_fg = folium.FeatureGroup(name=f"{name} radius", show=True)
@@ -449,7 +451,9 @@ class PolarsHtmlMap(PolarsFileExporter):
                     location=[info["lat_dd"], info["lon_dd"]],
                     popup=info.get("popup", None),
                     tooltip=info.get("tooltip", None),
-                    icon=folium.Icon(color=info.get("color", color), icon="glyphicon-remove-sign"),
+                    icon=folium.Icon(
+                        color=info.get("color", color), icon="glyphicon-remove-sign"
+                    ),
                 ).add_to(fg)
                 if info.get("radius"):
                     rad_info_present = True

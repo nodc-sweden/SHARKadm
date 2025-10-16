@@ -7,7 +7,7 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
-from sharkadm.data.archive import analyse_info, delivery_note, sampling_info, metadata
+from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile, PolarsDataFile
 from sharkadm.data.data_source.txt_file import (

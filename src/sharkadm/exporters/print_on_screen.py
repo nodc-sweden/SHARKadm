@@ -1,6 +1,6 @@
 from sharkadm.data import PandasDataHolder
 
-from .base import Exporter, PolarsExporter
+from .base import PolarsExporter
 
 
 class PrintDataFrame(PolarsExporter):

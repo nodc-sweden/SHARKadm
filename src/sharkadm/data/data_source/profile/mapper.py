@@ -1,5 +1,6 @@
-from sharkadm import config
 import yaml
+
+from sharkadm import config
 
 
 def get_ctd_parameter_mapper() -> dict:

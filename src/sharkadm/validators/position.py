@@ -1,35 +1,33 @@
 import logging
 import re
-from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Validator
 from ..data import PolarsDataHolder
+from .base import Validator
 
 logger = logging.getLogger(__name__)
 
 
 class ValidateReportedPosition(Validator):
-    # LAT_PATTERN = re.compile(r"^-?(\d+)(\d{2})(?:\.(\d+))?$")
-    LAT_PATTERNS = [
+    LAT_PATTERNS = (
         re.compile(r"^\d{2,4}\.?\d*$"),
         re.compile(r"^\d{7}\.?\d*$"),
-    ]
-    LON_PATTERNS = [
+    )
+    LON_PATTERNS = (
         re.compile(r"^\d{2,4}\.?\d*$"),
         re.compile(r"^\d{6}\.?\d*$"),
-    ]
+    )
 
-    lat_columns = [
+    lat_columns = (
         "visit_reported_latitude",
         "sample_reported_latitude",
-        "reported_latitude"
-    ]
+        "reported_latitude",
+    )
 
-    lon_columns = [
+    lon_columns = (
         "visit_reported_longitude",
         "sample_reported_longitude",
-        "reported_longitude"
-    ]
+        "reported_longitude",
+    )
 
     @staticmethod
     def get_validator_description() -> str:
@@ -45,15 +43,17 @@ class ValidateReportedPosition(Validator):
                     if reg.match(lat):
                         break
                 else:
-                    self._log_fail(f"Reported latitude {lat} in column {lat_col} has unknown format",
-                                   row_numbers=list(df["row_number"]))
+                    self._log_fail(
+                        f"Reported latitude {lat} in column {lat_col} has unknown format",
+                        row_numbers=list(df["row_number"]),
+                    )
             for lon_col in self.lon_columns:
                 for reg in self.LON_PATTERNS:
                     if reg.match(lon):
                         break
                 else:
-                    self._log_fail(f"Reported longitude {lon} in column {lon_col} has unknown format",
-                                   row_numbers=list(df["row_number"]))
-
-
-
+                    self._log_fail(
+                        f"Reported longitude {lon} in column "
+                        f"{lon_col} has unknown format",
+                        row_numbers=list(df["row_number"]),
+                    )

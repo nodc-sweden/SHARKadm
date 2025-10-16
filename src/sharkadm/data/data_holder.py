@@ -17,6 +17,7 @@ from sharkadm.sharkadm_logger import adm_logger
 class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the
     add_data_source method"""
+
     _data_structure = "row"
 
     def __init__(self, *args, **kwargs):
