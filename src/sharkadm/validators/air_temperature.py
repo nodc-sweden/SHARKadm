@@ -51,8 +51,10 @@ class ValidateAirtemp(Validator):
         if unique_rows["is_valid"].all():
             self._log_success("Air temperature (degC) is ok")
         else:
-            erroneous_rows = unique_rows.filter(~pl.col("is_valid")).select(
-                ["visit_key", "air_temperature_degc"]
+            erroneous_rows = (
+                unique_rows.filter(~pl.col("is_valid"))
+                .select(["visit_key", "air_temperature_degc"])
+                .to_dicts()
             )
 
             self._log_fail(

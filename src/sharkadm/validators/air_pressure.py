@@ -49,8 +49,10 @@ class ValidateAirpres(Validator):
         if unique_rows["is_valid"].all():
             self._log_success("Air pressure (hPa) is ok")
         else:
-            erroneous_rows = unique_rows.filter(~pl.col("is_valid")).select(
-                ["visit_key", "air_pressure_hpa"]
+            erroneous_rows = (
+                unique_rows.filter(~pl.col("is_valid"))
+                .select(["visit_key", "air_pressure_hpa"])
+                .to_dicts()
             )
 
             self._log_fail(f"Air pressure (hPa) has unexpected values:\n{erroneous_rows}")
