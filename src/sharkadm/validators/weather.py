@@ -44,8 +44,10 @@ class ValidateWeath(Validator):
         if unique_rows["is_valid"].all():
             self._log_success("Weather observation code is ok")
         else:
-            erroneous_rows = unique_rows.filter(~pl.col("is_valid")).select(
-                ["visit_key", "weather_observation_code"]
+            erroneous_rows = (
+                unique_rows.filter(~pl.col("is_valid"))
+                .select(["visit_key", "weather_observation_code"])
+                .to_dicts()
             )
 
             self._log_fail(
@@ -118,8 +120,12 @@ class ValidateWeatherConsistency(Validator):
         if unique_rows["is_valid"].all():
             self._log_success("Weather and cloud observation codes are consistent")
         else:
-            erroneous_rows = unique_rows.filter(~pl.col("is_valid")).select(
-                ["visit_key", "weather_observation_code", "cloud_observation_code"]
+            erroneous_rows = (
+                unique_rows.filter(~pl.col("is_valid"))
+                .select(
+                    ["visit_key", "weather_observation_code", "cloud_observation_code"]
+                )
+                .to_dicts()
             )
 
             self._log_fail(
