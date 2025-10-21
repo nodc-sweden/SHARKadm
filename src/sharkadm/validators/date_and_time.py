@@ -3,8 +3,8 @@ import re
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Validator
 from ..data import PolarsDataHolder
+from .base import DataHolderProtocol, Validator
 
 
 class MissingTime(Validator):
@@ -61,7 +61,7 @@ class ValidateDateAndTime(Validator):
         if date_col not in data_holder.data.columns:
             date_col = "sample_date"
         for (visit_date, sample_time), df in data_holder.data.group_by(
-                [date_col, time_col]
+            [date_col, time_col]
         ):
             if not (time_component := self._time_component(sample_time)):
                 self._log_fail(
