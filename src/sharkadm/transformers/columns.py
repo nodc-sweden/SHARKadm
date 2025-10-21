@@ -329,3 +329,44 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
                     level=adm_logger.WARNING,
                 )
                 data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
+
+class AddColumnsWithPrefix(Transformer):
+    def __init__(
+        self, apply_on_columns: tuple[str] | None = None, col_prefix: str | None = None
+    ) -> None:
+        super().__init__()
+        self.apply_on_columns = apply_on_columns
+        self.col_prefix = col_prefix
+        self._handled_cols = dict()
+        if not self.apply_on_columns or self.col_prefix is None:
+            self._log(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Copies columns to new column with prefix specified by the user"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        for source_col in self._get_matching_cols(data_holder):
+            target_col = f"{self.col_prefix}_{source_col}"
+            if target_col in data_holder.data.columns:
+                self._log(
+                    f"Column already present. Will do nothing: {target_col}",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+            data_holder.data = data_holder.data.with_columns(
+                [pl.col(source_col).alias(target_col)]
+            )
+            self._log(
+                f"Column {target_col} set from source column {source_col}",
+                level=adm_logger.DEBUG,
+            )
+
+    def _get_matching_cols(self, data_holder: PolarsDataHolder) -> list[str]:
+        return matching_strings.get_matching_strings(
+            strings=data_holder.data.columns, match_strings=self.apply_on_columns
+        )

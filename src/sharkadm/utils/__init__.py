@@ -9,6 +9,8 @@ import subprocess
 import sys
 import zipfile
 
+from sharkadm.utils.svn import SvnInfo
+
 SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
 
@@ -233,3 +235,7 @@ def _normalize_zip_content(zip_reference: zipfile.ZipFile) -> list[zipfile.ZipIn
         info.filename = normalized_relative_path
         members.append(info)
     return members
+
+
+def get_svn_info(path: str | pathlib.Path):
+    return SvnInfo.from_subprocess(path)
