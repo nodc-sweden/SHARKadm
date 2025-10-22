@@ -73,7 +73,7 @@ class DataHolder(ABC):
     @data_structure.setter
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
-        if data_structure_lower not in config.DATA_STRUCTURES:
+        if data_structure_lower not in config.get_all_data_structures():
             raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 
@@ -427,7 +427,7 @@ class old_DataHolder(ABC):
     @data_structure.setter
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
-        if data_structure_lower not in config.DATA_STRUCTURES:
+        if data_structure_lower not in config.get_all_data_structures():
             raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 

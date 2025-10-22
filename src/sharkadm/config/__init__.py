@@ -132,6 +132,10 @@ def get_all_data_types() -> list[str]:
     return [path.stem.split("_", 2)[-1].lower() for path in import_matrix_paths.values()]
 
 
+def get_all_data_structures() -> list[str]:
+    return DATA_STRUCTURES
+
+
 def get_valid_data_types(
     valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
@@ -148,12 +152,12 @@ def get_valid_data_structures(
     valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
     if not any([valid, invalid]):
-        return DATA_STRUCTURES
+        return get_all_data_structures()
     if valid:
-        return [item.lower() for item in valid if item.lower() in DATA_STRUCTURES]
+        return [item.lower() for item in valid if item.lower() in get_all_data_structures()]
     elif invalid:
         invalid_lower = [item.lower() for item in invalid]
-        return [item for item in DATA_STRUCTURES if item not in invalid_lower]
+        return [item for item in get_all_data_structures() if item not in invalid_lower]
 
 
 def get_adm_config_paths(config_directory=None):
