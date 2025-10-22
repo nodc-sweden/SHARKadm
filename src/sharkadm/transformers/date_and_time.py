@@ -274,13 +274,11 @@ class PolarsAddDatetime(PolarsTransformer):
         self,
         date_source_column: str | None = None,
         time_source_column: str | None = None,
-        strict: bool = True,
         **kwargs,
     ):
         super().__init__(**kwargs)
         self.date_source_column = date_source_column or self.date_source_column
         self.time_source_column = time_source_column or self.time_source_column
-        self._strict = strict
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -305,7 +303,7 @@ class PolarsAddDatetime(PolarsTransformer):
                 ).alias("datetime_str")
             )
         data_holder.data = data_holder.data.with_columns(
-            datetime=pl.col("datetime_str").str.to_datetime(strict=self._strict)
+            datetime=pl.col("datetime_str").str.strip_chars().str.to_datetime()
         )
 
 

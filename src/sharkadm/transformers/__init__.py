@@ -21,12 +21,17 @@ from sharkadm.transformers.arithmetic import (
 )
 from sharkadm.transformers.bacteria import SetBacteriaAsReportedScientificName
 from sharkadm.transformers.base import PolarsTransformer, Transformer
-from sharkadm.transformers.boolean import FixYesNo
+from sharkadm.transformers.boolean import (
+    FixYesNo,
+    PolarsFixYesNo
+)
 from sharkadm.transformers.bvol import (
     PolarsAddBvolAphiaId,
     PolarsAddBvolRefList,
     PolarsAddBvolScientificNameAndSizeClass,
     PolarsAddBvolScientificNameOriginal,
+    PolarsAddBvolCellVolume,
+    PolarsAddBvolCarbonVolume
 )
 from sharkadm.transformers.calculate import (
     PolarsCalculateAbundance,

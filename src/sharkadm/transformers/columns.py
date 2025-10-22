@@ -330,6 +330,7 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
                 )
                 data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
 
+
 class AddColumnsWithPrefix(Transformer):
     def __init__(
         self, apply_on_columns: tuple[str] | None = None, col_prefix: str | None = None
