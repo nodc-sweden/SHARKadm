@@ -154,7 +154,9 @@ def get_valid_data_structures(
     if not any([valid, invalid]):
         return get_all_data_structures()
     if valid:
-        return [item.lower() for item in valid if item.lower() in get_all_data_structures()]
+        return [
+            item.lower() for item in valid if item.lower() in get_all_data_structures()
+        ]
     elif invalid:
         invalid_lower = [item.lower() for item in invalid]
         return [item for item in get_all_data_structures() if item not in invalid_lower]

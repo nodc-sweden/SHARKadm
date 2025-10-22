@@ -7,6 +7,7 @@ import pandas as pd
 
 from sharkadm import config, utils
 from sharkadm.data import PolarsDataHolder, is_valid_data_holder
+from sharkadm.operation import OperationBase
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -103,7 +104,7 @@ class Exporter(ABC):
         adm_logger.log_export(msg, cls=self.__class__.__name__, **kwargs)
 
 
-class PolarsExporter(ABC):
+class PolarsExporter(ABC, OperationBase):
     """Abstract base class used as a blueprint for exporting stuff in a DataHolder"""
 
     valid_data_types: tuple[str, ...] = ()
@@ -158,7 +159,7 @@ class PolarsExporter(ABC):
     def description(self) -> str:
         return self.get_exporter_description()
 
-    def export(self, data_holder: PolarsDataHolder) -> Any:
+    def export_old(self, data_holder: PolarsDataHolder) -> Any:
         if (
             data_holder.data_type_internal != "unknown"
             and data_holder.data_type_internal
@@ -189,6 +190,17 @@ class PolarsExporter(ABC):
             item=self.get_exporter_description(),
             level=adm_logger.DEBUG,
         )
+        t0 = time.time()
+        data = self._export(data_holder=data_holder)
+        adm_logger.log_workflow(
+            f"Exporter {self.__class__.__name__} executed in {time.time() - t0} seconds",
+            level=adm_logger.DEBUG,
+        )
+        return data
+
+    def export(self, data_holder: PolarsDataHolder) -> Any:
+        if not self.is_valid_data_holder(data_holder):
+            return
         t0 = time.time()
         data = self._export(data_holder=data_holder)
         adm_logger.log_workflow(

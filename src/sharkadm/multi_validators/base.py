@@ -1,33 +1,10 @@
 import time
 from abc import abstractmethod
-from typing import Protocol, Type
+from typing import Type
 
-import pandas as pd
-
-from sharkadm import config
-from sharkadm.data import get_valid_data_holders
+from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.validators import Validator
-
-
-class DataHolderProtocol(Protocol):
-    @property
-    def data(self) -> pd.DataFrame: ...
-
-    @data.setter
-    def data(self, df: pd.DataFrame) -> None: ...
-
-    @property
-    @abstractmethod
-    def data_type(self) -> str: ...
-
-    @property
-    @abstractmethod
-    def dataset_name(self) -> str: ...
-
-    @property
-    @abstractmethod
-    def data_structure(self) -> str: ...
 
 
 class MultiValidator(Validator):
@@ -66,34 +43,9 @@ class MultiValidator(Validator):
     def description(self) -> str:
         return self.get_validator_description()
 
-    def validate(self, data_holder: DataHolderProtocol) -> None:
-        if data_holder.data_type_internal not in config.get_valid_data_types(
-            valid=self.valid_data_types, invalid=self.invalid_data_types
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_type {data_holder.data_type_internal} for multi validator"
-                f" {self.__class__.__name__}",
-                level=adm_logger.DEBUG,
-            )
+    def validate(self, data_holder: PolarsDataHolder) -> None:
+        if not self.is_valid_data_holder(data_holder):
             return
-        if data_holder.__class__.__name__ not in get_valid_data_holders(
-            valid=self.valid_data_holders, invalid=self.invalid_data_holders
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_holder {data_holder.__class__.__name__} "
-                f"for multi validator {self.__class__.__name__}"
-            )
-            return
-        if data_holder.data_structure.lower() not in config.get_valid_data_structures(
-            valid=self.invalid_data_structures, invalid=self.invalid_data_structures
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_format {data_holder.data_structure} for multi validator"
-                f" {self.__class__.__name__}",
-                level=adm_logger.DEBUG,
-            )
-            return
-
         adm_logger.log_workflow(
             f"Applying multi validator: {self.__class__.__name__}",
             item=self.get_validator_description(),
@@ -108,6 +60,58 @@ class MultiValidator(Validator):
             level=adm_logger.DEBUG,
         )
 
-    def _validate(self, data_holder: DataHolderProtocol) -> None:
+    # def _data_holder_has_valid_data_type(self, data_holder: "PolarsDataHolder") -> bool:
+    #     if (
+    #             data_holder.data_type_internal != "unknown"
+    #             and data_holder.data_type_internal
+    #             in config.get_valid_data_types(
+    #         valid=self.valid_data_types, invalid=self.invalid_data_types
+    #     )
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def _data_holder_is_valid_data_holder(self, data_holder: "PolarsDataHolder")
+    # -> bool:
+    #     if is_valid_polars_data_holder(
+    #             data_holder,
+    #             valid=self.valid_data_holders,
+    #             invalid=self.invalid_data_holders,
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def _data_holder_has_valid_data_structure(self, data_holder: "PolarsDataHolder")
+    # -> bool:
+    #     if data_holder.data_structure.lower() in config.get_valid_data_structures(
+    #             valid=self.valid_data_structures, invalid=self.invalid_data_structures
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def is_valid_data_holder(self, data_holder: "PolarsDataHolder") -> bool:
+    #     if not self._data_holder_has_valid_data_type(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data_type {data_holder.data_type_internal} for transformer"
+    #             f" {self.name}",
+    #             level=adm_logger.DEBUG,
+    #         )
+    #         return False
+    #     if not self._data_holder_is_valid_data_holder(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
+    #             f" {self.name}"
+    #         )
+    #         return False
+    #     if not self._data_holder_has_valid_data_structure(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data structure {data_holder.data_structure} "
+    #             f"for transformer {self.name}",
+    #             level=adm_logger.DEBUG,
+    #         )
+    #         return False
+    #     return True
+
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
         # Dummy method must be present to implement MultiValidator
         pass

@@ -20,7 +20,9 @@ from sharkadm.transformers.add_gsw_parameters import (
 )
 # @patch("sharkadm.config.get_all_data_types", return_value=[])
 # @patch("sharkadm.config.get_all_data_structures", return_value=[])
-@patch("sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True)
+@patch(
+    "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
+)
 def test_validate_add_density_wide(
     mocked_valid_data_holder,
     # mocked_data_structures,
@@ -102,7 +104,9 @@ def test_validate_add_density_wide(
 )
 # @patch("sharkadm.config.get_all_data_types", return_value=[])
 # @patch("sharkadm.config.get_all_data_structures", return_value=[])
-@patch("sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True)
+@patch(
+    "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
+)
 def test_validate_add_density(
     mocked_valid_data_holder,
     # mocked_data_structures,
