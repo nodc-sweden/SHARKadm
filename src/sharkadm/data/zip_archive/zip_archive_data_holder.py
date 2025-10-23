@@ -273,7 +273,6 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         self._initiate()
         self._unzip_archive()
         self._load_delivery_note()
-        self._load_import_matrix()
         self._load_sampling_info()
         self._load_analyse_info()
         self._load_metadata()
@@ -409,20 +408,6 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             return
         self._unzipped_archive_directory = utils.unzip_file(
             self._zip_archive_path, utils.get_temp_directory("zip"), delete_old=True
-        )
-
-    def _load_import_matrix(self) -> None:
-        """Loads the import matrix for the given data type and provider found in
-        delivery note"""
-        self._import_matrix = config.get_import_matrix_config(
-            data_type=self.data_type_internal
-        )
-        # if not self._import_matrix:
-        #     self._import_matrix = config.get_import_matrix_config(
-        #         data_type=self.delivery_note.data_format
-        #     )
-        self._import_matrix_mapper = self._import_matrix.get_mapper(
-            self.delivery_note.import_matrix_key
         )
 
     def _load_delivery_note(self) -> None:
