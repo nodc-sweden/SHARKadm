@@ -1,5 +1,6 @@
 import pathlib
 from enum import StrEnum
+from typing import Sequence
 
 import numpy as np
 import polars as pl
@@ -7,15 +8,17 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from .base import FileExporter
+from .base import PolarsFileExporter
 
-POPUP_WIDTH = 300
+POPUP_WIDTH = 400
 POPUP_HEIGHT = 300
 
 
 class MarkerColor(StrEnum):
+    # NOT_ACCEPTED = "orange"
     NOT_ACCEPTED = "orange"
-    ACCEPTED = "green"
+    # ACCEPTED = "green"
+    ACCEPTED = "orange"
     MASTER = "blue"
     MASTER_MATCH = "darkblue"
     IN_SHAPE = "pink"
@@ -98,20 +101,21 @@ def get_popup_html_table(title: str, data: dict) -> str:
     return html
 
 
-class PolarsHtmlMap(FileExporter):
+class PolarsHtmlMap(PolarsFileExporter):
     shape_layers: tuple[str, ...] = ()
 
     def __init__(
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        shape_layers: list[str | pathlib.Path] | None = None,
+        shape_layers: list[str] | None = None,
         shape_files: list[str | pathlib.Path] | None = None,
         highlight_stations_in_areas: bool = False,
         columns_to_show: list[str] | None = None,
-        show_master_stations_within_radius: int | bool = 10_000,
-        show_accepted: bool = True,
+        show_master_stations_within_radius: int | bool = False,
+        show_accepted: bool = False,
         show_stations: list[str] | None = None,
+        show_custom_positions: dict[str, list[dict]] | Sequence[dict] | None = None,
         **kwargs,
     ):
         self._shape_layers = self.shape_layers or shape_layers or []
@@ -128,16 +132,23 @@ class PolarsHtmlMap(FileExporter):
         self._show_master_stations_within_radius = show_master_stations_within_radius
         self._show_accepted = show_accepted
         self._show_stations = show_stations
+        self._show_custom_positions = show_custom_positions
         super().__init__(export_directory, export_file_name, **kwargs)
 
-        self._master = nodc_station.get_station_object()
+        self._master = None
+        if self._show_master_stations_within_radius or self._show_accepted:
+            self._master = nodc_station.get_station_object()
 
     def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
         if not self._export_file_name:
-            self._export_file_name = f"station_map_{data_holder.dataset_name}.html"
+            name = data_holder.dataset_name
+            if " " in name:
+                name = f"{name.split()[0]}___"
+            self._export_file_name = f"station_map_{name}.html"
         path = pathlib.Path(self._export_directory, self._export_file_name)
         if path.suffix != ".html":
             path = pathlib.Path(str(path) + ".html")
+        self._export_file_name = path.name
         return path
 
     @staticmethod
@@ -152,9 +163,23 @@ class PolarsHtmlMap(FileExporter):
             )
             return
 
-        lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
+        # lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
         m = folium.Map(
-            location=(lat_mid, lon_mid), zoom_start=6, tiles="Cartodb Positron"
+            # location=(lat_mid, lon_mid),
+            zoom_start=6,
+            tiles="Cartodb Positron",
+        )
+        m.fit_bounds(
+            (
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).min(),
+                    data_holder.data["sample_longitude_dd"].cast(float).min(),
+                ),
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).max(),
+                    data_holder.data["sample_longitude_dd"].cast(float).max(),
+                ),
+            )
         )
 
         # folium.TileLayer("OpenStreetMap").add_to(m)
@@ -173,6 +198,7 @@ class PolarsHtmlMap(FileExporter):
         self._add_other_station_markers(m)
         self._add_other_marker_radius(m)
         self._add_markers(m)
+        self._add_custom_positions(m)
         folium.LayerControl().add_to(m)
 
         export_path = self._get_path(data_holder)
@@ -238,14 +264,15 @@ class PolarsHtmlMap(FileExporter):
         )
         for info in red_df.to_dicts():
             accepted = False
+            matching = None
+            popup_data = {}
             if self._show_accepted:
                 all_matching = self._master.get_matching_stations(
-                    info["reported_station_name"],
+                    info.get("reported_station_name", info.get("station_name", "")),
                     info["sample_latitude_dd"],
                     info["sample_longitude_dd"],
                 )
                 matching: MatchingStation | None = all_matching.get_accepted_station()
-                popup_data = {}
                 if matching:
                     accepted = True
                     popup_data = {
@@ -256,37 +283,52 @@ class PolarsHtmlMap(FileExporter):
                     }
                     self._matching_stations_by_reg_id[matching.reg_id] = matching
 
-                popup_data.update(
-                    {
-                        "Latitude DD": info["sample_latitude_dd"],
-                        "Longitude DD": info["sample_longitude_dd"],
-                        "Latitude DM": info["sample_latitude_dm"],
-                        "Longitude DM": info["sample_longitude_dm"],
-                        "sweref99tm_y": round(float(info["sample_sweref99tm_y"])),
-                        "sweref99tm_x": round(float(info["sample_sweref99tm_x"])),
-                    }
-                )
+            y = info.get("sample_sweref99tm_y")
+            x = info.get("sample_sweref99tm_x")
+            if y:
+                y = str(round(float(y)))
+            else:
+                y = "<Not translated>"
 
-                for col in cols_to_show:
-                    popup_data[col] = info[col]
+            if x:
+                x = str(round(float(x)))
+            else:
+                x = "<Not translated>"
 
-                html = get_popup_html_table(
-                    title=info["reported_station_name"], data=popup_data
-                )
+            popup_data.update(
+                {
+                    "Latitude DD": info["sample_latitude_dd"],
+                    "Longitude DD": info["sample_longitude_dd"],
+                    "Latitude DM": info.get("sample_latitude_dm", "<Not translated>"),
+                    "Longitude DM": info.get("sample_longitude_dm", "<Not translated>"),
+                    "sweref99tm_y": y,
+                    "sweref99tm_x": x,
+                }
+            )
 
-                self._station_info.append(
-                    dict(
-                        lat_dd=float(info["sample_latitude_dd"]),
-                        lon_dd=float(info["sample_longitude_dd"]),
-                        sweref99tm_x=float(info["sample_sweref99tm_x"]),
-                        sweref99tm_y=float(info["sample_sweref99tm_y"]),
-                        station_name=info["reported_station_name"],
-                        popup_html=html,
-                        in_areas=False,
-                        accepted=accepted,
-                        matching_station=matching,
-                    )
+            for col in cols_to_show:
+                popup_data[col] = info[col]
+
+            html = get_popup_html_table(
+                title=info.get("reported_station_name", info.get("station_name", "")),
+                data=popup_data,
+            )
+
+            self._station_info.append(
+                dict(
+                    lat_dd=float(info["sample_latitude_dd"]),
+                    lon_dd=float(info["sample_longitude_dd"]),
+                    sweref99tm_x=x,
+                    sweref99tm_y=y,
+                    station_name=info.get(
+                        "reported_station_name", info.get("station_name", "")
+                    ),
+                    popup_html=html,
+                    in_areas=False,
+                    accepted=accepted,
+                    matching_station=matching,
                 )
+            )
 
     def _save_master_station_info(self, data_holder: PolarsDataHolder):
         if not self._show_master_stations_within_radius:
@@ -323,8 +365,9 @@ class PolarsHtmlMap(FileExporter):
         if not self._show_stations:
             return
         df = self._master.get_stations_by_name(self._show_stations)
-        station_infos = df.to_dict(orient="records")
-        for info in station_infos:
+        # station_infos = df.to_dict(orient="records")
+        # for info in station_infos:
+        for info in df.to_dicts():
             html = get_popup_html_table(
                 title=info["station_name"],
                 data={
@@ -390,6 +433,59 @@ class PolarsHtmlMap(FileExporter):
                 icon=folium.Icon(color=color),
             ).add_to(fg)
         fg.add_to(m)
+
+    def _add_custom_positions(self, m: "folium.Map") -> None:
+        if not self._show_custom_positions:
+            return
+        if not isinstance(self._show_custom_positions, dict):
+            self._show_custom_positions = {
+                "Custom positions": self._show_custom_positions
+            }
+        for name, data in self._show_custom_positions.items():
+            fg = folium.FeatureGroup(name=name, show=True)
+            rad_fg = folium.FeatureGroup(name=f"{name} radius", show=True)
+            rad_info_present = False
+            color = "black"
+            for info in data:
+                folium.Marker(
+                    location=[info["lat_dd"], info["lon_dd"]],
+                    popup=info.get("popup", None),
+                    tooltip=info.get("tooltip", None),
+                    icon=folium.Icon(
+                        color=info.get("color", color), icon="glyphicon-remove-sign"
+                    ),
+                ).add_to(fg)
+                if info.get("radius"):
+                    rad_info_present = True
+                    folium.Circle(
+                        location=[info["lat_dd"], info["lon_dd"]],
+                        radius=info.get("radius"),
+                        color=info.get("color", color),
+                        weight=1,
+                        fill_opacity=0.6,
+                        opacity=1,
+                        fill_color=info.get("color", color),
+                        fill=False,  # gets overridden by fill_color
+                        # popup=info.get("popup", None),
+                        # tooltip=info.get("tooltip", None),
+                    ).add_to(rad_fg)
+
+            fg.add_to(m)
+            if rad_info_present:
+                rad_fg.add_to(m)
+        # radius = 50
+        # folium.Circle(
+        #     location=[info["lat_dd"], info["lon_dd"]],
+        #     radius=radius,
+        #     color="black",
+        #     weight=1,
+        #     fill_opacity=0.6,
+        #     opacity=1,
+        #     fill_color="black",
+        #     fill=False,  # gets overridden by fill_color
+        #     popup=info.get("popup", None),
+        #     tooltip=info.get("tooltip", None),
+        # ).add_to(m)
 
     def _add_marker_buffer(self, m: "folium.Map"):
         if not self._show_master_stations_within_radius:

@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import get_valid_data_holders, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import Transformer
+from sharkadm.transformers import PolarsTransformer, Transformer
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PolarsDataHolder
@@ -118,7 +118,7 @@ class MultiTransformer(Transformer):
         pass
 
 
-class PolarsMultiTransformer(Transformer):
+class PolarsMultiTransformer(PolarsTransformer):
     """Abstract base class used as a blueprint for doing multiple changes in data
     in a DataHolder"""
 
@@ -131,7 +131,9 @@ class PolarsMultiTransformer(Transformer):
     valid_data_structures: tuple[str, ...] = ()
     invalid_data_structures: tuple[str, ...] = ()
 
-    _transformers: tuple[Type[Transformer], ...] = ()
+    operation_type: str = "multi transformer"
+
+    _transformers: tuple[Type[PolarsTransformer], ...] = ()
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -153,7 +155,7 @@ class PolarsMultiTransformer(Transformer):
     def description(self) -> str:
         return self.get_transformer_description()
 
-    def transform(self, data_holder: "PolarsDataHolder") -> None:
+    def transform_old(self, data_holder: "PolarsDataHolder") -> None:
         if (
             data_holder.data_type_internal != "unknown"
             and data_holder.data_type_internal
@@ -195,7 +197,24 @@ class PolarsMultiTransformer(Transformer):
         )
         t0 = time.time()
         for trans in self._transformers:
-            trans().transform(data_holder=data_holder)
+            trans(**self._kwargs).transform(data_holder=data_holder)
+        adm_logger.log_workflow(
+            f"Multi transformer {self.__class__.__name__} executed "
+            f"in {time.time() - t0} seconds",
+            level=adm_logger.DEBUG,
+        )
+
+    def transform(self, data_holder: "PolarsDataHolder") -> None:
+        if not self.is_valid_data_holder(data_holder):
+            return
+        self._log_workflow(
+            f"Applying multi transformer: {self.name}",
+            item=self.get_transformer_description(),
+            level=adm_logger.DEBUG,
+        )
+        t0 = time.time()
+        for trans in self._transformers:
+            trans(**self._kwargs).transform(data_holder=data_holder)
         adm_logger.log_workflow(
             f"Multi transformer {self.__class__.__name__} executed "
             f"in {time.time() - t0} seconds",

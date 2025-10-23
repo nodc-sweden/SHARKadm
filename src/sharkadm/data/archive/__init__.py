@@ -8,12 +8,18 @@ from sharkadm.data.archive.archive_data_holder import (
     PolarsArchiveDataHolder,
 )
 from sharkadm.data.archive.bacterioplankton import BacterioplanktonArchiveDataHolder
-from sharkadm.data.archive.chlorophyll import ChlorophyllArchiveDataHolder
+from sharkadm.data.archive.chlorophyll import (
+    ChlorophyllArchiveDataHolder,
+    PolarsChlorophyllArchiveDataHolder,
+)
 from sharkadm.data.archive.delivery_note import DeliveryNote
 from sharkadm.data.archive.epibenthos import EpibenthosMartransArchiveDataHolder
 from sharkadm.data.archive.jellyfish import JellyfishArchiveDataHolder
 from sharkadm.data.archive.physicalchemical import PhysicalChemicalArchiveDataHolder
-from sharkadm.data.archive.phytoplankton import PhytoplanktonArchiveDataHolder
+from sharkadm.data.archive.phytoplankton import (
+    PhytoplanktonArchiveDataHolder,
+    PolarsPhytoplanktonArchiveDataHolder,
+)
 from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHolder
 from sharkadm.data.archive.zoobenthos import (
     ZoobenthosArchiveDataHolder,

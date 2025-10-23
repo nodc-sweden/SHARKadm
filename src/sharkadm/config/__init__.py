@@ -10,10 +10,11 @@ from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
 from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.config.translate_headers import TranslateHeaders
 
 logger = logging.getLogger(__name__)
 
-DATA_STRUCTURES = ["row", "column"]
+DATA_STRUCTURES = ["row", "column", "profile"]
 
 CONFIG_ENV = "NODC_CONFIG"
 
@@ -60,6 +61,13 @@ class DataHolderProtocol(Protocol):
 def get_column_views_config(path: str | pathlib.Path | None = None) -> ColumnViews:
     path = path or DEFAULT_COLUMN_VIEWS_PATH
     return ColumnViews(path)
+
+
+def get_translate_headers_config(
+    path: str | pathlib.Path | None = None,
+) -> TranslateHeaders:
+    path = path or DEFAULT_TRANSLATE_HEADERS_PATH
+    return TranslateHeaders(path)
 
 
 def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
@@ -124,6 +132,10 @@ def get_all_data_types() -> list[str]:
     return [path.stem.split("_", 2)[-1].lower() for path in import_matrix_paths.values()]
 
 
+def get_all_data_structures() -> list[str]:
+    return DATA_STRUCTURES
+
+
 def get_valid_data_types(
     valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
@@ -140,12 +152,14 @@ def get_valid_data_structures(
     valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
 ) -> list[str]:
     if not any([valid, invalid]):
-        return DATA_STRUCTURES
+        return get_all_data_structures()
     if valid:
-        return [item.lower() for item in valid if item.lower() in DATA_STRUCTURES]
+        return [
+            item.lower() for item in valid if item.lower() in get_all_data_structures()
+        ]
     elif invalid:
         invalid_lower = [item.lower() for item in invalid]
-        return [item for item in DATA_STRUCTURES if item not in invalid_lower]
+        return [item for item in get_all_data_structures() if item not in invalid_lower]
 
 
 def get_adm_config_paths(config_directory=None):
@@ -170,6 +184,9 @@ def get_import_matrix_config_paths(
 
 DEFAULT_COLUMN_VIEWS_PATH = (
     CONFIG_DIRECTORY / "column_views.txt" if CONFIG_DIRECTORY else None
+)
+DEFAULT_TRANSLATE_HEADERS_PATH = (
+    CONFIG_DIRECTORY / "translate_headers.txt" if CONFIG_DIRECTORY else None
 )
 adm_config_paths = get_adm_config_paths(CONFIG_DIRECTORY)
 import_matrix_paths = get_import_matrix_config_paths(CONFIG_DIRECTORY)

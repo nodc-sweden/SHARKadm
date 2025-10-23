@@ -2,7 +2,7 @@ import pathlib
 
 from sharkadm.config import get_header_mapper_from_data_holder
 from sharkadm.data import PolarsDataHolder
-from sharkadm.exporters.base import DataHolderProtocol, FileExporter
+from sharkadm.exporters.base import DataHolderProtocol, FileExporter, PolarsFileExporter
 from sharkadm.utils.paths import get_next_incremented_file_path
 
 
@@ -54,7 +54,7 @@ class TxtAsIs(FileExporter):
             )
 
 
-class PolarsTxtAsIs(FileExporter):
+class PolarsTxtAsIs(PolarsFileExporter):
     """Test class to export data 'as is' to a text file"""
 
     def __init__(
@@ -91,12 +91,14 @@ class PolarsTxtAsIs(FileExporter):
             df.columns = new_column_names
         if not self._export_file_name:
             self._export_file_name = f"data_as_is_{data_holder.dataset_name}.txt"
+
+        pandas_df = df.to_pandas()
         try:
-            df.write_csv(
+            pandas_df.to_csv(
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )
         except PermissionError:
             self._export_file_name = get_next_incremented_file_path(self.export_file_path)
-            df.write_csv(
+            pandas_df.to_csv(
                 self.export_file_path, encoding=self._encoding, sep="\t", index=False
             )

@@ -5,21 +5,21 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.multi_transformers.base import MultiTransformer, PolarsMultiTransformer
 from sharkadm.multi_transformers.bvol import BvolPolars
-from sharkadm.multi_transformers.calculate import PolarsCalculate
+from sharkadm.multi_transformers.calculate import CalculatePolars
 from sharkadm.multi_transformers.date_time import DateTime, DateTimePolars
 from sharkadm.multi_transformers.dyntaxa import Dyntaxa, DyntaxaPolars
-from sharkadm.multi_transformers.general_dv import GeneralDV
+from sharkadm.multi_transformers.general_dv import GeneralDVPolars
 from sharkadm.multi_transformers.general_final import GeneralFinal
 from sharkadm.multi_transformers.general_initial import GeneralInitial
 from sharkadm.multi_transformers.lims import Lims
 from sharkadm.multi_transformers.location import (
-    Location,
+    LocationPolars,
     LocationRPolars,
     LocationRredPolars,
 )
 from sharkadm.multi_transformers.position import Position, PositionPolars
-from sharkadm.multi_transformers.static_dv import PolarsStaticDV, StaticDV
-from sharkadm.multi_transformers.translate import Translate
+from sharkadm.multi_transformers.static_dv import StaticDV, StaticDVPolars
+from sharkadm.multi_transformers.translate import TranslatePolars
 from sharkadm.multi_transformers.worms import Worms, WormsPolars
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 

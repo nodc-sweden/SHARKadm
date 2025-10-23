@@ -19,6 +19,10 @@ class PolarsDataFilter(ABC):
     def name(self) -> str:
         return self.__class__.__name__
 
+    @property
+    def description(self) -> str:
+        return "Without description"
+
     @abstractmethod
     def _get_filter_mask(
         self, data_holder: PolarsDataHolder

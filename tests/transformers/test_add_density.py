@@ -18,9 +18,15 @@ from sharkadm.transformers.add_gsw_parameters import (
         ("GHJ789", 56.5, 12.0, -100, 10.3, 10.1, False),  # erroneous depth
     ),
 )
-@patch("sharkadm.config.get_all_data_types", return_value=[])
+# @patch("sharkadm.config.get_all_data_types", return_value=[])
+# @patch("sharkadm.config.get_all_data_structures", return_value=[])
+@patch(
+    "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
+)
 def test_validate_add_density_wide(
-    mocked_data_types,
+    mocked_valid_data_holder,
+    # mocked_data_structures,
+    # mocked_data_types,
     polars_data_frame_holder_class,
     given_visit_key,
     given_latitude,
@@ -41,10 +47,11 @@ def test_validate_add_density_wide(
             "Temperature CTD": given_temperature,
         }
     )
-
     # Given a valid data holder
+    # mocked_valid_data_holder.side_effect = (True,)
     given_data_holder = polars_data_frame_holder_class(given_data)
-    mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
+    # mocked_data_types.side_effect = (given_data_holder.data_type_internal, )
+    # mocked_data_structures.side_effect = (given_data_holder.data_structure, )
 
     # There should be no column with in situ density
     # before application of transformer
@@ -95,9 +102,15 @@ def test_validate_add_density_wide(
         ),  # ok data
     ),
 )
-@patch("sharkadm.config.get_all_data_types", return_value=[])
+# @patch("sharkadm.config.get_all_data_types", return_value=[])
+# @patch("sharkadm.config.get_all_data_structures", return_value=[])
+@patch(
+    "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
+)
 def test_validate_add_density(
-    mocked_data_types,
+    mocked_valid_data_holder,
+    # mocked_data_structures,
+    # mocked_data_types,
     polars_data_frame_holder_class,
     given_visit_key,
     given_latitude,
@@ -121,7 +134,8 @@ def test_validate_add_density(
 
     # Given a valid data holder
     given_data_holder = polars_data_frame_holder_class(given_data)
-    mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
+    # mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
+    # mocked_data_structures.side_effect = (given_data_holder.data_structure,)
 
     # There should be no column with in situ density
     # before application of the transformer

@@ -1,10 +1,10 @@
 import pathlib
-from typing import T
 
 from sharkadm.config import get_column_views_config
-
-from ..transformers.base import PolarsDataHolderProtocol
-from .base import DataHolderProtocol, FileExporter
+from sharkadm.data import PolarsDataHolder
+from sharkadm.exporters.base import DataHolderProtocol, FileExporter, PolarsFileExporter
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.transformers.base import PolarsDataHolderProtocol
 
 
 class SHARKdataTxt(FileExporter):
@@ -37,6 +37,60 @@ class SHARKdataTxt(FileExporter):
         data.to_csv(self.export_file_path, encoding=self._encoding, sep="\t", index=False)
 
 
+class PolarsSHARKdataTxt(PolarsFileExporter):
+    """Writes data to file filtered by the columns specified for the given data type in
+    column_views."""
+
+    def __init__(
+        self,
+        export_directory: str | pathlib.Path | None = None,
+        export_file_name: str | pathlib.Path | None = None,
+        exclude_missing_columns: bool = False,
+        **kwargs,
+    ):
+        if not export_file_name:
+            export_file_name = "shark_data.txt"
+        super().__init__(export_directory, export_file_name, **kwargs)
+        self._exclude_missing_columns = exclude_missing_columns
+        self._column_views = get_column_views_config()
+        self._separator = kwargs.get("separator", "\t")
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return (
+            "Writes data to file filtered by the columns specified for the given data "
+            "type in column_views."
+        )
+
+    def _export(self, data_holder: PolarsDataHolder) -> None:
+        column_list = self._column_views.get_columns_for_view(
+            view=data_holder.data_type_internal
+        )
+        if self._exclude_missing_columns:
+            missing_columns = [
+                col for col in column_list if col not in data_holder.columns
+            ]
+            column_list = [col for col in column_list if col in data_holder.columns]
+            if missing_columns:
+                missing_str = ", ".join(missing_columns)
+                self._log(
+                    f"The following missing columns are "
+                    f"not being included in the export: {missing_str}",
+                    level=adm_logger.WARNING,
+                )
+        data = data_holder.data[column_list]
+        if self._encoding == "utf8":
+            data.write_csv(self.export_file_path, separator=self._separator)
+        else:
+            pdf = data.to_pandas()
+            pdf.to_csv(
+                self.export_file_path,
+                sep=self._separator,
+                index=False,
+                encoding=self._encoding,
+            )
+
+
 class SHARKdataTxtAsGiven(FileExporter):
     exclude_columns = ("source",)
 
@@ -44,7 +98,7 @@ class SHARKdataTxtAsGiven(FileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        exclude_columns: tuple[str, ...] = T | None,
+        exclude_columns: tuple[str, ...] | None = None,
         **kwargs,
     ):
         super().__init__(export_directory, export_file_name, **kwargs)
@@ -88,7 +142,7 @@ class PolarsSHARKdataTxtAsGiven(FileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
-        exclude_columns: tuple[str, ...] = T | None,
+        exclude_columns: tuple[str, ...] | None = None,
         **kwargs,
     ):
         super().__init__(export_directory, export_file_name, **kwargs)

@@ -24,7 +24,6 @@ class DateTime(MultiTransformer):
 class DateTimePolars(PolarsMultiTransformer):
     _transformers = (
         transformers.PolarsAddReportedDates,
-        transformers.PolarsAddReportedDates,
         transformers.PolarsFixDateFormat,
         transformers.PolarsFixTimeFormat,
         transformers.PolarsAddSampleDate,

@@ -9,6 +9,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder, is_valid_polars_data_holder
 from sharkadm.data_filter.base import PolarsDataFilter
+from sharkadm.operation import OperationBase
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter
 
@@ -130,7 +131,7 @@ class Transformer(ABC):
 
         self._log_workflow(
             f"Applying transformer: {self.__class__.__name__}",
-            item=self.get_transformer_description(),
+            item=self.description,
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
@@ -159,7 +160,7 @@ class Transformer(ABC):
         adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
 
 
-class PolarsTransformer(ABC):
+class PolarsTransformer(ABC, OperationBase):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
     valid_data_types: tuple[str, ...] = ()
@@ -173,6 +174,8 @@ class PolarsTransformer(ABC):
 
     source_col: str = ""
     col_to_set: str = ""
+
+    operation_type: str = "transformer"
 
     def __init__(
         self,
@@ -215,9 +218,25 @@ class PolarsTransformer(ABC):
 
     @property
     def description(self) -> str:
-        return self.get_transformer_description()
+        # return self.get_transformer_description()
+        info_str = self.get_transformer_description()
+        # if self._data_filter:
+        #     info_str = f"{info_str} (With filter {self._data_filter.description})"
+        return info_str
 
-    def transform(self, data_holder: "PolarsDataHolder") -> None:
+    def transform_old(self, data_holder: "PolarsDataHolder") -> None:
+        print(
+            "A",
+            config.get_valid_data_types(
+                valid=self.valid_data_types, invalid=self.invalid_data_types
+            ),
+        )
+        print(
+            "B",
+            config.get_valid_data_structures(
+                valid=self.valid_data_structures, invalid=self.invalid_data_structures
+            ),
+        )
         if (
             data_holder.data_type_internal != "unknown"
             and data_holder.data_type_internal
@@ -230,6 +249,7 @@ class PolarsTransformer(ABC):
                 f" {self.name}",
                 level=adm_logger.DEBUG,
             )
+            raise
             return
         if not is_valid_polars_data_holder(
             data_holder,
@@ -240,15 +260,17 @@ class PolarsTransformer(ABC):
                 f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
                 f" {self.name}"
             )
+            raise
             return
         if data_holder.data_structure.lower() not in config.get_valid_data_structures(
             valid=self.invalid_data_structures, invalid=self.invalid_data_structures
         ):
             self._log_workflow(
-                f"Invalid data_format {data_holder.data_structure} for transformer"
-                f" {self.name}",
+                f"Invalid data structure {data_holder.data_structure} "
+                f"for transformer {self.name}",
                 level=adm_logger.DEBUG,
             )
+            raise
             return
 
         self._log_workflow(
@@ -262,6 +284,73 @@ class PolarsTransformer(ABC):
             f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
             level=adm_logger.DEBUG,
         )
+
+    def transform(self, data_holder: "PolarsDataHolder") -> None:
+        if not self.is_valid_data_holder(data_holder):
+            return
+        self._log_workflow(
+            f"Applying transformer: {self.name}",
+            item=self.get_transformer_description(),
+            level=adm_logger.DEBUG,
+        )
+        t0 = time.perf_counter()
+        self._transform(data_holder=data_holder)
+        self._log_workflow(
+            f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
+            level=adm_logger.DEBUG,
+        )
+
+    # def _data_holder_has_valid_data_type(self, data_holder: "PolarsDataHolder") -> bool:
+    #     if (
+    #             data_holder.data_type_internal != "unknown"
+    #             and data_holder.data_type_internal
+    #             in config.get_valid_data_types(
+    #         valid=self.valid_data_types, invalid=self.invalid_data_types
+    #     )
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def _data_holder_is_valid_data_holder(self, data_holder: "PolarsDataHolder")
+    # -> bool:
+    #     if is_valid_polars_data_holder(
+    #             data_holder,
+    #             valid=self.valid_data_holders,
+    #             invalid=self.invalid_data_holders,
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def _data_holder_has_valid_data_structure(self, data_holder: "PolarsDataHolder")
+    # -> bool:
+    #     if data_holder.data_structure.lower() in config.get_valid_data_structures(
+    #             valid=self.valid_data_structures, invalid=self.invalid_data_structures
+    #     ):
+    #         return True
+    #     return False
+    #
+    # def is_valid_data_holder(self, data_holder: "PolarsDataHolder") -> bool:
+    #     if not self._data_holder_has_valid_data_type(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data_type {data_holder.data_type_internal} for transformer"
+    #             f" {self.name}",
+    #             level=adm_logger.DEBUG,
+    #         )
+    #         return False
+    #     if not self._data_holder_is_valid_data_holder(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
+    #             f" {self.name}"
+    #         )
+    #         return False
+    #     if not self._data_holder_has_valid_data_structure(data_holder):
+    #         self._log_workflow(
+    #             f"Invalid data structure {data_holder.data_structure} "
+    #             f"for transformer {self.name}",
+    #             level=adm_logger.DEBUG,
+    #         )
+    #         return False
+    #     return True
 
     @abstractmethod
     def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
@@ -280,8 +369,13 @@ class PolarsTransformer(ABC):
             pl.lit("").alias(self.col_to_set)
         )
 
-    def _add_empty_col(self, data_holder: "PolarsDataHolder", col: str) -> None:
-        data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
+    def _add_empty_col(
+        self, data_holder: "PolarsDataHolder", col: str, _float=False
+    ) -> None:
+        val = None if _float else ""
+        if col in data_holder.columns:
+            return
+        data_holder.data = data_holder.data.with_columns(pl.lit(val).alias(col))
 
     def _add_to_col_to_set(
         self, data_holder: "PolarsDataHolder", lookup_name, new_name: str

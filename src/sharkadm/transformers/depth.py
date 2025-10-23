@@ -82,9 +82,6 @@ class ReorderSampleMinAndMaxDepth(Transformer):
                 lambda row: self.reorder(row), axis=1, result_type="expand"
             )
         )
-        # data_holder.data[par] = data_holder.data.apply(
-        #     lambda row, p=par: self.reorder(p, row), axis=1
-        # )
 
     def reorder(self, row: pd.Series) -> list[str, str]:
         if row[self.min_depth_par] > row[self.max_depth_par]:

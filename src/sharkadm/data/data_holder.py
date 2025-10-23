@@ -18,12 +18,15 @@ class DataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the
     add_data_source method"""
 
+    _data_structure = "row"
+
     def __init__(self, *args, **kwargs):
         self._data_sources: dict[str, DataSource | PolarsDataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        self._data_structure = "row"
+        # self._data_structure = "column"
+        self._data = pl.DataFrame()
 
     def __repr__(self) -> str:
         return (
@@ -53,6 +56,10 @@ class DataHolder(ABC):
     def data(self) -> pd.DataFrame:
         return self._data
 
+    @property
+    def data_sources(self) -> dict:
+        return self._data_sources
+
     @data.setter
     def data(self, df: pd.DataFrame | pl.DataFrame) -> None:
         if not isinstance(df, (pd.DataFrame, pl.DataFrame)):
@@ -66,7 +73,7 @@ class DataHolder(ABC):
     @data_structure.setter
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
-        if data_structure_lower not in config.DATA_STRUCTURES:
+        if data_structure_lower not in config.get_all_data_structures():
             raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 
@@ -106,14 +113,14 @@ class DataHolder(ABC):
 
     @property
     def header_mapper(self):
-        mappers = []
+        mappers = set()
         for source in self._data_sources.values():
             if not source.header_mapper:
                 continue
-            mappers.append(source.header_mapper)
+            mappers.add(source.header_mapper)
         if len(mappers) != 1:
             return None
-        return mappers[0]
+        return mappers.pop()
 
     @property
     def qf_column_prefixes(self) -> list[str]:
@@ -239,7 +246,7 @@ class PolarsDataHolder(DataHolder, ABC):
         self._filtered_data = pl.DataFrame()
         super().__init__(*args, **kwargs)
 
-    def __add__(self, other):
+    def __add__(self, other) -> "PolarsConcatDataHolder":
         if self.data_type != other.data_type:
             adm_logger.log_workflow(
                 f"Not allowed to merge data_sources of different data_types: "
@@ -253,10 +260,14 @@ class PolarsDataHolder(DataHolder, ABC):
             )
             return
         concat_data = pl.concat([self.data, other.data])
-        cdh = ConcatDataHolder()
+        cdh = PolarsConcatDataHolder()
         cdh.data = concat_data
         cdh.data_type = self.data_type
+        cdh.data_type_internal = self.data_type_internal
         return cdh
+
+    def __radd__(self, other) -> "PolarsDataHolder":
+        return self
 
     @property
     def data(self) -> pl.DataFrame:
@@ -278,6 +289,38 @@ class PolarsDataHolder(DataHolder, ABC):
         return sorted(self.data.columns)
 
     @property
+    def min_year(self) -> str:
+        return str(min(self.data["datetime"]).year)
+
+    @property
+    def max_year(self) -> str:
+        return str(max(self.data["datetime"]).year)
+
+    @property
+    def min_date(self) -> str:
+        return min(self.data["datetime"]).strftime("%Y-%m-%d")
+
+    @property
+    def max_date(self) -> str:
+        return max(self.data["datetime"]).strftime("%Y-%m-%d")
+
+    @property
+    def min_longitude(self) -> str:
+        return str(min(self.data["sample_reported_longitude"].cast(float)))
+
+    @property
+    def max_longitude(self) -> str:
+        return str(max(self.data["sample_reported_longitude"].cast(float)))
+
+    @property
+    def min_latitude(self) -> str:
+        return str(min(self.data["sample_reported_latitude"].cast(float)))
+
+    @property
+    def max_latitude(self) -> str:
+        return str(max(self.data["sample_reported_latitude"].cast(float)))
+
+    @property
     def is_filtered(self) -> bool:
         return not self._filtered_data.is_empty()
 
@@ -289,7 +332,7 @@ class PolarsDataHolder(DataHolder, ABC):
                 level=adm_logger.WARNING,
             )
             return
-        self._filtered_data = self.data.remove(mask)
+        self._filtered_data = self.data.remove(~mask)
 
     def reset_filter(self):
         self._filtered_data = pl.DataFrame()
@@ -384,7 +427,7 @@ class old_DataHolder(ABC):
     @data_structure.setter
     def data_structure(self, data_structure):
         data_structure_lower = data_structure.lower()
-        if data_structure_lower not in config.DATA_STRUCTURES:
+        if data_structure_lower not in config.get_all_data_structures():
             raise ValueError(f"Invalid data structure: {data_structure}")
         self._data_structure = data_structure_lower
 
@@ -515,6 +558,41 @@ class ConcatDataHolder(PandasDataHolder):
     @property
     def dataset_name(self) -> str:
         return "#".join(self.data["dataset_name"].unique())
+
+    @property
+    def number_metadata_rows(self) -> None:
+        return
+
+
+class PolarsConcatDataHolder(PolarsDataHolder):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._data_type = ""
+        self._data_type_internal = ""
+
+    @staticmethod
+    def get_data_holder_description() -> str:
+        return "This is a concatenated data holder"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @data_type_internal.setter
+    def data_type_internal(self, data_type_internal: str) -> None:
+        self._data_type_internal = data_type_internal
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type
+
+    @data_type.setter
+    def data_type(self, data_type: str) -> None:
+        self._data_type = data_type
+
+    @property
+    def dataset_name(self) -> str:
+        return " # ".join(self.data["dataset_name"].unique())
 
     @property
     def number_metadata_rows(self) -> None:

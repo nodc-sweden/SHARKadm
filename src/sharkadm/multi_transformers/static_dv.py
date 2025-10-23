@@ -1,5 +1,5 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import MultiTransformer, PolarsMultiTransformer
 
 
 class StaticDV(MultiTransformer):
@@ -16,7 +16,7 @@ class StaticDV(MultiTransformer):
         return "\n".join(string_list)
 
 
-class PolarsStaticDV(MultiTransformer):
+class StaticDVPolars(PolarsMultiTransformer):
     _transformers = (
         transformers.PolarsAddStaticInternetAccessInfo,
         transformers.PolarsAddStaticDataHoldingCenterEnglish,
@@ -25,6 +25,6 @@ class PolarsStaticDV(MultiTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         string_list = ["Adds the following static information for Datavärdskapet:"]
-        for trans in PolarsStaticDV._transformers:
+        for trans in StaticDVPolars._transformers:
             string_list.append(f"    {trans.get_transformer_description()}")
         return "\n".join(string_list)

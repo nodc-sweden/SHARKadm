@@ -1,9 +1,9 @@
 from sharkadm.data import PandasDataHolder
 
-from .base import Exporter
+from .base import PolarsExporter
 
 
-class PrintDataFrame(Exporter):
+class PrintDataFrame(PolarsExporter):
     """Prints the dataframe on screen"""
 
     @staticmethod

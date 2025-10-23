@@ -409,7 +409,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                 else:
                     self._log(
                         f"No translation for: {name} ({len(df)} places)",
-                        level=adm_logger.WARNING,
+                        level=adm_logger.DEBUG,
                     )
                 new_name = name
 

@@ -5,7 +5,7 @@ import polars as pl
 
 from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.profile_file import (
+from sharkadm.data.data_source.profile.standard_format_file import (
     StandardFormatPolarsDataFile,
 )
 

@@ -1,6 +1,8 @@
 import numpy as np
 import pyproj
 
+from sharkadm.utils import sweref99tm_db
+
 
 def decdeg_to_decmin(
     pos: float | str, nr_decimals: int | None = 2, with_space: bool = False
@@ -39,11 +41,40 @@ def decmin_to_decdeg(pos: str, nr_decimals: int | None = 2):
 #     return x, y
 
 
-def decdeg_to_sweref99tm(lat: float, lon: float) -> (float, float):
+# def decdeg_to_sweref99tm(lat: float, lon: float) -> (float, float):
+#     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
+#     sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
+#     transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
+#     x, y = transformer.transform(lon, lat)
+#     return x, y
+
+
+def decdeg_to_sweref99tm(lat: str, lon: str) -> (float, float):
+    info = sweref99tm_db.get(lat, lon)
+    if info:
+        return info["x_pos"], info["y_pos"]
+    return _convert_decdeg_to_sweref99tm(lat, lon)
+
+
+def get_decdeg_to_sweref99tm_mapper(
+    lat: list[str], lon: list[str]
+) -> dict[(str, str), (str, str)]:
+    mapper = sweref99tm_db.get_mapper()
+    for pos in zip(lat, lon):
+        if not mapper.get(pos):
+            x, y = _convert_decdeg_to_sweref99tm(pos[0], pos[1])
+            mapper[(pos[0], pos[1])] = (x, y)
+    return mapper
+
+
+def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> (str, str):
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
     sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
     transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
+    print(f"{lat=}")
+    print(f"{lon=}")
     x, y = transformer.transform(lon, lat)
+    sweref99tm_db.add(lat, lon, x, y)
     return x, y
 
 

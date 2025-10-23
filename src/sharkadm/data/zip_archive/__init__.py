@@ -9,9 +9,9 @@ def get_zip_archive_data_holder(path: str | pathlib.Path) -> ZipArchiveDataHolde
 
 
 def get_polars_zip_archive_data_holder(
-    path: str | pathlib.Path,
+    path: str | pathlib.Path, **kwargs
 ) -> PolarsZipArchiveDataHolder:
-    return PolarsZipArchiveDataHolder(path)
+    return PolarsZipArchiveDataHolder(path, **kwargs)
 
 
 def path_is_zip_archive(path: str | pathlib.Path) -> Union[pathlib.Path, False]:
