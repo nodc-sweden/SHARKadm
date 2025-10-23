@@ -5,13 +5,12 @@ import polars as pl
 from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.profile.mapper import get_ctd_parameter_mapper
 
-mapper = get_ctd_parameter_mapper()
-
 
 class CnvDataFile(PolarsDataFile):
     def __init__(self, *args, **kwargs):
         self._metadata_lines: list[str] = []
         super().__init__(*args, **kwargs)
+        self._mapper = get_ctd_parameter_mapper()
 
     def __getitem__(self, item: str) -> list[str] | str:
         values = set(self._data[item])
@@ -50,7 +49,7 @@ class CnvDataFile(PolarsDataFile):
                     name = line.split("=", 1)[-1].strip()
                     if ", lat =" in name:
                         name = name.split(", lat =")[0]
-                    header.append(mapper.get(name, name))
+                    header.append(self._mapper.get(name, name))
                 elif line.startswith("*END*"):
                     is_data_line = True
                     continue
