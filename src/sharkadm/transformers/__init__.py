@@ -47,6 +47,7 @@ from sharkadm.transformers.columns import (
     RemoveColumns,
     SortColumns,
     PolarsSortColumns,
+    AddColumnsWithPrefix,
     PolarsAddDEPHqcColumn,
     PolarsAddFloatColumns,
     PolarsAddColumnDiff,
