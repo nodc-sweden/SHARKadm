@@ -65,14 +65,16 @@ class ValidateDateAndTime(Validator):
         ):
             if not (time_component := self._time_component(sample_time)):
                 self._log_fail(
-                    f"Sample time ({time_col}) not valid: '{sample_time}'",
+                    f"Sample time ({time_col}) not valid: '{sample_time}'"
+                    f" at visit keys: {df['visit_key'].to_list()}",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True
 
             if not (date_component := self._date_component(visit_date)):
                 self._log_fail(
-                    f"Visit date {date_col} not valid: '{visit_date}'",
+                    f"Visit date {date_col} not valid: '{visit_date}'"
+                    f" at visit keys: {df['visit_key'].to_list()}",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True
@@ -83,11 +85,13 @@ class ValidateDateAndTime(Validator):
                     self._log_fail(
                         f"Visit date and sample time before earliest valid value: "
                         f"{date_and_time} < {self._earliest_valid_datetime}"
+                        f" at visit keys: {df['visit_key'].to_list()}"
                     )
                     error = True
                 elif date_and_time > datetime.datetime.now():
                     self._log_fail(
                         f"Visit date and sample time in future: {date_and_time}"
+                        f" at visit keys: {df['visit_key'].to_list()}"
                     )
                     error = True
         if not error:

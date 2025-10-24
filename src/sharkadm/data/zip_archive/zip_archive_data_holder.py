@@ -7,7 +7,7 @@ from typing import Callable
 
 import pandas as pd
 
-from sharkadm import config, utils
+from sharkadm import utils
 from sharkadm.config import mapper_data_type_to_internal
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
