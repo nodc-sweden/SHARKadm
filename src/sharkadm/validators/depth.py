@@ -32,7 +32,7 @@ class ValidateSampleDepth(Validator):
             if float(sample_depth) >= float(water_depth):
                 self._log_fail(
                     f"Sample depth below water depth: {sample_depth} >= {water_depth}"
-                    f" at visit keys: {df['visit_key'].to_list()}",
+                    f" at visit keys: {df['visit_key'].unique().to_list()}",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True
@@ -77,7 +77,7 @@ class ValidateSecchiDepth(Validator):
             if float(value) >= float(water_depth):
                 self._log_fail(
                     f"Sample depth below water depth: {value} >= {df['water_depth_m']}"
-                    f" at visit keys: {df['visit_key'].to_list()}",
+                    f" at visit keys: {df['visit_key'].unique().to_list()}",
                     row_numbers=list(df["row_number"]),
                 )
                 error = True
