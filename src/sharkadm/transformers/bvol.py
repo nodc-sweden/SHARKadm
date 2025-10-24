@@ -6,6 +6,8 @@ from .base import (
     PolarsTransformer,
 )
 
+nodc_bvol = None
+
 try:
     import nodc_bvol
 except ModuleNotFoundError as e:
@@ -33,6 +35,13 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_bvol:
+            self._log(
+                "Could not add bvol scientific name. "
+                "Package nodc-bvol not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         self._add_column(data_holder)
         # self._log_result(data_holder)
 

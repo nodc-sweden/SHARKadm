@@ -5,6 +5,7 @@ from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 from .base import DataHolderProtocol, PolarsTransformer, Transformer
 
+nodc_worms = None
 try:
     import nodc_worms
 
@@ -51,7 +52,8 @@ class AddReportedAphiaId(Transformer):
 
 class AddWormsScientificName(Transformer):
     invalid_data_types = ("physicalchemical", "chlorophyll")
-    source_col = "dyntaxa_scientific_name"
+    # source_col = "dyntaxa_scientific_name"
+    source_col = "reported_scientific_name"
     col_to_set = "worms_scientific_name"
 
     def __init__(self, **kwargs):
@@ -182,6 +184,13 @@ class PolarsAddWormsScientificName(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_worms:
+            self._log(
+                "Could not add worms scientific name. "
+                "Package nodc-worms not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             new_name = translate_worms.get(str(name))
@@ -209,6 +218,12 @@ class PolarsAddWormsAphiaId(PolarsTransformer):
 
     @adm_logger.log_time
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_worms:
+            self._log(
+                "Could not add aphia id. Package nodc-worms not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         if self.col_to_set not in data_holder.data.columns:
             self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
             self._add_empty_col_to_set(data_holder)

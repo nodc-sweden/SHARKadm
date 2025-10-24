@@ -264,6 +264,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     _data_type: str | None = None
     _data_type_internal: str | None = None
     _data_format: str | None = None
+    _data_structure = "column"
 
     _date_str_format = "%Y-%m-%d"
 

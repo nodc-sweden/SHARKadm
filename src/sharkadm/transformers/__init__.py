@@ -266,6 +266,7 @@ from sharkadm.transformers.static_internet_access import (
 )
 from sharkadm.transformers.station import (
     AddStationInfo,
+    PolarsAddStationInfo,
     CopyReportedStationNameToStationName,
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
