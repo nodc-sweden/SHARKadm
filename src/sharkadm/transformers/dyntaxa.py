@@ -9,6 +9,7 @@ from .base import (
     Transformer,
 )
 
+nodc_dyntaxa = None
 try:
     import nodc_dyntaxa
 
@@ -374,6 +375,13 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_dyntaxa:
+            self._log(
+                "Could not add dyntaxa scientific name. "
+                "Package nodc-dyntaxa not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
@@ -439,6 +447,13 @@ class PolarsAddDyntaxaTranslatedScientificNameDyntaxaId(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_dyntaxa:
+            self._log(
+                "Could not add dyntaxa scientific name. "
+                "Package nodc-dyntaxa not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
@@ -487,6 +502,12 @@ class PolarsAddTaxonRanks(PolarsTransformer):
             self._add_empty_col(data_holder, col)
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_dyntaxa:
+            self._log(
+                "Could not add taxon rank. Package nodc-dyntaxa not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         self._add_columns(data_holder=data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus="accepted")
@@ -540,6 +561,12 @@ class PolarsAddDyntaxaId(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_dyntaxa:
+            self._log(
+                "Could not add dyntaxa id. Package nodc-dyntaxa not found/installed!",
+                level=adm_logger.ERROR,
+            )
+            return
         if self.source_col not in data_holder.data.columns:
             self._log(
                 f"Could not add column {self.col_to_set}. "

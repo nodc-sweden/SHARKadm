@@ -176,6 +176,36 @@ class SHARKadmLogger:
         )
         self._log(**data)
 
+    def log_validation(
+        self,
+        msg: str,
+        level: str = "debug",
+        item: str | None = None,
+        purpose: str = "",
+        row_number: int | None = None,
+        row_numbers: list[int] | None = None,
+        cls: str | None = None,
+    ) -> None:
+        if not cls:
+            cls = ""
+            stack = inspect.stack()
+            if stack[1][0].f_locals.get("self"):
+                cls = stack[1][0].f_locals["self"].__class__.__name__
+
+        if row_number is not None:
+            row_numbers = [row_number] + (row_numbers or [])
+
+        data = dict(
+            log_type=self.VALIDATION,
+            msg=msg,
+            level=level,
+            cls=cls,
+            item=item,
+            purpose=purpose,
+            row_numbers=row_numbers,
+        )
+        self._log(**data)
+
     def log_validation_failed(
         self,
         msg: str,

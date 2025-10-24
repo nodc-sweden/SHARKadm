@@ -27,7 +27,7 @@ class AddEnglishProjectName(_AddCodesProj):
 
 
 class PolarsAddSwedishProjectName(_PolarsAddCodesProj):
-    source_cols = ("sample_project_name", "sample_project_name_en")
+    source_cols = ("sample_project_code", "sample_project_name", "sample_project_name_en")
     col_to_set = "sample_project_name_sv"
     lookup_key = "swedish_name"
 
@@ -37,7 +37,7 @@ class PolarsAddSwedishProjectName(_PolarsAddCodesProj):
 
 
 class PolarsAddEnglishProjectName(_PolarsAddCodesProj):
-    source_cols = ("sample_project_name", "sample_project_name_sv")
+    source_cols = ("sample_project_code", "sample_project_name", "sample_project_name_sv")
     col_to_set = "sample_project_name_en"
     lookup_key = "english_name"
 

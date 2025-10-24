@@ -18,7 +18,10 @@ from sharkadm.validators.column_combination import (
     AssertCombination,
     AssertMinMaxDepthCombination,
 )
-from sharkadm.validators.columns import ValidateColumnViewColumnsNotInDataset
+from sharkadm.validators.columns import (
+    ValidateColumnViewColumnsNotInDataset,
+    ValidateUnmappedColumnsHasData,
+)
 from sharkadm.validators.common_values import ValidateCommonValuesByVisit
 from sharkadm.validators.date_and_time import MissingTime, ValidateDateAndTime
 from sharkadm.validators.depth import ValidateSampleDepth, ValidateSecchiDepth
@@ -30,6 +33,10 @@ from sharkadm.validators.mandatory import (
 )
 from sharkadm.validators.occurrence_id import ValidateOccurrenceId
 from sharkadm.validators.positive import ValidatePositiveValues
+from sharkadm.validators.scientific_name import (
+    ValidateAphiaIdDiffersFromBvolAphiaId,
+    ValidateScientificNameIsTranslated,
+)
 from sharkadm.validators.serial_number import ValidateSerialNumber
 from sharkadm.validators.speed import ValidateSpeed
 from sharkadm.validators.station import (
