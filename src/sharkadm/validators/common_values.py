@@ -37,10 +37,7 @@ class ValidateCommonValuesByVisit(Validator):
 
     @staticmethod
     def get_validator_description() -> str:
-        return (
-            "Check if these columns have unique values per visit: "
-            f"{ValidateCommonValuesByVisit.unique_columns}"
-        )
+        return "Check if metadata columns have unique values per visit."
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for column_name in self.unique_columns:

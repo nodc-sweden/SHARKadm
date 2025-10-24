@@ -36,6 +36,7 @@ def test_validate_visit_date(
     given_data = pl.DataFrame(
         [
             {
+                "visit_key": "ABC",
                 "visit_date": given_date,
                 "sample_time": "13:37",
                 "row_number": 1,
@@ -83,6 +84,7 @@ def test_validate_sample_time(
     given_data = pl.DataFrame(
         [
             {
+                "visit_key": "ABC",
                 "visit_date": "2025-08-06",
                 "sample_time": given_time,
                 "row_number": 1,
@@ -132,6 +134,7 @@ def test_future_datetime_not_allowed(
     given_data = pl.DataFrame(
         [
             {
+                "visit_key": "ABC",
                 "visit_date": given_visit_date,
                 "sample_time": given_sample_time,
                 "row_number": 1,
