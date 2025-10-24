@@ -10,20 +10,26 @@ from sharkadm.validators import ValidateCommonValuesByVisit
 @pytest.mark.parametrize(
     "given_column, given_value_a, given_value_b, given_should_be_checked",
     (
-        ("sample_date", "20250101", "20250102", True),
+        ("visit_year", "2025", "2024", True),
+        ("sample_project_code", "XXX", "ABH", True),
+        ("sample_orderer_code", "OLST", "BDLST", True),
+        ("visit_date", "20250101", "20250102", True),
         ("sample_time", "10:20", "10:21", True),
-        ("sample_latitude_dd", "16.1", "16.2", True),
-        ("sample_longitude_dd", "58.5", "58.6", True),
-        ("reported_station_name", "Station X", "Station Y", True),
+        ("sample_enddate", "20250101", "20250102", True),
+        ("sample_endtime", "10:21", "10:22", True),
+        ("platform_code", "ZZ99", "10", True),
+        ("expedition_id", "01", "02", True),
+        ("visit_id", "0001", "0002", True),
+        ("reported_station_name", "SALTHOLMEN", "TJÄRNÖ", True),
+        ("visit_reported_latitude", "58.1", "58.2", True),
+        ("visit_reported_longitude", "11.5", "11.6", True),
+        ("positioning_system_code", "GPS", "DGPS", True),
         ("water_depth_m", "100", "99", True),
-        ("visit_id", "Visit 1", "Visit 2", True),
-        ("expedition_id", "Expidition 1", "Expidition 2", True),
-        ("platform_code", "PLF1", "PLF2", True),
+        ("visit_comment", "Comment X", "Comment Y", True),
         ("wind_direction_code", "10", "20", True),
         ("wind_speed_ms", "3", "4", True),
         ("air_temperature_degc", "19", "20", True),
         ("air_pressure_hpa", "1020", "1021", True),
-        ("visit_comment", "Comment X", "Comment Y", True),
         ("sample_depth_m", "10", "11", False),
         ("made_up_column", "what", "ever", False),
     ),
@@ -39,7 +45,7 @@ def test_conflicting_values_for_same_visit_are_found(
 ):
     # Given data for a visit with conflicting values for a given column
     base_row = {column: "value" for column in ValidateCommonValuesByVisit.unique_columns}
-    given_key = "001"
+    given_key = "20250101_1020_ZZ99_SALTHOLMEN"
     assert given_value_a != given_value_b
     data = pl.DataFrame(
         [
@@ -47,6 +53,7 @@ def test_conflicting_values_for_same_visit_are_found(
             base_row | {"visit_key": given_key, given_column: given_value_b},
         ]
     )
+    print(data)
 
     # Given a data holder
     given_data_holder = polars_data_frame_holder_class(data)
