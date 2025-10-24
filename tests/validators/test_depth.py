@@ -27,6 +27,7 @@ def test_sample_depth_is_validated_against_water_depth(
     given_data = pl.DataFrame(
         [
             {
+                "visit_key": "ABC",
                 "sample_depth_m": given_sample_depth,
                 "water_depth_m": given_water_depth,
                 "row_number": 1,
@@ -59,7 +60,7 @@ def test_sample_depth_cant_be_validated_if_missing_parameters(
     mocked_data_types, polars_data_frame_holder_class, given_parameters
 ):
     # Given data with subset of required parameters
-    given_data = pl.DataFrame([given_parameters | {"row_number": 1}])
+    given_data = pl.DataFrame([given_parameters | {"row_number": 1, "visit_key": "ABC"}])
 
     # Given a valid data holder
     given_data_holder = polars_data_frame_holder_class(given_data)
@@ -99,6 +100,7 @@ def test_secchi_depth_is_validated_against_water_depth(
     given_data = pl.DataFrame(
         [
             {
+                "visit_key": "ABC",
                 "parameter": "SECCHI",
                 "value": given_secchi_depth,
                 "water_depth_m": given_water_depth,
@@ -145,7 +147,7 @@ def test_secchi_depth_cant_be_validated_if_missing_parameters(
     given_parameters,
 ):
     # Given data with subset of required parameters
-    given_data = pl.DataFrame([given_parameters | {"row_number": 1}])
+    given_data = pl.DataFrame([given_parameters | {"row_number": 1, "visit_key": "ABC"}])
 
     # Given a valid data holder
     given_data_holder = polars_data_frame_holder_class(given_data)
