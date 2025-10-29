@@ -1,4 +1,56 @@
+import polars as pl
+
 from sharkadm.validators.base import DataHolderProtocol, Validator
+
+
+class ValidateWaterDepth(Validator):
+    _display_name = "Water depth"
+    lower_limit = 0
+    upper_limit = 500
+
+    @staticmethod
+    def get_validator_description() -> str:
+        return "Checks that the water depth is within reasonable ranges (0 to 500 m)."
+
+    def _validate(self, data_holder: DataHolderProtocol) -> None:
+        self._log_workflow(
+            "Checking that the water depth is within reasonable ranges (0 to 500 m).",
+        )
+
+        if "water_depth_m" not in data_holder.data.columns:
+            self._log_fail(
+                "Could not validate water depth because water depth column missing.",
+            )
+            return
+
+        unique_rows = data_holder.data.select(
+            ["visit_key", "water_depth_m"],
+        ).unique()
+        unique_rows = unique_rows.with_columns(
+            [
+                pl.when(
+                    pl.col("water_depth_m")
+                    .cast(pl.Float64, strict=False)
+                    .is_between(self.lower_limit, self.upper_limit, closed="none")
+                )
+                .then(True)
+                .when(pl.col("water_depth_m").is_null() | (pl.col("water_depth_m") == ""))
+                .then(False)
+                .otherwise(False)
+                .alias("is_valid")
+            ]
+        )
+
+        if unique_rows["is_valid"].all():
+            self._log_success("Water depth is ok")
+        else:
+            erroneous_rows = (
+                unique_rows.filter(~pl.col("is_valid"))
+                .select(["visit_key", "water_depth_m"])
+                .to_dicts()
+            )
+
+            self._log_fail(f"Water depth has unexpected values:\n{erroneous_rows}")
 
 
 class ValidateSampleDepth(Validator):
