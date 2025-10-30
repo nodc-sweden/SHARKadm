@@ -107,6 +107,10 @@ class AddSamplePositionSweref99tm(Transformer):
     y_column_to_set = "sample_sweref99tm_y"
     x_column_to_set = "sample_sweref99tm_x"
 
+    def __init__(self, *args, use_db: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._use_db = use_db
+
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds sample position in sweref99tm"
@@ -123,14 +127,9 @@ class AddSamplePositionSweref99tm(Transformer):
                     f"and {self.y_column_to_set}"
                 )
                 continue
-            x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon)
+            x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon, use_db=self._use_db)
             data_holder.data.loc[df.index, self.x_column_to_set] = x
             data_holder.data.loc[df.index, self.y_column_to_set] = y
-            # boolean = (
-            #     data_holder.data[self.lat_source_col] == lat
-            # ) & (data_holder.data[self.lon_source_col] == lon)
-            # data_holder.data.loc[boolean, self.x_column_to_set] = x
-            # data_holder.data.loc[boolean, self.y_column_to_set] = y
 
 
 class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
@@ -138,6 +137,10 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
     lon_source_col = "sample_longitude_dd"
     y_column_to_set = "sample_sweref99tm_y"
     x_column_to_set = "sample_sweref99tm_x"
+
+    def __init__(self, *args, use_db: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._use_db = use_db
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -153,6 +156,7 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
         mapper = geography.get_decdeg_to_sweref99tm_mapper(
             data_holder.data["sample_latitude_dd"],
             data_holder.data["sample_longitude_dd"],
+            use_db=self._use_db,
         )
         nr = 0
         for (lat, lon), df in data_holder.data.group_by(

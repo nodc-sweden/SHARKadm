@@ -49,20 +49,29 @@ def decmin_to_decdeg(pos: str, nr_decimals: int | None = 2):
 #     return x, y
 
 
-def decdeg_to_sweref99tm(lat: str, lon: str) -> (float, float):
+def decdeg_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> (float, float):
+    if not use_db:
+        return _convert_decdeg_to_sweref99tm(lat, lon)
     info = sweref99tm_db.get(lat, lon)
     if info:
         return info["x_pos"], info["y_pos"]
-    return _convert_decdeg_to_sweref99tm(lat, lon)
+    x, y = _convert_decdeg_to_sweref99tm(lat, lon)
+    sweref99tm_db.add(lat, lon, x, y)
+    return x, y
 
 
 def get_decdeg_to_sweref99tm_mapper(
-    lat: list[str], lon: list[str]
+    lat: list[str], lon: list[str], use_db: bool = False
 ) -> dict[(str, str), (str, str)]:
-    mapper = sweref99tm_db.get_mapper()
+    mapper = {}
+    if use_db:
+        mapper = sweref99tm_db.get_mapper()
+        print(f"Getting mapper: {sweref99tm_db.DB_PATH}")
     for pos in zip(lat, lon):
         if not mapper.get(pos):
             x, y = _convert_decdeg_to_sweref99tm(pos[0], pos[1])
+            if use_db:
+                sweref99tm_db.add(pos[0], pos[1], x, y)
             mapper[(pos[0], pos[1])] = (x, y)
     return mapper
 
@@ -71,10 +80,7 @@ def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> (str, str):
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
     sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
     transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
-    print(f"{lat=}")
-    print(f"{lon=}")
     x, y = transformer.transform(lon, lat)
-    sweref99tm_db.add(lat, lon, x, y)
     return x, y
 
 
