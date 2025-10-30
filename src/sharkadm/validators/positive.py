@@ -18,7 +18,7 @@ class ValidatePositiveValues(Validator):
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Checks that all values are positive in columns specified by user: "
+        return "Checks that all values are positive in columns specified by user. "
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for column in self.columns_to_validate:
