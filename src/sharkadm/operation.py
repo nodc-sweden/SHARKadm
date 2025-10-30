@@ -22,7 +22,8 @@ class OperationBase:
         if data_holder.data_type_internal == "unknown":
             return True
         if data_holder.data_type_internal in config.get_valid_data_types(
-                valid=self.valid_data_types, invalid=self.invalid_data_types):
+            valid=self.valid_data_types, invalid=self.invalid_data_types
+        ):
             return True
         return False
 

@@ -1,5 +1,6 @@
 import datetime
 import re
+
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
@@ -70,23 +71,27 @@ class ValidateDateAndTime(Validator):
         ):
             if not (time_component := self._time_component(sample_time)):
                 msg = f"Sample time ({time_col}) not valid: '{sample_time}'"
-                self._log_fail(self._get_log_string(msg, df),
-                               row_numbers=list(df["row_number"]),
-                               )
+                self._log_fail(
+                    self._get_log_string(msg, df),
+                    row_numbers=list(df["row_number"]),
+                )
                 error = True
 
             if not (date_component := self._date_component(visit_date)):
                 msg = f"Visit date {date_col} not valid: '{visit_date}'"
-                self._log_fail(self._get_log_string(msg, df),
-                               row_numbers=list(df["row_number"]),
-                               )
+                self._log_fail(
+                    self._get_log_string(msg, df),
+                    row_numbers=list(df["row_number"]),
+                )
                 error = True
 
             if date_component and time_component:
                 date_and_time = datetime.datetime.combine(date_component, time_component)
                 if date_and_time < self._earliest_valid_datetime:
-                    msg = (f"Visit date and sample time before earliest valid value: "
-                           f"{date_and_time} < {self._earliest_valid_datetime}")
+                    msg = (
+                        f"Visit date and sample time before earliest valid value: "
+                        f"{date_and_time} < {self._earliest_valid_datetime}"
+                    )
                     self._log_fail(self._get_log_string(msg, df))
                     error = True
                 elif date_and_time > datetime.datetime.now():
