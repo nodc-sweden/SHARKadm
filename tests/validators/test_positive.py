@@ -8,22 +8,29 @@ from sharkadm.validators import ValidatePositiveValues
 
 
 @pytest.mark.parametrize(
-    "given_column, given_negative_value, given_row_number",
+    "columns_to_validate, given_column, given_negative_value, given_row_number",
     (
-        ("air_pressure_hpa", -1.23, 3),
-        ("wind_direction_code", -10, 4),
-        ("weather_observation_code", -1, 2),
-        ("cloud_observation_code", -3, 5),
-        ("wave_observation_code", -4, 7),
-        ("ice_observation_code", -2, 6),
-        ("wind_speed_ms", -30.1, 9),
-        ("water_depth_m", -120, 10),
+        (("air_pressure_hpa", "wind_direction_code"), "air_pressure_hpa", -1.23, 3),
+        (
+            ("weather_observation_code", "cloud_observation_code"),
+            "weather_observation_code",
+            -10,
+            4,
+        ),
+        (("wave_observation_code", "water_depth_m"), "wave_observation_code", -3, 5),
+        (
+            ("wind_speed_ms", "ice_observation_code", "water_depth_m"),
+            "wind_speed_ms",
+            -30.1,
+            9,
+        ),
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_negative_values_are_identified(
     mocked_data_types,
     polars_data_frame_holder_class,
+    columns_to_validate,
     given_column,
     given_negative_value,
     given_row_number,
@@ -34,9 +41,7 @@ def test_negative_values_are_identified(
     given_values = [
         {
             column: f"{12.34 * (0.8 + ((col_n + row_n / 10) % 0.123)):.3f}"
-            for col_n, column in enumerate(
-                ValidatePositiveValues.columns_to_validate, start=1
-            )
+            for col_n, column in enumerate(columns_to_validate, start=1)
         }
         | {"row_number": row_n}
         for row_n in range(1, given_row_number * 2 + 2)
@@ -52,7 +57,7 @@ def test_negative_values_are_identified(
 
     # When validating the data
     adm_logger.reset_log()
-    ValidatePositiveValues().validate(given_data_holder)
+    ValidatePositiveValues(columns_to_validate).validate(given_data_holder)
 
     # Then there should be exactly one failed validation messages for
     # that specific validator and column

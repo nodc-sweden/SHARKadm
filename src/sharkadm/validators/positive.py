@@ -1,26 +1,24 @@
 from sharkadm.validators.base import DataHolderProtocol, Validator
 
+from .. import adm_logger
+
 
 class ValidatePositiveValues(Validator):
     _display_name = "Positive values"
 
-    columns_to_validate = (
-        "air_pressure_hpa",
-        "wind_direction_code",
-        "weather_observation_code",
-        "cloud_observation_code",
-        "wave_observation_code",
-        "ice_observation_code",
-        "wind_speed_ms",
-        "water_depth_m",
-    )
+    def __init__(self, columns_to_validate: tuple[str] | None = None) -> None:
+        super().__init__()
+        self.columns_to_validate = columns_to_validate
+        if not self.columns_to_validate:
+            self._log_workflow(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
 
     @staticmethod
     def get_validator_description() -> str:
-        return (
-            f"Checks that all values are positive in columns: "
-            f"{ValidatePositiveValues.columns_to_validate}"
-        )
+        return "Checks that all values are positive in columns specified by user: "
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for column in self.columns_to_validate:

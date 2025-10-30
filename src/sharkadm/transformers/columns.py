@@ -338,7 +338,6 @@ class AddColumnsWithPrefix(Transformer):
         super().__init__()
         self.apply_on_columns = apply_on_columns
         self.col_prefix = col_prefix
-        self._handled_cols = dict()
         if not self.apply_on_columns or self.col_prefix is None:
             self._log(
                 "Not enough input, will do nothing ",
