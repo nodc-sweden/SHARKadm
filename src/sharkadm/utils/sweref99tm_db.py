@@ -2,19 +2,15 @@ import sqlite3
 
 from sharkadm.config import CONFIG_DIRECTORY
 
-DB_PATH = CONFIG_DIRECTORY / "sharkadm" / "sweref99tm_database.db"
-print(f"sweref99tm database at {DB_PATH}")
-
-COLUMNS = [
-    "id",
-    "lat_dd",
-    "lon_dd",
-    "x_pos",
-    "y_pos",
-]
+DB_PATH = None
+if CONFIG_DIRECTORY:
+    DB_PATH = CONFIG_DIRECTORY / "sharkadm" / "sweref99tm_database.db"
 
 
 def create_database():
+    if DB_PATH.exists():
+        return
+    print(f"Creating sweref99tm database at: {DB_PATH}")
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
@@ -35,6 +31,7 @@ def create_database():
 
 
 def add(lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
+    create_database()
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
@@ -50,6 +47,7 @@ def add(lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
 
 
 def get(lat_dd: str, lon_dd: str) -> dict:
+    create_database()
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
@@ -73,6 +71,7 @@ def get(lat_dd: str, lon_dd: str) -> dict:
 
 
 def get_mapper() -> dict:
+    create_database()
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
 
@@ -89,6 +88,3 @@ def get_mapper() -> dict:
         for res in result:
             info[(res[1], res[2])] = (res[3], res[4])
         return info
-
-
-create_database()
