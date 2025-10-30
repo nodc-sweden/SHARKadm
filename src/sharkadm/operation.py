@@ -19,12 +19,10 @@ class OperationBase:
         return self.__class__.__name__
 
     def _data_holder_has_valid_data_type(self, data_holder: PolarsDataHolder) -> bool:
-        if (
-            data_holder.data_type_internal != "unknown"
-            and data_holder.data_type_internal
-            in config.get_valid_data_types(
-                valid=self.valid_data_types, invalid=self.invalid_data_types
-            )
+        if data_holder.data_type_internal == "unknown":
+            return True
+        if data_holder.data_type_internal in config.get_valid_data_types(
+            valid=self.valid_data_types, invalid=self.invalid_data_types
         ):
             return True
         return False

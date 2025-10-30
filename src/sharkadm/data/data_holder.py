@@ -243,7 +243,7 @@ class PandasDataHolder(DataHolder, ABC):
 class PolarsDataHolder(DataHolder, ABC):
     def __init__(self, *args, **kwargs):
         self._data = pl.DataFrame()
-        self._filtered_data = pl.DataFrame()
+        self._filtered_data = None
         super().__init__(*args, **kwargs)
 
     def __add__(self, other) -> "PolarsConcatDataHolder":
@@ -322,7 +322,9 @@ class PolarsDataHolder(DataHolder, ABC):
 
     @property
     def is_filtered(self) -> bool:
-        return not self._filtered_data.is_empty()
+        if self._filtered_data is None:
+            return False
+        return True
 
     def filter(self, data_filter):
         mask = data_filter.get_filter_mask(self)
@@ -335,7 +337,7 @@ class PolarsDataHolder(DataHolder, ABC):
         self._filtered_data = self.data.remove(~mask)
 
     def reset_filter(self):
-        self._filtered_data = pl.DataFrame()
+        self._filtered_data = None
 
     def year_span(self) -> list[str]:
         years = list(set(self.data["visit_year"]))
