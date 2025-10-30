@@ -2,7 +2,9 @@ import sqlite3
 
 from sharkadm.config import CONFIG_DIRECTORY
 
-DB_PATH = CONFIG_DIRECTORY / "sharkadm" / "sweref99tm_database.db"
+DB_PATH = None
+if CONFIG_DIRECTORY:
+    DB_PATH = CONFIG_DIRECTORY / "sharkadm" / "sweref99tm_database.db"
 
 
 def create_database():
