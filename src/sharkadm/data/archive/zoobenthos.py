@@ -4,9 +4,15 @@ import pathlib
 from sharkadm.data import data_source
 
 from ..data_source.base import DataFile
-from .archive_data_holder import ArchiveDataHolder
+from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
+
+
+class PolarsZoobenthosArchiveDataHolder(PolarsArchiveDataHolder):
+    _data_type_internal = "zoobenthos"
+    _data_type = "Zoobenthos"
+    _data_format = "Zoobenthos"
 
 
 class ZoobenthosArchiveDataHolder(ArchiveDataHolder):
@@ -104,7 +110,6 @@ class ZoobenthosArchiveDataHolder(ArchiveDataHolder):
 
     def _add_data_sources(self) -> None:
         for name, path in self._file_paths.items():
-            # print(f'{path.name=}')
             d_source = self._get_data_source(path)
 
             self._add_visit_column_to_data_source(d_source)

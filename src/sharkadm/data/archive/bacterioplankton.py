@@ -2,9 +2,15 @@ import logging
 
 from sharkadm.data import data_source
 
-from .archive_data_holder import ArchiveDataHolder
+from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
+
+
+class PolarsBacterioplanktonArchiveDataHolder(PolarsArchiveDataHolder):
+    _data_type_internal = "bacterioplankton"
+    _data_type = "Bacterioplankton"
+    _data_format = "Bacterioplankton"
 
 
 class BacterioplanktonArchiveDataHolder(ArchiveDataHolder):

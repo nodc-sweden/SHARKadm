@@ -3,9 +3,15 @@ import pathlib
 
 from sharkadm.data import data_source
 
-from .archive_data_holder import ArchiveDataHolder
+from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
+
+
+class PolarsProfileArchiveDataHolder(PolarsArchiveDataHolder):
+    _data_type_internal = "profile"
+    _data_type = "Profile"
+    _data_format = "PROFILE"
 
 
 class ProfileArchiveDataHolder(ArchiveDataHolder):

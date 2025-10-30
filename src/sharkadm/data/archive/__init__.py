@@ -7,26 +7,46 @@ from sharkadm.data.archive.archive_data_holder import (
     ArchiveDataHolder,
     PolarsArchiveDataHolder,
 )
-from sharkadm.data.archive.bacterioplankton import BacterioplanktonArchiveDataHolder
+from sharkadm.data.archive.bacterioplankton import (
+    BacterioplanktonArchiveDataHolder,
+    PolarsBacterioplanktonArchiveDataHolder,
+)
 from sharkadm.data.archive.chlorophyll import (
     ChlorophyllArchiveDataHolder,
     PolarsChlorophyllArchiveDataHolder,
 )
 from sharkadm.data.archive.delivery_note import DeliveryNote
-from sharkadm.data.archive.epibenthos import EpibenthosMartransArchiveDataHolder
-from sharkadm.data.archive.jellyfish import JellyfishArchiveDataHolder
-from sharkadm.data.archive.physicalchemical import PhysicalChemicalArchiveDataHolder
+from sharkadm.data.archive.epibenthos import (
+    EpibenthosMartransArchiveDataHolder,
+    PolarsEpibenthosArchiveDataHolder,
+)
+from sharkadm.data.archive.greyseal import PolarsGreySealArchiveDataHolder
+from sharkadm.data.archive.jellyfish import (
+    JellyfishArchiveDataHolder,
+    PolarsJellyfishArchiveDataHolder,
+)
+from sharkadm.data.archive.physicalchemical import (
+    PhysicalChemicalArchiveDataHolder,
+    PolarsPhysicalChemicalArchiveDataHolder,
+)
 from sharkadm.data.archive.phytoplankton import (
     PhytoplanktonArchiveDataHolder,
     PolarsPhytoplanktonArchiveDataHolder,
 )
 from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHolder
+from sharkadm.data.archive.primaryproduction import (
+    PolarsPrimaryProductionArchiveDataHolder,
+)
 from sharkadm.data.archive.zoobenthos import (
+    PolarsZoobenthosArchiveDataHolder,
     ZoobenthosArchiveDataHolder,
     ZoobenthosBedaArchiveDataHolder,
     ZoobenthosBiomadArchiveDataHolder,
 )
-from sharkadm.data.archive.zooplankton import ZooplanktonArchiveDataHolder
+from sharkadm.data.archive.zooplankton import (
+    PolarsZooplanktonArchiveDataHolder,
+    ZooplanktonArchiveDataHolder,
+)
 
 
 def all_subclasses(cls):
@@ -41,9 +61,6 @@ object_mapping = dict(
 polars_object_mapping = dict(
     (cls._data_format, cls) for cls in all_subclasses(PolarsArchiveDataHolder)
 )
-# object_mapping = dict(
-#     (cls._data_format.lower(), cls) for cls in ArchiveDataHolder.__subclasses__()
-# )
 
 
 def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
@@ -58,6 +75,7 @@ def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
 def get_polars_archive_data_holder(path: str | pathlib.Path) -> PolarsArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
+    print(f"{polars_object_mapping.keys()=}")
     d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
