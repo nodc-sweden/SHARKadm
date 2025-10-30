@@ -71,8 +71,6 @@ def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> (str, str):
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
     sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
     transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
-    print(f"{lat=}")
-    print(f"{lon=}")
     x, y = transformer.transform(lon, lat)
     sweref99tm_db.add(lat, lon, x, y)
     return x, y

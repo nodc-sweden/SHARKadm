@@ -35,6 +35,9 @@ class DeliveryNote:
         if self._data["DTYPE"] == "Physical and Chemical":
             self._data["DTYPE"] = "PhysicalChemical"
 
+        if self._data["DTYPE"] == "Harbour Porpoise":
+            self._data["DTYPE"] = "Harbourporpoise"
+
         dtype = self.translate_codes.get_translation(
             field="delivery_datatype",
             synonym=self._data["DTYPE"],
