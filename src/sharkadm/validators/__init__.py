@@ -40,6 +40,7 @@ from sharkadm.validators.positive import ValidatePositiveValues
 from sharkadm.validators.scientific_name import (
     ValidateAphiaIdDiffersFromBvolAphiaId,
     ValidateScientificNameIsTranslated,
+    ValidateScientificNameAndSizeClassDiffersFromBvol,
 )
 from sharkadm.validators.serial_number import ValidateSerialNumber
 from sharkadm.validators.speed import ValidateSpeed
