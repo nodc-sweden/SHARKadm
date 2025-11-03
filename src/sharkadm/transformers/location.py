@@ -55,6 +55,9 @@ class _PolarsAddLocationBase(PolarsTransformer):
             )
 
         for (x, y), df in data_holder.data.group_by([self.x_pos_col, self.y_pos_col]):
+            if not all([x, y]):
+                self._log(f"Empty x, y position ('{x}', '{y}')", level=adm_logger.WARNING)
+                continue
             info = nodc_geography.get_shape_file_info_at_position(
                 x_pos=x, y_pos=y, variable=self.col_to_set
             )

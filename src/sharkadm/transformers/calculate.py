@@ -1,6 +1,7 @@
 import polars as pl
 
 from sharkadm.data import PolarsDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
 from sharkadm.utils import add_column
 
@@ -103,7 +104,11 @@ class PolarsCalculateAbundance(PolarsTransformer):
         return f"Calculating abundance. Setting value to column {COL_VALUE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        add_calculate_columns(data_holder)
+        try:
+            add_calculate_columns(data_holder)
+        except pl.exceptions.InvalidOperationError as e:
+            self._log(f"Could not add calculated columns: {e}", level=adm_logger.CRITICAL)
+            return
         self._calc_abundance(data_holder)
         self._add_combined_abundance(data_holder)
         self._add_to_parameter_column(data_holder)
@@ -349,6 +354,10 @@ class PolarsOnlyKeepReportedIfCalcByDc(PolarsTransformer):
         return "Removes values in reported_-columns if not calculated by dc"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if COL_CALC_BY_DC not in data_holder.data.columns:
+            self._log(f"No column named {COL_CALC_BY_DC} in data!",
+                      level=adm_logger.ERROR)
+            return
         boolean = pl.col(COL_CALC_BY_DC) != CALC_BY_DC_MARKER
         data_holder.data = data_holder.data.with_columns(
             pl.when(boolean)
