@@ -13,14 +13,10 @@ from sharkadm.validators import ValidateCommonValuesByVisit
         ("visit_year", "2025", "2024", True),
         ("sample_project_code", "XXX", "ABH", True),
         ("sample_orderer_code", "OLST", "BDLST", True),
-        ("visit_date", "20250101", "20250102", True),
-        ("sample_time", "10:20", "10:21", True),
         ("sample_enddate", "20250101", "20250102", True),
         ("sample_endtime", "10:21", "10:22", True),
-        ("platform_code", "ZZ99", "10", True),
         ("expedition_id", "01", "02", True),
         ("visit_id", "0001", "0002", True),
-        ("reported_station_name", "SALTHOLMEN", "TJÄRNÖ", True),
         ("visit_reported_latitude", "58.1", "58.2", True),
         ("visit_reported_longitude", "11.5", "11.6", True),
         ("positioning_system_code", "GPS", "DGPS", True),
@@ -45,15 +41,31 @@ def test_conflicting_values_for_same_visit_are_found(
 ):
     # Given data for a visit with conflicting values for a given column
     base_row = {column: "value" for column in ValidateCommonValuesByVisit.unique_columns}
-    given_key = "20250101_1020_ZZ99_SALTHOLMEN"
+    given_date = "20250101"
+    given_time = "10:20"
+    given_platform_code = "ZZ99"
+    given_station = "SALTHOLMEN"
     assert given_value_a != given_value_b
     data = pl.DataFrame(
         [
-            base_row | {"visit_key": given_key, given_column: given_value_a},
-            base_row | {"visit_key": given_key, given_column: given_value_b},
+            base_row
+            | {
+                "visit_date": given_date,
+                "sample_time": given_time,
+                "platform_code": given_platform_code,
+                "reported_station_name": given_station,
+                given_column: given_value_a,
+            },
+            base_row
+            | {
+                "visit_date": given_date,
+                "sample_time": given_time,
+                "platform_code": given_platform_code,
+                "reported_station_name": given_station,
+                given_column: given_value_b,
+            },
         ]
     )
-    print(data)
 
     # Given a data holder
     given_data_holder = polars_data_frame_holder_class(data)
