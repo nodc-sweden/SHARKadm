@@ -8,22 +8,23 @@ from sharkadm.validators.air_pressure import ValidateAirpres
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_air_pressure_hpa, expected_success",
+    "given_date, given_station, given_air_pressure_hpa, expected_success",
     (
-        ("20230802_1050_ZZ99_SKÅPESUND", "900.00", True),  # Float
-        ("20230530_1115_ZZ99_SMÅHOLMARNA", "1100.1", False),  # Possibly too high
-        ("20230530_0925_ZZ99_SVENSHOLMEN", "1000", True),  # Int
-        ("20230802_1050_ZZ99_SKÅPESUND", "850", False),  # Possibly too low
-        ("20230802_1050_ZZ99_SKÅPESUND", "", True),  # Missing as str
-        ("20230802_1050_ZZ99_SKÅPESUND", None, True),  # Missing as None
-        ("20230802_1050_ZZ99_SKÅPESUND", " ", False),  # White space
+        ("20230802", "SKÅPESUND", "900.00", True),  # Float
+        ("20230530", "SMÅHOLMARNA", "1100.1", False),  # Possibly too high
+        ("20230530", "SVENSHOLMEN", "1000", True),  # Int
+        ("20230802", "SKÅPESUND", "850", False),  # Possibly too low
+        ("20230802", "SKÅPESUND", "", True),  # Missing as str
+        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", " ", False),  # White space
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_airpres(
     mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
+    given_date,
+    given_station,
     given_air_pressure_hpa,
     expected_success,
 ):
@@ -31,7 +32,8 @@ def test_validate_airpres(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": given_visit_key,
+                "visit_date": given_date,
+                "reported_station_name": given_station,
                 "air_pressure_hpa": given_air_pressure_hpa,
             }
         ]
