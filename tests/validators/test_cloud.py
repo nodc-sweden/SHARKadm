@@ -8,24 +8,25 @@ from sharkadm.validators.cloud import ValidateCloud
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_cloud_observation_code, expected_success",
+    "given_date, given_station, given_cloud_observation_code, expected_success",
     (
-        ("20230802_1050_ZZ99_SKÅPESUND", "0", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", "10", True),
-        ("20230530_1115_ZZ99_SMÅHOLMARNA", "11", False),
-        ("20230802_1050_ZZ99_SKÅPESUND", "5", True),
-        ("20230530_0925_ZZ99_SVENSHOLMEN", "7.0", False),  # Float
-        ("20230802_1050_ZZ99_SKÅPESUND", "07", False),  # Zeropadded
-        ("20230802_1050_ZZ99_SKÅPESUND", "", True),  # Missing as str
-        ("20230802_1050_ZZ99_SKÅPESUND", None, True),  # Missing as None
-        ("20230802_1050_ZZ99_SKÅPESUND", " ", False),  # White space
+        ("20230802", "SKÅPESUND", "0", True),
+        ("20230802", "SKÅPESUND", "10", True),
+        ("20230530", "SMÅHOLMARNA", "11", False),
+        ("20230802", "SKÅPESUND", "5", True),
+        ("20230530", "SVENSHOLMEN", "7.0", False),  # Float
+        ("20230802", "SKÅPESUND", "07", False),  # Zeropadded
+        ("20230802", "SKÅPESUND", "", True),  # Missing as str
+        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", " ", False),  # White space
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_cloud(
     mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
+    given_date,
+    given_station,
     given_cloud_observation_code,
     expected_success,
 ):
@@ -33,7 +34,8 @@ def test_validate_cloud(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": given_visit_key,
+                "visit_date": given_date,
+                "reported_station_name": given_station,
                 "cloud_observation_code": given_cloud_observation_code,
             }
         ]
