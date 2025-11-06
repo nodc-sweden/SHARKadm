@@ -4,6 +4,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 
 from .base import Transformer
 
@@ -110,6 +111,12 @@ class AddLmqnt(Transformer):
         return lmqnt, lmqnt_unit
 
     def _transform(self, data_holder: PandasDataHolder) -> None:
+        if "quantification_limit" not in data_holder.data.columns:
+            self._log(
+                "Quantification limit column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
         grouped = data_holder.data.groupby(["quantification_limit", "parameter", "unit"])
 
         for (lmqnt_str, name, unit), group_idx in grouped.groups.items():
@@ -245,6 +252,12 @@ class PolarsAddLmqnt(Transformer):
         return None
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if "quantification_limit" not in data_holder.data.columns:
+            self._log(
+                "Quantification limit column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
         unique_lmqnt_df = data_holder.data.select(
             ["quantification_limit", "parameter", "unit"]
         ).unique()
