@@ -7,7 +7,7 @@ from . import PolarsTransformer
 
 class PolarsAddFromMetadata(PolarsTransformer):
     valid_data_holders = ("PolarsZipArchiveDataHolder",)
-    valid_data_types = ("profile", )
+    valid_data_types = ("profile",)
 
     columns: tuple[str] = ()
 

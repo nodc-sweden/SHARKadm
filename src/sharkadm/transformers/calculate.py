@@ -355,8 +355,9 @@ class PolarsOnlyKeepReportedIfCalcByDc(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if COL_CALC_BY_DC not in data_holder.data.columns:
-            self._log(f"No column named {COL_CALC_BY_DC} in data!",
-                      level=adm_logger.ERROR)
+            self._log(
+                f"No column named {COL_CALC_BY_DC} in data!", level=adm_logger.ERROR
+            )
             return
         boolean = pl.col(COL_CALC_BY_DC) != CALC_BY_DC_MARKER
         data_holder.data = data_holder.data.with_columns(

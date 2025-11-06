@@ -3,7 +3,9 @@
 # of valid size_class_ref_list_code
 
 import functools
+
 import polars as pl
+
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import get_nodc_config_directory
 
@@ -14,7 +16,7 @@ def get_valid_size_class_ref_list_codes() -> list[str]:
     if not path.exists():
         adm_logger.log_workflow(f"Could not find file: {path}", level=adm_logger.ERROR)
         return []
-    df = pl.read_csv(path, separator='\t', encoding="cp1252")
+    df = pl.read_csv(path, separator="\t", encoding="cp1252")
     return df.filter(pl.col("field") == "size_class_ref_list_code")["code"].to_list()
 
 

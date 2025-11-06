@@ -36,7 +36,7 @@ class _ValidateCodes(Validator):
             if col not in data_holder.data.columns:
                 self._log_fail(f"No column named {col} in data", level=adm_logger.DEBUG)
                 continue
-            for (code, ), df in data_holder.data.group_by(col):
+            for (code,), df in data_holder.data.group_by(col):
                 self._validate_code_and_log(
                     code,
                     col,
@@ -58,23 +58,18 @@ class _ValidateCodes(Validator):
             #             row_numbers=list(df["row_number"]),
             #         )
 
-    def _validate_code_and_log(self,
-                               code: str,
-                               source_col: str,
-                               df: pl.DataFrame) -> None:
+    def _validate_code_and_log(
+        self, code: str, source_col: str, df: pl.DataFrame
+    ) -> None:
         code = code.strip()
         if "," in code:
             for part in code.split(""):
-                self._validate_code_and_log(
-                    part, source_col, df
-                )
+                self._validate_code_and_log(part, source_col, df)
             return
 
         if " " in code:
             for part in code.split(" "):
-                self._validate_code_and_log(
-                    part, source_col, df
-                )
+                self._validate_code_and_log(part, source_col, df)
             return
 
         info = _translate_codes.get_info(self.lookup_field, code.strip())

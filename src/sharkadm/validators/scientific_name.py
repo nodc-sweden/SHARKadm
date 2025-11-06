@@ -126,14 +126,12 @@ class ValidateScientificNameAndSizeClassDiffersFromBvol(Validator):
 
 
 class ValidateScientificNameIsPresent(Validator):
-    valid_data_types = ("phytoplankton", )
+    valid_data_types = ("phytoplankton",)
     col_to_check = "reported_scientific_name"
 
     @staticmethod
     def get_validator_description() -> str:
-        return (
-            f"Checks if {ValidateScientificNameIsPresent.col_to_check} has values"
-        )
+        return f"Checks if {ValidateScientificNameIsPresent.col_to_check} has values"
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
         df = data_holder.data.filter(pl.col(self.col_to_check).str.strip_chars() != "")

@@ -42,13 +42,13 @@ from sharkadm.validators.positive import ValidatePositiveValues
 from sharkadm.validators.scientific_name import (
     ValidateAphiaIdDiffersFromBvolAphiaId,
     ValidateScientificNameAndSizeClassDiffersFromBvol,
-    ValidateScientificNameIsTranslated,
     ValidateScientificNameIsPresent,
+    ValidateScientificNameIsTranslated,
 )
 from sharkadm.validators.serial_number import ValidateSerialNumber
 from sharkadm.validators.size_class import (
     ValidateSizeClassIsPresent,
-    ValidateSizeClassRefListCode
+    ValidateSizeClassRefListCode,
 )
 from sharkadm.validators.speed import ValidateSpeed
 from sharkadm.validators.station import (

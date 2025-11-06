@@ -4,7 +4,6 @@ from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import Validator
 
-
 nodc_dyntaxa = None
 try:
     import nodc_dyntaxa
@@ -42,8 +41,7 @@ class ValidateScientificNameInDyntaxa(Validator):
             return
         if self.col_to_check not in data_holder.data.columns:
             adm_logger.log_validation(
-                f"Could not check name in dyntaxa. "
-                f"Missing column {self.col_to_check}.",
+                f"Could not check name in dyntaxa. Missing column {self.col_to_check}.",
                 level=adm_logger.ERROR,
             )
             return
@@ -51,14 +49,14 @@ class ValidateScientificNameInDyntaxa(Validator):
         mapper = dict((name, name) for name in dyntaxa_taxon.get_name_list())
 
         df = data_holder.data.with_columns(
-            pl.col(self.col_to_check)
-            .replace_strict(mapper, default="")
-            .alias("mapped")
+            pl.col(self.col_to_check).replace_strict(mapper, default="").alias("mapped")
         ).filter(pl.col("mapped") == "")
         for (name,), d in df.group_by(self.col_to_check):
             if not name:
-                adm_logger.log_validation(f"Empty scientific name")
+                adm_logger.log_validation("Empty scientific name")
             else:
-                adm_logger.log_validation(f"{name} is not a valid scientific name "
-                                          f"for dyntaxa ({len(d)} places)",
-                                          level=adm_logger.WARNING)
+                adm_logger.log_validation(
+                    f"{name} is not a valid scientific name "
+                    f"for dyntaxa ({len(d)} places)",
+                    level=adm_logger.WARNING,
+                )

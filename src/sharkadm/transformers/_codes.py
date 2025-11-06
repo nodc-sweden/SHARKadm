@@ -74,8 +74,7 @@ class _AddCodes(Transformer):
                         name = info.get(info.get(self.lookup_key))
                         names.append(info[self.lookup_key])
                         self._log(
-                            f"{source_col} {part} translated to {name} "
-                            f"({len_df} places)",
+                            f"{source_col} {part} translated to {name} ({len_df} places)",
                             level=adm_logger.INFO,
                         )
 
@@ -134,7 +133,8 @@ class _PolarsAddCodes(PolarsTransformer):
             #         if info:
             #             names.append(info[self.lookup_key])
             #             self._log(
-            #                 f"{source_col} {part} translated to {info[self.lookup_key]} "
+            #                 f"{source_col} {part} translated to
+            #                 {info[self.lookup_key]} "
             #                 f"({len_df} places)",
             #                 level=adm_logger.INFO,
             #             )
@@ -153,25 +153,20 @@ class _PolarsAddCodes(PolarsTransformer):
                 .alias(self.col_to_set)
             )
 
-    def _get_translation_and_log(self,
-                                 code: str,
-                                 source_col: str,
-                                 df: pl.DataFrame) -> list[str]:
+    def _get_translation_and_log(
+        self, code: str, source_col: str, df: pl.DataFrame
+    ) -> list[str]:
         code = code.strip()
         if "," in code:
             names = []
             for part in code.split(""):
-                names.extend(self._get_translation_and_log(
-                    part, source_col, df
-                ))
+                names.extend(self._get_translation_and_log(part, source_col, df))
             return names
 
         if " " in code:
             names = []
             for part in code.split(" "):
-                names.extend(self._get_translation_and_log(
-                    part, source_col, df
-                ))
+                names.extend(self._get_translation_and_log(part, source_col, df))
             return names
 
         info = _translate_codes.get_info(self.lookup_field, code.strip())
@@ -189,8 +184,6 @@ class _PolarsAddCodes(PolarsTransformer):
                 f"{source_col} to {self.lookup_key}",
                 level=adm_logger.WARNING,
             )
-
-
 
 
 class _AddCodesLab(_AddCodes):

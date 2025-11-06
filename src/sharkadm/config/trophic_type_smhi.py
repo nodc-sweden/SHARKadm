@@ -1,5 +1,5 @@
-import pathlib
 import functools
+import pathlib
 
 import polars as pl
 
@@ -22,11 +22,13 @@ class TrophicTypeSMHI:
             infer_schema=False,
             missing_utf8_is_empty_string=True,
         )
-        self._data = self._data.with_columns(pl.concat_str(
-            [pl.col("scientific_name", "size_class")],
-            separator=NAME_AND_SIZE_SEPARATOR).alias("name_and_size"))
+        self._data = self._data.with_columns(
+            pl.concat_str(
+                [pl.col("scientific_name", "size_class")],
+                separator=NAME_AND_SIZE_SEPARATOR,
+            ).alias("name_and_size")
+        )
 
     @functools.cache
     def get_mapper(self) -> dict[str, str]:
         return dict(zip(self._data["name_and_size"], self._data["trophic_type"]))
-

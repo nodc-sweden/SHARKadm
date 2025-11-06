@@ -174,7 +174,8 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
             return
         # if self.size_class_col not in data_holder.data:
         #     self._log(
-        #         f"Missing column {self.size_class_col} when trying to set bvol aphia_id",
+        #         f"Missing column {self.size_class_col}
+        #         when trying to set bvol aphia_id",
         #         level=adm_logger.WARNING,
         #     )
         #     return
@@ -219,9 +220,11 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
                 )
             else:
                 self._log(
-                    f"Adding {self.col_to_set}: {from_name} -> {to_name} ({len(df)} places)",
+                    f"Adding {self.col_to_set}: "
+                    f"{from_name} -> {to_name} ({len(df)} places)",
                     level=adm_logger.INFO,
                 )
+
     #         # TODO: Log level here?
     #         #  Maybe just log reported_scientific_name -> final scientific_name
 
