@@ -257,6 +257,12 @@ class AddUncertainty(Transformer):
             return np.full_like(param_vals, np.nan, dtype=float)
 
     def _transform(self, data_holder: PandasDataHolder) -> None:
+        if "estimation_uncertainty" not in data_holder.data.columns:
+            self._log(
+                "Estimation uncertainty column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
         unique_uncert_df = data_holder.data[
             ["parameter", "unit", "estimation_uncertainty"]
         ].drop_duplicates()
@@ -607,6 +613,12 @@ class PolarsAddUncertainty(Transformer):
             return pl.Series([None] * len(param_values))
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if "estimation_uncertainty" not in data_holder.data.columns:
+            self._log(
+                "Estimation uncertainty column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
         unique_uncert_df = data_holder.data.select(
             ["parameter", "unit", "estimation_uncertainty"]
         ).unique()
