@@ -64,18 +64,21 @@ class _AddCodes(Transformer):
                 for part in code.split(","):
                     part = part.strip()
                     info = _translate_codes.get_info(self.lookup_field, part)
-                    if info:
+                    if not info:
+                        self._log(
+                            f"Could not find translation for {part} from "
+                            f"{source_col} to {self.lookup_key}",
+                            level=adm_logger.WARNING,
+                        )
+                    else:
+                        name = info.get(info.get(self.lookup_key))
                         names.append(info[self.lookup_key])
                         self._log(
-                            f"{source_col} {part} translated to {info[self.lookup_key]} "
+                            f"{source_col} {part} translated to {name} "
                             f"({len_df} places)",
                             level=adm_logger.INFO,
                         )
-                    else:
-                        self._log(
-                            f"Could not find information for {source_col}: {part}",
-                            level=adm_logger.WARNING,
-                        )
+
             data_holder.data.loc[df.index, self.col_to_set] = ", ".join(names)
 
 
@@ -113,39 +116,81 @@ class _PolarsAddCodes(PolarsTransformer):
 
         # operations = []
         for (code,), df in data_holder.data.group_by(source_col):
-            len_df = len(df)
-            code = str(code)
-            names = []
-            info = _translate_codes.get_info(self.lookup_field, code.strip())
-            if info:
-                names = [info[self.lookup_key]]
-                self._log(
-                    f"{source_col} {code} translated to {info[self.lookup_key]} "
-                    f"({len_df} places)",
-                    level=adm_logger.INFO,
-                )
-            else:
-                for part in code.split(","):
-                    part = part.strip()
-                    info = _translate_codes.get_info(self.lookup_field, part)
-                    if info:
-                        names.append(info[self.lookup_key])
-                        self._log(
-                            f"{source_col} {part} translated to {info[self.lookup_key]} "
-                            f"({len_df} places)",
-                            level=adm_logger.INFO,
-                        )
-                    else:
-                        self._log(
-                            f"Could not find information for {source_col}: {part}",
-                            level=adm_logger.WARNING,
-                        )
+            # len_df = len(df)
+            # code = str(code)
+            # names = []
+            # info = _translate_codes.get_info(self.lookup_field, code.strip())
+            # if info:
+            #     names = [info[self.lookup_key]]
+            #     self._log(
+            #         f"{source_col} {code} translated to {info[self.lookup_key]} "
+            #         f"({len_df} places)",
+            #         level=adm_logger.INFO,
+            #     )
+            # else:
+            #     for part in code.split(","):
+            #         part = part.strip()
+            #         info = _translate_codes.get_info(self.lookup_field, part)
+            #         if info:
+            #             names.append(info[self.lookup_key])
+            #             self._log(
+            #                 f"{source_col} {part} translated to {info[self.lookup_key]} "
+            #                 f"({len_df} places)",
+            #                 level=adm_logger.INFO,
+            #             )
+            #         else:
+            #             self._log(
+            #                 f"Could not find translation for {part} from "
+            #                 f"{source_col} to {self.lookup_key}",
+            #                 level=adm_logger.WARNING,
+            #             )
+
+            names = self._get_translation_and_log(code, source_col, df)
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(source_col) == code)
                 .then(pl.lit(", ".join(names)))
                 .otherwise(pl.col(self.col_to_set))
                 .alias(self.col_to_set)
             )
+
+    def _get_translation_and_log(self,
+                                 code: str,
+                                 source_col: str,
+                                 df: pl.DataFrame) -> list[str]:
+        code = code.strip()
+        if "," in code:
+            names = []
+            for part in code.split(""):
+                names.extend(self._get_translation_and_log(
+                    part, source_col, df
+                ))
+            return names
+
+        if " " in code:
+            names = []
+            for part in code.split(" "):
+                names.extend(self._get_translation_and_log(
+                    part, source_col, df
+                ))
+            return names
+
+        info = _translate_codes.get_info(self.lookup_field, code.strip())
+        if info:
+            names = [info[self.lookup_key]]
+            self._log(
+                f"{source_col} {code} translated to {info[self.lookup_key]} "
+                f"({len(df)} places)",
+                level=adm_logger.INFO,
+            )
+            return names
+        else:
+            self._log(
+                f"Could not find translation for {code} from "
+                f"{source_col} to {self.lookup_key}",
+                level=adm_logger.WARNING,
+            )
+
+
 
 
 class _AddCodesLab(_AddCodes):

@@ -12,6 +12,7 @@ from sharkadm.validators.aphia_id import (
     ValidateReportedVsBvolAphiaId,
 )
 from sharkadm.validators.base import Validator
+from sharkadm.validators.bvol import ValidateBvolSizeClass
 from sharkadm.validators.cloud import ValidateCloud
 from sharkadm.validators.codes import ValidateLABOcodes, ValidateProjectCodes
 from sharkadm.validators.column_combination import (
@@ -29,6 +30,7 @@ from sharkadm.validators.depth import (
     ValidateSecchiDepth,
     ValidateWaterDepth,
 )
+from sharkadm.validators.dyntaxa import ValidateScientificNameInDyntaxa
 from sharkadm.validators.ice import ValidateIceob
 from sharkadm.validators.mandatory import (
     ValidateMandatoryColumns,
@@ -41,8 +43,13 @@ from sharkadm.validators.scientific_name import (
     ValidateAphiaIdDiffersFromBvolAphiaId,
     ValidateScientificNameAndSizeClassDiffersFromBvol,
     ValidateScientificNameIsTranslated,
+    ValidateScientificNameIsPresent,
 )
 from sharkadm.validators.serial_number import ValidateSerialNumber
+from sharkadm.validators.size_class import (
+    ValidateSizeClassIsPresent,
+    ValidateSizeClassRefListCode
+)
 from sharkadm.validators.speed import ValidateSpeed
 from sharkadm.validators.station import (
     ValidateCoordinatesDm,

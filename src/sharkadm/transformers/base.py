@@ -225,18 +225,6 @@ class PolarsTransformer(ABC, OperationBase):
         return info_str
 
     def transform_old(self, data_holder: "PolarsDataHolder") -> None:
-        print(
-            "A",
-            config.get_valid_data_types(
-                valid=self.valid_data_types, invalid=self.invalid_data_types
-            ),
-        )
-        print(
-            "B",
-            config.get_valid_data_structures(
-                valid=self.valid_data_structures, invalid=self.invalid_data_structures
-            ),
-        )
         if (
             data_holder.data_type_internal != "unknown"
             and data_holder.data_type_internal
