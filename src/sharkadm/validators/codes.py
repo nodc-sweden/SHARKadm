@@ -1,6 +1,7 @@
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
+from ..config.translate_codes_new import get_valid_species_flag_codes
 
 from ..data import PolarsDataHolder
 from .base import Validator
@@ -76,7 +77,7 @@ class _ValidateCodes(Validator):
         if info is not None:
             return
         self._log_fail(
-            f'Invalid value ({len(df)} rows) "{code}" in column {source_col}',
+            f"Invalid value {code} in column {source_col} ({len(df)} rows)",
             row_numbers=list(df["row_number"]),
         )
 
@@ -123,3 +124,48 @@ class ValidateLABOcodes(_ValidateCodes):
     def get_validator_description() -> str:
         col_str = ", ".join(ValidateLABOcodes.columns)
         return f"Checks so that all codes are valid in columns: {col_str}"
+
+
+class ValidateSflag(Validator):
+    col_to_check = "species_flag_code"
+
+    @staticmethod
+    def get_validator_description() -> str:
+        return ""
+
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
+        if self.col_to_check not in data_holder.data.columns:
+            self._log_fail(f"No column named {self.col_to_check} in data", level=adm_logger.DEBUG)
+            return
+        self._valid_codes = get_valid_species_flag_codes()
+        for (code,), df in data_holder.data.group_by(self.col_to_check):
+            self._validate_code_and_log(
+                code,
+                self.col_to_check,
+                df,
+            )
+
+    def _validate_code_and_log(
+        self, code: str, source_col: str, df: pl.DataFrame
+    ) -> None:
+        code = code.strip()
+        if "," in code:
+            for part in code.split(""):
+                self._validate_code_and_log(part, source_col, df)
+            return
+
+        if " " in code:
+            for part in code.split(" "):
+                self._validate_code_and_log(part, source_col, df)
+            return
+
+        if not code:
+            return
+
+        if code in self._valid_codes:
+            return
+
+        self._log_fail(
+            f"Invalid code {code} in column {source_col} ({len(df)} rows)",
+            row_numbers=list(df["row_number"]),
+        )

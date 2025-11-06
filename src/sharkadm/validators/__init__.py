@@ -14,7 +14,11 @@ from sharkadm.validators.aphia_id import (
 from sharkadm.validators.base import Validator
 from sharkadm.validators.bvol import ValidateBvolSizeClass
 from sharkadm.validators.cloud import ValidateCloud
-from sharkadm.validators.codes import ValidateLABOcodes, ValidateProjectCodes
+from sharkadm.validators.codes import (
+    ValidateLABOcodes,
+    ValidateProjectCodes,
+    ValidateSflag
+)
 from sharkadm.validators.column_combination import (
     AssertCombination,
     AssertMinMaxDepthCombination,
