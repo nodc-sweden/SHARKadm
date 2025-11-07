@@ -1,8 +1,8 @@
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from ..config.translate_codes_new import get_valid_species_flag_codes
 
+from ..config.translate_codes_new import get_valid_species_flag_codes
 from ..data import PolarsDataHolder
 from .base import Validator
 
@@ -44,21 +44,6 @@ class _ValidateCodes(Validator):
                     df,
                 )
 
-            # for code in set(data_holder.data[col]):
-            #     info = _translate_codes.get_info(self.lookup_field, code.strip())
-            #     if info is not None:
-            #         continue
-            #     for part in code.split(","):
-            #         part = part.strip()
-            #         info = _translate_codes.get_info(self.lookup_field, part)
-            #         if info is not None:
-            #             continue
-            #         df = data_holder.data.filter(pl.col(col) == part)
-            #         self._log_fail(
-            #             f'Invalid value(s) ({len(df)} rows) "{part}" in column {col}',
-            #             row_numbers=list(df["row_number"]),
-            #         )
-
     def _validate_code_and_log(
         self, code: str, source_col: str, df: pl.DataFrame
     ) -> None:
@@ -80,26 +65,6 @@ class _ValidateCodes(Validator):
             f"Invalid value {code} in column {source_col} ({len(df)} rows)",
             row_numbers=list(df["row_number"]),
         )
-
-    def old_validate(self, data_holder: PolarsDataHolder) -> None:
-        for col in self.columns:
-            if col not in data_holder.data.columns:
-                self._log_fail(f"No column named {col} in data", level=adm_logger.DEBUG)
-                continue
-            for code in set(data_holder.data[col]):
-                info = _translate_codes.get_info(self.lookup_field, code.strip())
-                if info is not None:
-                    continue
-                for part in code.split(","):
-                    part = part.strip()
-                    info = _translate_codes.get_info(self.lookup_field, part)
-                    if info is not None:
-                        continue
-                    df = data_holder.data.filter(pl.col(col) == part)
-                    self._log_fail(
-                        f'Invalid value(s) ({len(df)} rows) "{part}" in column {col}',
-                        row_numbers=list(df["row_number"]),
-                    )
 
 
 class ValidateProjectCodes(_ValidateCodes):
@@ -135,7 +100,9 @@ class ValidateSflag(Validator):
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_check not in data_holder.data.columns:
-            self._log_fail(f"No column named {self.col_to_check} in data", level=adm_logger.DEBUG)
+            self._log_fail(
+                f"No column named {self.col_to_check} in data", level=adm_logger.DEBUG
+            )
             return
         self._valid_codes = get_valid_species_flag_codes()
         for (code,), df in data_holder.data.group_by(self.col_to_check):

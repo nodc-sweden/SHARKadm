@@ -13,12 +13,14 @@ from sharkadm.validators.aphia_id import (
 )
 from sharkadm.validators.base import Validator
 from sharkadm.validators.bvol import ValidateBvolSizeClass
-from sharkadm.validators.calculate import ValidateCalculatedValueDiffersToMuchFromReportedValue
+from sharkadm.validators.calculate import (
+    ValidateCalculatedValueDiffersToMuchFromReportedValue,
+)
 from sharkadm.validators.cloud import ValidateCloud
 from sharkadm.validators.codes import (
     ValidateLABOcodes,
     ValidateProjectCodes,
-    ValidateSflag
+    ValidateSflag,
 )
 from sharkadm.validators.column_combination import (
     AssertCombination,
