@@ -181,7 +181,7 @@ class PolarsCalculateAbundance(PolarsTransformer):
 
 
 class PolarsCalculateBiovolume(PolarsTransformer):
-    valid_data_structures = ("column",)
+    valid_data_structures = ("row",)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -269,7 +269,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
 
 
 class PolarsCalculateCarbon(PolarsTransformer):
-    valid_data_structures = ("column",)
+    valid_data_structures = ("row",)
 
     @staticmethod
     def get_transformer_description() -> str:

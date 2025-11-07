@@ -1,10 +1,21 @@
-import nodc_bvol
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import Validator
+
+nodc_bvol = None
+
+try:
+    import nodc_bvol
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. '
+        f"You need to install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
 
 
 class ValidateBvolSizeClass(Validator):
@@ -17,6 +28,8 @@ class ValidateBvolSizeClass(Validator):
         return "Check if bvol size class is is valid in nomp-list"
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_bvol:
+            return
         if self.scientific_name_col not in data_holder.data.columns:
             adm_logger.log_validation(
                 f"Could not validate bvol size class. "
