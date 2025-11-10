@@ -149,9 +149,9 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
     valid_data_types = ("Phytoplankton",)
 
     scientific_name_col = "bvol_scientific_name"
-    size_class_col = "bvol_size_class"
+    # size_class_col = "bvol_size_class"
     col_to_set = "bvol_aphia_id"
-    joined_col = f"{scientific_name_col}:{size_class_col}"
+    # joined_col = f"{scientific_name_col}:{size_class_col}"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -160,8 +160,8 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
     def get_transformer_description() -> str:
         return (
             f"Adds {PolarsAddBvolAphiaId.col_to_set} "
-            f"from {PolarsAddBvolAphiaId.scientific_name_col} and "
-            f"{PolarsAddBvolAphiaId.size_class_col}"
+            f"from {PolarsAddBvolAphiaId.scientific_name_col}"
+            # f"{PolarsAddBvolAphiaId.size_class_col}"
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
@@ -172,49 +172,59 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-        if self.size_class_col not in data_holder.data:
-            self._log(
-                f"Missing column {self.size_class_col} when trying to set bvol aphia_id",
-                level=adm_logger.WARNING,
-            )
-            return
-        self._add_joined_column(data_holder)
+        # if self.size_class_col not in data_holder.data:
+        #     self._log(
+        #         f"Missing column {self.size_class_col}
+        #         when trying to set bvol aphia_id",
+        #         level=adm_logger.WARNING,
+        #     )
+        #     return
+        # self._add_joined_column(data_holder)
         self._add_column(data_holder)
-        # self._log_result(data_holder)
+        self._log_result(data_holder)
 
-    def _add_joined_column(self, data_holder: PolarsDataHolder):
-        data_holder.data = data_holder.data.with_columns(
-            pl.concat_str(
-                [
-                    pl.col(self.scientific_name_col),
-                    pl.col(self.size_class_col),
-                ],
-                separator=":",
-            ).alias(self.joined_col)
-        )
+    # def _add_joined_column(self, data_holder: PolarsDataHolder):
+    #     data_holder.data = data_holder.data.with_columns(
+    #         pl.concat_str(
+    #             [
+    #                 pl.col(self.scientific_name_col),
+    #                 pl.col(self.size_class_col),
+    #             ],
+    #             separator=":",
+    #         ).alias(self.joined_col)
+    #     )
 
     def _add_column(self, data_holder: PolarsDataHolder):
         bvol_nomp = nodc_bvol.get_bvol_nomp_object()
         _mapper = bvol_nomp.get_species_to_aphia_id_mapper()
-        # TODO: One species might map to multiple aphia_ids. Check this!
+        # One species might map to multiple aphia_ids. Check this! Should not happen
+        # Diplopsalis och Diplopsalis CPX
         # Species = 1138
         # AphiaID = 1133
         # Kombination = 1136
 
         data_holder.data = data_holder.data.with_columns(
-            pl.col(self.joined_col)
+            pl.col(self.scientific_name_col)
             .replace_strict(_mapper, default="")
             .alias(self.col_to_set)
         )
 
-    # def _log_result(self, data_holder: PolarsDataHolder):
-    #     for (from_name, to_name), df in data_holder.data.filter(
-    #         pl.col(self.source_col) != pl.col(self.col_to_set)
-    #     ).group_by(self.source_col, self.col_to_set):
-    #         self._log(
-    #             f"Adding Bvol AphiaID: {from_name} -> {to_name} ({len(df)} places)",
-    #             level=adm_logger.INFO,
-    #         )
+    def _log_result(self, data_holder: PolarsDataHolder):
+        for (from_name, to_name), df in data_holder.data.filter(
+            pl.col(self.scientific_name_col) != pl.col(self.col_to_set)
+        ).group_by(self.scientific_name_col, self.col_to_set):
+            if not to_name:
+                self._log(
+                    f"No {self.col_to_set} found for {from_name} ({len(df)} places)",
+                    level=adm_logger.WARNING,
+                )
+            else:
+                self._log(
+                    f"Adding {self.col_to_set}: "
+                    f"{from_name} -> {to_name} ({len(df)} places)",
+                    level=adm_logger.INFO,
+                )
+
     #         # TODO: Log level here?
     #         #  Maybe just log reported_scientific_name -> final scientific_name
 
@@ -255,7 +265,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
         self._add_joined_column(data_holder)
         self._add_column(data_holder)
-        # self._log_result(data_holder)
+        self._log_result(data_holder)
 
     def _add_joined_column(self, data_holder: PolarsDataHolder):
         data_holder.data = data_holder.data.with_columns(
@@ -270,7 +280,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
 
     def _add_column(self, data_holder: PolarsDataHolder):
         bvol_nomp = nodc_bvol.get_bvol_nomp_object()
-        _mapper = bvol_nomp.get_species_to_ref_list_mapper()
+        _mapper = bvol_nomp.get_species_and_size_class_to_ref_list_mapper()
         # TODO: One species might map to multiple aphia_ids. Check this! Might be fixed...
         # Species = 1138
         # AphiaID = 1133
@@ -282,14 +292,15 @@ class PolarsAddBvolRefList(PolarsTransformer):
             .alias(self.col_to_set)
         )
 
-    # def _log_result(self, data_holder: PolarsDataHolder):
-    #     for (from_name, to_name), df in data_holder.data.filter(
-    #         pl.col(self.scientific_name_col) != pl.col(self.col_to_set)
-    #     ).group_by(self.scientific_name_col, self.col_to_set):
-    #         self._log(
-    #             f"Adding Bvol ref list: {from_name} -> {to_name} ({len(df)} places)",
-    #             level=adm_logger.INFO,
-    #         )
+    def _log_result(self, data_holder: PolarsDataHolder):
+        return
+        for (from_name, to_name), df in data_holder.data.filter(
+            pl.col(self.scientific_name_col) != pl.col(self.col_to_set)
+        ).group_by(self.scientific_name_col, self.col_to_set):
+            self._log(
+                f"Adding Bvol ref list: {from_name} -> {to_name} ({len(df)} places)",
+                level=adm_logger.INFO,
+            )
 
 
 COL_JOINED_APHIA_ID_AND_SIZE_CLASS = "aphia_id_and_size_class"

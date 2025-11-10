@@ -123,3 +123,18 @@ class ValidateScientificNameAndSizeClassDiffersFromBvol(Validator):
                 f"{to} (bvol) ({len(df)} places)",
                 level=adm_logger.INFO,
             )
+
+
+class ValidateScientificNameIsPresent(Validator):
+    valid_data_types = ("phytoplankton",)
+    col_to_check = "reported_scientific_name"
+
+    @staticmethod
+    def get_validator_description() -> str:
+        return f"Checks if {ValidateScientificNameIsPresent.col_to_check} has values"
+
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
+        df = data_holder.data.filter(pl.col(self.col_to_check).str.strip_chars() != "")
+        if not len(df):
+            return
+        self._log_fail(f"Missing {self.col_to_check} ({len(df)} places)")

@@ -69,6 +69,9 @@ def get_decdeg_to_sweref99tm_mapper(
         print(f"Getting mapper: {sweref99tm_db.DB_PATH}")
     for pos in zip(lat, lon):
         if not mapper.get(pos):
+            if not pos[0] and not pos[1]:
+                mapper[(pos[0], pos[1])] = ("", "")
+                continue
             x, y = _convert_decdeg_to_sweref99tm(pos[0], pos[1])
             if use_db:
                 sweref99tm_db.add(pos[0], pos[1], x, y)

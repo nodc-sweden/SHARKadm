@@ -248,6 +248,7 @@ from sharkadm.transformers.scientific_name import (
     PolarsSetScientificNameFromDyntaxaScientificName,
     PolarsSetScientificNameFromReportedScientificName,
 )
+from sharkadm.transformers.trophic_type import PolarsSetTrophicTypeSMHI
 from sharkadm.transformers.shark_id import AddSharkId, PolarsAddSharkId
 from sharkadm.transformers.sort_data import (
     SortData,
