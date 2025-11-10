@@ -209,6 +209,7 @@ class PolarsCalculateBiovolume(PolarsTransformer):
             .then(
                 pl.col(FLOAT_COL_ABUNDANCE_COMBINED)
                 * pl.col(FLOAT_COL_CELL_VOLUME_COMBINED)
+                / 1_000_000_000
             )
             .otherwise(pl.lit(None))
             .alias(FLOAT_COL_BIOVOLUME_CALCULATED)

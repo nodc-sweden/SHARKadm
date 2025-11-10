@@ -23,16 +23,24 @@ class ValidateCalculatedValueDiffersToMuchFromReportedValue(Validator):
             )
             return
         filt = pl.col("calc_by_dc") != ""
-        for row in data_holder.data.filter(filt).to_dicts():
+        for (par, val, rep_val, name, size_class), df in (
+                data_holder.data.filter(filt).group_by(["parameter",
+                                                        "value",
+                                                        "reported_value",
+                                                        "bvol_scientific_name",
+                                                        "bvol_size_class"])):
+
+            percent = round(float(val) / float(rep_val) * 100, 1)
+        # for row in data_holder.data.filter(filt).to_dicts():
             adm_logger.log_validation(
-                f"Calculated value differs to much from reported"
+                f"Calculated value differs to much from reported "
                 f"value. "
-                f"Parameter: {row['parameter']}. "
-                f"Calculated value: {row['value']}. "
-                f"Reported value: {row['reported_value']}. "
-                f"({float(row['value']) / float(row['reported_value'])})"
-                f"Species/size: {row['bvol_scientific_name']} / "
-                f"{row['bvol_size_class']}.",
+                f"Parameter: {par}. "
+                f"Calculated value: {val}. "
+                f"Reported value: {rep_val}. "
+                f"({percent})"
+                f"Species/size: {name} / "
+                f"{size_class}.",
                 level=adm_logger.WARNING,
-                item=float(row["value"]) / float(row["reported_value"]),
+                item=percent,
             )
