@@ -9,11 +9,13 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import get_nodc_config_directory
 
-FILE_PATH = get_nodc_config_directory() / "translate_codes_NEW.txt"
+FILE_PATH = None
+if get_nodc_config_directory():
+    FILE_PATH = get_nodc_config_directory() / "translate_codes_NEW.txt"
 
 
 def _file_exists() -> bool:
-    if not FILE_PATH.exists():
+    if FILE_PATH or not FILE_PATH.exists():
         adm_logger.log_workflow(
             f"Could not find file: {FILE_PATH}", level=adm_logger.ERROR
         )
