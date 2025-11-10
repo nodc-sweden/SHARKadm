@@ -8,23 +8,24 @@ from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_wind_direction_code, expected_success",
+    "given_visit_date, given_station, given_wind_direction_code, expected_success",
     (
-        ("20230802_1050_ZZ99_SKÅPESUND", "00", True),
-        ("20230530_1115_ZZ99_SMÅHOLMARNA", "37", False),  # Incorrect direction
-        ("20230530_0925_ZZ99_SVENSHOLMEN", "08", True),  # zero padding before
-        ("20230802_1050_ZZ99_SKÅPESUND", "99", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", "1", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", "", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", None, True),
-        ("20230802_1050_ZZ99_SKÅPESUND", " ", False),
+        ("20230802", "SKÅPESUND", "00", True),
+        ("20230530", "SMÅHOLMARNA", "37", False),  # Incorrect direction
+        ("20230530", "SVENSHOLMEN", "08", True),  # zero padding before
+        ("20230802", "SKÅPESUND", "99", True),
+        ("20230802", "SKÅPESUND", "1", True),
+        ("20230802", "SKÅPESUND", "", True),
+        ("20230802", "SKÅPESUND", None, True),
+        ("20230802", "SKÅPESUND", " ", False),
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_windir(
     mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
+    given_visit_date,
+    given_station,
     given_wind_direction_code,
     expected_success,
 ):
@@ -32,7 +33,8 @@ def test_validate_windir(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": given_visit_key,
+                "visit_date": given_visit_date,
+                "reported_station_name": given_station,
                 "wind_direction_code": given_wind_direction_code,
             }
         ]
@@ -57,22 +59,23 @@ def test_validate_windir(
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_wind_speed_ms, expected_success",
+    "given_visit_date, given_station, given_wind_speed_ms, expected_success",
     (
-        ("20230802_1050_ZZ99_SKÅPESUND", "10", True),
-        ("20230530_1115_ZZ99_SMÅHOLMARNA", "45", False),  # Incorrect direction
-        ("20230530_0925_ZZ99_SVENSHOLMEN", "0", True),  # zero padding before
-        ("20230802_1050_ZZ99_SKÅPESUND", "40", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", "", True),
-        ("20230802_1050_ZZ99_SKÅPESUND", None, True),
-        ("20230802_1050_ZZ99_SKÅPESUND", " ", False),
+        ("20230802", "SKÅPESUND", "10", True),
+        ("20230530", "SMÅHOLMARNA", "45", False),
+        ("20230530", "SVENSHOLMEN", "0", True),
+        ("20230802", "SKÅPESUND", "40", True),
+        ("20230802", "SKÅPESUND", "", True),
+        ("20230802", "SKÅPESUND", None, True),
+        ("20230802", "SKÅPESUND", " ", False),
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_winsp(
     mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
+    given_visit_date,
+    given_station,
     given_wind_speed_ms,
     expected_success,
 ):
@@ -80,7 +83,8 @@ def test_validate_winsp(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": given_visit_key,
+                "visit_date": given_visit_date,
+                "reported_station_name": given_station,
                 "wind_speed_ms": given_wind_speed_ms,
             }
         ]
