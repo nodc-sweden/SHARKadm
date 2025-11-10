@@ -12,23 +12,22 @@ from sharkadm.validators.depth import (
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_water_depth_m, expected_success",
+    "given_visit_date, given_station, given_water_depth_m, expected_success",
     (
-        ("20230802_1050_ZZ99_SKÅPESUND", "0.2", True),  # Float
-        ("20230802_1050_ZZ99_SKÅPESUND", "499.9", True),  # Float
-        ("20230530_1115_ZZ99_SMÅHOLMARNA", "500", False),  # Possibly too high
-        ("20230530_0925_ZZ99_SVENSHOLMEN", "0", False),  # limit
-        ("20230802_1050_ZZ99_SKÅPESUND", "-40", False),  # Possibly too low
-        ("20230802_1050_ZZ99_SKÅPESUND", "", False),  # Missing as str
-        ("20230802_1050_ZZ99_SKÅPESUND", None, False),  # Missing as None
-        ("20230802_1050_ZZ99_SKÅPESUND", " ", False),  # White space
+        ("2023080", "SKÅPESUND", "0.2", True),  # Float
+        ("20230802", "SKÅPESUND", "499.9", True),  # Float
+        ("20230530", "SMÅHOLMARNA", "500", False),  # Possibly too high
+        ("2023053", "SVENSHOLMEN", "0", False),  # limit
+        ("2023080", "SKÅPESUND", "", False),  # Missing as str
+        ("202308", "SKÅPESUND", " ", False),  # White space
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
 def test_validate_wadep(
     mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
+    given_visit_date,
+    given_station,
     given_water_depth_m,
     expected_success,
 ):
@@ -36,7 +35,8 @@ def test_validate_wadep(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": given_visit_key,
+                "visit_date": given_visit_date,
+                "reported_station_name": given_station,
                 "water_depth_m": given_water_depth_m,
             }
         ]
@@ -80,7 +80,8 @@ def test_sample_depth_is_validated_against_water_depth(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": "ABC",
+                "visit_date": "20250101",
+                "reported_station_name": "SKÅPESUND",
                 "sample_depth_m": given_sample_depth,
                 "water_depth_m": given_water_depth,
                 "row_number": 1,
@@ -113,7 +114,16 @@ def test_sample_depth_cant_be_validated_if_missing_parameters(
     mocked_data_types, polars_data_frame_holder_class, given_parameters
 ):
     # Given data with subset of required parameters
-    given_data = pl.DataFrame([given_parameters | {"row_number": 1, "visit_key": "ABC"}])
+    given_data = pl.DataFrame(
+        [
+            given_parameters
+            | {
+                "row_number": 1,
+                "visit_date": "20250101",
+                "reported_station_name": "SALTÖ",
+            }
+        ]
+    )
 
     # Given a valid data holder
     given_data_holder = polars_data_frame_holder_class(given_data)
@@ -153,7 +163,8 @@ def test_secchi_depth_is_validated_against_water_depth(
     given_data = pl.DataFrame(
         [
             {
-                "visit_key": "ABC",
+                "visit_date": "20250101",
+                "reported_station_name": "SLÄGGÖ",
                 "parameter": "SECCHI",
                 "value": given_secchi_depth,
                 "water_depth_m": given_water_depth,
@@ -200,7 +211,16 @@ def test_secchi_depth_cant_be_validated_if_missing_parameters(
     given_parameters,
 ):
     # Given data with subset of required parameters
-    given_data = pl.DataFrame([given_parameters | {"row_number": 1, "visit_key": "ABC"}])
+    given_data = pl.DataFrame(
+        [
+            given_parameters
+            | {
+                "row_number": 1,
+                "visit_date": "20250101",
+                "reported_station_name": "SALTÖ",
+            }
+        ]
+    )
 
     # Given a valid data holder
     given_data_holder = polars_data_frame_holder_class(given_data)
