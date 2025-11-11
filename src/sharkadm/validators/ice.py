@@ -20,12 +20,17 @@ class ValidateIceob(Validator):
                 "Could not validate the ice observation code, column is missing.",
             )
             return
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
 
         valid_values = [
             str(i) for i in range(10) if i not in (2, 3)
         ]  # 2, 3 refers to icebergs
         unique_rows = data_holder.data.select(
-            ["visit_key", "ice_observation_code"]
+            ["visit_date", "reported_station_name", "ice_observation_code"]
         ).unique()
         unique_rows = unique_rows.with_columns(
             [
@@ -46,7 +51,7 @@ class ValidateIceob(Validator):
         else:
             erroneous_rows = (
                 unique_rows.filter(~pl.col("is_valid"))
-                .select(["visit_key", "ice_observation_code"])
+                .select(["visit_date", "reported_station_name", "ice_observation_code"])
                 .to_dicts()
             )
 

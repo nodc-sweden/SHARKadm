@@ -19,6 +19,12 @@ class ValidateWindir(Validator):
             )
             return
 
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
+
         error = False
 
         valid_values = (
@@ -28,11 +34,13 @@ class ValidateWindir(Validator):
             + ["99"]
         )
         unique_rows = data_holder.data.select(
-            ["visit_key", "wind_direction_code"]
+            ["visit_date", "reported_station_name", "wind_direction_code"]
         ).unique()
 
         for row in unique_rows.iter_rows(named=True):
-            visit_info = row["visit_key"]
+            visit_info = (
+                row["visit_date"] + " at station: " + row["reported_station_name"]
+            )
             code_str = row["wind_direction_code"]
 
             if not code_str or code_str == "":
@@ -40,8 +48,7 @@ class ValidateWindir(Validator):
             if code_str not in valid_values:
                 error = True
                 self._log_fail(
-                    f"Wind direction code: {code_str} not in correct format "
-                    f"at {visit_info}",
+                    f"Wind direction code: {code_str} not in correct format {visit_info}",
                 )
 
         if not error:
@@ -65,15 +72,24 @@ class ValidateWinsp(Validator):
                 "Could not validate wind speed (m/s), column is missing.",
             )
             return
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
 
         error = False
 
         lower_limit = 0
         upper_limit = 40
-        unique_rows = data_holder.data.select(["visit_key", "wind_speed_ms"]).unique()
+        unique_rows = data_holder.data.select(
+            ["visit_date", "reported_station_name", "wind_speed_ms"]
+        ).unique()
 
         for row in unique_rows.iter_rows(named=True):
-            visit_info = row["visit_key"]
+            visit_info = (
+                row["visit_date"] + " at station: " + row["reported_station_name"]
+            )
             winsp = row["wind_speed_ms"]
 
             if not winsp or winsp == "":
@@ -86,12 +102,12 @@ class ValidateWinsp(Validator):
                     error = True
                     self._log_fail(
                         f"Wind speed (m/s): {winsp} is outside reasonable "
-                        f"ranges (0-40 m/s) at {visit_info}",
+                        f"ranges (0-40 m/s) {visit_info}",
                     )
             except ValueError:
                 error = True
                 self._log_fail(
-                    f"Wind speed (m/s): {winsp} has unexpected format at {visit_info}",
+                    f"Wind speed (m/s): {winsp} has unexpected format {visit_info}",
                 )
 
         if not error:

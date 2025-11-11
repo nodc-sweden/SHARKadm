@@ -5,6 +5,8 @@ from sharkadm.validators.base import DataHolderProtocol, Validator
 
 class ValidateAirpres(Validator):
     _display_name = "Air pressure (hPa)"
+    lower_limit = 900
+    upper_limit = 1100
 
     @staticmethod
     def get_validator_description() -> str:
@@ -24,10 +26,15 @@ class ValidateAirpres(Validator):
                 "Could not validate air pressure (hPa), column is missing.",
             )
             return
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
 
-        lower_limit = 900
-        upper_limit = 1100
-        unique_rows = data_holder.data.select(["visit_key", "air_pressure_hpa"]).unique()
+        unique_rows = data_holder.data.select(
+            ["visit_date", "reported_station_name", "air_pressure_hpa"]
+        ).unique()
         unique_rows = unique_rows.with_columns(
             [
                 pl.when(
@@ -38,7 +45,7 @@ class ValidateAirpres(Validator):
                 .when(
                     pl.col("air_pressure_hpa")
                     .cast(pl.Float64, strict=False)
-                    .is_between(lower_limit, upper_limit, closed="both")
+                    .is_between(self.lower_limit, self.upper_limit, closed="both")
                 )
                 .then(True)
                 .otherwise(False)
@@ -51,7 +58,7 @@ class ValidateAirpres(Validator):
         else:
             erroneous_rows = (
                 unique_rows.filter(~pl.col("is_valid"))
-                .select(["visit_key", "air_pressure_hpa"])
+                .select(["visit_date", "reported_station_name", "air_pressure_hpa"])
                 .to_dicts()
             )
 

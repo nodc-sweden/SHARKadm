@@ -5,6 +5,8 @@ from sharkadm.validators.base import DataHolderProtocol, Validator
 
 class ValidateAirtemp(Validator):
     _display_name = "Air temperature (degC)"
+    lower_limit = -20
+    upper_limit = 40
 
     @staticmethod
     def get_validator_description() -> str:
@@ -24,11 +26,14 @@ class ValidateAirtemp(Validator):
                 "Could not validate air temperature (degC), column is missing.",
             )
             return
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
 
-        lower_limit = -20
-        upper_limit = 40
         unique_rows = data_holder.data.select(
-            ["visit_key", "air_temperature_degc"]
+            ["visit_date", "reported_station_name", "air_temperature_degc"]
         ).unique()
         unique_rows = unique_rows.with_columns(
             [
@@ -40,7 +45,7 @@ class ValidateAirtemp(Validator):
                 .when(
                     pl.col("air_temperature_degc")
                     .cast(pl.Float64, strict=False)
-                    .is_between(lower_limit, upper_limit, closed="both")
+                    .is_between(self.lower_limit, self.upper_limit, closed="both")
                 )
                 .then(True)
                 .otherwise(False)
@@ -53,7 +58,7 @@ class ValidateAirtemp(Validator):
         else:
             erroneous_rows = (
                 unique_rows.filter(~pl.col("is_valid"))
-                .select(["visit_key", "air_temperature_degc"])
+                .select(["visit_date", "reported_station_name", "air_temperature_degc"])
                 .to_dicts()
             )
 
