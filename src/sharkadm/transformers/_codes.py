@@ -145,6 +145,16 @@ class _PolarsAddCodes(PolarsTransformer):
             #                 level=adm_logger.WARNING,
             #             )
 
+            # if "code" in source_col:
+            #     if code != code.upper():
+            #         self._log(
+            #             f"Code in column {source_col} is not uppercase and "
+            #             f"is changed:"
+            #             f"{code} -> {code.upper()} ({len(df)} places)",
+            #             level=adm_logger.WARNING,
+            #         )
+            #         code = code.upper()
+
             names = self._get_translation_and_log(code, source_col, df)
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(source_col) == code)
@@ -169,7 +179,7 @@ class _PolarsAddCodes(PolarsTransformer):
                 names.extend(self._get_translation_and_log(part, source_col, df))
             return names
 
-        info = _translate_codes.get_info(self.lookup_field, code.strip())
+        info = _translate_codes.get_info(self.lookup_field, code)
         if info:
             names = [info[self.lookup_key]]
             self._log(
@@ -184,6 +194,7 @@ class _PolarsAddCodes(PolarsTransformer):
                 f"{source_col} to {self.lookup_key}",
                 level=adm_logger.WARNING,
             )
+            return []
 
 
 class _AddCodesLab(_AddCodes):

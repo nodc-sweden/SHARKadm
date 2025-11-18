@@ -15,7 +15,7 @@ if get_nodc_config_directory():
 
 
 def _file_exists() -> bool:
-    if FILE_PATH or not FILE_PATH.exists():
+    if not FILE_PATH or not FILE_PATH.exists():
         adm_logger.log_workflow(
             f"Could not find file: {FILE_PATH}", level=adm_logger.ERROR
         )

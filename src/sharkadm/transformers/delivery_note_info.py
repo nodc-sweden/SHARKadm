@@ -132,8 +132,9 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
         "Physical and Chemical".lower(),
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, overwrite: bool = False, **kwargs):
         super().__init__(**kwargs)
+        self._overwrite = overwrite
         self._status_config = yaml_data.load_yaml(
             adm_config_paths("delivery_note_status"), encoding="utf8"
         )
@@ -168,6 +169,8 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
             #     f"Adding {key} info from delivery_note",
             #     item=data_holder.delivery_note[key],
             # )
+            if key in data_holder.data.columns and not self._overwrite:
+                continue
             ops_to_run.append(pl.lit(str(data_holder.delivery_note[key])).alias(key))
             # data_holder.data = data_holder.data.with_columns(
             #     pl.lit(str(data_holder.delivery_note[key])).alias(key)
