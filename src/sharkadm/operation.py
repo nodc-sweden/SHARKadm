@@ -72,3 +72,53 @@ class OperationBase:
 
     def _log_workflow(self, msg: str, **kwargs):
         adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
+
+
+class OperationInfo:
+    """This class is used as a return for operators
+    (validator, transfromer, exporter) to give information about the outcome. """
+    def __init__(self,
+                 operator: OperationBase = None,
+                 valid: bool = True,
+                 success: bool = True,
+                 exception: Exception = None,
+                 msg: str = "",
+                 cause_for_termination: bool = False,
+                 ):
+
+        self._operator = operator
+        self._valid = valid
+        self._success = success
+        self._exception = exception
+        self._msg = msg
+        self._cause_for_termination = cause_for_termination
+
+    @property
+    def operator(self) -> OperationBase:
+        return self._operator
+
+    @operator.setter
+    def operator(self, operator: OperationBase):
+        if not isinstance(operator, OperationBase):
+            raise ValueError(f"Invalid class ")
+        self._operator = operator
+
+    @property
+    def valid(self) -> bool:
+        return self._valid
+
+    @property
+    def success(self) -> bool:
+        return self._success
+
+    @property
+    def exception(self) -> Exception:
+        return self._exception
+
+    @property
+    def msg(self) -> str:
+        return self._msg
+
+    @property
+    def cause_for_termination(self) -> bool:
+        return self._cause_for_termination

@@ -19,6 +19,7 @@ from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
+from sharkadm.operation import OperationInfo
 
 
 class BaseSHARKadmController:
@@ -119,40 +120,66 @@ class BaseSHARKadmController:
         """Add one or more Transformers to the data holder"""
         self._transformers = args
 
-    def transform_all(self) -> None:
+    def transform_all(self) -> list[OperationInfo]:
         """Runs all transform objects in self._transformers"""
-        tot_nr_operators = len(self._transformers)
-        for i, trans in enumerate(self._transformers):
-            trans.transform(self._data_holder)
+        return self.transform(*self._transformers)
+        # tot_nr_operators = len(self._transformers)
+        # for i, trans in enumerate(self._transformers):
+        #     info = trans.transform(self._data_holder)
+        #     event.post_event(
+        #         "progress",
+        #         dict(
+        #             total=tot_nr_operators,
+        #             current=i,
+        #             title=f"Transforming...{trans.name}",
+        #         ),
+        #     )
+        #     if info.cause_for_termination:
+        #         return info
+
+    def transform(
+            self,
+            *transformers: Transformer
+            | MultiTransformer
+            | PolarsTransformer
+            | PolarsMultiTransformer,
+            return_if_cause_for_termination: bool = True
+    ) -> list[OperationInfo]:
+        tot_nr_operators = len(transformers)
+        infos = []
+        for i, trans in enumerate(transformers):
+            info = trans.transform(self._data_holder,
+                                   return_if_cause_for_termination=return_if_cause_for_termination)
             event.post_event(
                 "progress",
                 dict(
                     total=tot_nr_operators,
-                    current=i,
+                    current=i+1,
                     title=f"Transforming...{trans.name}",
                 ),
             )
-
-    def transform(
-        self,
-        *transformers: Transformer
-        | MultiTransformer
-        | PolarsTransformer
-        | PolarsMultiTransformer,
-    ) -> Self:
-        for trans in transformers:
-            trans.transform(self._data_holder)
-        return self
+            if isinstance(info, list):
+                for _info in info:
+                    infos.append(_info)
+                    if return_if_cause_for_termination and _info.cause_for_termination:
+                        return infos
+            else:
+                infos.append(info)
+                if return_if_cause_for_termination and info.cause_for_termination:
+                    return infos
+        if return_if_cause_for_termination and info.cause_for_termination:
+            return info
+        return infos
 
     def set_validators_before(self, *args: Validator) -> None:
         """Sets one or more Validators to the data holder"""
         self._validators_before = args
 
-    def validate_before_all(self) -> None:
+    def validate_before_all(self) -> OperationInfo:
         """Runs all set validator objects in self._validators_before"""
         tot_nr_operators = len(self._validators_before)
         for i, val in enumerate(self._validators_before):
-            val.validate(self._data_holder)
+            info = val.validate(self._data_holder)
             event.post_event(
                 "progress",
                 dict(
@@ -161,6 +188,8 @@ class BaseSHARKadmController:
                     title=f"Initial validation...{val.name}",
                 ),
             )
+            if info.cause_for_termination:
+                return info
 
     def validate(self, *validators: Validator) -> Self:
         for val in validators:
@@ -171,11 +200,11 @@ class BaseSHARKadmController:
         """Sets one or more Validators to the data holder"""
         self._validators_after = args
 
-    def validate_after_all(self) -> None:
+    def validate_after_all(self) -> OperationInfo:
         """Runs all set validator objects in self._validators_after"""
         tot_nr_operators = len(self._validators_after)
         for i, val in enumerate(self._validators_after):
-            val.validate(self._data_holder)
+            info = val.validate(self._data_holder)
             event.post_event(
                 "progress",
                 dict(
@@ -184,6 +213,8 @@ class BaseSHARKadmController:
                     title=f"Final validation...{val.name}",
                 ),
             )
+            if info.cause_for_termination:
+                return info
 
     def set_exporters(self, *args: Exporter) -> None:
         """Add one or more Exporters to the data holder"""
