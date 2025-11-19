@@ -37,6 +37,7 @@ from sharkadm.validators.depth import (
     ValidateSecchiDepth,
     ValidateWaterDepth,
 )
+from sharkadm.validators.duplicates import ValidateDuplicatedRows
 from sharkadm.validators.dyntaxa import ValidateScientificNameInDyntaxa
 from sharkadm.validators.ice import ValidateIceob
 from sharkadm.validators.mandatory import (

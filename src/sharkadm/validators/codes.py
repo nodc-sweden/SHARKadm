@@ -48,6 +48,13 @@ class _ValidateCodes(Validator):
         self, code: str, source_col: str, df: pl.DataFrame
     ) -> None:
         code = code.strip()
+        if code.upper() != code:
+            adm_logger.log_validation(
+                f"Code is not uppercase. Will convert to uppercase before lookup: {code}",
+                row_numbers=list(df["row_number"]),
+                level=adm_logger.DEBUG,
+            )
+            code = code.upper()
         if "," in code:
             for part in code.split(""):
                 self._validate_code_and_log(part, source_col, df)
@@ -58,7 +65,7 @@ class _ValidateCodes(Validator):
                 self._validate_code_and_log(part, source_col, df)
             return
 
-        info = _translate_codes.get_info(self.lookup_field, code.strip())
+        info = _translate_codes.get_info(self.lookup_field, code)
         if info is not None:
             return
         self._log_fail(

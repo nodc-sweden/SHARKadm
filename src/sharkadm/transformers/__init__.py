@@ -272,6 +272,7 @@ from sharkadm.transformers.station import (
     CopyReportedStationNameToStationName,
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
+from sharkadm.transformers.string import PolarsCodesToUppercase
 from sharkadm.transformers.strip import StripAllValues, StripAllValuesPolars
 from sharkadm.transformers.visit import (
     AddVisitKey,
