@@ -1,8 +1,9 @@
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from .base import PolarsTransformer
+
 from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
 class _PolarsToUppercase(PolarsTransformer):
@@ -15,13 +16,13 @@ class _PolarsToUppercase(PolarsTransformer):
 
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Converts all values to uppercase"
+        return "Converts all values to uppercase"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         for col in self.apply_on_columns:
             if col not in data_holder.data.columns:
                 continue
-            for (val, ), df in data_holder.data.group_by(col):
+            for (val,), df in data_holder.data.group_by(col):
                 upper_val = val.upper()
                 if val == upper_val:
                     continue
@@ -31,9 +32,11 @@ class _PolarsToUppercase(PolarsTransformer):
                     .otherwise(pl.col(col))
                     .alias(col)
                 )
-                self._log(f"Value in column {col} converted to uppercase: "
-                          f"{val} -> {upper_val} ({len(df)} places)",
-                          level=adm_logger.INFO)
+                self._log(
+                    f"Value in column {col} converted to uppercase: "
+                    f"{val} -> {upper_val} ({len(df)} places)",
+                    level=adm_logger.INFO,
+                )
 
 
 class PolarsCodesToUppercase(_PolarsToUppercase):

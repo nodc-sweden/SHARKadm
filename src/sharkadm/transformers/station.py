@@ -239,20 +239,22 @@ class PolarsAddStationInfo(PolarsTransformer):
             if not accepted_station:
                 closest_station = matching_stations.get_closest_station()
                 synonym_station = matching_stations.get_accepted_station_by_name_only()
-                distance = f"{closest_station.distance:,}".replace(",",
-                                                                   " ")
-                msg = (f"No accepted station found for station {reported_station} "
-                       f"at position {lat} : {lon}. "
-                       f"Closest station is {closest_station.station} "
-                       f"({distance} m)."
-                       )
+                distance = f"{closest_station.distance:,}".replace(",", " ")
+                msg = (
+                    f"No accepted station found for station {reported_station} "
+                    f"at position {lat} : {lon}. "
+                    f"Closest station is {closest_station.station} "
+                    f"({distance} m)."
+                )
                 if synonym_station:
-                    distance = f"{synonym_station.distance:,}".replace(",",
-                                                                       " ")
-                    msg = (f"{msg} Synonym matches station {synonym_station.station} "
-                           f"({distance} m)")
+                    distance = f"{synonym_station.distance:,}".replace(",", " ")
+                    msg = (
+                        f"{msg} Synonym matches station {synonym_station.station} "
+                        f"({distance} m)"
+                    )
                 self._log(
-                    msg, level=adm_logger.WARNING,
+                    msg,
+                    level=adm_logger.WARNING,
                 )
                 continue
 

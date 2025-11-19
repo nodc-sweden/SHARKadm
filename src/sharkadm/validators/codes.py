@@ -50,10 +50,9 @@ class _ValidateCodes(Validator):
         code = code.strip()
         if code.upper() != code:
             adm_logger.log_validation(
-                f"Code is not uppercase. "
-                f"Will convert to uppercase before lookup: {code}",
+                f"Code is not uppercase. Will convert to uppercase before lookup: {code}",
                 row_numbers=list(df["row_number"]),
-                level=adm_logger.DEBUG
+                level=adm_logger.DEBUG,
             )
             code = code.upper()
         if "," in code:
