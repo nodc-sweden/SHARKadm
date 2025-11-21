@@ -169,7 +169,7 @@ class _PolarsAddCodes(PolarsTransformer):
         code = code.strip()
         if "," in code:
             names = []
-            for part in code.split(""):
+            for part in code.split(","):
                 names.extend(self._get_translation_and_log(part, source_col, df))
             return names
 
