@@ -800,3 +800,42 @@ class PolarsAddUncertainty(Transformer):
                     .otherwise(pl.col("UNCERT_VAL"))
                     .alias("UNCERT_VAL")
                 ).drop("UNCERT_VAL_right")
+
+
+class PolarsAddStandardUncertainty(Transformer):
+    valid_data_types = ("physicalchemical",)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds the standard uncertainty in float associated to a parameter value"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if "UNCERT_VAL" not in data_holder.data.columns:
+            self._log(
+                "Uncertainty value column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
+        if "method_calculation_uncertainty" not in data_holder.data.columns:
+            self._log(
+                "Method calculation uncertainty (metcu) code column is missing.",
+                level=adm_logger.WARNING,
+            )
+            return
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(
+                (pl.col("method_calculation_uncertainty") == "U2")
+                & pl.col("UNCERT_VAL").is_not_null()
+            )
+            .then(pl.col("UNCERT_VAL").cast(pl.Float64) / 2)
+            .when(
+                (pl.col("method_calculation_uncertainty") == "SD")
+                & pl.col("UNCERT_VAL").is_not_null()
+            )
+            .then(pl.col("UNCERT_VAL").cast(pl.Float64))
+            .otherwise(
+                pl.col("STD_UNCERT") if "STD_UNCERT" in data_holder.data.columns else None
+            )
+            .alias("STD_UNCERT")
+        )
