@@ -50,7 +50,7 @@ class PolarsAddPressure(PolarsTransformer):
     valid_data_structures = ("column", "row")
     depth_col = "sample_depth_m"
     latitude_col = "sample_latitude_dd"
-    col_to_set = "pressure"  # in dbar
+    col_to_set = "COPY_VARIABLE.Derived pressure.dbar"
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -108,12 +108,12 @@ class PolarsAddPressure(PolarsTransformer):
 
 class PolarsAddDensityWide(PolarsTransformer):
     valid_data_structures = ("column",)
-    practical_salinity = "Salinity CTD"
-    temperature = "Temperature CTD"
+    practical_salinity = "COPY_VARIABLE.Salinity CTD.o/oo psu"
+    temperature = "COPY_VARIABLE.Temperature CTD.C"
     depth_col = "sample_depth_m"
     longitude_col = "sample_longitude_dd"
     latitude_col = "sample_latitude_dd"
-    col_to_set = "in_situ_density"  # in kg/m3
+    col_to_set = "COPY_VARIABLE.Derived in situ density.kg/m3"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
 
     @staticmethod
@@ -145,16 +145,26 @@ class PolarsAddDensityWide(PolarsTransformer):
             return
 
         valid_rows = (
-            data_holder.data[self.longitude_col].cast(pl.Float64).is_not_null()
-            & data_holder.data[self.latitude_col].cast(pl.Float64).is_not_null()
-            & data_holder.data[self.depth_col].cast(pl.Float64).is_not_null()
-            & data_holder.data[self.practical_salinity].cast(pl.Float64).is_not_null()
-            & data_holder.data[self.temperature].cast(pl.Float64).is_not_null()
+            data_holder.data[self.longitude_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.latitude_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.depth_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.practical_salinity]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.temperature]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
         )
 
         if valid_rows.any():
             valid_data = data_holder.data.filter(valid_rows)
-            psu = valid_data[self.practical_salinity].cast(pl.Float64).to_numpy()
+            psal = valid_data[self.practical_salinity].cast(pl.Float64).to_numpy()
             temp = valid_data[self.temperature].cast(pl.Float64).to_numpy()
             depth = valid_data[self.depth_col].cast(pl.Float64).to_numpy()
             lon = valid_data[self.longitude_col].cast(pl.Float64).to_numpy()
@@ -162,7 +172,7 @@ class PolarsAddDensityWide(PolarsTransformer):
 
             dens = np.full(len(data_holder.data), np.nan)
             dens[valid_rows.to_numpy()] = in_situ_density(
-                psu, temp, depth, self.p_reference, lon, lat
+                psal, temp, depth, self.p_reference, lon, lat
             )
 
             data_holder.data = data_holder.data.with_columns(
@@ -302,6 +312,133 @@ class PolarsAddDensity(PolarsTransformer):
             on=["visit_key", self.depth_col],
             how="left",
         )
+
+
+class PolarsAddOxygenSaturationWide(PolarsTransformer):
+    valid_data_structures = ("column",)
+    practical_salinity = "COPY_VARIABLE.Salinity CTD.o/oo psu"
+    temperature = "COPY_VARIABLE.Temperature CTD.C"
+    oxygen = "COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l"
+    density_col = "COPY_VARIABLE.Derived in situ density.kg/m3"  # in kg/m3
+    depth_col = "sample_depth_m"
+    longitude_col = "sample_longitude_dd"
+    latitude_col = "sample_latitude_dd"
+    cols_to_set: ClassVar[list[str]] = [
+        "COPY_VARIABLE.Derived oxygen at saturation.ml/l",
+        "COPY_VARIABLE.Derived oxygen saturation.%",
+    ]
+    p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Calculating oxygen at saturation in ml/l and "
+            f"the oxygen saturation of the water body in %. "
+            f"Setting value to column {', '.join(PolarsAddOxygenSaturation.cols_to_set)}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if [col for col in self.cols_to_set if col in data_holder.data.columns]:
+            adm_logger.log_transformation(
+                "Calculated oxygen parameters already exists, "
+                "values will be recalculated",
+                level=adm_logger.INFO,
+            )
+        must_haves = [
+            self.depth_col,
+            self.longitude_col,
+            self.latitude_col,
+            self.practical_salinity,
+            self.temperature,
+            self.oxygen,
+            self.density_col,
+        ]
+        if not all(col in data_holder.data.columns for col in must_haves):
+            adm_logger.log_transformation(
+                "Missing required columns: "
+                f"{[col for col in must_haves if col not in data_holder.data.columns]}",
+                level=adm_logger.WARNING,
+            )
+            return
+        valid_rows = (
+            data_holder.data[self.longitude_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.latitude_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.depth_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.practical_salinity]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.temperature]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.oxygen].cast(pl.Float64, strict=False).is_not_null()
+            & data_holder.data[self.density_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+        )
+
+        if valid_rows.any():
+            valid_data = data_holder.data.filter(valid_rows)
+            practical_salinity = (
+                valid_data[self.practical_salinity].cast(pl.Float64).to_numpy()
+            )
+            temperature = valid_data[self.temperature].cast(pl.Float64).to_numpy()
+            oxygen = valid_data[self.oxygen].cast(pl.Float64).to_numpy()
+            density = valid_data[self.density_col].cast(pl.Float64).to_numpy()
+            depth = valid_data[self.depth_col].cast(pl.Float64).to_numpy()
+            longitude = valid_data[self.longitude_col].cast(pl.Float64).to_numpy()
+            latitude = valid_data[self.latitude_col].cast(pl.Float64).to_numpy()
+
+            oxygen_values = np.full(len(data_holder.data), np.nan)
+            oxygen_values[valid_rows.to_numpy()] = oxygen_from_umol_kg_2_ml_l(
+                oxygen_saturation(
+                    practical_salinity,
+                    temperature,
+                    depth,
+                    self.p_reference,
+                    longitude,
+                    latitude,
+                ),
+                density,
+            )
+            oxygen_values_percent = np.full(len(data_holder.data), np.nan)
+            oxygen_values_percent[valid_rows.to_numpy()] = (
+                oxygen / oxygen_values[valid_rows.to_numpy()] * 100
+            )
+            oxygen_values = np.where(np.isnan(oxygen_values), None, oxygen_values)
+            oxygen_values_percent = np.where(
+                np.isnan(oxygen_values_percent), None, oxygen_values_percent
+            )
+
+            data_holder.data = data_holder.data.with_columns(
+                [
+                    pl.when(valid_rows)
+                    .then(
+                        pl.Series(oxygen_values).map_elements(
+                            lambda x: None if np.isnan(x) else x, return_dtype=pl.Float64
+                        )
+                    )
+                    .otherwise(None)
+                    .alias(self.cols_to_set[0]),
+                    pl.when(valid_rows)
+                    .then(
+                        pl.Series(oxygen_values_percent).map_elements(
+                            lambda x: None if np.isnan(x) else x, return_dtype=pl.Float64
+                        )
+                    )
+                    .otherwise(None)
+                    .alias(self.cols_to_set[1]),
+                ]
+            )
+        else:
+            adm_logger.log_transformation(
+                "No valid data rows for oxygen calculations.", level=adm_logger.WARNING
+            )
 
 
 class PolarsAddOxygenSaturation(PolarsTransformer):

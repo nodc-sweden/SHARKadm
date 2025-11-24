@@ -10,28 +10,23 @@ from sharkadm.transformers.add_gsw_parameters import (
 
 
 @pytest.mark.parametrize(
-    "given_visit_key, given_latitude, given_longitude, given_depths, "
+    "given_latitude, given_longitude, given_depth, "
     "given_salinity_psu, given_temperature, expected_success",
     (
-        ("ABC123", 58.2, 10.1, 5.0, -7, 20, False),  # erroneous salinity
-        ("DEF456", 57.1, 11.0, 5.7, 0, 5.2, True),  # ok data
-        ("GHJ789", 56.5, 12.0, -100, 10.3, 10.1, False),  # erroneous depth
+        (58.2, 10.1, 5.0, -7, 20, False),  # erroneous salinity
+        (57.1, 11.0, 5.7, 0, 5.2, True),  # ok data
+        (56.5, 12.0, -100, 10.3, 10.1, False),  # erroneous depth
     ),
 )
-# @patch("sharkadm.config.get_all_data_types", return_value=[])
-# @patch("sharkadm.config.get_all_data_structures", return_value=[])
 @patch(
     "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
 )
 def test_validate_add_density_wide(
     mocked_valid_data_holder,
-    # mocked_data_structures,
-    # mocked_data_types,
     polars_data_frame_holder_class,
-    given_visit_key,
     given_latitude,
     given_longitude,
-    given_depths,
+    given_depth,
     given_salinity_psu,
     given_temperature,
     expected_success,
@@ -39,36 +34,34 @@ def test_validate_add_density_wide(
     # Arrange
     given_data = pl.DataFrame(
         {
-            "visit_key": given_visit_key,
             "sample_latitude_dd": given_latitude,
             "sample_longitude_dd": given_longitude,
-            "sample_depth_m": given_depths,
-            "Salinity CTD": given_salinity_psu,
-            "Temperature CTD": given_temperature,
+            "sample_depth_m": given_depth,
+            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity_psu,
+            "COPY_VARIABLE.Temperature CTD.C": given_temperature,
         }
     )
     # Given a valid data holder
-    # mocked_valid_data_holder.side_effect = (True,)
     given_data_holder = polars_data_frame_holder_class(given_data)
-    # mocked_data_types.side_effect = (given_data_holder.data_type_internal, )
-    # mocked_data_structures.side_effect = (given_data_holder.data_structure, )
 
     # There should be no column with in situ density
     # before application of transformer
-    assert "in_situ_density" not in given_data_holder.data.columns, (
-        "Density column already exist"
-    )
+    assert (
+        "COPY_VARIABLE.Derived in situ density.kg/m3"
+        not in given_data_holder.data.columns
+    ), "Density column already exist"
 
-    # Transforming the data
     PolarsAddDensityWide().transform(given_data_holder)
 
     # After transformation the in situ density column
     # should exist
-    assert "in_situ_density" in given_data_holder.data.columns, (
-        "Density column was not added"
-    )
+    assert (
+        "COPY_VARIABLE.Derived in situ density.kg/m3" in given_data_holder.data.columns
+    ), "Density column was not added"
 
-    density_value = given_data_holder.data["in_situ_density"][0]
+    density_value = given_data_holder.data["COPY_VARIABLE.Derived in situ density.kg/m3"][
+        0
+    ]
 
     # The calculated density will either be a float
     # or None if in-data are incorrect

@@ -8,6 +8,7 @@ from sharkadm.transformers.add_gsw_parameters import (
     PolarsAddPressure,
     PolarsAddDensityWide,
     PolarsAddDensity,
+    PolarsAddOxygenSaturationWide,
     PolarsAddOxygenSaturation,
 )
 from sharkadm.transformers.add_ctd_kust import AddCtdKust
