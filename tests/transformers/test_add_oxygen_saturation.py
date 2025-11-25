@@ -3,7 +3,90 @@ from unittest.mock import patch
 import polars as pl
 import pytest
 
-from sharkadm.transformers.add_gsw_parameters import PolarsAddOxygenSaturation
+from sharkadm.transformers.add_gsw_parameters import (
+    PolarsAddOxygenSaturation,
+    PolarsAddOxygenSaturationWide,
+)
+
+
+@pytest.mark.parametrize(
+    "given_latitude, given_longitude, given_depth, given_salinity_psu,"
+    " given_temperature, given_oxygen, given_density, expected_o2_at_sat, "
+    "expected_o2_sat",
+    (
+        (58.34, 11.03, 102, 34.56, 8.27, 6.4, 1027.3593565, 6.583, 97.226),
+        (58.26, 11.44, 1, 26.74, 4.58, 7.4, 1021.194037235, 7.551, 97.994),
+    ),
+)
+@patch(
+    "sharkadm.transformers.base.PolarsTransformer.is_valid_data_holder", return_value=True
+)
+def test_validate_add_oxygen_wide(
+    mocked_valid_data_holder,
+    polars_data_frame_holder_class,
+    given_latitude,
+    given_longitude,
+    given_depth,
+    given_salinity_psu,
+    given_temperature,
+    given_oxygen,
+    given_density,
+    expected_o2_at_sat,
+    expected_o2_sat,
+):
+    # Arrange
+    given_data = pl.DataFrame(
+        {
+            "sample_latitude_dd": given_latitude,
+            "sample_longitude_dd": given_longitude,
+            "sample_depth_m": given_depth,
+            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity_psu,
+            "COPY_VARIABLE.Temperature CTD.C": given_temperature,
+            "COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l": given_oxygen,
+            "COPY_VARIABLE.Derived in situ density.kg/m3": given_density,
+        }
+    )
+    # Given a valid data holder
+    given_data_holder = polars_data_frame_holder_class(given_data)
+
+    # There should be no columns with derived oxygen
+    # before application of transformer
+    assert (
+        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+        not in given_data_holder.data.columns
+    ), "Oxygen at saturation column already exist"
+    assert (
+        "COPY_VARIABLE.Derived oxygen saturation.%" not in given_data_holder.data.columns
+    ), "Oxygen at saturation column already exist"
+
+    PolarsAddOxygenSaturationWide().transform(given_data_holder)
+
+    # After transformation the derived oxygen columns
+    # should exist
+    assert (
+        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+        in given_data_holder.data.columns
+    ), "Oxygen at saturation was not added"
+
+    assert (
+        "COPY_VARIABLE.Derived oxygen saturation.%" in given_data_holder.data.columns
+    ), "Oxygen saturation was not added"
+
+    oxygen_at_sat_value = given_data_holder.data[
+        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+    ][0]
+    # The calculated oxygen at saturation should match the expected value
+    assert round(oxygen_at_sat_value, 3) == expected_o2_at_sat, (
+        "Oxygen at saturation does not match the expected value"
+    )
+
+    oxygen_sat_value = given_data_holder.data[
+        "COPY_VARIABLE.Derived oxygen saturation.%"
+    ][0]
+    # The calculated oxygen at saturation should match the expected value
+    assert round(oxygen_sat_value, 3) == expected_o2_sat, (
+        "Oxygen saturation does not match the expected value"
+    )
 
 
 @pytest.mark.parametrize(
@@ -51,7 +134,7 @@ from sharkadm.transformers.add_gsw_parameters import PolarsAddOxygenSaturation
     ),
 )
 @patch("sharkadm.config.get_all_data_types", return_value=[])
-def test_validate_add_density_wide(
+def test_validate_add_oxygen(
     mocked_data_types,
     polars_data_frame_holder_class,
     given_visit_key,
