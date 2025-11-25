@@ -123,7 +123,7 @@ class _PolarsAddCodes(PolarsTransformer):
             )
 
     def _get_translation_and_log(
-            self, code: str, source_col: str, df: pl.DataFrame
+        self, code: str, source_col: str, df: pl.DataFrame
     ) -> list[str]:
         code = code.strip()
         info = _translate_codes.get_info(self.lookup_field, code)
