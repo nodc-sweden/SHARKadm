@@ -12,7 +12,11 @@ from sharkadm.transformers.add_gsw_parameters import (
 )
 from sharkadm.transformers.add_ctd_kust import AddCtdKust
 from sharkadm.transformers.add_lmqnt import AddLmqnt, PolarsAddLmqnt
-from sharkadm.transformers.add_uncertainty import AddUncertainty, PolarsAddUncertainty
+from sharkadm.transformers.add_uncertainty import (
+    AddUncertainty,
+    PolarsAddUncertainty,
+    PolarsAddStandardUncertainty,
+)
 from sharkadm.transformers.analyse_info import AddAnalyseInfo, PolarsAddAnalyseInfo
 from sharkadm.transformers.arithmetic import (
     Divide,
