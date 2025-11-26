@@ -261,11 +261,8 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
 
 
 class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
-    _data_type: str | None = None
-    _data_type_internal: str | None = None
     _data_format: str | None = None
     _data_structure = "column"
-
     _date_str_format = "%Y-%m-%d"
 
     def __init__(
@@ -503,14 +500,9 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in
         delivery note"""
-        self._import_matrix = config.get_import_matrix_config(
-            data_type=self.data_type_internal
-        )
-        # if not self._import_matrix:
-        #     self._import_matrix = config.get_import_matrix_config(
-        #         data_type=self.delivery_note.data_format
-        #     )
-        self._import_matrix_mapper = self._import_matrix.get_mapper(
+
+        self._import_matrix = self.data_type_obj.import_matrix
+        self._import_matrix_mapper = self.data_type_obj.get_mapper(
             self.delivery_note.import_matrix_key
         )
 

@@ -9,6 +9,7 @@ import pandas as pd
 
 from sharkadm import utils
 from sharkadm.config import mapper_data_type_to_internal
+from sharkadm.config.data_type import data_type_handler
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
@@ -240,11 +241,8 @@ class ZipArchiveDataHolder(PandasDataHolder, ABC):
 
 
 class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
-    _data_type_internal: str | None = None
-    _data_type: str | None = None
     _data_format: str | None = None
     _data_structure = "row"
-
     _date_str_format = "%Y-%m-%d"
 
     def __init__(
@@ -284,19 +282,11 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
 
     def _initiate(self) -> None:
         self._dataset_name = self.zip_archive_path.stem
-        self._data_type = self.zip_archive_path.stem.split("_")[1]
-        dtype_lower = self._data_type.lower()
-        self._data_type_internal = mapper_data_type_to_internal.get(
-            dtype_lower, default=dtype_lower
+        self._data_type_obj = data_type_handler.get_data_type_obj(
+            self.zip_archive_path.stem.split("_")[1]
         )
-
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type_internal
-
-    @property
-    def data_type(self) -> str:
-        return self._data_type
+        # self._data_type = self.zip_archive_path.stem.split("_")[1]
+        # dtype_lower = self._data_type.lower()
 
     @property
     def delivery_note(self) -> delivery_note.DeliveryNote:

@@ -3,6 +3,7 @@ import pathlib
 
 from sharkadm.data import data_source
 
+from ...config.data_type import data_type_handler
 from ..data_source.base import DataFile
 from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
@@ -10,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class PolarsZoobenthosArchiveDataHolder(PolarsArchiveDataHolder):
-    _data_type_internal = "zoobenthos"
-    _data_type = "Zoobenthos"
+    _data_type_obj = data_type_handler.get_data_type_obj("zoobenthos")
     _data_format = "Zoobenthos"
 
 

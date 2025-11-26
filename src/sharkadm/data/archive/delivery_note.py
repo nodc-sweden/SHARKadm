@@ -8,7 +8,6 @@ from typing import Protocol
 import pandas as pd
 
 from sharkadm import config, sharkadm_exceptions
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.config.data_type import data_type_handler
 
 try:
@@ -31,7 +30,7 @@ class DeliveryNote:
         self._data_format = data.get("data_format", None)
         self._import_matrix_key = data.get("import_matrix_key", None)
         self._mapper = mapper
-        self._data_type_obj = data_type_handler.get_datatype(self._data["DTYPE"])
+        self._data_type_obj = data_type_handler.get_data_type_obj(self._data["DTYPE"])
         if not self._mapper and self._data_type_obj:
             self._mapper = self._data_type_obj.get_mapper(self._import_matrix_key)
 
