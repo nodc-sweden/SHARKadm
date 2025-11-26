@@ -15,7 +15,7 @@ def _get_mapped_datatype(data_type_synonym: str) -> str:
 
 
 class DataType:
-    def __init__(self, data_type_internal: str | None= None):
+    def __init__(self, data_type_internal: str | None = None):
         self._data_type_internal = data_type_internal
         self._import_matrix_config: ImportMatrixConfig | None = None
 
