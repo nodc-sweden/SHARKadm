@@ -14,7 +14,9 @@ from sharkadm.data.data_source.xlsx_file import (
     XlsxFormatDataFile,
     XlsxFormatPolarsDataFile,
 )
+from sharkadm.config.data_type import data_type_handler
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.config.data_type import data_type_handler, DataType
 
 logger = logging.getLogger(__name__)
 
@@ -288,8 +290,8 @@ class DvTemplateDataHolder(PandasDataHolder):
 
 
 class PolarsDvTemplateDataHolder(PolarsDataHolder):
-    _data_type: str | None = None
-    _data_type_internal: str | None = None
+    _data_type: DataType | None = None
+    # _data_type_internal: str | None = None
     _data_format: str | None = None
     _data_structure = "column"
 
@@ -342,7 +344,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     @property
     def data_type(self) -> str:
-        return self._data_type
+        return self._data_type.data_type
 
     @property
     def data_type_internal(self) -> str:
@@ -398,19 +400,19 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     @property
     def min_longitude(self) -> str:
-        return str(min(self.data["sample_longitude_dd"].astype(float)))
+        return str(min(self.data["sample_longitude_dd"].cast(float)))
 
     @property
     def max_longitude(self) -> str:
-        return str(max(self.data["sample_longitude_dd"].astype(float)))
+        return str(max(self.data["sample_longitude_dd"].cast(float)))
 
     @property
     def min_latitude(self) -> str:
-        return str(min(self.data["sample_latitude_dd"].astype(float)))
+        return str(min(self.data["sample_latitude_dd"].cast(float)))
 
     @property
     def max_latitude(self) -> str:
-        return str(max(self.data["sample_latitude_dd"].astype(float)))
+        return str(max(self.data["sample_latitude_dd"].cast(float)))
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_dv_template(
@@ -465,30 +467,35 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
         ]
 
     def _load_import_matrix(self) -> None:
-        """Loads the import matrix for the given data type and provider found
-        in delivery note"""
-        data_type_mapper = config.get_data_type_mapper()
-        dtype = data_type_mapper.get(
-            self.delivery_note.data_type, default=self.delivery_note.data_type.lower()
-        )
-        self._import_matrix = config.get_import_matrix_config(data_type=dtype)
-        if not self._import_matrix:
-            msg = (
-                f"Could not find import matrix for data_type: "
-                f"{self.delivery_note.data_type}"
-            )
-            adm_logger.log_workflow(msg)
-            return
-        try:
-            self._import_matrix_mapper = self._import_matrix.get_mapper(
-                self.delivery_note.import_matrix_key
-            )
-        except KeyError:
-            msg = (
-                f"Could not get import matrix mapper for import_matrix_key: "
-                f"{self.delivery_note.import_matrix_key}"
-            )
-            adm_logger.log_workflow(msg)
+        """Loads the import matrix for the given data type"""
+        # return
+        #
+        self._data_type = data_type_handler.get_datatype(self.delivery_note.data_type)
+        self._import_matrix = self._data_type.import_matrix
+        self._import_matrix_mapper = self._data_type.get_mapper(self.delivery_note.import_matrix_key)
+
+        # data_type_mapper = config.get_data_type_mapper()
+        # dtype = data_type_mapper.get(
+        #     self.delivery_note.data_type, default=self.delivery_note.data_type.lower()
+        # )
+        # self._import_matrix = config.get_import_matrix_config(data_type=dtype)
+        # if not self._import_matrix:
+        #     msg = (
+        #         f"Could not find import matrix for data_type: "
+        #         f"{self.delivery_note.data_type}"
+        #     )
+        #     adm_logger.log_workflow(msg)
+        #     return
+        # try:
+        #     self._import_matrix_mapper = self._import_matrix.get_mapper(
+        #         self.delivery_note.import_matrix_key
+        #     )
+        # except KeyError:
+        #     msg = (
+        #         f"Could not get import matrix mapper for import_matrix_key: "
+        #         f"{self.delivery_note.import_matrix_key}"
+        #     )
+        #     adm_logger.log_workflow(msg)
 
     def _add_concatenated_column(
         self, new_column: str, columns_to_use: list[str]
