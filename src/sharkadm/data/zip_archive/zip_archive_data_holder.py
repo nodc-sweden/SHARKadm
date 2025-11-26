@@ -418,7 +418,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
             )
             return
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(
-            self.delivery_note_path
+            self.delivery_note_path, mapper=self._import_matrix_mapper
         )
 
     def _load_sampling_info(self) -> None:

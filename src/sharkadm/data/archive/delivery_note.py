@@ -9,6 +9,7 @@ import pandas as pd
 
 from sharkadm import config, sharkadm_exceptions
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.config.data_type import data_type_handler
 
 try:
     import nodc_codes
@@ -30,28 +31,26 @@ class DeliveryNote:
         self._data_format = data.get("data_format", None)
         self._import_matrix_key = data.get("import_matrix_key", None)
         self._mapper = mapper
+        self._data_type_obj = data_type_handler.get_datatype(self._data["DTYPE"])
+        if not self._mapper and self._data_type_obj:
+            self._mapper = self._data_type_obj.get_mapper(self._import_matrix_key)
 
-        # TODO: Fullhack
-        if self._data["DTYPE"] == "Physical and Chemical":
-            self._data["DTYPE"] = "PhysicalChemical"
-
-        if self._data["DTYPE"] == "Harbour Porpoise":
-            self._data["DTYPE"] = "Harbourporpoise"
-
-        dtype = self.translate_codes.get_translation(
-            field="delivery_datatype",
-            synonym=self._data["DTYPE"],
-            translate_to="internal_value",
-        )
-
-        if not dtype:
-            raise sharkadm_exceptions.DeliveryNoteError(
-                f"Missing translation for datatype {self._data['DTYPE']} "
-                f"in file {self.translate_codes.path}",
-                level=adm_logger.ERROR,
-            )
-
-        self._data["DTYPE"] = dtype
+        # dtype = self.translate_codes.get_translation(
+        #     field="delivery_datatype",
+        #     synonym=self._data["DTYPE"],
+        #     translate_to="internal_value",
+        # )
+        #
+        # return
+        #
+        # if not dtype:
+        #     raise sharkadm_exceptions.DeliveryNoteError(
+        #         f"Missing translation for datatype {self._data['DTYPE']} "
+        #         f"in file {self.translate_codes.path}",
+        #         level=adm_logger.ERROR,
+        #     )
+        #
+        # self._data["DTYPE"] = dtype
 
         if self._mapper:
             self._map_data()

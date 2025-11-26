@@ -5,6 +5,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
+from sharkadm.config.data_type import DataType
 from sharkadm.data.data_source.base import (
     DataFile,
     DataSource,
@@ -241,6 +242,8 @@ class PandasDataHolder(DataHolder, ABC):
 
 
 class PolarsDataHolder(DataHolder, ABC):
+    _data_type_obj: DataType = None
+
     def __init__(self, *args, **kwargs):
         self._data = pl.DataFrame()
         self._filtered_data = None
@@ -283,6 +286,14 @@ class PolarsDataHolder(DataHolder, ABC):
                 f"(was '{type(df)}')"
             )
         self._data = df
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type_obj.data_type
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_obj.data_type_internal
 
     @property
     def columns(self) -> list[str]:
