@@ -6,6 +6,7 @@ import openpyxl
 import pandas as pd
 
 from sharkadm import config
+from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
@@ -14,9 +15,7 @@ from sharkadm.data.data_source.xlsx_file import (
     XlsxFormatDataFile,
     XlsxFormatPolarsDataFile,
 )
-from sharkadm.config.data_type import data_type_handler
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.config.data_type import data_type_handler, DataType
 
 logger = logging.getLogger(__name__)
 
@@ -470,9 +469,13 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
         """Loads the import matrix for the given data type"""
         # return
         #
-        self._data_type = data_type_handler.get_datatype(self.delivery_note.data_type)
+        self._data_type = data_type_handler.get_data_type_obj(
+            self.delivery_note.data_type
+        )
         self._import_matrix = self._data_type.import_matrix
-        self._import_matrix_mapper = self._data_type.get_mapper(self.delivery_note.import_matrix_key)
+        self._import_matrix_mapper = self._data_type.get_mapper(
+            self.delivery_note.import_matrix_key
+        )
 
         # data_type_mapper = config.get_data_type_mapper()
         # dtype = data_type_mapper.get(

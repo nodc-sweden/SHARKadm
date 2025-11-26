@@ -158,7 +158,7 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
         self, data_holder: PolarsDataHolder | PolarsArchiveDataHolder
     ):
         ops_to_run = []
-        columns = self._columns or data_holder.delivery_note.fields
+        # columns = self._columns or data_holder.delivery_note.fields
         for key in data_holder.delivery_note.fields:
             # if key in data_holder.data and any(data_holder.data[key]):
             #     self._log(

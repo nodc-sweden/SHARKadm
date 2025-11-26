@@ -149,7 +149,7 @@ class LimsDataHolder(PandasDataHolder):
 
 class PolarsLimsDataHolder(PolarsDataHolder):
     # _data_type_internal = "physicalchemical"
-    _data_type = data_type_handler.get_datatype("physicalchemical")
+    _data_type = data_type_handler.get_data_type_obj("physicalchemical")
     # _data_type = "Physical and Chemical"
     _data_format = "LIMS"
     _data_structure = "column"
