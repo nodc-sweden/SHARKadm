@@ -88,7 +88,6 @@ class DataTypeHandler:
 
     def get_data_type_obj(self, data_type_synonym: str) -> DataType:
         obj = self._data_types.get(data_type_synonym)
-        print(f"{obj=}")
         if obj:
             return obj
         obj = _get_data_type(data_type_synonym)
