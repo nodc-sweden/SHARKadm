@@ -34,23 +34,6 @@ class DeliveryNote:
         if not self._mapper and self._data_type_obj:
             self._mapper = self._data_type_obj.get_mapper(self._import_matrix_key)
 
-        # dtype = self.translate_codes.get_translation(
-        #     field="delivery_datatype",
-        #     synonym=self._data["DTYPE"],
-        #     translate_to="internal_value",
-        # )
-        #
-        # return
-        #
-        # if not dtype:
-        #     raise sharkadm_exceptions.DeliveryNoteError(
-        #         f"Missing translation for datatype {self._data['DTYPE']} "
-        #         f"in file {self.translate_codes.path}",
-        #         level=adm_logger.ERROR,
-        #     )
-        #
-        # self._data["DTYPE"] = dtype
-
         if self._mapper:
             self._map_data()
 
@@ -183,3 +166,7 @@ class DeliveryNote:
         if self["RLABO"]:
             return self["RLABO"].upper()
         return self["reporting_institute_code"].upper()
+
+
+if __name__ == "__main__":
+    dn = DeliveryNote({})
