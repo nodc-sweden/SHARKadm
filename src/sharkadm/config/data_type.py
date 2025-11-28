@@ -87,10 +87,13 @@ class DataTypeHandler:
         self._data_types: dict[str, DataType] = {}
 
     def get_data_type_obj(self, data_type_synonym: str) -> DataType:
+        print(f"Input to get_data_type_obj: {data_type_synonym}")
         obj = self._data_types.get(data_type_synonym)
+        print(f"Resultant object: {obj}")
         if obj:
             return obj
         obj = _get_data_type(data_type_synonym)
+        print(f"Check obj returned by _get_data_type {obj}")
         if obj:
             self._data_types[data_type_synonym] = obj
         return obj
