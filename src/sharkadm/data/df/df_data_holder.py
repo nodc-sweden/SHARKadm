@@ -4,6 +4,7 @@ from typing import Protocol
 import pandas as pd
 import polars as pl
 
+from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataDataFrame, DataFile
 
@@ -78,8 +79,7 @@ class PandasDataFrameDataHolder(PandasDataHolder):
 
 
 class PolarsDataFrameDataHolder(PolarsDataHolder):
-    _data_type: str = "unknown"
-    _data_type_internal: str = "unknown"
+    _data_type: DataType = data_type_handler.get_data_type_obj("unknown")
     _data_structure: str = "row"
 
     def __init__(

@@ -2,6 +2,7 @@ import logging
 
 from sharkadm.data import data_source
 
+from ...config.data_type import data_type_handler
 from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,5 @@ class PhysicalChemicalArchiveDataHolder(ArchiveDataHolder):
 
 
 class PolarsPhysicalChemicalArchiveDataHolder(PolarsArchiveDataHolder):
-    _data_type_internal = "physicalchemical"
-    _data_type = "Physical and Chemical"
+    _data_type_obj = data_type_handler.get_data_type_obj("physicalchemical")
     _data_format = "PhysicalChemical"

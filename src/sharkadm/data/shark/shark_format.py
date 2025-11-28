@@ -2,19 +2,15 @@ import pathlib
 
 import polars as pl
 
-from sharkadm import config
-
 from ...config import ImportMatrixConfig, ImportMatrixMapper
+from ...config.data_type import data_type_handler
 from .. import PolarsDataHolder
 from ..data_source.base import DataFile
 from ..data_source.txt_file import CsvRowFormatPolarsDataFile
 
 
 class PolarsSharkDataHolder(PolarsDataHolder):
-    _data_type: str | None = None
-    _data_type_internal: str | None = None
     _data_format: str | None = "all"
-
     _date_str_format = "%Y-%m-%d"
 
     def __init__(self, path: str | pathlib.Path | None = None, **kwargs):
@@ -38,12 +34,8 @@ class PolarsSharkDataHolder(PolarsDataHolder):
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in
         delivery note"""
-        self._import_matrix = config.get_import_matrix_config(
-            data_type=self.data_type_internal
-        )
-        if not self._import_matrix:
-            return
-        self._import_matrix_mapper = self._import_matrix.get_mapper(self.data_format)
+        self._import_matrix = self.data_type_obj.import_matrix
+        self._import_matrix_mapper = self.data_type_obj.get_mapper(self.data_format)
 
     def _load_data(self) -> None:
         d_source = CsvRowFormatPolarsDataFile(path=self._path, encoding=self._encoding)
@@ -57,31 +49,9 @@ class PolarsSharkDataHolder(PolarsDataHolder):
                 break
 
         if d_source._data_type:
-            self._data_type = d_source._data_type.lower().replace(" ", "")
-            data_type_internal = self._data_type
-        else:
-            data_type_internal = ""
-
-        if "physical" in data_type_internal:
-            data_type_internal = "physicalchemical"
-        elif "imaging" in data_type_internal:
-            data_type_internal = "plankton_imaging"
-        elif "dropvideo" in data_type_internal:
-            data_type_internal = "epibenthos_dropvideo"
-        elif "grey" in data_type_internal:
-            data_type_internal = "greyseal"
-        elif "ringed" in data_type_internal:
-            data_type_internal = "ringedseal"
-        elif "porpoise" in data_type_internal:
-            data_type_internal = "harbourporpoise"
-        elif "barcoding" in data_type_internal:
-            data_type_internal = "plankton_barcoding"
-        elif "production" in data_type_internal:
-            data_type_internal = "primaryproduction"
-        elif "production" in data_type_internal:
-            data_type_internal = "primaryproduction"
-
-        self._data_type_internal = data_type_internal
+            self._data_type_obj = data_type_handler.get_data_type_obj(
+                d_source._data_type.lower().replace(" ", "")
+            )
 
         self._load_import_matrix()
         if self.import_matrix_mapper:

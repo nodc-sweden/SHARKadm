@@ -79,12 +79,19 @@ def get_trophic_type_smhi_object(
 
 
 def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
-    for name, path in import_matrix_paths.items():
-        if data_type == name:
-            return ImportMatrixConfig(
-                path,
-                data_type=data_type,
-            )
+    path = import_matrix_paths.get(data_type)
+    if not path:
+        return
+    return ImportMatrixConfig(
+        path,
+        data_type=data_type,
+    )
+    # for name, path in import_matrix_paths.items():
+    #     if data_type == name:
+    #         return ImportMatrixConfig(
+    #             path,
+    #             data_type=data_type,
+    #         )
 
 
 def get_import_matrix_mapper(

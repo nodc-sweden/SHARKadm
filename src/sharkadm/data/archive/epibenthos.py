@@ -2,6 +2,7 @@ import logging
 
 from sharkadm.data import data_source
 
+from ...config.data_type import data_type_handler
 from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
@@ -87,6 +88,5 @@ class EpibenthosMartransArchiveDataHolder(ArchiveDataHolder):
 
 
 class PolarsEpibenthosArchiveDataHolder(PolarsArchiveDataHolder):
-    _data_type_internal = "epibenthos"
-    _data_type = "Epibenthos"
+    _data_type_obj = data_type_handler.get_data_type_obj("epibenthos")
     _data_format = "Epibenthos"

@@ -1,9 +1,9 @@
+from sharkadm.config.data_type import data_type_handler
 from sharkadm.data.data_holder import PolarsDataHolder
 
 
 class PolarsProfileDataHolder(PolarsDataHolder):
-    _data_type_internal = "physicalchemical"
-    _data_type = "Physical and Chemical"
+    _data_type_obj = data_type_handler.get_data_type_obj("physicalchemical")
     _data_structure = "profile"
     _dataset_name = "profile"
 
@@ -50,14 +50,6 @@ class PolarsProfileDataHolder(PolarsDataHolder):
     @staticmethod
     def get_data_holder_description() -> str:
         return """"""
-
-    @property
-    def data_type(self) -> str:
-        return self._data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type_internal
 
     @property
     def dataset_name(self) -> str:

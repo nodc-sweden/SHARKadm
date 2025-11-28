@@ -5,6 +5,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
+from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_source.base import (
     DataFile,
     DataSource,
@@ -241,6 +242,8 @@ class PandasDataHolder(DataHolder, ABC):
 
 
 class PolarsDataHolder(DataHolder, ABC):
+    _data_type_obj: DataType = data_type_handler.get_data_type_obj("unknown")
+
     def __init__(self, *args, **kwargs):
         self._data = pl.DataFrame()
         self._filtered_data = None
@@ -262,8 +265,7 @@ class PolarsDataHolder(DataHolder, ABC):
         concat_data = pl.concat([self.data, other.data])
         cdh = PolarsConcatDataHolder()
         cdh.data = concat_data
-        cdh.data_type = self.data_type
-        cdh.data_type_internal = self.data_type_internal
+        cdh.set_data_type_obj(self.data_type_obj)
         return cdh
 
     def __radd__(self, other) -> "PolarsDataHolder":
@@ -283,6 +285,22 @@ class PolarsDataHolder(DataHolder, ABC):
                 f"(was '{type(df)}')"
             )
         self._data = df
+
+    @property
+    def data_type_obj(self) -> DataType:
+        return self._data_type_obj
+
+    @property
+    def data_type(self) -> str:
+        return self._data_type_obj.data_type
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_obj.data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return self._data_type_obj.data_type_in_data
 
     @property
     def columns(self) -> list[str]:
@@ -569,28 +587,15 @@ class ConcatDataHolder(PandasDataHolder):
 class PolarsConcatDataHolder(PolarsDataHolder):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._data_type = ""
-        self._data_type_internal = ""
 
     @staticmethod
     def get_data_holder_description() -> str:
         return "This is a concatenated data holder"
 
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type_internal
-
-    @data_type_internal.setter
-    def data_type_internal(self, data_type_internal: str) -> None:
-        self._data_type_internal = data_type_internal
-
-    @property
-    def data_type(self) -> str:
-        return self._data_type
-
-    @data_type.setter
-    def data_type(self, data_type: str) -> None:
-        self._data_type = data_type
+    def set_data_type_obj(self, data_type_obj: DataType):
+        if not isinstance(data_type_obj, DataType):
+            raise TypeError("Data type object must be of type DataType")
+        self._data_type_obj = data_type_obj
 
     @property
     def dataset_name(self) -> str:
