@@ -76,16 +76,17 @@ class OperationBase:
 
 class OperationInfo:
     """This class is used as a return for operators
-    (validator, transfromer, exporter) to give information about the outcome. """
-    def __init__(self,
-                 operator: OperationBase = None,
-                 valid: bool = True,
-                 success: bool = True,
-                 exception: Exception = None,
-                 msg: str = "",
-                 cause_for_termination: bool = False,
-                 ):
+    (validator, transfromer, exporter) to give information about the outcome."""
 
+    def __init__(
+        self,
+        operator: OperationBase = None,
+        valid: bool = True,
+        success: bool = True,
+        exception: Exception | None = None,
+        msg: str = "",
+        cause_for_termination: bool = False,
+    ):
         self._operator = operator
         self._valid = valid
         self._success = success
@@ -100,7 +101,7 @@ class OperationInfo:
     @operator.setter
     def operator(self, operator: OperationBase):
         if not isinstance(operator, OperationBase):
-            raise ValueError(f"Invalid class ")
+            raise ValueError("Invalid class ")
         self._operator = operator
 
     @property

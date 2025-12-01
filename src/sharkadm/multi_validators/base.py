@@ -44,10 +44,9 @@ class MultiValidator(Validator):
     def description(self) -> str:
         return self.get_validator_description()
 
-    def validate(self,
-                 data_holder: PolarsDataHolder,
-                 return_if_cause_for_termination: bool = True
-                 ) -> list[OperationInfo]:
+    def validate(
+        self, data_holder: PolarsDataHolder, return_if_cause_for_termination: bool = True
+    ) -> list[OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
             return [OperationInfo(operator=self)]
         adm_logger.log_workflow(

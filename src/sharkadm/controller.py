@@ -16,10 +16,10 @@ from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
+from sharkadm.operation import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.validators import Validator
-from sharkadm.operation import OperationInfo
 
 
 class BaseSHARKadmController:
@@ -47,26 +47,14 @@ class BaseSHARKadmController:
     @classmethod
     def get_validators(cls) -> dict[str, dict]:
         return validators.get_validators_info()
-        # return_dict = dict()
-        # for name, desc in validators.get_validators_description().items():
-        #     return_dict[name] = dict(name=name, description=desc)
-        # return return_dict
 
     @classmethod
     def get_transformers(cls) -> dict[str, dict]:
         return transformers.get_transformers_info()
-        # return_dict = dict()
-        # for name, desc in transformers.get_transformers_description().items():
-        #     return_dict[name] = dict(name=name, description=desc)
-        # return return_dict
 
     @classmethod
     def get_exporters(cls) -> dict[str, dict]:
         return exporters.get_exporters_info()
-        # return_dict = dict()
-        # for name, desc in exporters.get_exporters_description().items():
-        #     return_dict[name] = dict(name=name, description=desc)
-        # return return_dict
 
     @classmethod
     def get_transformer_list(
@@ -125,23 +113,25 @@ class BaseSHARKadmController:
         return self.transform(*self._transformers)
 
     def transform(
-            self,
-            *transformers: Transformer
-            | MultiTransformer
-            | PolarsTransformer
-            | PolarsMultiTransformer,
-            return_if_cause_for_termination: bool = True
+        self,
+        *transformers: Transformer
+        | MultiTransformer
+        | PolarsTransformer
+        | PolarsMultiTransformer,
+        return_if_cause_for_termination: bool = True,
     ) -> list[OperationInfo]:
         tot_nr_operators = len(transformers)
         infos = []
         for i, trans in enumerate(transformers):
-            info = trans.transform(self._data_holder,
-                                   return_if_cause_for_termination=return_if_cause_for_termination)
+            info = trans.transform(
+                self._data_holder,
+                return_if_cause_for_termination=return_if_cause_for_termination,
+            )
             event.post_event(
                 "progress",
                 dict(
                     total=tot_nr_operators,
-                    current=i+1,
+                    current=i + 1,
                     title=f"Transforming...{trans.name}",
                 ),
             )
