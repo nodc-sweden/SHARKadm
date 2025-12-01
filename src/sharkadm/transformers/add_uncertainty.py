@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import Transformer
+from .base import Transformer, PolarsTransformer
 
 
 class AddUncertainty(Transformer):
@@ -372,7 +372,7 @@ class AddUncertainty(Transformer):
             data_holder.data.loc[uncert_bool, "UNCERT_VAL"] = uncert_vals
 
 
-class PolarsAddUncertainty(Transformer):
+class PolarsAddUncertainty(PolarsTransformer):
     valid_data_types = ("physicalchemical",)
 
     @staticmethod
@@ -802,7 +802,7 @@ class PolarsAddUncertainty(Transformer):
                 ).drop("UNCERT_VAL_right")
 
 
-class PolarsAddStandardUncertainty(Transformer):
+class PolarsAddStandardUncertainty(PolarsTransformer):
     valid_data_types = ("physicalchemical",)
 
     @staticmethod

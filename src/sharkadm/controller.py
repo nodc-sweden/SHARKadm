@@ -123,19 +123,6 @@ class BaseSHARKadmController:
     def transform_all(self) -> list[OperationInfo]:
         """Runs all transform objects in self._transformers"""
         return self.transform(*self._transformers)
-        # tot_nr_operators = len(self._transformers)
-        # for i, trans in enumerate(self._transformers):
-        #     info = trans.transform(self._data_holder)
-        #     event.post_event(
-        #         "progress",
-        #         dict(
-        #             total=tot_nr_operators,
-        #             current=i,
-        #             title=f"Transforming...{trans.name}",
-        #         ),
-        #     )
-        #     if info.cause_for_termination:
-        #         return info
 
     def transform(
             self,
