@@ -7,7 +7,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm import config
-from sharkadm.data import is_valid_data_holder, is_valid_polars_data_holder
+from sharkadm.data import is_valid_data_holder
 from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.operation import OperationBase, OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
@@ -140,6 +140,7 @@ class Transformer(ABC, OperationBase):
             f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
             level=adm_logger.DEBUG,
         )
+        return info
 
     def validate(self, data_holder: "PolarsDataHolder") -> OperationInfo:
         if not self.is_valid_data_holder(data_holder):

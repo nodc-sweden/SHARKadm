@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import Transformer, PolarsTransformer
+from .base import PolarsTransformer, Transformer
 
 
 class AddUncertainty(Transformer):

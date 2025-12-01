@@ -205,10 +205,9 @@ class PolarsMultiTransformer(PolarsTransformer):
             level=adm_logger.DEBUG,
         )
 
-    def transform(self,
-                  data_holder: PolarsDataHolder,
-                  return_if_cause_for_termination: bool = True
-                  ) -> list[OperationInfo]:
+    def transform(
+        self, data_holder: PolarsDataHolder, return_if_cause_for_termination: bool = True
+    ) -> list[OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
             return [OperationInfo(operator=self)]
         self._log_workflow(
