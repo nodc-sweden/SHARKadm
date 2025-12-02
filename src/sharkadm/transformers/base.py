@@ -98,7 +98,7 @@ class Transformer(ABC, OperationBase):
     def description(self) -> str:
         return self.get_transformer_description()
 
-    def transform(self, data_holder: "PandasDataHolder") -> None:
+    def transform(self, data_holder: "PandasDataHolder", **kwargs) -> None:
         if data_holder.data_type_internal not in config.get_valid_data_types(
             valid=self.valid_data_types, invalid=self.invalid_data_types
         ):
@@ -244,7 +244,7 @@ class PolarsTransformer(ABC, OperationBase):
         #     info_str = f"{info_str} (With filter {self._data_filter.description})"
         return info_str
 
-    def transform(self, data_holder: "PolarsDataHolder") -> OperationInfo:
+    def transform(self, data_holder: "PolarsDataHolder", **kwargs) -> OperationInfo:
         if not self.is_valid_data_holder(data_holder):
             return OperationInfo(operator=self, valid=False)
         self._log_workflow(

@@ -206,7 +206,9 @@ class PolarsMultiTransformer(PolarsTransformer):
         )
 
     def transform(
-        self, data_holder: PolarsDataHolder, return_if_cause_for_termination: bool = True
+        self,
+        data_holder: "PolarsDataHolder",
+        return_if_cause_for_termination: bool = True,
     ) -> list[OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
             return [OperationInfo(operator=self)]
@@ -218,6 +220,7 @@ class PolarsMultiTransformer(PolarsTransformer):
         infos = []
         t0 = time.time()
         for trans in self._transformers:
+            print(f"{trans=}")
             info = trans(**self._kwargs).transform(data_holder=data_holder)
             infos.append(info)
             if return_if_cause_for_termination and info.cause_for_termination:

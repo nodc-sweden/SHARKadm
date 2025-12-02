@@ -123,6 +123,7 @@ class BaseSHARKadmController:
         tot_nr_operators = len(transformers)
         infos = []
         for i, trans in enumerate(transformers):
+            # abort = False
             info = trans.transform(
                 self._data_holder,
                 return_if_cause_for_termination=return_if_cause_for_termination,
@@ -144,8 +145,8 @@ class BaseSHARKadmController:
                 infos.append(info)
                 if return_if_cause_for_termination and info.cause_for_termination:
                     return infos
-        if return_if_cause_for_termination and info.cause_for_termination:
-            return info
+        # if return_if_cause_for_termination and info.cause_for_termination:
+        #     return info
         return infos
 
     def set_validators_before(self, *args: Validator) -> None:
