@@ -123,7 +123,6 @@ class BaseSHARKadmController:
         tot_nr_operators = len(transformers)
         infos = []
         for i, trans in enumerate(transformers):
-            # abort = False
             info = trans.transform(
                 self._data_holder,
                 return_if_cause_for_termination=return_if_cause_for_termination,
