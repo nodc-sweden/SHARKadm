@@ -195,20 +195,32 @@ class PolarsAddDEPHqcColumn(PolarsTransformer):
 
 
 class PolarsAddFloatColumns(PolarsTransformer):
-    def __init__(self, columns: list[str], **kwargs):
+    def __init__(
+        self, columns: list[str], column_names: list[str] | None = None, **kwargs
+    ):
         super().__init__(**kwargs)
         self._columns = columns
+        self._column_names = column_names or [None] * len(columns)
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Converts matching columns to float. Uses regex to match columns."
+        return "Converts given columns to float with given column names."
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        columns = matching_strings.get_matching_strings(
-            data_holder.data.columns, self._columns
-        )
-        for col in columns:
-            data_holder.data = add_column.add_float_column(data_holder.data, col)
+        if len(self._columns) != len(self._column_names):
+            self._log(
+                "Given columns do not match given column names.",
+                level=adm_logger.WARNING,
+            )
+            return
+        for col, name in zip(self._columns, self._column_names):
+            if col in data_holder.data.columns:
+                if name:
+                    data_holder.data = add_column.add_float_column(
+                        data_holder.data, col, name
+                    )
+                else:
+                    data_holder.data = add_column.add_float_column(data_holder.data, col)
 
 
 class PolarsAddColumnDiff(PolarsTransformer):
@@ -331,7 +343,7 @@ class PolarsFixDuplicateColumns(PolarsTransformer):
                 data_holder.data = data_holder.data.drop(f"{valid_col}__duplicate")
 
 
-class AddColumnsWithPrefix(Transformer):
+class AddColumnsWithPrefix(PolarsTransformer):
     def __init__(
         self, apply_on_columns: tuple[str] | None = None, col_prefix: str | None = None
     ) -> None:
