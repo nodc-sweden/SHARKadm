@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Type
 
 from sharkadm.data import PolarsDataHolder
+from sharkadm.operation import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.validators import Validator
 
@@ -43,22 +44,29 @@ class MultiValidator(Validator):
     def description(self) -> str:
         return self.get_validator_description()
 
-    def validate(self, data_holder: PolarsDataHolder) -> None:
+    def validate(
+        self, data_holder: PolarsDataHolder, return_if_cause_for_termination: bool = True
+    ) -> list[OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
-            return
+            return [OperationInfo(operator=self)]
         adm_logger.log_workflow(
             f"Applying multi validator: {self.__class__.__name__}",
             item=self.get_validator_description(),
             level=adm_logger.DEBUG,
         )
+        infos = []
         t0 = time.time()
         for vali in self._validators:
-            vali().validate(data_holder=data_holder)
+            info = vali(**self._kwargs).validate(data_holder=data_holder)
+            infos.append(info)
+            if return_if_cause_for_termination and info.cause_for_termination:
+                return infos
         adm_logger.log_workflow(
             f"Multi validator {self.__class__.__name__} "
             f"executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
+        return infos
 
     # def _data_holder_has_valid_data_type(self, data_holder: "PolarsDataHolder") -> bool:
     #     if (

@@ -7,6 +7,7 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.data import get_valid_data_holders, is_valid_polars_data_holder
+from sharkadm.operation import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 
@@ -71,7 +72,7 @@ class MultiTransformer(Transformer):
     def description(self) -> str:
         return self.get_transformer_description()
 
-    def transform(self, data_holder: DataHolderProtocol) -> None:
+    def transform_old(self, data_holder: DataHolderProtocol) -> None:
         if data_holder.data_type_internal not in config.get_valid_data_types(
             valid=self.valid_data_types, invalid=self.invalid_data_types
         ):
@@ -204,22 +205,32 @@ class PolarsMultiTransformer(PolarsTransformer):
             level=adm_logger.DEBUG,
         )
 
-    def transform(self, data_holder: "PolarsDataHolder") -> None:
+    def transform(
+        self,
+        data_holder: "PolarsDataHolder",
+        return_if_cause_for_termination: bool = True,
+    ) -> list[OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
-            return
+            return [OperationInfo(operator=self)]
         self._log_workflow(
             f"Applying multi transformer: {self.name}",
             item=self.get_transformer_description(),
             level=adm_logger.DEBUG,
         )
+        infos = []
         t0 = time.time()
         for trans in self._transformers:
-            trans(**self._kwargs).transform(data_holder=data_holder)
+            print(f"{trans=}")
+            info = trans(**self._kwargs).transform(data_holder=data_holder)
+            infos.append(info)
+            if return_if_cause_for_termination and info.cause_for_termination:
+                return infos
         adm_logger.log_workflow(
             f"Multi transformer {self.__class__.__name__} executed "
             f"in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
+        return infos
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
         # Dummy method must be present to implement MultiTransformers

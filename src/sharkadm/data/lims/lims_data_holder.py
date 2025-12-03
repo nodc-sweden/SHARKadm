@@ -5,7 +5,6 @@ from typing import Protocol
 import pandas as pd
 import polars as pl
 
-from sharkadm.config.data_type import data_type_handler
 from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile
@@ -149,7 +148,7 @@ class LimsDataHolder(PandasDataHolder):
 
 class PolarsLimsDataHolder(PolarsDataHolder):
     # _data_type_internal = "physicalchemical"
-    _data_type = data_type_handler.get_data_type_obj("physicalchemical")
+    _data_type_synonym = "physicalchemical"
     # _data_type = "Physical and Chemical"
     _data_format = "LIMS"
     _data_structure = "column"
@@ -253,14 +252,6 @@ class PolarsLimsDataHolder(PolarsDataHolder):
     #     if type(df) != pd.DataFrame:
     #         raise 'Data must be of type pd.DataFrame'
     #     self._data = df
-
-    @property
-    def data_type(self) -> str:
-        return self._data_type.data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type.data_type_internal
 
     @property
     def dataset_name(self) -> str:

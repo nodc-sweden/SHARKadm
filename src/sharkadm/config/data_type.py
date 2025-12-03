@@ -6,6 +6,8 @@ DTYPE_MAPPER = {
     "planktonimaging": "plankton_imaging",
     "epibenthosdropvideo": "epibenthos_dropvideo",
     "physicalandchemical": "physicalchemical",
+    "PHYCHE".lower(): "physicalchemical",
+    "marinebiotoxins": "marine_biotoxins",
 }
 
 
@@ -82,11 +84,26 @@ class DataTypePhysicalChemical(DataType):
         return "Physical and Chemical"
 
 
+class DataTypeMarineBiotoxins(DataType):
+    @property
+    def data_type(self) -> str:
+        return "MarineBiotoxins"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return "Marine Biotoxins"
+
+
 class DataTypeHandler:
     def __init__(self):
         self._data_types: dict[str, DataType] = {}
 
     def get_data_type_obj(self, data_type_synonym: str) -> DataType:
+        print(f"{data_type_synonym=}")
         obj = self._data_types.get(data_type_synonym)
         if obj:
             return obj
@@ -99,6 +116,7 @@ class DataTypeHandler:
 CLASS_MAPPER = {
     "unknown": DataTypeUnknown,
     "physicalchemical": DataTypePhysicalChemical,
+    "marine_biotoxins": DataTypeMarineBiotoxins,
 }
 
 

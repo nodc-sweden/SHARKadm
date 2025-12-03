@@ -195,7 +195,6 @@ class PolarsZipArchive(PolarsFileExporter):
         self._create_shark_metadata_auto()
         self._create_data_file()
         self._create_changelog_file()
-
         self._create_zip_package()
 
     def _copy_received_files(self) -> None:
@@ -236,7 +235,10 @@ class PolarsZipArchive(PolarsFileExporter):
         self._metadata_auto.set_data_holder(data_holder=self._data_holder)
 
     def _add_shark_metadata(self) -> None:
-        if not hasattr(self._data_holder, "shark_metadata_path"):
+        if (
+            not hasattr(self._data_holder, "shark_metadata_path")
+            or not self._data_holder.shark_metadata_path.exists()
+        ):
             self._log(
                 f"No attribute for shark_metadata_path for data_holder "
                 f"{self._data_holder.data_holder_name}",

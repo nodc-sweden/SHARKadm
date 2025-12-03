@@ -167,6 +167,21 @@ class DeliveryNote:
             return self["RLABO"].upper()
         return self["reporting_institute_code"].upper()
 
+    def save(self, path: pathlib.Path | str):
+        path = pathlib.Path(path)
+        if path.exists():
+            raise FileExistsError(path)
+        lines = []
+        for key, value in self._data.items():
+            lines.append(f"{key}: {value}")
+        with open(path, "w") as fid:
+            fid.write("\n".join(lines))
+
+
+def create_delivery_note(data: dict, path: str | pathlib.Path):
+    dn = DeliveryNote(data)
+    dn.save(path)
+
 
 if __name__ == "__main__":
     dn = DeliveryNote({})

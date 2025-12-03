@@ -5,6 +5,8 @@ from typing import Protocol
 import pandas as pd
 import polars as pl
 
+from sharkadm.config.data_type import DataType, data_type_handler
+
 # from sharkadm.config.import_config import ImportMatrixMapper
 
 
@@ -19,7 +21,9 @@ class PolarsDataSource:
         self,
         data_type: str | None = None,
     ) -> None:
-        self._data_type = data_type
+        self._data_type_obj: DataType | None = None
+        if data_type:
+            self._data_type_obj = data_type_handler.get_data_type_obj(data_type)
         self._source = None
         self._data: pl.DataFrame = pl.DataFrame()
         self._original_header: list = []
@@ -50,8 +54,12 @@ class PolarsDataSource:
         self._original_header = self._data.columns
 
     @property
+    def data_type_obj(self) -> DataType:
+        return self._data_type_obj
+
+    @property
     def data_type(self) -> str:
-        return self._data_type.lower()
+        return self._data_type_obj.data_type
 
     @property
     def source(self) -> str:

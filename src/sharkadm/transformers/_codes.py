@@ -126,6 +126,13 @@ class _PolarsAddCodes(PolarsTransformer):
         self, code: str, source_col: str, df: pl.DataFrame
     ) -> list[str]:
         code = code.strip()
+        if not code:
+            adm_logger.log_validation(
+                f"Missing code for {source_col}.",
+                row_numbers=list(df["row_number"]),
+                level=adm_logger.WARNING,
+            )
+            return []
         info = _translate_codes.get_info(self.lookup_field, code)
         if not info:
             if "," in code:

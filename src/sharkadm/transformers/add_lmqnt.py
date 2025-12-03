@@ -6,7 +6,7 @@ import polars as pl
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import Transformer
+from .base import PolarsTransformer, Transformer
 
 
 class AddLmqnt(Transformer):
@@ -136,7 +136,7 @@ class AddLmqnt(Transformer):
                 )
 
 
-class PolarsAddLmqnt(Transformer):
+class PolarsAddLmqnt(PolarsTransformer):
     valid_data_types = ("physicalchemical",)
 
     @staticmethod

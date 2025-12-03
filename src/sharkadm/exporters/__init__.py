@@ -34,7 +34,7 @@ from sharkadm.exporters.system import (
     ValidatorsSummaryFile,
 )
 from sharkadm.exporters.txt_file import TxtAsIs, PolarsTxtAsIs
-from sharkadm.exporters.zip_archive import ZipArchive
+from sharkadm.exporters.zip_archive import ZipArchive, PolarsZipArchive
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
 

@@ -48,9 +48,17 @@ class _ValidateCodes(Validator):
         self, code: str, source_col: str, df: pl.DataFrame
     ) -> None:
         code = code.strip()
+        if not code:
+            adm_logger.log_validation(
+                f"Missing code for {source_col}.",
+                row_numbers=list(df["row_number"]),
+                level=adm_logger.WARNING,
+            )
+            return
         if code.upper() != code:
             adm_logger.log_validation(
-                f"Code is not uppercase. Will convert to uppercase before lookup: {code}",
+                f"Code is not uppercase. Will convert to uppercase before lookup: "
+                f"{code} ({source_col})",
                 row_numbers=list(df["row_number"]),
                 level=adm_logger.DEBUG,
             )

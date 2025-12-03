@@ -339,15 +339,6 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         return self._import_matrix_mapper
 
     @property
-    def data_type(self) -> str:
-        return self._data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        # return self._data_type_mapper.get(self.data_format)
-        return self._data_type_internal
-
-    @property
     def delivery_note(self) -> delivery_note.DeliveryNote:
         return self._delivery_note
 

@@ -99,6 +99,7 @@ class CustomIdsHandler:
         # data_type_mapper: DataTypeMapper = None) -> SharkadmIdLevelHandler | None:
         # data_type = data_type_mapper.get(data_type)
         data_type = data_type.lower()
+        print(f"{self._id_objects=}")
         if level not in self._id_objects[data_type]:
             return
         return self._id_objects[data_type][level]

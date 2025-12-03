@@ -10,7 +10,7 @@ from sharkadm.data import (
     PolarsDataHolder,
     is_valid_data_holder,
 )
-from sharkadm.operation import OperationBase
+from sharkadm.operation import OperationBase, OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -99,20 +99,24 @@ class Validator(ABC, OperationBase):
             level=adm_logger.DEBUG,
         )
 
-    def validate(self, data_holder: PolarsDataHolder) -> None:
+    def validate(self, data_holder: PolarsDataHolder) -> OperationInfo:
         if not self.is_valid_data_holder(data_holder):
-            return
+            return OperationInfo(operator=self, valid=False)
         adm_logger.log_workflow(
             f"Applying validator: {self.name}",
             item=self.get_validator_description(),
             level=adm_logger.DEBUG,
         )
         t0 = time.time()
-        self._validate(data_holder=data_holder)
+        info = self._validate(data_holder=data_holder)
         adm_logger.log_workflow(
             f"Validator {self.name} executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
+        if isinstance(info, OperationInfo):
+            info.operator = self
+            return info
+        return OperationInfo(operator=self)
 
     # def _data_holder_has_valid_data_type(self, data_holder: "PolarsDataHolder")
     # -> bool:

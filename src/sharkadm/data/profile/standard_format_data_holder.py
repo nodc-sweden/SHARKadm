@@ -3,7 +3,6 @@ from typing import Protocol
 
 import polars as pl
 
-from sharkadm.config.data_type import data_type_handler
 from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.data_source.profile.standard_format_file import (
@@ -16,7 +15,7 @@ class HeaderMapper(Protocol):
 
 
 class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
-    _data_type_obj = data_type_handler.get_data_type_obj("profile")
+    _data_type_synonym = "profile"
     _data_format = "PROFILE"
     _data_structure = "profile"
 

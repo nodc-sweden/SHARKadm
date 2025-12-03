@@ -25,6 +25,7 @@ from sharkadm.data.archive.jellyfish import (
     JellyfishArchiveDataHolder,
     PolarsJellyfishArchiveDataHolder,
 )
+from sharkadm.data.archive.marine_biotoxins import PolarsMarineBiotoxinsArchiveDataHolder
 from sharkadm.data.archive.physicalchemical import (
     PhysicalChemicalArchiveDataHolder,
     PolarsPhysicalChemicalArchiveDataHolder,
@@ -75,7 +76,6 @@ def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
 def get_polars_archive_data_holder(path: str | pathlib.Path) -> PolarsArchiveDataHolder:
     path = pathlib.Path(path)
     d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
-    print(f"{polars_object_mapping.keys()=}")
     d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
@@ -95,3 +95,7 @@ def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, F
 
 def get_archive_data_holder_names() -> list[str]:
     return utils.get_all_class_children_names(ArchiveDataHolder)
+
+
+def get_polars_archive_data_holder_names() -> list[str]:
+    return utils.get_all_class_children_names(PolarsArchiveDataHolder)

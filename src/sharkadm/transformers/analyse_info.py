@@ -80,7 +80,6 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                     level=adm_logger.WARNING,
                 )
                 continue
-
             info = data_holder.analyse_info.get_info(parameter, dtime.date())
 
             analyse_info_columns = [

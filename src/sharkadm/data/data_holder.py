@@ -242,11 +242,14 @@ class PandasDataHolder(DataHolder, ABC):
 
 
 class PolarsDataHolder(DataHolder, ABC):
-    _data_type_obj: DataType = data_type_handler.get_data_type_obj("unknown")
+    _data_type_synonym = "unknown"
 
     def __init__(self, *args, **kwargs):
         self._data = pl.DataFrame()
         self._filtered_data = None
+        self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
+            self._data_type_synonym
+        )
         super().__init__(*args, **kwargs)
 
     def __add__(self, other) -> "PolarsConcatDataHolder":

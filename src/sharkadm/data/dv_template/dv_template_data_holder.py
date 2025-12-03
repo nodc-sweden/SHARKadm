@@ -342,14 +342,6 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
         return self._import_matrix_mapper
 
     @property
-    def data_type(self) -> str:
-        return self._data_type.data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type_internal
-
-    @property
     def dataset_name(self) -> str:
         return self._dataset_name
 
@@ -469,11 +461,12 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
         """Loads the import matrix for the given data type"""
         # return
         #
-        self._data_type = data_type_handler.get_data_type_obj(
+        self._data_type_obj = data_type_handler.get_data_type_obj(
             self.delivery_note.data_type
         )
-        self._import_matrix = self._data_type.import_matrix
-        self._import_matrix_mapper = self._data_type.get_mapper(
+        print(f"{self._data_type_obj=}")
+        self._import_matrix = self._data_type_obj.import_matrix
+        self._import_matrix_mapper = self._data_type_obj.get_mapper(
             self.delivery_note.import_matrix_key
         )
 
@@ -526,8 +519,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     def _set_data_source(self, data_source: PolarsDataFile) -> None:
         """Sets a single data source to self._data"""
-        self._data_type = data_source.data_type
-        self._data_type_internal = data_source.data_type.replace(" ", "").lower()
+        self._data_type_obj = data_type_handler.get_data_type_obj(data_source.data_type)
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 

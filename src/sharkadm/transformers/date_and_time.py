@@ -360,7 +360,7 @@ class AddReportedDates(Transformer):
             data_holder.data[target_col] = data_holder.data[source_col]
 
 
-class PolarsAddReportedDates(Transformer):
+class PolarsAddReportedDates(PolarsTransformer):
     source_columns = ("visit_date", "sample_date")
     reported_col_prefix = "reported"
 
@@ -656,7 +656,7 @@ class PolarsFixDateFormat(PolarsTransformer):
             )
 
 
-class PolarsFixTimeFormat(Transformer):
+class PolarsFixTimeFormat(PolarsTransformer):
     time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod
@@ -757,7 +757,7 @@ class PolarsFixTimeFormat(Transformer):
                 return True
 
 
-class PolarsAddVisitDateFromObservationDate(Transformer):
+class PolarsAddVisitDateFromObservationDate(PolarsTransformer):
     valid_data_types = ("HarbourPorpoise",)
     valid_data_holders = ("ZipArchiveDataHolder",)
     source_col = "observation_date"
