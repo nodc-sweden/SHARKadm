@@ -40,7 +40,7 @@ def test_validate_add_pressure(
 
     # There should be no column with pressure
     # before application of transformer
-    assert "pressure" not in given_data_holder.data.columns, (
+    assert "Derived pressure" not in given_data_holder.data.columns, (
         "Pressure column not added yet"
     )
 
@@ -49,11 +49,11 @@ def test_validate_add_pressure(
 
     # After transformation the pressure column
     # should exist
-    assert "COPY_VARIABLE.Derived pressure.dbar" in given_data_holder.data.columns, (
+    assert "Derived pressure" in given_data_holder.data.columns, (
         "Pressure column was not added"
     )
 
-    pressure_value = given_data_holder.data["COPY_VARIABLE.Derived pressure.dbar"][0]
+    pressure_value = given_data_holder.data["Derived pressure"][0]
 
     # The calculated pressure will either be a float
     # or None if in-data are incorrect

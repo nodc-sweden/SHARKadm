@@ -11,7 +11,7 @@ from sharkadm.transformers.add_gsw_parameters import (
 
 @pytest.mark.parametrize(
     "given_latitude, given_longitude, given_depth, "
-    "given_salinity_psu, given_temperature, expected_success",
+    "given_salinity, given_temperature, expected_success",
     (
         (58.2, 10.1, 5.0, -7, 20, False),  # erroneous salinity
         (57.1, 11.0, 5.7, 0, 5.2, True),  # ok data
@@ -27,7 +27,7 @@ def test_validate_add_density_wide(
     given_latitude,
     given_longitude,
     given_depth,
-    given_salinity_psu,
+    given_salinity,
     given_temperature,
     expected_success,
 ):
@@ -37,7 +37,7 @@ def test_validate_add_density_wide(
             "sample_latitude_dd": given_latitude,
             "sample_longitude_dd": given_longitude,
             "sample_depth_m": given_depth,
-            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity_psu,
+            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity,
             "COPY_VARIABLE.Temperature CTD.C": given_temperature,
         }
     )
@@ -47,21 +47,22 @@ def test_validate_add_density_wide(
     # There should be no column with in situ density
     # before application of transformer
     assert (
-        "COPY_VARIABLE.Derived in situ density.kg/m3"
+        "COPY_VARIABLE.Derived in situ density CTD.kg/m3"
         not in given_data_holder.data.columns
     ), "Density column already exist"
 
-    PolarsAddDensityWide().transform(given_data_holder)
+    PolarsAddDensityWide("CTD").transform(given_data_holder)
 
     # After transformation the in situ density column
     # should exist
     assert (
-        "COPY_VARIABLE.Derived in situ density.kg/m3" in given_data_holder.data.columns
+        "COPY_VARIABLE.Derived in situ density CTD.kg/m3"
+        in given_data_holder.data.columns
     ), "Density column was not added"
 
-    density_value = given_data_holder.data["COPY_VARIABLE.Derived in situ density.kg/m3"][
-        0
-    ]
+    density_value = given_data_holder.data[
+        "COPY_VARIABLE.Derived in situ density CTD.kg/m3"
+    ][0]
 
     # The calculated density will either be a float
     # or None if in-data are incorrect
@@ -132,20 +133,20 @@ def test_validate_add_density(
 
     # There should be no column with in situ density
     # before application of the transformer
-    assert "in_situ_density" not in given_data_holder.data.columns, (
+    assert "Derived in situ density CTD" not in given_data_holder.data.columns, (
         "Density column already exist"
     )
 
     # Transforming the data
-    PolarsAddDensity().transform(given_data_holder)
+    PolarsAddDensity("CTD").transform(given_data_holder)
 
     # After transformation the in situ density column
     # should exist
-    assert "in_situ_density" in given_data_holder.data.columns, (
+    assert "Derived in situ density CTD" in given_data_holder.data.columns, (
         "Density column was not added"
     )
 
-    density_value = given_data_holder.data["in_situ_density"][0]
+    density_value = given_data_holder.data["Derived in situ density CTD"][0]
 
     # The calculated density will either be a float
     # or None if in-data are incorrect
