@@ -10,7 +10,7 @@ from sharkadm.transformers.add_gsw_parameters import (
 
 
 @pytest.mark.parametrize(
-    "given_latitude, given_longitude, given_depth, given_salinity_psu,"
+    "given_latitude, given_longitude, given_depth, given_salinity,"
     " given_temperature, given_oxygen, given_density, expected_o2_at_sat, "
     "expected_o2_sat",
     (
@@ -27,7 +27,7 @@ def test_validate_add_oxygen_wide(
     given_latitude,
     given_longitude,
     given_depth,
-    given_salinity_psu,
+    given_salinity,
     given_temperature,
     given_oxygen,
     given_density,
@@ -40,10 +40,10 @@ def test_validate_add_oxygen_wide(
             "sample_latitude_dd": given_latitude,
             "sample_longitude_dd": given_longitude,
             "sample_depth_m": given_depth,
-            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity_psu,
+            "COPY_VARIABLE.Salinity CTD.o/oo psu": given_salinity,
             "COPY_VARIABLE.Temperature CTD.C": given_temperature,
             "COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l": given_oxygen,
-            "COPY_VARIABLE.Derived in situ density.kg/m3": given_density,
+            "COPY_VARIABLE.Derived in situ density CTD.kg/m3": given_density,
         }
     )
     # Given a valid data holder
@@ -52,28 +52,33 @@ def test_validate_add_oxygen_wide(
     # There should be no columns with derived oxygen
     # before application of transformer
     assert (
-        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+        "COPY_VARIABLE.Derived oxygen at saturation CTD.ml/l"
         not in given_data_holder.data.columns
     ), "Oxygen at saturation column already exist"
     assert (
-        "COPY_VARIABLE.Derived oxygen saturation.%" not in given_data_holder.data.columns
-    ), "Oxygen at saturation column already exist"
+        "COPY_VARIABLE.Derived oxygen saturation CTD.%"
+        not in given_data_holder.data.columns
+    ), "Oxygen saturation column already exist"
 
-    PolarsAddOxygenSaturationWide().transform(given_data_holder)
+    print(given_data_holder.data.columns)
+
+    PolarsAddOxygenSaturationWide("CTD").transform(given_data_holder)
+
+    print(given_data_holder.data.columns)
 
     # After transformation the derived oxygen columns
     # should exist
     assert (
-        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+        "COPY_VARIABLE.Derived oxygen at saturation CTD.ml/l"
         in given_data_holder.data.columns
     ), "Oxygen at saturation was not added"
 
     assert (
-        "COPY_VARIABLE.Derived oxygen saturation.%" in given_data_holder.data.columns
+        "COPY_VARIABLE.Derived oxygen saturation CTD.%" in given_data_holder.data.columns
     ), "Oxygen saturation was not added"
 
     oxygen_at_sat_value = given_data_holder.data[
-        "COPY_VARIABLE.Derived oxygen at saturation.ml/l"
+        "COPY_VARIABLE.Derived oxygen at saturation CTD.ml/l"
     ][0]
     # The calculated oxygen at saturation should match the expected value
     assert round(oxygen_at_sat_value, 3) == expected_o2_at_sat, (
@@ -81,7 +86,7 @@ def test_validate_add_oxygen_wide(
     )
 
     oxygen_sat_value = given_data_holder.data[
-        "COPY_VARIABLE.Derived oxygen saturation.%"
+        "COPY_VARIABLE.Derived oxygen saturation CTD.%"
     ][0]
     # The calculated oxygen at saturation should match the expected value
     assert round(oxygen_sat_value, 3) == expected_o2_sat, (
@@ -156,7 +161,7 @@ def test_validate_add_oxygen(
             "sample_depth_m": given_depth,
             "parameter": given_parameter,
             "value": given_value,
-            "in_situ_density": given_density,
+            "Derived in situ density CTD": given_density,
         }
     )
 
@@ -166,23 +171,25 @@ def test_validate_add_oxygen(
 
     # There should be no column with in situ density
     # before application of transformer
-    for col in ["oxygen_at_saturation_in_ml_per_l", "oxygen_saturation_in_percent"]:
+    for col in ["Derived oxygen at saturation CTD", "Derived oxygen saturation CTD"]:
         assert col not in given_data_holder.data.columns, (
             f"Column for calculated {col} exists before transformation"
         )
 
+    print(given_data_holder.data.columns)
     # Transforming the data
-    PolarsAddOxygenSaturation().transform(given_data_holder)
+    PolarsAddOxygenSaturation("CTD").transform(given_data_holder)
+    print(given_data_holder.data.columns)
 
     # After transformation the calculated oxygen properties
     # should exist
-    for col in ["oxygen_at_saturation_in_ml_per_l", "oxygen_saturation_in_percent"]:
+    for col in ["Derived oxygen at saturation CTD", "Derived oxygen saturation CTD"]:
         assert col in given_data_holder.data.columns, (
             f"Column for calculated {col} was not added"
         )
 
-    oxygen_value = given_data_holder.data["oxygen_at_saturation_in_ml_per_l"][0]
-    oxygen_saturation_value = given_data_holder.data["oxygen_saturation_in_percent"][0]
+    oxygen_value = given_data_holder.data["Derived oxygen at saturation CTD"][0]
+    oxygen_saturation_value = given_data_holder.data["Derived oxygen saturation CTD"][0]
 
     # The calculated oxygen at saturation should match the expected value
     if expected_o2_at_saturation[0]:

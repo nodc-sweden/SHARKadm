@@ -1,5 +1,3 @@
-from typing import ClassVar
-
 import numpy as np
 import polars as pl
 from gsw import CT_from_pt, O2sol_SP_pt, SA_from_SP, pt_from_t, rho
@@ -9,6 +7,11 @@ from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
+
+
+def add_suffix(name: str, suffix: str | None) -> str:
+    base, rest = name.rsplit(".", 1)
+    return f"{base} {suffix}.{rest}"
 
 
 def pressure(depth, latitude):
@@ -50,7 +53,7 @@ class PolarsAddPressure(PolarsTransformer):
     valid_data_structures = ("column", "row")
     depth_col = "sample_depth_m"
     latitude_col = "sample_latitude_dd"
-    col_to_set = "COPY_VARIABLE.Derived pressure.dbar"
+    col_to_set = "Derived pressure"
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -60,6 +63,8 @@ class PolarsAddPressure(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if data_holder.data_structure == "column":
+            self.col_to_set = "COPY_VARIABLE.Derived pressure.dbar"
         if self.col_to_set in data_holder.data.columns:
             adm_logger.log_transformation(
                 f"{self.col_to_set} already exists, values will be recalculated",
@@ -108,20 +113,31 @@ class PolarsAddPressure(PolarsTransformer):
 
 class PolarsAddDensityWide(PolarsTransformer):
     valid_data_structures = ("column",)
-    practical_salinity = "COPY_VARIABLE.Salinity CTD.o/oo psu"
-    temperature = "COPY_VARIABLE.Temperature CTD.C"
+    practical_salinity = "COPY_VARIABLE.Salinity.o/oo psu"
+    temperature = "COPY_VARIABLE.Temperature.C"
     depth_col = "sample_depth_m"
     longitude_col = "sample_longitude_dd"
     latitude_col = "sample_latitude_dd"
     col_to_set = "COPY_VARIABLE.Derived in situ density.kg/m3"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
 
+    def __init__(self, col_suffix: str | None = None):
+        super().__init__()
+        self.col_suffix = col_suffix
+        if self.col_suffix is None:
+            self._log(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
+
+        self.practical_salinity = add_suffix(self.practical_salinity, self.col_suffix)
+        self.temperature = add_suffix(self.temperature, self.col_suffix)
+        self.col_to_set = add_suffix(self.col_to_set, self.col_suffix)
+
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Calculating density. "
-            f"Setting value to column {PolarsAddDensityWide.col_to_set}"
-        )
+        return "Calculating in situ density using gsw package"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_set in data_holder.data.columns:
@@ -193,19 +209,31 @@ class PolarsAddDensityWide(PolarsTransformer):
 
 class PolarsAddDensity(PolarsTransformer):
     valid_data_structures = ("row",)
-    practical_salinity = "Salinity CTD"
-    temperature = "Temperature CTD"
+    practical_salinity = "Salinity"
+    temperature = "Temperature"
     depth_col = "sample_depth_m"
     longitude_col = "sample_longitude_dd"
     latitude_col = "sample_latitude_dd"
-    col_to_set = "in_situ_density"  # in kg/m3
+    col_to_set = "Derived in situ density"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
+
+    def __init__(self, col_suffix: str | None = None):
+        super().__init__()
+        self.col_suffix = col_suffix
+        if self.col_suffix is None:
+            self._log(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
+
+        self.practical_salinity = f"{self.practical_salinity} {self.col_suffix}"
+        self.temperature = f"{self.temperature} {self.col_suffix}"
+        self.col_to_set = f"{self.col_to_set} {self.col_suffix}"
 
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            f"Calculating density. Setting value to column {PolarsAddDensity.col_to_set}"
-        )
+        return "Calculating in situ density using gsw package"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.col_to_set in data_holder.data.columns:
@@ -316,25 +344,41 @@ class PolarsAddDensity(PolarsTransformer):
 
 class PolarsAddOxygenSaturationWide(PolarsTransformer):
     valid_data_structures = ("column",)
-    practical_salinity = "COPY_VARIABLE.Salinity CTD.o/oo psu"
-    temperature = "COPY_VARIABLE.Temperature CTD.C"
-    oxygen = "COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l"
+    practical_salinity = "COPY_VARIABLE.Salinity.o/oo psu"
+    temperature = "COPY_VARIABLE.Temperature.C"
+    oxygen = "COPY_VARIABLE.Dissolved oxygen O2.ml/l"
     density_col = "COPY_VARIABLE.Derived in situ density.kg/m3"  # in kg/m3
     depth_col = "sample_depth_m"
     longitude_col = "sample_longitude_dd"
     latitude_col = "sample_latitude_dd"
-    cols_to_set: ClassVar[list[str]] = [
-        "COPY_VARIABLE.Derived oxygen at saturation.ml/l",
-        "COPY_VARIABLE.Derived oxygen saturation.%",
-    ]
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
+
+    def __init__(self, col_suffix: str | None = None):
+        super().__init__()
+        self.col_suffix = col_suffix
+        if self.col_suffix is None:
+            self._log(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
+
+        self.practical_salinity = add_suffix(self.practical_salinity, self.col_suffix)
+        self.temperature = add_suffix(self.temperature, self.col_suffix)
+        self.oxygen = add_suffix(self.oxygen, self.col_suffix)
+        self.density_col = add_suffix(self.density_col, self.col_suffix)
+        self.cols_to_set = [
+            add_suffix(
+                "COPY_VARIABLE.Derived oxygen at saturation.ml/l", self.col_suffix
+            ),
+            add_suffix("COPY_VARIABLE.Derived oxygen saturation.%", self.col_suffix),
+        ]
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Calculating oxygen at saturation in ml/l and "
-            f"the oxygen saturation of the water body in %. "
-            f"Setting value to column {', '.join(PolarsAddOxygenSaturation.cols_to_set)}"
+            "Calculating oxygen at saturation in ml/l and "
+            "the oxygen saturation of the water body in %. "
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
@@ -443,25 +487,39 @@ class PolarsAddOxygenSaturationWide(PolarsTransformer):
 
 class PolarsAddOxygenSaturation(PolarsTransformer):
     valid_data_structures = ("row",)
-    practical_salinity = "Salinity CTD"
-    temperature = "Temperature CTD"
-    oxygen = "Dissolved oxygen O2 CTD"
+    practical_salinity = "Salinity"
+    temperature = "Temperature"
+    oxygen = "Dissolved oxygen O2"
     depth_col = "sample_depth_m"
     longitude_col = "sample_longitude_dd"
     latitude_col = "sample_latitude_dd"
-    density_col = "in_situ_density"
-    cols_to_set: ClassVar[list[str]] = [
-        "oxygen_at_saturation_in_ml_per_l",
-        "oxygen_saturation_in_percent",
-    ]
+    density_col = "Derived in situ density"  # in kg/m3
     p_reference = 0  # reference pressure for pot. temperature set to 0 dbar.
+
+    def __init__(self, col_suffix: str | None = None):
+        super().__init__()
+        self.col_suffix = col_suffix
+        if self.col_suffix is None:
+            self._log(
+                "Not enough input, will do nothing ",
+                level=adm_logger.DEBUG,
+            )
+            return
+
+        self.practical_salinity = f"{self.practical_salinity} {self.col_suffix}"
+        self.temperature = f"{self.temperature} {self.col_suffix}"
+        self.oxygen = f"{self.oxygen} {self.col_suffix}"
+        self.density_col = f"{self.density_col} {self.col_suffix}"
+        self.cols_to_set = [
+            f"Derived oxygen at saturation {self.col_suffix}",
+            f"Derived oxygen saturation {self.col_suffix}",
+        ]
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Calculating oxygen at saturation in ml/l and "
-            f"the oxygen saturation of the water body in %. "
-            f"Setting value to column {', '.join(PolarsAddOxygenSaturation.cols_to_set)}"
+            "Calculating oxygen at saturation in ml/l and "
+            "the oxygen saturation of the water body in %. "
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
