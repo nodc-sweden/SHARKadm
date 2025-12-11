@@ -148,7 +148,7 @@ class PolarsAddLocationTypeArea(_PolarsAddLocationBase):
 
 
 class PolarsAddLocationSeaAreaCode(_PolarsAddLocationBase):
-    col_to_set = "location_sea_area_code"
+    col_to_set = "location_svar_sea_area_code"
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -156,7 +156,7 @@ class PolarsAddLocationSeaAreaCode(_PolarsAddLocationBase):
 
 
 class PolarsAddLocationSeaAreaName(_PolarsAddLocationBase):
-    col_to_set = "location_sea_area_name"
+    col_to_set = "location_svar_sea_area_name"
 
     @staticmethod
     def get_transformer_description() -> str:

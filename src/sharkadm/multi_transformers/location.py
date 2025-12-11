@@ -4,13 +4,18 @@ from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 class LocationPolars(PolarsMultiTransformer):
     _transformers = (
+        transformers.PolarsAddLocationTypeArea,
+        transformers.PolarsAddLocationWB,
+        transformers.PolarsAddLocationTYPNFS06,
         transformers.PolarsAddLocationCounty,
         transformers.PolarsAddLocationHelcomOsparArea,
         transformers.PolarsAddLocationMunicipality,
         transformers.PolarsAddLocationNation,
         transformers.PolarsAddLocationSeaBasin,
-        # transformers.PolarsAddLocationTypeArea,
         transformers.PolarsAddLocationWaterDistrict,
+        transformers.PolarsAddLocationWaterCategory,
+        transformers.PolarsAddLocationSeaAreaCode,
+        transformers.PolarsAddLocationSeaAreaName,
     )
 
     @staticmethod
