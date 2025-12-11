@@ -369,7 +369,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"PolarsAdds {PolarsAddDyntaxaScientificName.col_to_set} "
+            f"Adds {PolarsAddDyntaxaScientificName.col_to_set} "
             f"translated from nodc_dyntaxa. "
             f"Source column is {AddDyntaxaScientificName.source_col}"
         )

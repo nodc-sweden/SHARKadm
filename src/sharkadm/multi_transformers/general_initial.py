@@ -13,7 +13,6 @@ class GeneralInitial(MultiTransformer):
         transformers.AddSamplePositionDD,
         transformers.AddSamplePositionDM,
         transformers.AddSamplePositionSweref99tm,
-        transformers.AddDatatype,
     )
 
     @staticmethod

@@ -101,8 +101,8 @@ class AnalyseInfo:
         self._path = data.pop("path", None)
         self._mapper = mapper
 
-        if self._mapper:
-            self._map_data()
+        # if self._mapper:
+        #     self._map_data()
 
     def _map_data(self):
         if not self._mapper:
