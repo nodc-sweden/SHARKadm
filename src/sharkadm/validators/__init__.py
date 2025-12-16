@@ -46,6 +46,7 @@ from sharkadm.validators.mandatory import (
     ValidateValuesInMandatoryRegColumns,
 )
 from sharkadm.validators.occurrence_id import ValidateOccurrenceId
+from sharkadm.validators.position import ValidateReportedPosition
 from sharkadm.validators.positive import ValidatePositiveValues
 from sharkadm.validators.scientific_name import (
     ValidateAphiaIdDiffersFromBvolAphiaId,

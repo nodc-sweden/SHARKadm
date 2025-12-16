@@ -281,6 +281,8 @@ from sharkadm.transformers.station import (
     AddStationInfo,
     PolarsAddStationInfo,
     CopyReportedStationNameToStationName,
+    PolarsCopyReportedStationNameToStationName,
+    PolarsSetStationNameFromReportedStationNameIfMissing,
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
 from sharkadm.transformers.string import PolarsCodesToUppercase

@@ -158,6 +158,35 @@ class CopyReportedStationNameToStationName(Transformer):
         data_holder.data[self.col_to_set] = data_holder.data[self.source_column]
 
 
+class PolarsSetStationNameFromReportedStationNameIfMissing(PolarsTransformer):
+
+    source_column = "reported_station_name"
+    col_to_set = "station_name"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Sets {PolarsSetStationNameFromReportedStationNameIfMissing.source_column} to "
+            f"{PolarsSetStationNameFromReportedStationNameIfMissing.col_to_set} if missing"
+        )
+
+    def _transform(self, data_holder: DataHolderProtocol) -> None:
+        mask = pl.col(self.col_to_set) == ""
+        missing_df = data_holder.data.filter(mask)
+        if not len(missing_df):
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(mask)
+            .then(pl.col(self.source_column))
+            .otherwise(pl.col(self.col_to_set))
+            .alias(self.col_to_set)
+        )
+        adm_logger.log_transformation(f"Missing {self.col_to_set} set "
+                                      f"from {self.source_column} "
+                                      f"({len(missing_df)} places)",
+                                      level=adm_logger.DEBUG)
+
+
 class PolarsCopyReportedStationNameToStationName(PolarsTransformer):
     valid_data_types = ("plankton_imaging",)
 
