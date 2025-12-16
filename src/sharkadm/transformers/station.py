@@ -80,15 +80,15 @@ class AddStationInfo(Transformer):
                     closest_info = closest_info[0]
                     if closest_info["accepted"]:
                         self._log(
-                            f"Station '{reported_station}' is not found as a synonym in "
-                            f"station list Closest station is "
+                            f"Station '{reported_station}' is not found as a "
+                            f"synonym in station list Closest station is "
                             f"{closest_info['STATION_NAME']} and is accepted",
                             level=adm_logger.WARNING,
                         )
                     else:
                         self._log(
-                            f"Station '{reported_station}' is not found as a synonym in "
-                            f"station list Closest station is "
+                            f"Station '{reported_station}' is not found as a "
+                            f"synonym in station list Closest station is "
                             f"{closest_info['STATION_NAME']} but is not accepted",
                             level=adm_logger.WARNING,
                         )
@@ -159,15 +159,15 @@ class CopyReportedStationNameToStationName(Transformer):
 
 
 class PolarsSetStationNameFromReportedStationNameIfMissing(PolarsTransformer):
-
     source_column = "reported_station_name"
     col_to_set = "station_name"
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Sets {PolarsSetStationNameFromReportedStationNameIfMissing.source_column} to "
-            f"{PolarsSetStationNameFromReportedStationNameIfMissing.col_to_set} if missing"
+            f"Sets {PolarsSetStationNameFromReportedStationNameIfMissing.source_column} "
+            f"to {PolarsSetStationNameFromReportedStationNameIfMissing.col_to_set} "
+            f"if missing"
         )
 
     def _transform(self, data_holder: DataHolderProtocol) -> None:
@@ -181,10 +181,12 @@ class PolarsSetStationNameFromReportedStationNameIfMissing(PolarsTransformer):
             .otherwise(pl.col(self.col_to_set))
             .alias(self.col_to_set)
         )
-        adm_logger.log_transformation(f"Missing {self.col_to_set} set "
-                                      f"from {self.source_column} "
-                                      f"({len(missing_df)} places)",
-                                      level=adm_logger.DEBUG)
+        adm_logger.log_transformation(
+            f"Missing {self.col_to_set} set "
+            f"from {self.source_column} "
+            f"({len(missing_df)} places)",
+            level=adm_logger.DEBUG,
+        )
 
 
 class PolarsCopyReportedStationNameToStationName(PolarsTransformer):
