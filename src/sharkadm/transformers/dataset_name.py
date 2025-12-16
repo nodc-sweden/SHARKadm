@@ -2,6 +2,7 @@ import polars as pl
 
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 from sharkadm.utils import archive
+
 from .base import PolarsTransformer, Transformer
 
 
@@ -51,5 +52,7 @@ class PolarsAddDatasetFileName(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.lit(archive.get_zip_archive_file_base(data_holder) + ".zip").alias(self.col_to_set)
+            pl.lit(archive.get_zip_archive_file_base(data_holder) + ".zip").alias(
+                self.col_to_set
+            )
         )

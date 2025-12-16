@@ -195,9 +195,11 @@ class PolarsAddWormsScientificName(PolarsTransformer):
         for (name,), df in data_holder.data.group_by(self.source_col):
             new_name = translate_worms.get(str(name))
             if new_name:
-                self._log(f"Translated using {translate_worms.source}. "
-                          f"Reported name via dyntaxa: {name} "
-                          f"Translated to: {new_name} ({len(df)} rows)")
+                self._log(
+                    f"Translated using {translate_worms.source}. "
+                    f"Reported name via dyntaxa: {name} "
+                    f"Translated to: {new_name} ({len(df)} rows)"
+                )
                 # self._log(f"Translate worms: {name} -> {new_name} ({len(df)} places)")
             else:
                 new_name = name
