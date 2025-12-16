@@ -162,10 +162,17 @@ class DeliveryNote:
         return self["STATUS"]
 
     @property
-    def reporting_institute_code(self):
+    def reporting_institute_code(self) -> str:
         if self["RLABO"]:
             return self["RLABO"].upper()
         return self["reporting_institute_code"].upper()
+
+    @property
+    def sample_orderer_code(self) -> str:
+        code = self["sample_orderer_code"]
+        if code:
+            code = code.upper()
+        return code
 
     def save(self, path: pathlib.Path | str):
         path = pathlib.Path(path)

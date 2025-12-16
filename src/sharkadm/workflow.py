@@ -217,6 +217,7 @@ class SHARKadmWorkflow:
         }
 
     def get_validator_before_descriptions(self) -> dict[str, str]:
+        print(f"{self._validators_before=}")
         return {
             val["name"]: VALIDATOR_DESCRIPTIONS[val["name"]]
             for val in self._validators_before

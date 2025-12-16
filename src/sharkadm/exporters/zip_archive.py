@@ -6,6 +6,7 @@ import shutil
 from sharkadm import exporters, sharkadm_logger, utils
 from sharkadm.data import PandasDataHolder, PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.utils import archive
 
 from .base import FileExporter, PolarsFileExporter
 
@@ -165,7 +166,9 @@ class PolarsZipArchive(PolarsFileExporter):
 
     @property
     def _temp_target_directory(self) -> pathlib.Path:
-        return utils.get_temp_directory(f"{self._data_holder.zip_archive_name}")
+        return utils.get_temp_directory(
+            f"{archive.get_zip_archive_file_base(self._data_holder)}"
+        )
 
     @property
     def _save_zip_path(self) -> pathlib.Path:

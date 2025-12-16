@@ -41,7 +41,7 @@ class AddAnalyseInfo(Transformer):
                 data_holder.data.loc[df.index, col] = info.get(col, "")
 
 
-class PolarsAddAnalyseInfo(PolarsTransformer):
+class PolarsAddAnalyseInfoOld(PolarsTransformer):
     valid_data_holders = (
         "PolarsArchiveDataHolder",
         "PolarsLimsDataHolder",
@@ -104,3 +104,53 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                     .otherwise(pl.col(column))
                     .alias(column)
                 )
+
+
+class PolarsAddAnalyseInfo(PolarsTransformer):
+    valid_data_holders = (
+        "PolarsArchiveDataHolder",
+        "PolarsLimsDataHolder",
+        "PolarsDvTemplateDataHolder",
+    )
+    valid_data_structures = ("row",)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds analyse information to data"
+
+    def _transform(
+        self, data_holder: PolarsArchiveDataHolder | PolarsLimsDataHolder
+    ) -> None:
+        if "parameter" not in data_holder.columns:
+            self._log(
+                "Can not add analyse info. Data is not in row format.",
+                level=adm_logger.ERROR,
+            )
+            return
+        if not hasattr(data_holder, "analyse_info") or data_holder.analyse_info is None:
+            self._log(
+                "Can not add analyse info. No analyse_info found",
+                level=adm_logger.WARNING,
+            )
+            return
+
+        for par in data_holder.analyse_info.data:
+            for info in data_holder.analyse_info.data[par]:
+                mask = [
+                    pl.col("datetime") >= info["VALIDFR"],
+                    pl.col("datetime") <= info["VALIDTO"],
+                    pl.col("parameter") == par,
+                ]
+                for col, value in info.items():
+                    if col in ["VALIDFR", "VALIDTO"]:
+                        continue
+                    if col not in data_holder.data.columns:
+                        data_holder.data = data_holder.data.with_columns(
+                            pl.lit("").alias(col)
+                        )
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.when(mask)
+                        .then(pl.lit(value))
+                        .otherwise(pl.col(col))
+                        .alias(col)
+                    )
