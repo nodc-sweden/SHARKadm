@@ -350,12 +350,6 @@ class PolarsAddReportedScientificNameDyntaxaId(PolarsTransformer):
                 level=adm_logger.DEBUG,
             )
             self._add_to_col_to_set(data_holder, name, name)
-            # data_holder.data = data_holder.data.with_columns(
-            #     pl.when(pl.col(self.source_col) == name)
-            #     .then(pl.lit(name))
-            #     .otherwise(pl.col(self.col_to_set))
-            #     .alias(self.col_to_set)
-            # )
 
 
 class PolarsAddDyntaxaScientificName(PolarsTransformer):
@@ -391,8 +385,11 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                     new_name_2 = translate_dyntaxa.get(new_name)
                     if new_name_2:
                         self._log(
-                            f"Translated from dyntaxa: {name} -> {new_name} -> "
-                            f"{new_name_2} ({len(df)} places)",
+                            f"Translated using {translate_dyntaxa.source}. "
+                            f"Reported name: {name} "
+                            f"Translated to: {new_name_2} ({len(df)} rows)",
+                            # f"Translated from dyntaxa: {name} -> {new_name} -> "
+                            # f"{new_name_2} ({len(df)} places)",
                             level=adm_logger.INFO,
                         )
                         new_name = new_name_2
@@ -403,20 +400,24 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                         )
                 else:
                     self._log(
-                        f"Translated from dyntaxa: {name} -> {new_name} "
-                        f"({len(df)} places)",
+                        f"Translated using {translate_dyntaxa.source}. "
+                        f"Reported name: {name} "
+                        f"Translated to: {new_name} ({len(df)} rows)",
+                        # f"Translated from dyntaxa: {name} -> {new_name} "
+                        # f"({len(df)} places)",
                         level=adm_logger.INFO,
                     )
             else:
                 if name.isdigit():
                     self._log(
                         f"{self.source_col} {name} seems to be a dyntaxa_id "
-                        f"and could not be translated ({len(df)} places)",
+                        f"and could not be translated ({len(df)} rows)",
                         level=adm_logger.WARNING,
                     )
                 else:
                     self._log(
-                        f"No translation for: {name} ({len(df)} places)",
+                        f"No translation ({translate_dyntaxa.source}) for: "
+                        f"{name} ({len(df)} rows)",
                         level=adm_logger.DEBUG,
                     )
                 new_name = name
