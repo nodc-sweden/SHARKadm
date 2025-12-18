@@ -313,6 +313,7 @@ class SHARKadmLogger:
         data["level"] = self._check_level(data.get("level", self.INFO))
         data["log_type"] = data.get("log_type", self.WORKFLOW)
         data["purpose"] = data.get("purpose", self.GENERAL)
+        data["cls"] = data.get("cls", self.name)
 
         self._nr_log_entries += 1
         data["log_nr"] = self._nr_log_entries

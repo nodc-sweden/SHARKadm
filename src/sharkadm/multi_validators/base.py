@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import Type
 
 from sharkadm.data import PolarsDataHolder
-from sharkadm.operation import OperationInfo
+from sharkadm.operator import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.validators import Validator
 

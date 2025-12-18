@@ -9,7 +9,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
 from sharkadm.data_filter.base import PolarsDataFilter
-from sharkadm.operation import OperationBase, OperationInfo
+from sharkadm.operator import Operator, OperationInfo, OperationType
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter
 
@@ -65,7 +65,7 @@ class PolarsDataHolderProtocol(Protocol):
     def dataset_name(self) -> str: ...
 
 
-class Transformer(ABC, OperationBase):
+class Transformer(ABC, Operator):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
     valid_data_types = ()
@@ -180,7 +180,7 @@ class Transformer(ABC, OperationBase):
         adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
 
 
-class PolarsTransformer(ABC, OperationBase):
+class PolarsTransformer(ABC, Operator):
     """Abstract base class used as a blueprint for changing data in a DataHolder"""
 
     valid_data_types: tuple[str, ...] = ()
@@ -195,7 +195,7 @@ class PolarsTransformer(ABC, OperationBase):
     source_col: str = ""
     col_to_set: str = ""
 
-    operation_type: str = "transformer"
+    operation_type: str = OperationType.TRANSFORMER
 
     def __init__(
         self,
@@ -228,6 +228,7 @@ class PolarsTransformer(ABC, OperationBase):
 
     @property
     def name(self) -> str:
+        print(f"{self.__class__.__name__=}")
         return self.__class__.__name__
 
     @staticmethod
@@ -253,14 +254,22 @@ class PolarsTransformer(ABC, OperationBase):
             level=adm_logger.DEBUG,
         )
         t0 = time.perf_counter()
-        info = self._transform(data_holder=data_holder)
-        self._log_workflow(
-            f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
-            level=adm_logger.DEBUG,
-        )
-        if isinstance(info, OperationInfo):
-            info.operator = self
-            return info
+        try:
+            info = self._transform(data_holder=data_holder)
+            self._log_workflow(
+                f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
+                level=adm_logger.DEBUG,
+            )
+            if isinstance(info, OperationInfo):
+                info.operator = self
+                return info
+        except pl.exceptions.InvalidOperationError as e:
+            return OperationInfo(
+                operator=self,
+                exception=e,
+                cause_for_termination=True,
+                success=False
+            )
         return OperationInfo(operator=self)
 
     @abstractmethod
