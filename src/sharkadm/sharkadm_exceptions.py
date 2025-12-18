@@ -39,6 +39,10 @@ class InvalidTransformer(SHARKadmException):
     pass
 
 
+class InvalidOperator(SHARKadmException):
+    pass
+
+
 class InvalidWorkflow(SHARKadmException):
     pass
 
