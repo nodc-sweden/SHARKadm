@@ -7,7 +7,7 @@ import pandas as pd
 
 from sharkadm import config, utils
 from sharkadm.data import PolarsDataHolder, is_valid_data_holder
-from sharkadm.operation import OperationBase
+from sharkadm.operator import Operator
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -104,7 +104,7 @@ class Exporter(ABC):
         adm_logger.log_export(msg, cls=self.__class__.__name__, **kwargs)
 
 
-class PolarsExporter(ABC, OperationBase):
+class PolarsExporter(ABC, Operator):
     """Abstract base class used as a blueprint for exporting stuff in a DataHolder"""
 
     valid_data_types: tuple[str, ...] = ()

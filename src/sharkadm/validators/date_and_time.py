@@ -7,6 +7,7 @@ from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import DataHolderProtocol, Validator
+from ..operator import OperationInfo
 
 
 class MissingTime(Validator):
@@ -57,7 +58,8 @@ class ValidateDateAndTime(Validator):
             return msg
         return f"{msg} at visit keys: {df['visit_key'].unique().to_list()}"
 
-    def _validate(self, data_holder: PolarsDataHolder) -> None:
+    def _validate(self, data_holder: PolarsDataHolder) -> OperationInfo | None:
+        info = OperationInfo(operator=self)
         self._log_workflow(
             "Checking that visit date and sample time.",
         )
@@ -100,6 +102,7 @@ class ValidateDateAndTime(Validator):
                     error = True
         if not error:
             self._log_success("All visit date and sample time valid.")
+        return info
 
     def _time_component(self, time_string: str) -> datetime.time | None:
         if match := self._time_pattern.match(time_string):
