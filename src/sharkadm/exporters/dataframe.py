@@ -164,3 +164,76 @@ class PolarsDataFrame(PolarsExporter):
             return float(value)
         except ValueError:
             return np.nan
+
+
+class PolarsDataFrameQc(PolarsExporter):
+    def __init__(
+        self,
+        header_as: str | None = None,
+        float_columns: bool | list[str] = False,
+    ):
+        super().__init__()
+        self._header_as = header_as
+        self._float_columns = float_columns
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return """
+        Returns a modified dataframe. Option to:
+        map header via "header_as"
+        convert certain columns to float via: "float_columns".
+        """
+
+    def _export(self, data_holder: PolarsDataHolder) -> pl.DataFrame | None:
+        df = data_holder.data
+        if self._float_columns:
+            if self._float_columns is True:
+                self._float_columns = self._get_float_columns(df)
+            for col in self._float_columns:
+                if col not in df.columns:
+                    continue
+
+                casted_series = df[col].cast(pl.Float64, strict=False)
+
+                if casted_series.null_count() > 0:
+                    failed_casts = (
+                        df.filter(casted_series.is_null())
+                        .group_by(col)
+                        .agg(pl.count().alias("count"))
+                    )
+                    for row in failed_casts.to_dicts():
+                        value = row[col]
+                        count = row["count"]
+                        self._log(
+                            f"Could not convert {value} to numeric in column {col}. "
+                            f"Setting value to None ({count} places).",
+                            item=col,
+                            level=adm_logger.WARNING,
+                        )
+                df = df.with_columns(casted_series.alias(col))
+
+        if self._header_as:
+            mapper = get_header_mapper_from_data_holder(
+                data_holder, import_column=self._header_as
+            )
+            if not mapper:
+                self._log(
+                    f"Could not find mapper using header_as = {self._header_as}",
+                    level=adm_logger.WARNING,
+                )
+                return
+            df.columns = [mapper.get_external_name(col) for col in df.columns]
+        return df
+
+    def _get_float_columns(self, df: pd.DataFrame):
+        float_columns = [
+            "sample_latitude_dd",
+            "sample_longitude_dd",
+            "water_depth_m",
+            "wind_speed_ms",
+            "air_temperature_degc",
+            "air_pressure_hpa",
+            "sample_depth_m",
+            "value",
+        ]
+        return float_columns
