@@ -136,11 +136,19 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
 
         for par in data_holder.analyse_info.data:
             for info in data_holder.analyse_info.data[par]:
-                mask = [
-                    pl.col("datetime") >= info["VALIDFR"],
-                    pl.col("datetime") <= info["VALIDTO"],
-                    pl.col("parameter") == par,
-                ]
+                if (info["VALIDFR"] != "") and (info["VALIDTO"] != ""):
+                    mask = [
+                        pl.col("datetime") >= info["VALIDFR"],
+                        pl.col("datetime") <= info["VALIDTO"],
+                        pl.col("parameter") == par,
+                    ]
+                    missing_date = False
+                else:
+                    mask = [
+                        pl.col("parameter") == par,
+                    ]
+                    missing_date = True
+
                 for col, value in info.items():
                     if col in ["VALIDFR", "VALIDTO"]:
                         continue
@@ -150,7 +158,7 @@ class PolarsAddAnalyseInfo(PolarsTransformer):
                         )
                     data_holder.data = data_holder.data.with_columns(
                         pl.when(mask)
-                        .then(pl.lit(value))
+                        .then(pl.lit("") if missing_date else pl.lit(value))
                         .otherwise(pl.col(col))
                         .alias(col)
                     )
