@@ -1,8 +1,8 @@
 from sharkadm import event
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer
 from ..utils import svn
+from .base import DataHolderProtocol, Transformer
 
 nodc_occurrence_id = None
 try:
@@ -79,8 +79,11 @@ class AddOccurrenceId(Transformer):
         self.database.add_uuid_to_data_and_database(data_holder.data, add_if_valid=True)
 
         if self._svn_commit:
-            svn.commit_files(nodc_occurrence_id.get_database_name_for_data_type(
-                data_holder.data_type_internal))
+            svn.commit_files(
+                nodc_occurrence_id.get_database_name_for_data_type(
+                    data_holder.data_type_internal
+                )
+            )
 
     # def add_valid_matches(self):
     #     self.database.add_matching_to_data(*self.valid_matches)
