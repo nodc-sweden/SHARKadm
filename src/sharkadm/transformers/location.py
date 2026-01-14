@@ -2,6 +2,7 @@ import polars as pl
 
 from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.utils import svn
 
 from .base import (
     PolarsTransformer,
@@ -27,6 +28,7 @@ class _PolarsAddLocationBase(PolarsTransformer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._cached_data = {}
+        self._svn_commit = kwargs.get("svn_commit", False)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -75,6 +77,9 @@ class _PolarsAddLocationBase(PolarsTransformer):
                 .alias(self.col_to_set)
             )
 
+        if self._svn_commit:
+            svn.commit_files(nodc_geography.location_db.DB_PATH)
+
 
 class PolarsAddLocations(PolarsTransformer):
     x_pos_col = "sample_sweref99tm_x"
@@ -85,6 +90,7 @@ class PolarsAddLocations(PolarsTransformer):
         self._locations = locations
         self._cached_data = {}
         self.set_boolean = set_boolean
+        self._svn_commit = kwargs.get("svn_commit", False)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -137,6 +143,9 @@ class PolarsAddLocations(PolarsTransformer):
                     .otherwise(pl.col(loc))
                     .alias(loc)
                 )
+
+        if self._svn_commit:
+            svn.commit_files(nodc_geography.location_db.DB_PATH)
 
 
 class PolarsAddLocationTypeArea(_PolarsAddLocationBase):

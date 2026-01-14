@@ -2,7 +2,7 @@ import pandas as pd
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import geography
+from sharkadm.utils import geography, svn
 
 from ..data import PolarsDataHolder
 from .base import (
@@ -110,6 +110,7 @@ class AddSamplePositionSweref99tm(Transformer):
     def __init__(self, *args, use_db: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         self._use_db = use_db
+        self._svn_commit = kwargs.get("svn_commit", False)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -130,6 +131,9 @@ class AddSamplePositionSweref99tm(Transformer):
             x, y = geography.decdeg_to_sweref99tm(lat=lat, lon=lon, use_db=self._use_db)
             data_holder.data.loc[df.index, self.x_column_to_set] = x
             data_holder.data.loc[df.index, self.y_column_to_set] = y
+
+        if self._use_db and self._svn_commit:
+            svn.commit_files(geography.sweref99tm_db.DB_PATH)
 
 
 class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
