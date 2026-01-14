@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 import subprocess
 from dataclasses import dataclass
 
@@ -38,3 +39,19 @@ class SvnInfo:
             return SvnInfo(**info)
         except subprocess.CalledProcessError:
             return
+
+
+def commit_files(*paths: pathlib.Path, msg: str = "Auto commit by sharkadm"):
+    svn_exec = shutil.which('svn')
+    if svn_exec is None:
+        return
+    for path in paths:
+        args = [
+            svn_exec,
+            "commit",
+            str(path),
+            "-m",
+            f'"{msg}"'
+        ]
+        subprocess.run(args)
+

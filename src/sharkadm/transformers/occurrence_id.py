@@ -2,6 +2,7 @@ from sharkadm import event
 from sharkadm.sharkadm_logger import adm_logger
 
 from .base import DataHolderProtocol, Transformer
+from ..utils import svn
 
 nodc_occurrence_id = None
 try:
@@ -24,6 +25,7 @@ class AddOccurrenceId(Transformer):
         self.col_to_set = ""  # Is set in self._transform
         self.database = None
         self.valid_matches = []
+        self._svn_commit = kwargs.get("svn_commit", False)
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -75,6 +77,10 @@ class AddOccurrenceId(Transformer):
         self.col_to_set = self.database.id_column
         self.valid_matches = []
         self.database.add_uuid_to_data_and_database(data_holder.data, add_if_valid=True)
+
+        if self._svn_commit:
+            svn.commit_files(nodc_occurrence_id.get_database_name_for_data_type(
+                data_holder.data_type_internal))
 
     # def add_valid_matches(self):
     #     self.database.add_matching_to_data(*self.valid_matches)
