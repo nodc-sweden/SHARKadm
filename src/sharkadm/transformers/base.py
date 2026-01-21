@@ -9,7 +9,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import is_valid_data_holder
 from sharkadm.data_filter.base import PolarsDataFilter
-from sharkadm.operator import Operator, OperationInfo, OperationType
+from sharkadm.operator import OperationInfo, OperationType, Operator
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils.data_filter import DataFilter
 
@@ -257,7 +257,8 @@ class PolarsTransformer(ABC, Operator):
         try:
             info = self._transform(data_holder=data_holder)
             self._log_workflow(
-                f"Transformer {self.name} executed in {time.perf_counter() - t0:.6f} seconds",
+                f"Transformer {self.name} executed in "
+                f"{time.perf_counter() - t0:.6f} seconds",
                 level=adm_logger.DEBUG,
             )
             if isinstance(info, OperationInfo):
@@ -265,10 +266,7 @@ class PolarsTransformer(ABC, Operator):
                 return info
         except pl.exceptions.InvalidOperationError as e:
             return OperationInfo(
-                operator=self,
-                exception=e,
-                cause_for_termination=True,
-                success=False
+                operator=self, exception=e, cause_for_termination=True, success=False
             )
         return OperationInfo(operator=self)
 

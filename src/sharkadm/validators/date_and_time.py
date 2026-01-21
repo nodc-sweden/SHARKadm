@@ -6,8 +6,8 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from .base import DataHolderProtocol, Validator
 from ..operator import OperationInfo
+from .base import DataHolderProtocol, Validator
 
 
 class MissingTime(Validator):

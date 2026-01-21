@@ -5,6 +5,7 @@ import yaml
 from sharkadm import (
     exporters,
     multi_transformers,
+    operator,
     sharkadm_exceptions,
     transformers,
     utils,
@@ -15,7 +16,6 @@ from sharkadm.controller import SHARKadmPolarsController
 from sharkadm.data import get_polars_data_holder
 from sharkadm.exporters.base import PolarsFileExporter
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
-from sharkadm import operator
 
 # VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
 # TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
@@ -229,8 +229,7 @@ class SHARKadmWorkflow:
 
     def get_operator_descriptions(self) -> dict[str, str]:
         return {
-            oper["name"]: OPERATOR_DESCRIPTIONS[oper["name"]]
-            for oper in self._operators
+            oper["name"]: OPERATOR_DESCRIPTIONS[oper["name"]] for oper in self._operators
         }
 
     # def get_transformer_descriptions(self) -> dict[str, str]:

@@ -1,0 +1,99 @@
+@startuml
+
+title Class diagram: controller.py
+
+class controller.BaseSHARKadmController #B5788A {
+	-_exporters
+	-_transformers
+	-_validators_after
+	-_validators_before
+	data_holder, @p
+	data_type, @p
+	dataset_name, @p
+==
+	+export()
+	+export_all()
+	+get_exporter_list(), @cm
+	+get_exporters(), @cm
+	+get_transformer_list(), @cm
+	+get_transformers(), @cm
+	+get_validator_list(), @cm
+	+get_validators(), @cm
+	+get_workflow_description()
+	+set_exporters()
+	+set_transformers()
+	+set_validators_after()
+	+set_validators_before()
+	+start_data_handling()
+	+transform()
+	+transform_all()
+	+validate()
+	+validate_after_all()
+	+validate_before_all()
+	-__add__()
+	-__repr__()
+}
+
+class controller.SHARKadmController #B5788A {
+	-_data_holder
+	data, @p
+==
+	+set_data_holder()
+}
+
+class controller.SHARKadmPolarsController #B5788A {
+	-_data_holder
+	data, @p
+	is_filtered, @p
+==
+	+filter()
+	+reset_filter()
+	+run_operator()
+	+run_operators()
+	+set_data_holder()
+	+transform()
+	+transform_all()
+}
+
+class controller._get_fixed_list #B5788A {
+	
+==
+	
+}
+
+class controller._get_name_mapper #B5788A {
+	
+==
+	
+}
+
+class controller.get_controller_with_data #B5788A {
+	
+==
+	
+}
+
+class controller.get_polars_controller_with_data #B5788A {
+	
+==
+	
+}
+
+
+controller.SHARKadmController <|-- controller.BaseSHARKadmController
+
+controller.SHARKadmPolarsController <|-- controller.BaseSHARKadmController
+
+controller.BaseSHARKadmController o-- controller.SHARKadmController
+controller.BaseSHARKadmController o-- controller._get_name_mapper
+controller.BaseSHARKadmController o-- controller.SHARKadmController
+controller.BaseSHARKadmController o-- controller._get_name_mapper
+controller.BaseSHARKadmController o-- controller.SHARKadmController
+controller.BaseSHARKadmController o-- controller._get_name_mapper
+controller.BaseSHARKadmController o-- controller.SHARKadmController
+
+controller.get_controller_with_data o-- controller.SHARKadmController
+
+controller.get_polars_controller_with_data o-- controller.SHARKadmPolarsController
+
+@enduml

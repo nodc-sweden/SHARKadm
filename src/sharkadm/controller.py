@@ -16,8 +16,7 @@ from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
 from sharkadm.exporters import Exporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
-from sharkadm.operator import OperationInfo
-from sharkadm.operator import Operator
+from sharkadm.operator import OperationInfo, Operator
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 from sharkadm.utils import data_structures
@@ -144,8 +143,9 @@ class BaseSHARKadmController:
                         return infos
             else:
                 infos.append(info)
-                if return_if_cause_for_termination and info.cause_for_termination:
-                    return infos
+                # TODO: Kolla detta!!!
+                # if return_if_cause_for_termination and info.cause_for_termination:
+                #     return infos
         # if return_if_cause_for_termination and info.cause_for_termination:
         #     return info
         return infos
@@ -302,10 +302,11 @@ class SHARKadmPolarsController(BaseSHARKadmController):
         super().transform(*transformers)
         return self
 
-    def run_operators(self,
-                      *operators: Operator,
-                      return_if_cause_for_termination: bool = True,
-                      ) -> dict[str, utils.data_structures.IndexDict[str, OperationInfo] | bool]:
+    def run_operators(
+        self,
+        *operators: Operator,
+        return_if_cause_for_termination: bool = True,
+    ) -> dict[str, utils.data_structures.IndexDict[str, OperationInfo] | bool]:
         tot_nr_operators = len(operators)
         infos = dict()
         infos["terminated"] = False
@@ -348,13 +349,14 @@ class SHARKadmPolarsController(BaseSHARKadmController):
                     break
         return infos
 
-    def run_operator(self,
-                     operator: Operator,
-                     return_if_cause_for_termination: bool = True,
-                     ) -> dict[str, dict[str, OperationInfo] | bool]:
-        return self.run_operators(operator,
-                    return_if_cause_for_termination=return_if_cause_for_termination)
-
+    def run_operator(
+        self,
+        operator: Operator,
+        return_if_cause_for_termination: bool = True,
+    ) -> dict[str, dict[str, OperationInfo] | bool]:
+        return self.run_operators(
+            operator, return_if_cause_for_termination=return_if_cause_for_termination
+        )
 
 
 def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:
