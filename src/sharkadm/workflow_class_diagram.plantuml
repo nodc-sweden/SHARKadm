@@ -1,0 +1,68 @@
+@startuml
+
+title Class diagram: workflow.py
+
+class workflow.SHARKadmWorkflow #8CFFBC {
+	+export_paths
+	-_adm_logger_config
+	-_controller
+	-_data_sources
+	-_exporters
+	-_operator_objects
+	-_operators
+	-_workflow_config
+	exporters, @p
+	path, @p
+==
+	+export()
+	+from_yaml_config(), @cm
+	+get_exporter_descriptions()
+	+get_operator_descriptions()
+	+save_config()
+	+set_data_sources()
+	+start_workflow()
+	-_do_adm_logger_stuff()
+	-_filter_log()
+	-_get_directory()
+	-_get_transformer_object()
+	-_get_validator_object()
+	-_initiate_workflow()
+	-_paths_to_string()
+	-_save_operators()
+	-_set_exporters()
+}
+
+class workflow.get_dv_validation_workflow_for_data_type #8CFFBC {
+	
+==
+	
+}
+
+class workflow.get_dv_workflow_for_data_type #8CFFBC {
+	
+==
+	
+}
+
+class workflow.get_workflow #8CFFBC {
+	
+==
+	
+}
+
+class workflow.get_workflows #8CFFBC {
+	
+==
+	
+}
+
+
+workflow.SHARKadmWorkflow o-- workflow.SHARKadmWorkflow
+
+workflow.get_workflow o-- workflow.get_workflows
+
+workflow.get_dv_workflow_for_data_type o-- workflow.get_workflows
+
+workflow.get_dv_validation_workflow_for_data_type o-- workflow.get_workflows
+
+@enduml

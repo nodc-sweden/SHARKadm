@@ -1,6 +1,5 @@
 from sharkadm.config import get_import_matrix_config, import_matrix_paths
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
-import traceback
 
 DTYPE_MAPPER = {
     "planktonbarcoding": "plankton_barcoding",

@@ -10,7 +10,7 @@ from sharkadm.data import (
     PolarsDataHolder,
     is_valid_data_holder,
 )
-from sharkadm.operator import Operator, OperationInfo, OperationType
+from sharkadm.operator import OperationInfo, OperationType, Operator
 from sharkadm.sharkadm_logger import adm_logger
 
 
