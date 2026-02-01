@@ -83,14 +83,18 @@ class PolarsAddPressure(PolarsTransformer):
             return
 
         valid_rows = (
-            data_holder.data[self.latitude_col].cast(pl.Float64).is_not_null()
-            & data_holder.data[self.depth_col].cast(pl.Float64).is_not_null()
+            data_holder.data[self.latitude_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
+            & data_holder.data[self.depth_col]
+            .cast(pl.Float64, strict=False)
+            .is_not_null()
         )
 
         if valid_rows.any():
             valid_data = data_holder.data.filter(valid_rows)
-            depth = valid_data[self.depth_col].cast(pl.Float64).to_numpy()
-            lat = valid_data[self.latitude_col].cast(pl.Float64).to_numpy()
+            depth = valid_data[self.depth_col].cast(pl.Float64, strict=False).to_numpy()
+            lat = valid_data[self.latitude_col].cast(pl.Float64, strict=False).to_numpy()
 
             pres = np.full(len(data_holder.data), np.nan)
             pres[valid_rows.to_numpy()] = pressure(depth, lat)
@@ -180,11 +184,15 @@ class PolarsAddDensityWide(PolarsTransformer):
 
         if valid_rows.any():
             valid_data = data_holder.data.filter(valid_rows)
-            psal = valid_data[self.practical_salinity].cast(pl.Float64).to_numpy()
-            temp = valid_data[self.temperature].cast(pl.Float64).to_numpy()
-            depth = valid_data[self.depth_col].cast(pl.Float64).to_numpy()
-            lon = valid_data[self.longitude_col].cast(pl.Float64).to_numpy()
-            lat = valid_data[self.latitude_col].cast(pl.Float64).to_numpy()
+            psal = (
+                valid_data[self.practical_salinity]
+                .cast(pl.Float64, strict=False)
+                .to_numpy()
+            )
+            temp = valid_data[self.temperature].cast(pl.Float64, strict=False).to_numpy()
+            depth = valid_data[self.depth_col].cast(pl.Float64, strict=False).to_numpy()
+            lon = valid_data[self.longitude_col].cast(pl.Float64, strict=False).to_numpy()
+            lat = valid_data[self.latitude_col].cast(pl.Float64, strict=False).to_numpy()
 
             dens = np.full(len(data_holder.data), np.nan)
             dens[valid_rows.to_numpy()] = in_situ_density(
@@ -429,14 +437,24 @@ class PolarsAddOxygenSaturationWide(PolarsTransformer):
         if valid_rows.any():
             valid_data = data_holder.data.filter(valid_rows)
             practical_salinity = (
-                valid_data[self.practical_salinity].cast(pl.Float64).to_numpy()
+                valid_data[self.practical_salinity]
+                .cast(pl.Float64, strict=False)
+                .to_numpy()
             )
-            temperature = valid_data[self.temperature].cast(pl.Float64).to_numpy()
-            oxygen = valid_data[self.oxygen].cast(pl.Float64).to_numpy()
-            density = valid_data[self.density_col].cast(pl.Float64).to_numpy()
-            depth = valid_data[self.depth_col].cast(pl.Float64).to_numpy()
-            longitude = valid_data[self.longitude_col].cast(pl.Float64).to_numpy()
-            latitude = valid_data[self.latitude_col].cast(pl.Float64).to_numpy()
+            temperature = (
+                valid_data[self.temperature].cast(pl.Float64, strict=False).to_numpy()
+            )
+            oxygen = valid_data[self.oxygen].cast(pl.Float64, strict=False).to_numpy()
+            density = (
+                valid_data[self.density_col].cast(pl.Float64, strict=False).to_numpy()
+            )
+            depth = valid_data[self.depth_col].cast(pl.Float64, strict=False).to_numpy()
+            longitude = (
+                valid_data[self.longitude_col].cast(pl.Float64, strict=False).to_numpy()
+            )
+            latitude = (
+                valid_data[self.latitude_col].cast(pl.Float64, strict=False).to_numpy()
+            )
 
             oxygen_values = np.full(len(data_holder.data), np.nan)
             oxygen_values[valid_rows.to_numpy()] = oxygen_from_umol_kg_2_ml_l(
