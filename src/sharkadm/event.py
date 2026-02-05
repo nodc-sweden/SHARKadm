@@ -48,4 +48,5 @@ def post_event(event: str | Events, data: dict | str) -> None:
         raise EventNotFound(event)
     for prio in sorted(_subscribers[event]):
         for func in _subscribers[event][prio]:
+            print(f"{func=}")
             func(data)
