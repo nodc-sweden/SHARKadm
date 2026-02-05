@@ -103,7 +103,12 @@ class DataTypeHandler:
         self._data_types: dict[str, DataType] = {}
 
     def get_data_type_obj(self, data_type_synonym: str) -> DataType:
-        print(f"{data_type_synonym=}")
+        # print()
+        # print("="*100)
+        # print(f"{data_type_synonym=}")
+        # for line in traceback.format_stack():
+        #     print("    ", line.strip())
+        # print("-" * 100)
         obj = self._data_types.get(data_type_synonym)
         if obj:
             return obj

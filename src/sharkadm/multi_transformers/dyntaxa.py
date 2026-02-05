@@ -25,7 +25,8 @@ class DyntaxaPolars(PolarsMultiTransformer):
         transformers.PolarsAddReportedDyntaxaId,
         transformers.PolarsAddReportedScientificNameDyntaxaId,
         transformers.PolarsAddDyntaxaScientificName,
-        transformers.PolarsAddDyntaxaTranslatedScientificNameDyntaxaId,
+        # transformers.PolarsAddDyntaxaTranslatedScientificNameDyntaxaId,
+        # Ska ej vara med
         transformers.PolarsAddTaxonRanks,
         transformers.PolarsAddDyntaxaId,
     )

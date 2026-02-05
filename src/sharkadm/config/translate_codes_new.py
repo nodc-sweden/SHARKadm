@@ -6,12 +6,12 @@ import functools
 
 import polars as pl
 
+from sharkadm.config import get_config_path
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import get_nodc_config_directory
 
 FILE_PATH = None
-if get_nodc_config_directory():
-    FILE_PATH = get_nodc_config_directory() / "translate_codes_NEW.txt"
+if get_config_path():
+    FILE_PATH = get_config_path() / "translate_codes_NEW.txt"
 
 
 def _file_exists() -> bool:

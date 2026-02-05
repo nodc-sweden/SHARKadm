@@ -20,7 +20,7 @@ from sharkadm.multi_transformers.location import (
 from sharkadm.multi_transformers.position import Position, PositionPolars
 from sharkadm.multi_transformers.static_dv import StaticDV, StaticDVPolars
 from sharkadm.multi_transformers.translate import TranslatePolars
-from sharkadm.multi_transformers.worms import Worms, WormsPolars
+from sharkadm.multi_transformers.worms import WormsPolars
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
 

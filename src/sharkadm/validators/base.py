@@ -10,7 +10,7 @@ from sharkadm.data import (
     PolarsDataHolder,
     is_valid_data_holder,
 )
-from sharkadm.operation import OperationBase, OperationInfo
+from sharkadm.operator import OperationInfo, OperationType, Operator
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -24,7 +24,7 @@ class DataHolderProtocol(Protocol):
     def data_type(self) -> str: ...
 
 
-class Validator(ABC, OperationBase):
+class Validator(ABC, Operator):
     """Abstract base class used as a blueprint to validate/tidy/check data
     in a DataHolder"""
 
@@ -39,7 +39,7 @@ class Validator(ABC, OperationBase):
 
     _display_name = None
 
-    operation_type = "validator"
+    operation_type = OperationType.VALIDATOR
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -109,6 +109,7 @@ class Validator(ABC, OperationBase):
         )
         t0 = time.time()
         info = self._validate(data_holder=data_holder)
+        print(f"IN Validator.validate: {info=}")
         adm_logger.log_workflow(
             f"Validator {self.name} executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,

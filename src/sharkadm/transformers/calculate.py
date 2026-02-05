@@ -73,6 +73,8 @@ def add_calculate_columns(data_holder: PolarsDataHolder) -> PolarsDataHolder:
         COL_CELL_VOLUME_REPORTED,
         column_name=FLOAT_COL_CELL_VOLUME_REPORTED,
     )
+    print("+++")
+    print([col for col in data_holder.data.columns if "reported" in col])
     data_holder.data = add_column.add_float_column(
         data_holder.data, GIVEN_COL_ABUNDANCE, column_name=FLOAT_COL_ABUNDANCE_REPORTED
     )
@@ -104,11 +106,14 @@ class PolarsCalculateAbundance(PolarsTransformer):
         return f"Calculating abundance. Setting value to column {COL_VALUE}"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        try:
-            add_calculate_columns(data_holder)
-        except pl.exceptions.InvalidOperationError as e:
-            self._log(f"Could not add calculated columns: {e}", level=adm_logger.CRITICAL)
-            return
+        add_calculate_columns(data_holder)
+        # try:
+        #     add_calculate_columns(data_holder)
+        # except pl.exceptions.InvalidOperationError as e:
+        #     self._log(f"Could not add calculated columns: {e}",
+        #     level=adm_logger.CRITICAL)
+        #     # raise
+        #     return
         self._calc_abundance(data_holder)
         self._add_combined_abundance(data_holder)
         self._add_to_parameter_column(data_holder)
@@ -225,6 +230,9 @@ class PolarsCalculateBiovolume(PolarsTransformer):
         )
 
     def _add_to_parameter_column(self, data_holder: PolarsDataHolder):
+        print("???????")
+        print(f"{self._get_out_of_range_boolean(data_holder)=}")
+        print(f"{self._get_par_boolean()=}")
         out_of_range_boolean_for_par = (
             self._get_out_of_range_boolean(data_holder) & self._get_par_boolean()
         )
@@ -288,7 +296,7 @@ class PolarsCalculateCarbon(PolarsTransformer):
             .then(
                 pl.col(FLOAT_COL_ABUNDANCE_COMBINED)
                 * pl.col(FLOAT_COL_CARBON_PER_UNIT_BVOL)
-                / 1_000_000
+                # / 1_000_000
             )
             .otherwise(pl.lit(None))
             .alias(FLOAT_COL_CARBON_CALCULATED)

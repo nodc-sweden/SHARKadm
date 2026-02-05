@@ -14,11 +14,12 @@ from sharkadm import (
 )
 from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
-from sharkadm.exporters import Exporter
+from sharkadm.exporters import Exporter, PolarsExporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
-from sharkadm.operation import OperationInfo
+from sharkadm.operator import OperationInfo, Operator
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
+from sharkadm.utils import data_structures
 from sharkadm.validators import Validator
 
 
@@ -26,8 +27,8 @@ class BaseSHARKadmController:
     """Class to hold data from a specific data type"""
 
     def __init__(self) -> None:
-        self._data_holder: DataHolder | None = None
-        self._transformers: list[Transformer | MultiTransformer] = []
+        self._data_holder: PolarsDataHolder | None = None
+        self._transformers: list[PolarsTransformer | PolarsMultiTransformer] = []
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
         self._exporters: list[Exporter] = []
@@ -142,8 +143,9 @@ class BaseSHARKadmController:
                         return infos
             else:
                 infos.append(info)
-                if return_if_cause_for_termination and info.cause_for_termination:
-                    return infos
+                # TODO: Kolla detta!!!
+                # if return_if_cause_for_termination and info.cause_for_termination:
+                #     return infos
         # if return_if_cause_for_termination and info.cause_for_termination:
         #     return info
         return infos
@@ -207,7 +209,7 @@ class BaseSHARKadmController:
                 dict(total=tot_nr_operators, current=i, title=f"Exporting...{exp.name}"),
             )
 
-    def export(self, *exporters: Exporter) -> Any:
+    def export(self, *exporters: PolarsExporter) -> Any:
         for exp in exporters:
             data = exp.export(self._data_holder)
             if isinstance(data, (pd.DataFrame, pl.DataFrame)):
@@ -291,10 +293,7 @@ class SHARKadmPolarsController(BaseSHARKadmController):
 
     def transform(
         self,
-        *transformers: Transformer
-        | MultiTransformer
-        | PolarsTransformer
-        | PolarsMultiTransformer,
+        *transformers: PolarsTransformer | PolarsMultiTransformer,
     ) -> Self:
         if self.is_filtered:
             raise sharkadm_exceptions.DataIsFilteredError(
@@ -302,6 +301,62 @@ class SHARKadmPolarsController(BaseSHARKadmController):
             )
         super().transform(*transformers)
         return self
+
+    def run_operators(
+        self,
+        *operators: Operator,
+        return_if_cause_for_termination: bool = True,
+    ) -> dict[str, utils.data_structures.IndexDict[str, OperationInfo] | bool]:
+        tot_nr_operators = len(operators)
+        infos = dict()
+        infos["terminated"] = False
+        infos["operators"] = data_structures.IndexDict()
+        for i, oper in enumerate(operators):
+            title = f"Running transformer...{oper.name}"
+            if isinstance(oper, Validator):
+                title = f"Running validator...{oper.name}"
+            event.post_event(
+                "progress",
+                dict(
+                    total=tot_nr_operators,
+                    current=i + 1,
+                    title=title,
+                ),
+            )
+            info = OperationInfo()
+            if isinstance(oper, PolarsTransformer):
+                info = oper.transform(
+                    self._data_holder,
+                    return_if_cause_for_termination=return_if_cause_for_termination,
+                )
+            elif isinstance(oper, Validator):
+                info = oper.validate(
+                    self._data_holder,
+                )
+            if isinstance(info, dict):
+                # Can be dict from multitransformers
+                for name, _info in info.items():
+                    infos["operators"][name] = _info
+                    if return_if_cause_for_termination and _info.cause_for_termination:
+                        infos["terminated"] = True
+                        break
+                if infos["terminated"]:
+                    break
+            else:
+                infos["operators"][oper.name] = info
+                if return_if_cause_for_termination and info.cause_for_termination:
+                    infos["terminated"] = True
+                    break
+        return infos
+
+    def run_operator(
+        self,
+        operator: Operator,
+        return_if_cause_for_termination: bool = True,
+    ) -> dict[str, dict[str, OperationInfo] | bool]:
+        return self.run_operators(
+            operator, return_if_cause_for_termination=return_if_cause_for_termination
+        )
 
 
 def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:

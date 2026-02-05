@@ -269,6 +269,7 @@ class PolarsZipArchive(PolarsFileExporter):
         exporter = exporters.PolarsSHARKdataTxt(
             export_directory=self._temp_target_directory,
             export_file_name="shark_data.txt",
+            **self._kwargs,
         )
         exporter.export(self._data_holder)
 

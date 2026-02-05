@@ -1,8 +1,16 @@
-from sharkadm import adm_logger, config
+import enum
+
+from sharkadm import adm_logger, config, event
 from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 
 
-class OperationBase:
+class OperationType(enum.StrEnum):
+    OPERATION = "operator"
+    VALIDATOR = "validator"
+    TRANSFORMER = "transformer"
+
+
+class Operator:
     valid_data_types: tuple[str, ...] = ()
     invalid_data_types: tuple[str, ...] = ()
 
@@ -12,7 +20,7 @@ class OperationBase:
     valid_data_structures: tuple[str, ...] = ()
     invalid_data_structures: tuple[str, ...] = ()
 
-    operation_type: str = "operation"
+    operation_type: str = OperationType.OPERATION
 
     @property
     def name(self) -> str:
@@ -76,11 +84,11 @@ class OperationBase:
 
 class OperationInfo:
     """This class is used as a return for operators
-    (validator, transfromer, exporter) to give information about the outcome."""
+    (validator, transformer, exporter) to give information about the outcome."""
 
     def __init__(
         self,
-        operator: OperationBase = None,
+        operator: Operator = None,
         valid: bool = True,
         success: bool = True,
         exception: Exception | None = None,
@@ -93,20 +101,42 @@ class OperationInfo:
         self._exception = exception
         self._msg = msg
         self._cause_for_termination = cause_for_termination
+        self._has_subscribed: bool = False
+        self._logs = list()
+
+        self._subscribe()
+
+    def __repr__(self):
+        return f"{self.__class__.__name__} for operator: {self.operator}"
+
+    def _subscribe(self):
+        if not self.operator:
+            return
+        if self._has_subscribed:
+            return
 
     @property
-    def operator(self) -> OperationBase:
+    def operator(self) -> Operator:
         return self._operator
 
     @operator.setter
-    def operator(self, operator: OperationBase):
-        if not isinstance(operator, OperationBase):
-            raise ValueError("Invalid class ")
+    def operator(self, operator: Operator):
+        if self._operator:
+            if self._operator == operator:
+                return
+            raise ValueError("Cannot set new operator!")
+        if not isinstance(operator, Operator):
+            raise ValueError("Invalid class!")
         self._operator = operator
+        self._subscribe()
 
     @property
     def valid(self) -> bool:
         return self._valid
+
+    @valid.setter
+    def valid(self, is_valid: bool) -> None:
+        self._valid = bool(is_valid)
 
     @property
     def success(self) -> bool:
@@ -121,5 +151,22 @@ class OperationInfo:
         return self._msg
 
     @property
+    def logs(self) -> list[dict]:
+        return self._logs
+
+    @property
     def cause_for_termination(self) -> bool:
         return self._cause_for_termination
+
+    def _on_log(self, data: dict):
+        if not self.operator:
+            return
+        # print(f"::: {self.operator.name=} -> {data["cls"]=}")
+        # print(f"{data=}")
+        # print()
+        if self.operator.name != data["cls"]:
+            return
+        self._logs.append(data)
+        # print(f"_on_log {data['cls']=}: {data=}")
+        # print()
+        # print()

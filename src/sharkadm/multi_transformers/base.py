@@ -7,7 +7,7 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.data import get_valid_data_holders, is_valid_polars_data_holder
-from sharkadm.operation import OperationInfo
+from sharkadm.operator import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer, Transformer
 
@@ -209,7 +209,7 @@ class PolarsMultiTransformer(PolarsTransformer):
         self,
         data_holder: "PolarsDataHolder",
         return_if_cause_for_termination: bool = True,
-    ) -> list[OperationInfo]:
+    ) -> dict[str, OperationInfo]:
         if not self.is_valid_data_holder(data_holder):
             return [OperationInfo(operator=self)]
         self._log_workflow(
@@ -217,12 +217,12 @@ class PolarsMultiTransformer(PolarsTransformer):
             item=self.get_transformer_description(),
             level=adm_logger.DEBUG,
         )
-        infos = []
+        infos = dict()
         t0 = time.time()
         for trans in self._transformers:
-            print(f"{trans=}")
-            info = trans(**self._kwargs).transform(data_holder=data_holder)
-            infos.append(info)
+            obj = trans(**self._kwargs)
+            info = obj.transform(data_holder=data_holder)
+            infos[obj.name] = info
             if return_if_cause_for_termination and info.cause_for_termination:
                 return infos
         adm_logger.log_workflow(
