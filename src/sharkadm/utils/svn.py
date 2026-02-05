@@ -88,3 +88,31 @@ def get_modified_svn_files(
         if path in match_paths:
             paths.append(path)
     return paths
+
+
+# def _get_nodc_config_directory() -> pathlib.Path | None:
+#     config_dir = get_config_path()
+#     if not config_dir:
+#         adm_logger.log_workflow(
+#             "No nodc_config directory is configured.", level=adm_logger.WARNING
+#         )
+#         return
+#     return config_dir
+
+
+# def get_modified_config_files_in_svn() -> list[pathlib.Path]:
+#     config_dir = _get_nodc_config_directory()
+#     if not config_dir:
+#         return []
+#     return get_modified_svn_files(config_dir)
+#
+#
+# def commit_modified_config_files_in_svn(
+#     *paths: pathlib.Path, msg: str = "Auto commit by sharkadm"
+# ) -> list[pathlib.Path]:
+#     config_dir = _get_nodc_config_directory()
+#     if not config_dir:
+#         return []
+#     updated_paths = get_modified_svn_files(config_dir, match_paths=paths)
+#     commit_files(*paths, msg=msg)
+#     return updated_paths
