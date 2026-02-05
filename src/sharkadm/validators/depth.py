@@ -87,8 +87,8 @@ class ValidateSampleDepth(Validator):
             ["sample_depth_m", "water_depth_m"]
         ):
             visit_info = (
-                    df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
-                )
+                df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
+            )
             if water_depth == "":
                 self._log_fail(
                     f"Could not validate sample depth"
