@@ -1,9 +1,7 @@
 import subprocess
 
-from sharkadm.config import get_config_path
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import get_nodc_config_directory, get_svn_info
-from sharkadm.utils.svn import commit_files, get_modified_svn_files, update_svn_directory
+from sharkadm.utils import get_nodc_config_directory
 
 
 def update_nodc_config_directory_from_svn() -> None:
@@ -16,16 +14,6 @@ def update_nodc_config_directory_from_svn() -> None:
     status = subprocess.run(["svn", "update"], cwd=config_dir)
     if status.returncode:
         adm_logger.log_workflow("Could not update nodc_config.", level=adm_logger.WARNING)
-
-
-def get_nodc_config_svn_revision() -> str:
-    config_dir = get_config_path()
-    if not config_dir:
-        return ""
-    svn_info = get_svn_info(get_config_path())
-    if not svn_info:
-        return ""
-    return svn_info.revision
 
 
 try:

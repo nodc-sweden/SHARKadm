@@ -90,6 +90,16 @@ def get_modified_svn_files(
     return paths
 
 
+# def get_nodc_config_svn_revision() -> str:
+#     config_dir = get_config_path()
+#     if not config_dir:
+#         return ""
+#     svn_info = get_svn_info(get_config_path())
+#     if not svn_info:
+#         return ""
+#     return svn_info.revision
+
+
 # def _get_nodc_config_directory() -> pathlib.Path | None:
 #     config_dir = get_config_path()
 #     if not config_dir:
