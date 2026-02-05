@@ -5,6 +5,7 @@ from sharkadm.data import PolarsDataHolder
 from sharkadm.exporters.base import DataHolderProtocol, FileExporter, PolarsFileExporter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsDataHolderProtocol
+from sharkadm.utils.paths import get_next_incremented_file_path
 
 
 class SHARKdataTxt(FileExporter):
@@ -79,16 +80,29 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
                     level=adm_logger.WARNING,
                 )
         data = data_holder.data[column_list]
-        if self._encoding == "utf8":
-            data.write_csv(self.export_file_path, separator=self._separator)
-        else:
-            pdf = data.to_pandas()
-            pdf.to_csv(
-                self.export_file_path,
-                sep=self._separator,
-                index=False,
-                encoding=self._encoding,
-            )
+        try:
+            if self._encoding == "utf8":
+                data.write_csv(self.export_file_path, separator=self._separator)
+            else:
+                pdf = data.to_pandas()
+                pdf.to_csv(
+                    self.export_file_path,
+                    sep=self._separator,
+                    index=False,
+                    encoding=self._encoding,
+                )
+        except PermissionError:
+            self._export_file_name = get_next_incremented_file_path(self.export_file_path)
+            if self._encoding == "utf8":
+                data.write_csv(self.export_file_path, separator=self._separator)
+            else:
+                pdf = data.to_pandas()
+                pdf.to_csv(
+                    self.export_file_path,
+                    sep=self._separator,
+                    index=False,
+                    encoding=self._encoding,
+                )
 
 
 class SHARKdataTxtAsGiven(FileExporter):

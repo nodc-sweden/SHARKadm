@@ -220,6 +220,7 @@ class PolarsMultiTransformer(PolarsTransformer):
         infos = dict()
         t0 = time.time()
         for trans in self._transformers:
+            # print()
             # print(f"{trans=}")
             # print(f"{trans.name=}")
             # print(f"{str(trans.name)=}")

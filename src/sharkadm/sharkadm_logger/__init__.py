@@ -21,12 +21,12 @@ def get_exporter(**kwargs):
     return obj(**kwargs)
 
 
-def create_xlsx_report(logger: SHARKadmLogger, log_filter: dict | None = None, **kwargs):
+def create_xlsx_report(log_filter: dict | None = None, **kwargs):
     if log_filter:
-        logger.reset_filter()
-        logger.filter(**log_filter)
+        adm_logger.reset_filter()
+        adm_logger.filter(**log_filter)
     exp = XlsxExporter(**kwargs)
-    logger.export(exp)
+    adm_logger.export(exp)
     adm_logger.reset_filter()
 
 
@@ -47,14 +47,12 @@ def create_changelog_file(**kwargs):
     adm_logger.reset_filter()
 
 
-def create_feedback_report(
-    logger: SHARKadmLogger, log_filter: dict | None = None, **kwargs
-):
+def create_feedback_report(log_filter: dict | None = None, **kwargs):
     if log_filter:
-        logger.reset_filter()
-        logger.filter(**log_filter)
+        adm_logger.reset_filter()
+        adm_logger.filter(**log_filter)
     exp = FeedbackTxtExporter(**kwargs)
-    logger.export(exp)
+    adm_logger.export(exp)
     adm_logger.reset_filter()
 
 

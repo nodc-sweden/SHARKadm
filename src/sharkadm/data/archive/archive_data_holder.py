@@ -439,18 +439,26 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
 
     @property
     def min_longitude(self) -> str:
+        if "sample_longitude_dd" in self._data.columns:
+            return str(min(self.data["sample_longitude_dd"].cast(float)))
         return str(min(self.data["visit_reported_longitude"].cast(float)))
 
     @property
     def max_longitude(self) -> str:
+        if "sample_longitude_dd" in self._data.columns:
+            return str(min(self.data["sample_longitude_dd"].cast(float)))
         return str(max(self.data["visit_reported_longitude"].cast(float)))
 
     @property
     def min_latitude(self) -> str:
+        if "sample_latitude_dd" in self._data.columns:
+            return str(min(self.data["sample_latitude_dd"].cast(float)))
         return str(min(self.data["visit_reported_latitude"].cast(float)))
 
     @property
     def max_latitude(self) -> str:
+        if "sample_latitude_dd" in self._data.columns:
+            return str(min(self.data["sample_latitude_dd"].cast(float)))
         return str(max(self.data["visit_reported_latitude"].cast(float)))
 
     def _load_delivery_note(self) -> None:

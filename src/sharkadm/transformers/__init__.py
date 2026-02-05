@@ -23,6 +23,12 @@ from sharkadm.transformers.analyse_info import (
     PolarsAddAnalyseInfoOld,
     PolarsAddAnalyseInfo,
 )
+from sharkadm.transformers.aphia_id import (
+    PolarsSetReportedAphiaIdFromAphiaId,
+    PolarsSetAphiaIdFromReportedAphiaId,
+    PolarsSetAphiaIdFromWormsAphiaId,
+    PolarsSetAphiaIdFromBvolAphiaId,
+)
 from sharkadm.transformers.arithmetic import (
     Divide,
     Multiply,
@@ -295,14 +301,8 @@ from sharkadm.transformers.visit import (
 )
 from sharkadm.transformers.wide_to_long import PolarsWideToLong, WideToLong
 from sharkadm.transformers.worms import (
-    AddReportedAphiaId,
-    AddWormsAphiaId,
-    AddWormsScientificName,
-    PolarsAddReportedAphiaId,
     PolarsAddWormsAphiaId,
     PolarsAddWormsScientificName,
-    PolarsSetAphiaIdFromReportedAphiaId,
-    SetAphiaIdFromReportedAphiaId,
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 

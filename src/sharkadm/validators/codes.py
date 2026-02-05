@@ -132,7 +132,7 @@ class ValidateSflag(Validator):
     ) -> None:
         code = code.strip()
         if "," in code:
-            for part in code.split(""):
+            for part in code.split(","):
                 self._validate_code_and_log(part, source_col, df)
             return
 

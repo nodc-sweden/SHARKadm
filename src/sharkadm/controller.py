@@ -14,7 +14,7 @@ from sharkadm import (
 )
 from sharkadm.data import get_data_holder, get_polars_data_holder
 from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
-from sharkadm.exporters import Exporter
+from sharkadm.exporters import Exporter, PolarsExporter
 from sharkadm.multi_transformers import MultiTransformer, PolarsMultiTransformer
 from sharkadm.operator import OperationInfo, Operator
 from sharkadm.sharkadm_logger import adm_logger
@@ -27,8 +27,8 @@ class BaseSHARKadmController:
     """Class to hold data from a specific data type"""
 
     def __init__(self) -> None:
-        self._data_holder: DataHolder | None = None
-        self._transformers: list[Transformer | MultiTransformer] = []
+        self._data_holder: PolarsDataHolder | None = None
+        self._transformers: list[PolarsTransformer | PolarsMultiTransformer] = []
         self._validators_before: list[Validator] = []
         self._validators_after: list[Validator] = []
         self._exporters: list[Exporter] = []
@@ -209,7 +209,7 @@ class BaseSHARKadmController:
                 dict(total=tot_nr_operators, current=i, title=f"Exporting...{exp.name}"),
             )
 
-    def export(self, *exporters: Exporter) -> Any:
+    def export(self, *exporters: PolarsExporter) -> Any:
         for exp in exporters:
             data = exp.export(self._data_holder)
             if isinstance(data, (pd.DataFrame, pl.DataFrame)):

@@ -1,6 +1,6 @@
 import enum
 
-from sharkadm import adm_logger, config, event
+from sharkadm import adm_logger, config
 from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 
 
@@ -114,12 +114,12 @@ class OperationInfo:
             return
         if self._has_subscribed:
             return
-        if self.operator.operation_type == OperationType.TRANSFORMER:
-            event.subscribe(event.Events.LOG_TRANSFORMATION, self._on_log)
-            self._has_subscribed = True
-        elif self.operator.operation_type == OperationType.VALIDATOR:
-            event.subscribe(event.Events.LOG_VALIDATION, self._on_log)
-            self._has_subscribed = True
+        # if self.operator.operation_type == OperationType.TRANSFORMER:
+        #     event.subscribe(event.Events.LOG_TRANSFORMATION, self._on_log)
+        #     self._has_subscribed = True
+        # elif self.operator.operation_type == OperationType.VALIDATOR:
+        #     event.subscribe(event.Events.LOG_VALIDATION, self._on_log)
+        #     self._has_subscribed = True
 
     @property
     def operator(self) -> Operator:

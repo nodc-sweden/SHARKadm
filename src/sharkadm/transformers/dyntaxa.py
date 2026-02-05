@@ -386,7 +386,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                     if new_name_2:
                         self._log(
                             f"Translated using {translate_dyntaxa.source}. "
-                            f"Reported name: {name} "
+                            f"Reported name: {name} > "
                             f"Translated to: {new_name_2} ({len(df)} rows)",
                             # f"Translated from dyntaxa: {name} -> {new_name} -> "
                             # f"{new_name_2} ({len(df)} places)",
@@ -401,7 +401,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                 else:
                     self._log(
                         f"Translated using {translate_dyntaxa.source}. "
-                        f"Reported name: {name} "
+                        f"Reported name: {name} > "
                         f"Translated to: {new_name} ({len(df)} rows)",
                         # f"Translated from dyntaxa: {name} -> {new_name} "
                         # f"({len(df)} places)",
@@ -432,6 +432,10 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
 
 
 class PolarsAddDyntaxaTranslatedScientificNameDyntaxaId(PolarsTransformer):
+    """
+    Den här ska inte vara aktiverad för tillfället
+    """
+
     invalid_data_types = ("physicalchemical", "chlorophyll")
     source_col = "reported_scientific_name"
     col_to_set = "dyntaxa_translated_scientific_name_dyntaxa_id"

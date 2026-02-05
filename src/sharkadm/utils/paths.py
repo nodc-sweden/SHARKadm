@@ -2,6 +2,8 @@ import pathlib
 
 
 def get_next_incremented_file_path(path: pathlib.Path):
+    if not path.exists():
+        return path
     i = 1
     new_path = _get_incremented_file_path(path, i)
     while new_path.exists():

@@ -127,6 +127,7 @@ class SHARKadmWorkflow:
                 obj = self._get_validator_object(oper)
             if not obj:
                 raise sharkadm_exceptions.InvalidOperator(obj)
+            self._operator_objects.append(obj)
 
     def _set_exporters(self) -> None:
         exporter_list = []
@@ -147,6 +148,7 @@ class SHARKadmWorkflow:
     def start_workflow(self) -> None | operator.OperationInfo:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
+        print(f"{self._operator_objects=}")
         for data_source in self._data_sources:
             adm_logger.reset_log()
             d_holder = get_polars_data_holder(**data_source)
