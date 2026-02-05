@@ -1,6 +1,6 @@
 import enum
 
-from sharkadm import adm_logger, config, event
+from sharkadm import adm_logger, config
 from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 
 
