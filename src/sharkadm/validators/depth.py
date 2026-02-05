@@ -86,10 +86,19 @@ class ValidateSampleDepth(Validator):
         for (sample_depth, water_depth), df in data_holder.data.group_by(
             ["sample_depth_m", "water_depth_m"]
         ):
-            if float(sample_depth) >= float(water_depth):
-                visit_info = (
+            visit_info = (
                     df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
                 )
+            if water_depth == "":
+                self._log_fail(
+                    f"Could not validate sample depth"
+                    f"water depth is empty."
+                    f"at visit date and station: {visit_info}",
+                )
+                error = True
+                continue
+
+            if float(sample_depth) >= float(water_depth):
                 self._log_fail(
                     f"Sample depth below water depth: {sample_depth} >= {water_depth}"
                     f" at visit date and station: "
