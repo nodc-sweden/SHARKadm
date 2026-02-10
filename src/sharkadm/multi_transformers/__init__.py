@@ -16,6 +16,7 @@ from sharkadm.multi_transformers.location import (
     LocationPolars,
     LocationRPolars,
     LocationRredPolars,
+    LocationIntWaterPolars,
 )
 from sharkadm.multi_transformers.position import Position, PositionPolars
 from sharkadm.multi_transformers.static_dv import StaticDV, StaticDVPolars

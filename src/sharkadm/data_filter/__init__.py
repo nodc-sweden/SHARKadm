@@ -1,6 +1,10 @@
 from sharkadm.data_filter.data_filter_1nm import PolarsDataFilterInside1nm
 from sharkadm.data_filter.data_filter_12nm import PolarsDataFilterInside12nm
 from sharkadm.data_filter.data_filter_approved import PolarsDataFilterApprovedData
+from sharkadm.data_filter.data_filter_boolean import (
+    PolarsDataFilterTrue,
+    PolarsDataFilterFalse
+)
 from sharkadm.data_filter.data_filter_combined import (
     PolarsDataFilterApprovedAndOutside12nm,
     PolarsDataFilterInside12nmAndNotRestricted,
@@ -11,10 +15,11 @@ from sharkadm.data_filter.data_filter_coordinates import PolarsDataFilterBoundin
 from sharkadm.data_filter.data_filter_depth import (
     PolarsDataFilterDeepestDepthAtEachVisit,
     PolarsDataFilterDepthDeeperThanWaterDepth,
+    PolarsDataFilterDepthDeeperThanIobisDepth,
 )
 from sharkadm.data_filter.data_filter_location import (
     PolarsDataFilterLocation,
-    PolarsDataFilterRestrictAreaGandC,
+    # PolarsDataFilterRestrictAreaGandC,
     PolarsDataFilterRestrictAreaO,
     PolarsDataFilterRestrictAreaR,
     PolarsDataFilterRestrictAreaRred,
