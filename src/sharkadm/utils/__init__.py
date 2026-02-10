@@ -9,7 +9,7 @@ import subprocess
 import sys
 import zipfile
 
-from sharkadm.utils.svn import SvnInfo
+from sharkadm.utils.svn import get_modified_svn_files, get_svn_info
 
 SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
@@ -18,14 +18,6 @@ def get_nodc_config_directory() -> pathlib.Path | None:
     CONFIG_ENV = "NODC_CONFIG"
     if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
         return pathlib.Path(os.getenv(CONFIG_ENV))
-
-
-def has_admin_config() -> bool:
-    """Returns True if user has local environment variable for NODC_CONFIG.
-    Else return False"""
-    if get_nodc_config_directory():
-        return True
-    return False
 
 
 def _remove_empty_directories(directory: pathlib.Path):
@@ -235,7 +227,3 @@ def _normalize_zip_content(zip_reference: zipfile.ZipFile) -> list[zipfile.ZipIn
         info.filename = normalized_relative_path
         members.append(info)
     return members
-
-
-def get_svn_info(path: str | pathlib.Path):
-    return SvnInfo.from_subprocess(path)
