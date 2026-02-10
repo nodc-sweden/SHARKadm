@@ -29,7 +29,6 @@ OTHER_CONFIG_SOURCES = [
 
 # CONFIG_DIRECTORY = None
 CONFIG_DIRECTORY = utils.get_user_given_config_dir()
-ADMIN_CONFIG_PATH = CONFIG_DIRECTORY
 if not CONFIG_DIRECTORY:
     if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
         CONFIG_DIRECTORY = pathlib.Path(os.getenv(CONFIG_ENV))
@@ -52,14 +51,6 @@ def get_config_path(name: str | None = None) -> pathlib.Path:
     if not path.exists():
         raise FileNotFoundError(f"Could not find config file {name}")
     return path
-
-
-def has_admin_config() -> bool:
-    """Returns True if user has local environment variable for NODC_CONFIG.
-    Else return False"""
-    if ADMIN_CONFIG_PATH:
-        return True
-    return False
 
 
 class DataHolderProtocol(Protocol):
