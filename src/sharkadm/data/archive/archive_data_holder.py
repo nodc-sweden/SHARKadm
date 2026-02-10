@@ -7,6 +7,7 @@ import polars as pl
 
 from sharkadm import config
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
+from sharkadm.data import change_log
 from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
 from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile, PolarsDataFile
@@ -37,6 +38,7 @@ class ArchiveDataHolder(PandasDataHolder, ABC):
         self._delivery_note: delivery_note.DeliveryNote | None = None
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
+
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -278,6 +280,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
         self._metadata: metadata.Metadata | None = None
+        self._change_log: change_log.ChangeLog | None = None
         self._import_matrix: ImportMatrixConfig | None = None
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
@@ -290,6 +293,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         self._load_sampling_info()
         self._load_analyse_info()
         self._load_metadata()
+        self._load_change_log()
         self._load_data()
         self._load_delivery_note()  # Reload to map
 
@@ -414,6 +418,14 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         return self.archive_root_directory / "shark_metadata.txt"
 
     @property
+    def change_log_path(self) -> pathlib.Path:
+        return self.processed_data_directory / "change_log.txt"
+
+    @property
+    def change_log(self) -> change_log.ChangeLog:
+        return self._change_log
+
+    @property
     def import_matrix(self) -> ImportMatrixConfig:
         return self._import_matrix
 
@@ -495,6 +507,9 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         self._metadata = metadata.Metadata.from_txt_file(
             self.metadata_path, mapper=self._import_matrix_mapper
         )
+
+    def _load_change_log(self) -> None:
+        self._change_log = change_log.ChangeLog(self.change_log_path)
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in

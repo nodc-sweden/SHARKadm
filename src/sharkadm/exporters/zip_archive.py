@@ -274,9 +274,14 @@ class PolarsZipArchive(PolarsFileExporter):
         exporter.export(self._data_holder)
 
     def _create_changelog_file(self) -> None:
-        sharkadm_logger.create_changelog_file(
-            export_directory=self._temp_target_directory
-        )
+        if hasattr(self._data_holder, "change_log"):
+            path = self._temp_target_directory / "change_log.txt"
+            self._data_holder.change_log.add_sharkadm_logger_info()
+            self._data_holder.change_log.save_file(path)
+        else:
+            sharkadm_logger.create_changelog_file(
+                export_directory=self._temp_target_directory
+            )
 
     def _create_zip_package(self):
         shutil.make_archive(
