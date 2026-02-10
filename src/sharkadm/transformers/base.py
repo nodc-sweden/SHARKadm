@@ -228,7 +228,6 @@ class PolarsTransformer(ABC, Operator):
 
     @property
     def name(self) -> str:
-        print(f"{self.__class__.__name__=}")
         return self.__class__.__name__
 
     @staticmethod
