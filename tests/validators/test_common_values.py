@@ -39,8 +39,31 @@ def test_conflicting_values_for_same_visit_are_found(
     given_value_b,
     given_should_be_checked,
 ):
+    columns_to_validate = (
+        "visit_year",
+        "sample_project_code",
+        "sample_orderer_code",
+        "sample_enddate",
+        "sample_endtime",
+        "expedition_id",
+        "visit_id",
+        "visit_reported_latitude",
+        "visit_reported_longitude",
+        "positioning_system_code",
+        "water_depth_m",
+        "visit_comment",
+        "nr_depths",
+        "wind_direction_code",
+        "wind_speed_ms",
+        "air_temperature_degc",
+        "air_pressure_hpa",
+        "weather_observation_code",
+        "cloud_observation_code",
+        "wave_observation_code",
+        "ice_observation_code",
+    )
     # Given data for a visit with conflicting values for a given column
-    base_row = {column: "value" for column in ValidateCommonValuesByVisit.unique_columns}
+    base_row = {column: "value" for column in columns_to_validate}
     given_date = "20250101"
     given_time = "10:20"
     given_platform_code = "ZZ99"
@@ -75,7 +98,7 @@ def test_conflicting_values_for_same_visit_are_found(
 
     # When validating the data
     adm_logger.reset_log()
-    ValidateCommonValuesByVisit().validate(given_data_holder)
+    ValidateCommonValuesByVisit(columns_to_validate).validate(given_data_holder)
 
     # Then there should be exactly one or zero failed validation messages for
     # that specific validator and column
