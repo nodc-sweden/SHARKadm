@@ -17,13 +17,18 @@ class ValidateCommonValuesByVisit(Validator):
         "visit_id",
         "STATION_ID",
         "SITE_ID",
+        "COLONY",
+        "sea_region",
         "visit_reported_latitude",
         "visit_reported_longitude",
         "positioning_system_code",
         "water_depth_m",
         "nr_depths",
         "monitoring_station_type_code",
+        "monitoring_purpose_code",
+        "monitoring_program_code",
         "additional_sampling",
+        "finding_circumstances",
         "visit_comment",
         "wind_direction_code",
         "wind_speed_ms",
@@ -78,7 +83,7 @@ class ValidateCommonValuesByVisit(Validator):
             )
             return
         if missing_columns:
-            self._log_workflow(
+            adm_logger.log_workflow(
                 f"Ignoring missing columns: {', '.join(missing_columns)}",
                 level=adm_logger.DEBUG,
             )
