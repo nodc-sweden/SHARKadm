@@ -125,6 +125,7 @@ from sharkadm.transformers.depth import (
     AddSampleMinAndMaxDepth,
     AddSectionStartAndEndDepth,
     ReorderSampleMinAndMaxDepth,
+    PolarsAddIOdisDepth,
 )
 from sharkadm.transformers.dyntaxa import (
     AddDyntaxaId,

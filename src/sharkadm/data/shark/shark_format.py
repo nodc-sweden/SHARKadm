@@ -45,13 +45,18 @@ class PolarsSharkDataHolder(PolarsDataHolder):
                 # Not sure if we want to raise exception if multiple datatypes are found
                 # if len(all_data_types) > 1:
                 #     raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
-                d_source._data_type = all_data_types.pop()
+                data_type = all_data_types.pop()
+                self._data_type_obj = data_type_handler.get_data_type_obj(
+                    data_type.lower().replace(" ", "")
+                )
+                d_source.data_type_obj = self._data_type_obj
                 break
 
-        if d_source._data_type:
-            self._data_type_obj = data_type_handler.get_data_type_obj(
-                d_source._data_type.lower().replace(" ", "")
-            )
+        # if d_source._data_type:
+        #     self._data_type_obj = data_type_handler.get_data_type_obj(
+        #         d_source._data_type.lower().replace(" ", "")
+        #     )
+        # print(f"{self._data_type_obj=}")
 
         self._load_import_matrix()
         if self.import_matrix_mapper:
@@ -81,12 +86,12 @@ class PolarsSharkDataHolder(PolarsDataHolder):
 
     @property
     def data_type(self) -> str:
-        return self._data_type
+        return self._data_type_obj.data_type
 
     @property
     def data_type_internal(self) -> str:
         # return self._data_type_mapper.get(self.data_format)
-        return self._data_type_internal
+        return self._data_type_obj.data_type_internal
 
     @property
     def dataset_name(self) -> str:

@@ -58,3 +58,17 @@ class LocationRredPolars(PolarsMultiTransformer):
         for trans in LocationRredPolars._transformers:
             string_list.append(f"    {trans.get_transformer_description()}")
         return "\n".join(string_list)
+
+
+class LocationIntWaterPolars(PolarsMultiTransformer):
+    _transformers = (
+        transformers.PolarsAddLocationWB,
+        transformers.PolarsAddLocationCounty,
+    )
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        string_list = ["Performs all transformations related to location r."]
+        for trans in LocationIntWaterPolars._transformers:
+            string_list.append(f"    {trans.get_transformer_description()}")
+        return "\n".join(string_list)

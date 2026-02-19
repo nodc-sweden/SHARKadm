@@ -2,6 +2,7 @@ import polars as pl
 
 from sharkadm.data import PolarsDataHolder
 from sharkadm.data_filter.base import PolarsDataFilter
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class PolarsDataFilterDeepestDepthAtEachVisit(PolarsDataFilter):
@@ -73,4 +74,27 @@ class PolarsDataFilterDepthDeeperThanWaterDepth(PolarsDataFilter):
         return data_holder.data.select(
             (pl.col(self.depth_column).cast(float) + self.margin)
             >= pl.col(self.water_depth_column).cast(float)
+        ).to_series()
+
+
+class PolarsDataFilterDepthDeeperThanIobisDepth(PolarsDataFilter):
+    ref_depth_column = "iobis_depth"
+
+    def __init__(self, depth_column: str, margin: float | int = 0):
+        super().__init__(depth_column=depth_column, margin=margin)
+        self.depth_column = depth_column
+        self.margin = margin
+
+    def _get_filter_mask(
+        self,
+        data_holder: PolarsDataHolder,
+    ) -> pl.Series:
+        if self.depth_column not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.depth_column}", level=adm_logger.ERROR
+            )
+            return pl.Series()
+        return data_holder.data.select(
+            (pl.col(self.depth_column).cast(float) + self.margin)
+            >= pl.col(self.ref_depth_column).cast(float)
         ).to_series()
