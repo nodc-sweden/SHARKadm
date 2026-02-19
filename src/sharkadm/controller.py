@@ -1,4 +1,5 @@
 import pathlib
+import re
 from typing import Any, Self
 
 import pandas as pd
@@ -357,6 +358,13 @@ class SHARKadmPolarsController(BaseSHARKadmController):
         return self.run_operators(
             operator, return_if_cause_for_termination=return_if_cause_for_termination
         )
+
+    def get_columns(self, regex: str = "") -> list[str]:
+        cols = []
+        for col in self.data.columns:
+            if re.search(regex, col):
+                cols.append(col)
+        return cols
 
 
 def _get_name_mapper(list_to_map: list[dict]) -> dict[str, dict]:

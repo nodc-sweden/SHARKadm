@@ -295,11 +295,11 @@ class PolarsDataHolder(DataHolder, ABC):
 
     @property
     def data_type(self) -> str:
-        return self._data_type_obj.data_type
+        return self.data_type_obj.data_type
 
     @property
     def data_type_internal(self) -> str:
-        return self._data_type_obj.data_type_internal
+        return self.data_type_obj.data_type_internal
 
     @property
     def data_type_in_data(self) -> str:
@@ -377,6 +377,13 @@ class PolarsDataHolder(DataHolder, ABC):
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
+
+    # def _set_data_source(self, data_source: DataSource) -> None:
+    #     """Sets a single data source to self._data"""
+    #     # self._data_type = data_source.data_type
+    #     # self._data_type_internal = data_source.data_type.replace(" ", "").lower()
+    #     self._add_data_source(data_source)
+    #     self._data = self._get_data_from_data_source(data_source)
 
 
 class old_DataHolder(ABC):

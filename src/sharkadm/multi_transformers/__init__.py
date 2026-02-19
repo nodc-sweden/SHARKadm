@@ -13,10 +13,10 @@ from sharkadm.multi_transformers.general_final import GeneralFinal
 from sharkadm.multi_transformers.general_initial import GeneralInitial
 from sharkadm.multi_transformers.lims import Lims
 from sharkadm.multi_transformers.location import (
+    LocationIntWaterPolars,
     LocationPolars,
     LocationRPolars,
     LocationRredPolars,
-    LocationIntWaterPolars,
 )
 from sharkadm.multi_transformers.position import Position, PositionPolars
 from sharkadm.multi_transformers.static_dv import StaticDV, StaticDVPolars

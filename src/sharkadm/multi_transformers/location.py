@@ -72,4 +72,3 @@ class LocationIntWaterPolars(PolarsMultiTransformer):
         for trans in LocationIntWaterPolars._transformers:
             string_list.append(f"    {trans.get_transformer_description()}")
         return "\n".join(string_list)
-

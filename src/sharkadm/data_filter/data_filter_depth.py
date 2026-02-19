@@ -90,8 +90,9 @@ class PolarsDataFilterDepthDeeperThanIobisDepth(PolarsDataFilter):
         data_holder: PolarsDataHolder,
     ) -> pl.Series:
         if self.depth_column not in data_holder.data.columns:
-            adm_logger.log_transformation(f"Missing column {self.depth_column}",
-                                          level=adm_logger.ERROR)
+            adm_logger.log_transformation(
+                f"Missing column {self.depth_column}", level=adm_logger.ERROR
+            )
             return pl.Series()
         return data_holder.data.select(
             (pl.col(self.depth_column).cast(float) + self.margin)

@@ -57,6 +57,12 @@ class PolarsDataSource:
     def data_type_obj(self) -> DataType:
         return self._data_type_obj
 
+    @data_type_obj.setter
+    def data_type_obj(self, data_type_obj: DataType) -> None:
+        if not isinstance(data_type_obj, DataType):
+            raise TypeError(type(data_type_obj))
+        self._data_type_obj = data_type_obj
+
     @property
     def data_type(self) -> str:
         return self._data_type_obj.data_type
