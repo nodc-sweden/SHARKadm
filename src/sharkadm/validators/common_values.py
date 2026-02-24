@@ -55,7 +55,6 @@ class ValidateCommonValuesByVisit(Validator):
             self.columns_to_validate = self.default_columns_to_validate
             adm_logger.log_workflow(
                 "Using default columns_to_validate",
-                validator=self.get_display_name(),
                 level=adm_logger.DEBUG,
             )
         else:
