@@ -223,6 +223,35 @@ class PolarsAddFloatColumns(PolarsTransformer):
                     data_holder.data = add_column.add_float_column(data_holder.data, col)
 
 
+class PolarsAddIntColumns(PolarsTransformer):
+    def __init__(
+        self, columns: list[str], column_names: list[str] | None = None, **kwargs
+    ):
+        super().__init__(**kwargs)
+        self._columns = columns
+        self._column_names = column_names or [None] * len(columns)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Converts given columns to int with given column names."
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if len(self._columns) != len(self._column_names):
+            self._log(
+                "Given columns do not match given column names.",
+                level=adm_logger.WARNING,
+            )
+            return
+        for col, name in zip(self._columns, self._column_names):
+            if col in data_holder.data.columns:
+                if name:
+                    data_holder.data = add_column.add_int_column(
+                        data_holder.data, col, name
+                    )
+                else:
+                    data_holder.data = add_column.add_int_column(data_holder.data, col)
+
+
 class PolarsAddColumnDiff(PolarsTransformer):
     def __init__(self, col1: str, col2: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
