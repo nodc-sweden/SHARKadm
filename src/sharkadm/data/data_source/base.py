@@ -7,8 +7,6 @@ import polars as pl
 
 from sharkadm.config.data_type import DataType, data_type_handler
 
-# from sharkadm.config.import_config import ImportMatrixMapper
-
 
 class ImportMapper(Protocol):
     def get_internal_name(self, external_par: str) -> str: ...
@@ -30,6 +28,7 @@ class PolarsDataSource:
         self._header_mapper: ImportMapper | None = None
         self._mapped_columns: dict = dict()
         self._not_mapped_columns: list = []
+        self._unit_mapper: dict[str, str] = dict()
 
     def __repr__(self) -> str:
         return (
@@ -78,6 +77,10 @@ class PolarsDataSource:
     @property
     def header_mapper(self):
         return self._header_mapper
+
+    @property
+    def unit_mapper(self) -> dict[str, str]:
+        return self._unit_mapper
 
     def map_header(self, mapper: ImportMapper) -> None:
         mapped_header = []

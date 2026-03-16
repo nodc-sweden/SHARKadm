@@ -709,7 +709,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
                 nr_rows = len(data_holder.data.filter(mask))
             else:
                 if self._only_when_value:
-                    mask = data_holder.data[col] == ""
+                    mask = data_holder.data[col] != ""
                     data_holder.data = data_holder.data.with_columns(
                         pl.when(mask)
                         .then(pl.lit(self._replace_value))

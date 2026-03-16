@@ -116,6 +116,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         show_accepted: bool = False,
         show_stations: list[str] | None = None,
         show_custom_positions: dict[str, list[dict]] | Sequence[dict] | None = None,
+        show_lines_between_stations: bool = False,
         **kwargs,
     ):
         self._shape_layers = self.shape_layers or shape_layers or []
@@ -133,6 +134,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         self._show_accepted = show_accepted
         self._show_stations = show_stations
         self._show_custom_positions = show_custom_positions
+        self._show_lines_between_stations = show_lines_between_stations
         super().__init__(export_directory, export_file_name, **kwargs)
 
         self._master = None
@@ -198,6 +200,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         self._add_other_station_markers(m)
         self._add_other_marker_radius(m)
         self._add_markers(m)
+        self._add_lines_between_markers(m)
         self._add_custom_positions(m)
         folium.LayerControl().add_to(m)
 
@@ -262,6 +265,8 @@ class PolarsHtmlMap(PolarsFileExporter):
                 "sample_longitude_dd",
             ]
         )
+        if "datetime" in red_df.columns:
+            red_df = red_df.sort("datetime")
         for info in red_df.to_dicts():
             accepted = False
             matching = None
@@ -314,21 +319,22 @@ class PolarsHtmlMap(PolarsFileExporter):
                 data=popup_data,
             )
 
-            self._station_info.append(
-                dict(
-                    lat_dd=float(info["sample_latitude_dd"]),
-                    lon_dd=float(info["sample_longitude_dd"]),
-                    sweref99tm_x=x,
-                    sweref99tm_y=y,
-                    station_name=info.get(
-                        "reported_station_name", info.get("station_name", "")
-                    ),
-                    popup_html=html,
-                    in_areas=False,
-                    accepted=accepted,
-                    matching_station=matching,
-                )
+            data = dict(
+                lat_dd=float(info["sample_latitude_dd"]),
+                lon_dd=float(info["sample_longitude_dd"]),
+                sweref99tm_x=x,
+                sweref99tm_y=y,
+                station_name=info.get(
+                    "reported_station_name", info.get("station_name", "")
+                ),
+                popup_html=html,
+                in_areas=False,
+                accepted=accepted,
+                matching_station=matching,
+                datetime=info.get("datetime"),
             )
+
+            self._station_info.append(data)
 
     def _save_master_station_info(self, data_holder: PolarsDataHolder):
         if not self._show_master_stations_within_radius:
@@ -432,6 +438,22 @@ class PolarsHtmlMap(PolarsFileExporter):
                 popup=popup,
                 icon=folium.Icon(color=color),
             ).add_to(fg)
+        fg.add_to(m)
+
+    def _add_lines_between_markers(self, m: "folium.Map") -> None:
+        if not self._show_lines_between_stations:
+            return
+        fg = folium.FeatureGroup(name="Lines between stations", show=True)
+        coordinates = []
+        for info in self._station_info:
+            print(f"{info=}")
+            coordinates.append([info["lat_dd"], info["lon_dd"]])
+        folium.PolyLine(
+            locations=coordinates,
+            color="#FF0000",
+            weight=5,
+            tooltip="From Boston to San Francisco",
+        ).add_to(fg)
         fg.add_to(m)
 
     def _add_custom_positions(self, m: "folium.Map") -> None:
