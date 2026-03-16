@@ -1,11 +1,15 @@
 import subprocess
 
+from sharkadm.config import CONFIG_DIRECTORY
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import get_nodc_config_directory, get_svn_info, svn
 
 
 def update_nodc_config_directory_from_svn() -> None:
     config_dir = get_nodc_config_directory()
+    if config_dir != CONFIG_DIRECTORY:
+        print("Config not linked to SVN. Will not try to update.")
+        return
     if not config_dir:
         adm_logger.log_workflow(
             "No nodc_config directory is configured.", level=adm_logger.WARNING

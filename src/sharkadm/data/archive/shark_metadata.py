@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 class SharkMetadata:
-    # def __init__(self, path: str | pathlib.Path, encoding: str = 'cp1252') -> None:
     def __init__(self, data: dict) -> None:
         self._data = data
         self._path = data.pop("path", None)

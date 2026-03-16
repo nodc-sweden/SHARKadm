@@ -75,7 +75,15 @@ class PolarsStandardFormat(PolarsFileExporter):
             LONGITUDE_DD=pl.col("visit_reported_longitude"),
             CRUISE=pl.lit(""),
             FILE_NAME=pl.col("source").str.split("\\").list.last(),
+            FILE_NAME_DATABASE=pl.col("source").str.split("\\").list.last(),
         )
+        # // METADATA;
+        # FILE_NAME;
+        # SBE09_0745_20250924_1123_77SE_22_0775.cnv
+        # // METADATA;
+        # FILE_NAME_DATABASE;
+        # ctd_profile_20250924_77SE_0775.txt
+
         if "cruise_id" in data.columns:
             data = data.with_columns(
                 CRUISE=pl.col("cruise_id"),

@@ -220,7 +220,10 @@ from sharkadm.transformers.position import (
     PolarsAddSamplePositionDM,
     PolarsAddSamplePositionSweref99tm,
 )
-from sharkadm.transformers.profile import PolarsAddMetadataToProfileData
+from sharkadm.transformers.profile import (
+    PolarsAddMetadataToProfileData,
+    PolarsLoadSensorInfoToProfileData,
+)
 from sharkadm.transformers.project_code import (
     AddEnglishProjectName,
     AddSwedishProjectName,

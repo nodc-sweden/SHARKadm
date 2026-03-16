@@ -3,7 +3,6 @@ from typing import Protocol
 
 import polars as pl
 
-from sharkadm.data.archive import metadata
 from sharkadm.data.data_source.profile.cnv_file import CnvDataFile
 from sharkadm.data.profile.base import PolarsProfileDataHolder
 
@@ -89,25 +88,7 @@ class PolarsCnvDataHolder(PolarsProfileDataHolder):
                 columns = set(data_source.data.columns)
             columns.intersection_update(data_source.data.columns)
             dfs.append(data_source.data)
-            self._data_sources[str(data_source)] = data_source
+            self._data_sources[data_source.path.stem] = data_source
         dfs = [df.select(sorted(columns)) for df in dfs]
         self._data = pl.concat(dfs, how="vertical_relaxed")
         self._data.fill_nan("")
-
-    def add_metadata(self, data: metadata.Metadata) -> None:
-        for (date, time), df in self._data.group_by(self.date_column, self.time_column):
-            boolean = (pl.col(self.date_column) == date) & (
-                pl.col(self.time_column) == time
-            )
-            kw = {self.date_column: date, self.time_column: time[:5]}
-            print(f"{kw=}")
-            meta = data.get_info(**kw)
-            print(f"{meta=}")
-            if len(meta) != 1:
-                raise Exception("Metadata error")
-            for col, value in meta[0].items():
-                if col not in self._data.columns:
-                    self._data = self._data.with_columns(pl.lit("").alias(col))
-                self._data = self._data.with_columns(
-                    pl.when(boolean).then(pl.lit(value)).otherwise(pl.col(col)).alias(col)
-                )

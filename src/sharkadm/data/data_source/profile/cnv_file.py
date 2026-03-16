@@ -1,22 +1,28 @@
 import datetime
+import re
 
 import polars as pl
 
 from sharkadm.data.data_source.base import PolarsDataFile
-from sharkadm.data.data_source.profile.mapper import get_ctd_parameter_mapper
+from sharkadm.data.data_source.profile.mapper import get_profile_mapper
 
 
 class CnvDataFile(PolarsDataFile):
     def __init__(self, *args, **kwargs):
         self._metadata_lines: list[str] = []
+        self._unit_mapper = {}
+        self._mapper = get_profile_mapper()
         super().__init__(*args, **kwargs)
-        self._mapper = get_ctd_parameter_mapper()
 
     def __getitem__(self, item: str) -> list[str] | str:
         values = set(self._data[item])
         if len(values) == 1:
             return values.pop()
         return sorted(values)
+
+    @property
+    def metadata_lines(self) -> list[str]:
+        return self._metadata_lines
 
     def _load_file(self) -> None:
         header = []
@@ -49,7 +55,12 @@ class CnvDataFile(PolarsDataFile):
                     name = line.split("=", 1)[-1].strip()
                     if ", lat =" in name:
                         name = name.split(", lat =")[0]
-                    header.append(self._mapper.get(name, name))
+                    unit_search = re.search(r"\[.+\]", name)
+                    internal_name = self._mapper.get(name, name)
+                    if unit_search:
+                        self._unit_mapper[internal_name] = unit_search.group()
+                    header.append(internal_name)
+                    # header.append(name)
                 elif line.startswith("*END*"):
                     is_data_line = True
                     continue

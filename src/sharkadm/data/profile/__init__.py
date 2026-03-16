@@ -72,3 +72,4 @@ def get_polars_profile_cnv_data_holder(
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(data_type="profile", import_column="PROFILE")
     return PolarsCnvDataHolder(path=path, header_mapper=mapper, **kwargs)
+    # return PolarsCnvDataHolder(path=path, **kwargs)
