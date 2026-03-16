@@ -1,9 +1,20 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-
+from .. import adm_logger
 from ..data import PolarsDataHolder
 from ..utils.add_column import add_float_column
 from .base import FileExporter
+
+plt = None
+sns = None
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. You need to '
+        f"install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
 
 
 class SimplePlot(FileExporter):
@@ -17,6 +28,12 @@ class SimplePlot(FileExporter):
         return "Creates a simple plot"
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
+        if not all([plt, sns]):
+            adm_logger.log_workflow(
+                "Could not create plot. Matplotlib and/or seaborn is missing",
+                level=adm_logger.WARNING,
+            )
+            return
         if not self._export_file_name:
             self._export_file_name = f"plot_{self._xcol}_{self._zcol}.png"
 
