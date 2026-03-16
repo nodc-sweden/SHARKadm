@@ -92,7 +92,7 @@ def get_mapper() -> dict:
         return info
 
 
-def fetch_obis_data(lat: float, lon: float) -> dict:
+def fetch_obis_data(lat: float, lon: float, verify_ssl: bool = True) -> dict:
     """
     Hämtar data från OBIS API för koordinaterna x och y.
 
@@ -107,18 +107,22 @@ def fetch_obis_data(lat: float, lon: float) -> dict:
     params = {"x": lon, "y": lat}
 
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params, timeout=10, verify=verify_ssl)
         response.raise_for_status()  # Kastar fel om statuskod ≠ 200
         return response.json()[0]
     except requests.exceptions.RequestException:
         return {}
 
 
-def get_obis_depth(lat: float, lon: float) -> float | None:
+def get_obis_depth(lat: float, lon: float, verify_ssl: bool = True) -> float | None:
     db_data = get_db_data(str(lat), str(lon))
     if db_data:
         return db_data["depth"]
-    info = fetch_obis_data(lat, lon)
+    info = fetch_obis_data(lat, lon, verify_ssl=verify_ssl)
+    if not info:
+        return None
     depth = float(info.get("grids", {}).get("bathymetry"))
+    if not depth:
+        return None
     add_db_data(str(lat), str(lon), str(depth))
     return depth

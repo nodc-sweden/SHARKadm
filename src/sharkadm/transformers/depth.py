@@ -96,19 +96,23 @@ class ReorderSampleMinAndMaxDepth(Transformer):
         return [row[self.min_depth_par], row[self.max_depth_par]]
 
 
-class PolarsAddIOdisDepth(PolarsTransformer):
+class PolarsAddIObisDepth(PolarsTransformer):
     col_to_set = "iobis_depth"
     lat_col = "sample_latitude_dd"
     lon_col = "sample_longitude_dd"
 
+    def __init__(self, verify_ssl: bool = True, **kwargs):
+        self._verify_ssl = verify_ssl
+        super().__init__(**kwargs)
+
     @staticmethod
     def get_transformer_description() -> str:
-        return f"Adds {PolarsAddIOdisDepth.col_to_set} from iobis api."
+        return f"Adds {PolarsAddIObisDepth.col_to_set} from iobis api."
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._add_empty_col_to_set(data_holder)
         for (lat, lon), df in data_holder.data.group_by([self.lat_col, self.lon_col]):
-            depth = iobis.get_obis_depth(lat, lon)
+            depth = iobis.get_obis_depth(lat, lon, verify_ssl=self._verify_ssl)
             if not depth:
                 continue
             print(lat, lon, depth)
