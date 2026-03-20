@@ -1,58 +1,8 @@
 import polars as pl
 
-from sharkadm import adm_logger
-from sharkadm.transformers.base import (
-    DataHolderProtocol,
-    PolarsDataHolderProtocol,
-    PolarsTransformer,
-    Transformer,
-)
+from sharkadm.data import PolarsDataHolder
+from sharkadm.transformers.base import PolarsTransformer
 from sharkadm.utils import matching_strings
-
-
-class ReplaceCommaWithDot(Transformer):
-    apply_on_columns = (
-        ".*latitude.*",
-        ".*longitude.*",
-        "water_depth_m",
-        ".*DIVIDE.*",
-        ".*MULTIPLY.*",
-        ".*COPY_VARIABLE.*",
-        "sampled_volume.*",
-        "sampler_area.*",
-        ".*wind.*",
-        ".*pressure.*",
-        ".*temperature.*",
-    )
-
-    def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
-        super().__init__()
-        if apply_on_columns:
-            self.apply_on_columns = apply_on_columns
-
-        self._handled_cols = dict()
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Replacing comma with dot in given columns"
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        for col in self._get_matching_cols(data_holder):
-            for item, df in data_holder.data.groupby(col):
-                item = str(item)
-                if "," not in item:
-                    continue
-                new_item = item.replace(",", ".")
-                self._log(
-                    f"Replacing comma with dot for value {item} in column {col}",
-                    level=adm_logger.INFO,
-                )
-                data_holder.data.loc[df.index, col] = new_item
-
-    def _get_matching_cols(self, data_holder: DataHolderProtocol) -> list[str]:
-        return matching_strings.get_matching_strings(
-            strings=data_holder.data.columns, match_strings=self.apply_on_columns
-        )
 
 
 class PolarsReplaceCommaWithDot(PolarsTransformer):
@@ -81,7 +31,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Replacing comma with dot in given columns"
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         columns = self._get_matching_cols(data_holder)
         transformed_data = data_holder.data.with_columns(
             [pl.col(column).str.replace(",", ".").alias(column) for column in columns]
@@ -106,7 +56,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
 
         data_holder.data = transformed_data
 
-    def _get_matching_cols(self, data_holder: PolarsDataHolderProtocol) -> list[str]:
+    def _get_matching_cols(self, data_holder: PolarsDataHolder) -> list[str]:
         return matching_strings.get_matching_strings(
             strings=data_holder.data.columns, match_strings=self.apply_on_columns
         )

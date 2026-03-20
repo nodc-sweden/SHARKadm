@@ -1,7 +1,10 @@
-from .base import DataHolderProtocol, Transformer
+import polars as pl
+
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
-class SetBacteriaAsReportedScientificName(Transformer):
+class SetBacteriaAsReportedScientificName(PolarsTransformer):
     valid_data_types = ("Bacterioplankton",)
     col_to_set = "scientific_name"
     value_to_set = "Bacteria"
@@ -18,7 +21,10 @@ class SetBacteriaAsReportedScientificName(Transformer):
             f"{SetBacteriaAsReportedScientificName.col_to_set} if column does not exist"
         )
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_to_set not in data_holder.data.columns:
-            data_holder.data[self.col_to_set] = self.value_to_set
-            self._log(f"Added column {self.col_to_set} with value {self.value_to_set}")
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if self.col_to_set in data_holder.data.columns:
+            return
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit(self.value_to_set).alias(self.col_to_set)
+        )
+        self._log(f"Added column {self.col_to_set} with value {self.value_to_set}")

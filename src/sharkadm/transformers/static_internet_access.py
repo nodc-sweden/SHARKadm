@@ -1,26 +1,7 @@
 import polars as pl
 
-from sharkadm.data.archive import get_archive_data_holder_names
-
-from .base import (
-    DataHolderProtocol,
-    PolarsDataHolderProtocol,
-    PolarsTransformer,
-    Transformer,
-)
-
-
-class AddStaticInternetAccessInfo(Transformer):
-    valid_data_holders = get_archive_data_holder_names()
-    col_to_set = "internet_access"
-    text_to_set = "https://shark.smhi.se"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adds link to where you can find the data. This information is static!"
-
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data[self.col_to_set] = self.text_to_set
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
 class PolarsAddStaticInternetAccessInfo(PolarsTransformer):
@@ -31,7 +12,7 @@ class PolarsAddStaticInternetAccessInfo(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Adds link to where you can find the data. This information is static!"
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
             pl.lit(self.text_to_set).alias(self.col_to_set)
         )

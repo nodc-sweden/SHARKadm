@@ -2,7 +2,7 @@ import logging
 
 from sharkadm.data import data_source
 
-from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
+from .archive_data_holder import PolarsArchiveDataHolder
 
 logger = logging.getLogger(__name__)
 

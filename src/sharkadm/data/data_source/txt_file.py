@@ -1,6 +1,5 @@
 import logging
 
-import pandas as pd
 import polars as pl
 
 from .base import DataFile, PolarsDataFile

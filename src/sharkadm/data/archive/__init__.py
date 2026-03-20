@@ -4,7 +4,6 @@ from typing import Union
 
 from sharkadm import sharkadm_exceptions, utils
 from sharkadm.data.archive.archive_data_holder import (
-    ArchiveDataHolder,
     PolarsArchiveDataHolder,
 )
 from sharkadm.data.archive.bacterioplankton import (

@@ -1,10 +1,10 @@
 from sharkadm import config
 from sharkadm.data import archive
 
-from .base import Transformer
+from .base import PolarsTransformer
 
 
-class ArchiveMapper(Transformer):
+class ArchiveMapper(PolarsTransformer):
     valid_data_holders = archive.get_archive_data_holder_names()
 
     def __init__(self, **kwargs):
