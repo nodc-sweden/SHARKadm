@@ -21,19 +21,21 @@ class MissingTime(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in MissingTime.source_cols:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation_failed(
+                self._log_fail(
                     f'Missing column "{col}"', level=adm_logger.ERROR
                 )
                 continue
             df = data_holder.data[data_holder.data[col].str.strip() == ""]
             if df.empty:
                 continue
-            nr_missing = len(df)
-            rows_str = ", ".join(list(df["row_number"].astype(str)))
-            adm_logger.log_validation_failed(
-                f"Missing {col} if {nr_missing} rows. Att rows: {rows_str}",
-                level=adm_logger.ERROR,
-            )
+            # nr_missing = len(df)
+            # rows_str = ", ".join(list(df["row_number"].astype(str)))
+            if len(df):
+                self._log_fail(
+                    f"Missing column {col} at {len(df)} rows",
+                    level=adm_logger.ERROR,
+                    row_numbers = df["row_number"].to_list(9)
+                )
 
     @staticmethod
     def check(x):
