@@ -89,23 +89,14 @@ class ValidateWeatherConsistency(Validator):
         ):
             self._log_fail("Missing visit date or reported station name columns.")
 
-        unique_rows = data_holder.data.select(
-            [
-                "visit_date",
-                "reported_station_name",
-                "weather_observation_code",
-                "cloud_observation_code",
-            ]
-        ).unique()
-
-        unique_rows = unique_rows.with_columns(
+        df = data_holder.data.with_columns(
             [
                 pl.col("cloud_observation_code").cast(pl.Int32, strict=False),
                 pl.col("weather_observation_code").cast(pl.Int32, strict=False),
             ]
         )
 
-        unique_rows = unique_rows.with_columns(
+        df = df.with_columns(
             [
                 pl.when(
                     pl.col("weather_observation_code").is_null()
@@ -135,23 +126,30 @@ class ValidateWeatherConsistency(Validator):
             ]
         )
 
-        if unique_rows["is_valid"].all():
+        invalid_row_numbers = df.filter(pl.col("is_valid"))["row_number"].to_list()
+
+        invalid_unique = (
+            df
+            .filter(~pl.col("is_valid"))
+            .group_by([
+                "visit_date",
+                "reported_station_name",
+                "weather_observation_code",
+                "cloud_observation_code",
+            ])
+            .agg(
+                pl.col("row_number").alias("row_numbers")
+            )
+        )
+
+        if len(invalid_row_numbers) == 0:
             self._log_success("Weather and cloud observation codes are consistent")
         else:
-            erroneous_rows = (
-                unique_rows.filter(~pl.col("is_valid"))
-                .select(
-                    [
-                        "visit_date",
-                        "reported_station_name",
-                        "weather_observation_code",
-                        "cloud_observation_code",
-                    ]
+            for row in invalid_unique.iter_rows(named=True):
+                message = (
+                    f"{row['reported_station_name']} on {row['visit_date']}: "
+                    f"weather observation code {row['weather_observation_code']} "
+                    f"is inconsistent with cloud observation code "
+                    f"{row['cloud_observation_code']}"
                 )
-                .to_dicts()
-            )
-
-            self._log_fail(
-                f"Weather and cloud observation codes are not consistent:"
-                f"\n{erroneous_rows}"
-            )
+                self._log_fail(msg=message, row_numbers=row["row_numbers"])

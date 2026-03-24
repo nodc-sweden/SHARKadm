@@ -63,7 +63,7 @@ class ValidateDateAndTime(Validator):
     def _validate(self, data_holder: PolarsDataHolder) -> OperationInfo | None:
         info = OperationInfo(operator=self)
         self._log_workflow(
-            "Checking that visit date and sample time.",
+            "Checking visit/sample date and sample time.",
         )
         error = False
         date_col = "visit_date"
@@ -74,18 +74,18 @@ class ValidateDateAndTime(Validator):
             [date_col, time_col]
         ):
             if not (time_component := self._time_component(sample_time)):
-                msg = f"Sample time ({time_col}) not valid: '{sample_time}'"
+                msg = f"Sample time from {time_col} not valid: '{sample_time}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"]),
+                    row_numbers=list(df["row_number"].to_list()),
                 )
                 error = True
 
             if not (date_component := self._date_component(visit_date)):
-                msg = f"Visit date {date_col} not valid: '{visit_date}'"
+                msg = f"Visit date from {date_col} not valid: '{visit_date}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"]),
+                    row_numbers=list(df["row_number"].to_list()),
                 )
                 error = True
 
