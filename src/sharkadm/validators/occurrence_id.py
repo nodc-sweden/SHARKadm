@@ -1,7 +1,5 @@
 import logging
 
-from sharkadm.sharkadm_logger import adm_logger
-
 from .base import DataHolderProtocol, Validator
 
 logger = logging.getLogger(__name__)
@@ -16,7 +14,7 @@ class ValidateOccurrenceId(Validator):
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         if self.col_to_check not in data_holder.data:
-            adm_logger.log_validation_failed(
+            self._log_fail(
                 f"Could not validate occurrence id. Missing column: {self.col_to_check}"
             )
             return
@@ -24,6 +22,6 @@ class ValidateOccurrenceId(Validator):
         df = data_holder.data.loc[missing_boolean, :]
         if df.empty:
             return
-        adm_logger.log_validation_failed(
+        self._log_fail(
             f"Missing {self.col_to_check} ({len(df)} places)"
         )

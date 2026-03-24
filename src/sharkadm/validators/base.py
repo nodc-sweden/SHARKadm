@@ -175,14 +175,22 @@ class Validator(ABC, Operator):
     @abstractmethod
     def _validate(self, data_holder: PolarsDataHolder) -> None: ...
 
-    def _log_success(self, msg: str, **kwargs):
-        adm_logger.log_validation_succeeded(
-            msg, validator=self.get_display_name(), cls=self.__class__.__name__, **kwargs
+    def _log_success(self, msg: str, level: str = adm_logger.INFO,**kwargs):
+        adm_logger.log_validation(
+            msg=msg,
+            level=level,
+            validator=self.get_display_name(),
+            cls=self.__class__.__name__,
+            **kwargs,
         )
 
-    def _log_fail(self, msg: str, **kwargs):
-        adm_logger.log_validation_failed(
-            msg, validator=self.get_display_name(), cls=self.__class__.__name__, **kwargs
+    def _log_fail(self, msg: str, level: str = adm_logger.WARNING, **kwargs):
+        adm_logger.log_validation(
+            msg=msg,
+            level=level,
+            validator=self.get_display_name(),
+            cls=self.__class__.__name__,
+            **kwargs,
         )
 
     def _log_workflow(self, msg: str, **kwargs):
