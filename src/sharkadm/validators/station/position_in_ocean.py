@@ -42,5 +42,7 @@ class ValidatePositionInOcean(Validator):
                 self._log_success(f"Station '{name}' is inside ocean.")
             else:
                 self._log_fail(
-                    f"Station '{name}' (at {point.x}, {point.y}) is not inside ocean."
+                    msg=f"Station '{name}' at "
+                    f"{latitude}, {longitude} is not inside ocean.",
+                    row_numbers=data["row_number"].to_list()
                 )

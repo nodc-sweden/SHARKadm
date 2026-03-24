@@ -27,35 +27,48 @@ class ValidateWaterDepth(Validator):
             or "reported_station_name" not in data_holder.data.columns
         ):
             self._log_fail("Missing visit date or reported station name columns.")
+        df = data_holder.data.with_columns(
+            [pl.col("water_depth_m").cast(pl.Float64, strict=False)]
+        )
 
-        unique_rows = data_holder.data.select(
-            ["visit_date", "reported_station_name", "water_depth_m"],
-        ).unique()
-        unique_rows = unique_rows.with_columns(
+        df = df.with_columns(
             [
                 pl.when(
-                    pl.col("water_depth_m")
-                    .cast(pl.Float64, strict=False)
-                    .is_between(self.lower_limit, self.upper_limit, closed="none")
+                    # valid numeric values within the limits
+                    (pl.col("water_depth_m").is_not_null())
+                    & pl.col("water_depth_m").is_between(
+                        self.lower_limit, self.upper_limit, closed="both"
+                    )
                 )
                 .then(True)
-                .when(pl.col("water_depth_m").is_null() | (pl.col("water_depth_m") == ""))
-                .then(False)
                 .otherwise(False)
                 .alias("is_valid")
             ]
         )
 
-        if unique_rows["is_valid"].all():
+        invalid_row_numbers = df.filter(pl.col("is_valid"))["row_number"].to_list()
+
+        invalid_unique = (
+            df.filter(~pl.col("is_valid"))
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "water_depth_m",
+                ]
+            )
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
+
+        if len(invalid_row_numbers) == 0:
             self._log_success("Water depth is ok")
         else:
-            erroneous_rows = (
-                unique_rows.filter(~pl.col("is_valid"))
-                .select(["visit_date", "reported_station_name", "water_depth_m"])
-                .to_dicts()
-            )
-
-            self._log_fail(f"Water depth has unexpected values:\n{erroneous_rows}")
+            for row in invalid_unique.iter_rows(named=True):
+                message = (
+                    f"{row['reported_station_name']} on {row['visit_date']}: "
+                    f"water depth has unexpected value"
+                )
+                self._log_fail(msg=message, row_numbers=row["row_numbers"])
 
 
 class ValidateSampleDepth(Validator):
@@ -82,38 +95,70 @@ class ValidateSampleDepth(Validator):
             )
             return
 
-        error = False
-        for (sample_depth, water_depth), df in data_holder.data.group_by(
-            ["sample_depth_m", "water_depth_m"]
-        ):
-            visit_info = (
-                df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
-            )
-            try:
-                sample_depth_float = float(sample_depth)
-                water_depth_float = float(water_depth)
-            except (TypeError, ValueError):
-                self._log_fail(
-                    f"Could not validate sample depth: "
-                    f"invalid formats in "
-                    f"sample_depth={sample_depth!r} "
-                    f"and/or "
-                    f"water_depth={water_depth!r} "
-                    f"at visit date and station: {visit_info}",
-                    row_numbers=list(df["row_number"]),
-                )
-                error = True
-                continue
-            if sample_depth_float >= water_depth_float:
-                self._log_fail(
-                    f"Sample depth below water depth: {sample_depth} >= {water_depth}"
-                    f" at visit date and station: "
-                    f"{visit_info}",
-                    row_numbers=list(df["row_number"]),
-                )
-                error = True
+        df = data_holder.data.with_columns(
+            [
+                pl.col("water_depth_m").cast(pl.Float64, strict=False),
+                pl.col("sample_depth_m").cast(pl.Float64, strict=False),
+            ]
+        )
 
-        if not error:
+        df = df.with_columns(
+            [
+                # sample depth missing (but only care if water_depth exists)
+                (
+                    pl.col("water_depth_m").is_not_null()
+                    & pl.col("sample_depth_m").is_null()
+                ).alias("fail_sample_depth_missing"),
+                # sample depth too deep (only when both exist)
+                (
+                    pl.col("water_depth_m").is_not_null()
+                    & pl.col("sample_depth_m").is_not_null()
+                    & (pl.col("sample_depth_m") >= pl.col("water_depth_m"))
+                ).alias("fail_sample_too_deep"),
+            ]
+        )
+
+        missing_groups = (
+            df.filter(pl.col("fail_sample_depth_missing"))
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "water_depth_m",
+                ]
+            )
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
+
+        for row in missing_groups.iter_rows(named=True):
+            message = (
+                f"{row['reported_station_name']} on {row['visit_date']}: "
+                f"Missing sample depth (water_depth={row['water_depth_m']})"
+            )
+            self._log_fail(msg=message, row_numbers=row["row_numbers"])
+
+        too_deep_groups = (
+            df.filter(pl.col("fail_sample_too_deep"))
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "water_depth_m",
+                    "sample_depth_m",
+                ]
+            )
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
+
+        for row in too_deep_groups.iter_rows(named=True):
+            message = (
+                f"{row['reported_station_name']} on {row['visit_date']}: "
+                f"Sample depth below water depth: "
+                f"{row['sample_depth_m']} >= {row['water_depth_m']}"
+            )
+            self._log_fail(msg=message, row_numbers=row["row_numbers"])
+
+        if missing_groups.height == 0 and too_deep_groups.height == 0:
             self._log_success("All sample depths above water depth.")
 
 

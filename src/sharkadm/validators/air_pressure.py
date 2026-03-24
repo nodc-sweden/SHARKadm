@@ -32,34 +32,51 @@ class ValidateAirpres(Validator):
         ):
             self._log_fail("Missing visit date or reported station name columns.")
 
-        unique_rows = data_holder.data.select(
-            ["visit_date", "reported_station_name", "air_pressure_hpa"]
-        ).unique()
-        unique_rows = unique_rows.with_columns(
+        df = data_holder.data.with_columns(
+            [pl.col("air_pressure_hpa").cast(pl.Float64, strict=False)]
+        )
+        df = df.with_columns(
             [
-                pl.when(
-                    pl.col("air_pressure_hpa").is_null()
-                    | (pl.col("air_pressure_hpa") == "")
-                )
-                .then(True)
-                .when(
-                    pl.col("air_pressure_hpa")
-                    .cast(pl.Float64, strict=False)
-                    .is_between(self.lower_limit, self.upper_limit, closed="both")
-                )
-                .then(True)
-                .otherwise(False)
-                .alias("is_valid")
+                (pl.col("air_pressure_hpa").is_null()).alias("fail_no_air_pressure"),
+                (
+                    ~pl.col("air_pressure_hpa").is_between(
+                        self.lower_limit, self.upper_limit, closed="both"
+                    )
+                ).alias("fail_air_pressure_out_of_range"),
             ]
         )
 
-        if unique_rows["is_valid"].all():
-            self._log_success("Air pressure (hPa) is ok")
-        else:
-            erroneous_rows = (
-                unique_rows.filter(~pl.col("is_valid"))
-                .select(["visit_date", "reported_station_name", "air_pressure_hpa"])
-                .to_dicts()
+        missing_groups = (
+            df.filter(pl.col("fail_no_air_pressure"))
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                ]
             )
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
 
-            self._log_fail(f"Air pressure (hPa) has unexpected values:\n{erroneous_rows}")
+        for row in missing_groups.iter_rows(named=True):
+            message = (
+                f"{row['reported_station_name']} on {row['visit_date']}: "
+                f"Missing air pressure ({row['air_pressure_hpa']})"
+            )
+            self._log_fail(msg=message, row_numbers=row["row_numbers"])
+
+        out_of_range_groups = (
+            df.filter(pl.col("fail_air_pressure_out_of_range"))
+            .group_by(["visit_date", "reported_station_name", "air_pressure_hpa"])
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
+
+        for row in out_of_range_groups.iter_rows(named=True):
+            message = (
+                f"{row['reported_station_name']} on {row['visit_date']}: "
+                f"air pressure out of range: "
+                f"{self.lower_limit} > {row['air_pressure_hpa']} > {self.upper_limit}"
+            )
+            self._log_fail(msg=message, row_numbers=row["row_numbers"])
+
+        if missing_groups.height == 0 and out_of_range_groups.height == 0:
+            self._log_success("All airpressures are accepted.")
