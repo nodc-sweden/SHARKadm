@@ -88,7 +88,7 @@ class ValidateSerialNumber(Validator):
                 )
 
         if not error_found:
-            adm_logger.log_validation_succeeded(
-                "All serial numbers are chronological and correctly formatted.",
-                level="info",
+            self._log_success(
+                msg="All serial numbers are chronological and correctly formatted.",
+                level=adm_logger.INFO,
             )

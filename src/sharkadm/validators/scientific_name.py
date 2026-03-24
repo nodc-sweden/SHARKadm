@@ -19,7 +19,7 @@ class ValidateScientificNameIsTranslated(Validator):
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
         if self.to_col not in data_holder.data:
-            adm_logger.log_validation_failed(
+            self._log_fail(
                 f"Could not validate scientific_name. Missing column {self.to_col}",
                 level=adm_logger.WARNING,
             )
@@ -52,7 +52,7 @@ class ValidateAphiaIdDiffersFromBvolAphiaId(Validator):
         if self.to_col not in data_holder.data:
             missing.append(self.to_col)
         if missing:
-            adm_logger.log_validation_failed(
+            self._log_fail(
                 f"Could not validate aphia_id. Missing column(s) {', '.join(missing)}",
                 level=adm_logger.WARNING,
             )
@@ -97,7 +97,7 @@ class ValidateScientificNameAndSizeClassDiffersFromBvol(Validator):
             if col not in data_holder.data.columns
         ]
         if missing:
-            adm_logger.log_validation_failed(
+            self._log_fail(
                 f"Could not validate scientific and size_class. Missing column(s) "
                 f"{', '.join(missing)}",
                 level=adm_logger.WARNING,
