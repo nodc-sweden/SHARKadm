@@ -1,7 +1,8 @@
-from .base import DataHolderProtocol, FileExporter
+from ..data import PolarsDataHolder
+from .base import PolarsFileExporter
 
 
-class SpeciesTranslationTxt(FileExporter):
+class SpeciesTranslationTxt(PolarsFileExporter):
     """Creates a txt file with all translations of scientific_name to dyntaxa, worms and
     bvol names"""
 
@@ -31,7 +32,7 @@ class SpeciesTranslationTxt(FileExporter):
             "worms and bvol names."
         )
 
-    def _export(self, data_holder: DataHolderProtocol) -> None:
+    def _export(self, data_holder: PolarsDataHolder) -> None:
         if not self.export_file_name:
             self._export_file_name = f"species_translation_{data_holder.dataset_name}.txt"
         columns = [col for col in self.columns if col in data_holder.data]

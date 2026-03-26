@@ -2,7 +2,8 @@ import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, PolarsTransformer
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 try:
     from nodc_codes import get_translate_codes_object
@@ -32,7 +33,7 @@ class _PolarsAddCodes(PolarsTransformer):
     def get_transformer_description() -> str:
         return ""
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         source_col = ""
         for col in self.source_cols:
             if col in data_holder.data.columns:

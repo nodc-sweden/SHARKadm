@@ -1,10 +1,7 @@
 import functools
-import logging
 import pathlib
 
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 
 class ImportMatrixMapper:
@@ -105,7 +102,7 @@ class ImportMatrixConfig:
             msg = (
                 f"Datatype {self.data_type} does not match name of file {self._path.name}"
             )
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise ValueError(msg)
 
     def _load_file(self) -> None:

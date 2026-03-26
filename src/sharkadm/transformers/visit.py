@@ -1,9 +1,7 @@
 import polars as pl
 
-from .base import (
-    PolarsDataHolder,
-    PolarsTransformer,
-)
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
 class PolarsAddVisitKey(PolarsTransformer):

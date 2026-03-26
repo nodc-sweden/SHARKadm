@@ -1,11 +1,8 @@
-import logging
 import xml.etree.ElementTree as ET
 
 import pandas as pd
 
 from .base import DataFile
-
-logger = logging.getLogger(__name__)
 
 
 class old_XmlDataFile(DataFile):

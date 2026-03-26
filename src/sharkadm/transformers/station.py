@@ -1,7 +1,8 @@
 import polars as pl
 
+from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers.base import PolarsDataHolder, PolarsTransformer
+from sharkadm.transformers.base import PolarsTransformer
 
 try:
     from nodc_station import get_station_object

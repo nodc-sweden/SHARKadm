@@ -13,19 +13,24 @@ from sharkadm.data.data_source.base import (
 from sharkadm.sharkadm_logger import adm_logger
 
 
-class DataHolder(ABC):
+class PolarsDataHolder(ABC):
     """Class to hold data from a specific data type. Add data using the
     add_data_source method"""
 
+    _data_type_synonym = "unknown"
     _data_structure = "row"
 
     def __init__(self, *args, **kwargs):
-        self._data_sources: dict[str, DataSource | PolarsDataSource] = dict()
+        self._data_sources: dict[str, PolarsDataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
         # self._data_structure = "column"
         self._data = pl.DataFrame()
+        self._filtered_data = None
+        self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
+            self._data_type_synonym
+        )
 
     def __repr__(self) -> str:
         return (
@@ -33,8 +38,27 @@ class DataHolder(ABC):
             f"{self.dataset_name}"
         )
 
-    @abstractmethod
-    def __add__(self, other): ...
+    def __add__(self, other) -> "PolarsConcatDataHolder":
+        if self.data_type != other.data_type:
+            adm_logger.log_workflow(
+                f"Not allowed to merge data_sources of different data_types: "
+                f"{self.data_type} and {other.data_type}"
+            )
+            raise TypeError
+        if self.dataset_name == other.dataset_name:
+            adm_logger.log_workflow(
+                f"Not allowed to merge to instances of the same dataset: "
+                f"{self.dataset_name}"
+            )
+            raise TypeError
+        concat_data = pl.concat([self.data, other.data])
+        cdh = PolarsConcatDataHolder()
+        cdh.data = concat_data
+        cdh.set_data_type_obj(self.data_type_obj)
+        return cdh
+
+    def __radd__(self, other) -> "PolarsDataHolder":
+        return self
 
     @property
     def workflow_message(self) -> str:
@@ -52,12 +76,14 @@ class DataHolder(ABC):
         ...
 
     @property
-    def data(self) -> pl.DataFrame:
-        return self._data
-
-    @property
     def data_sources(self) -> dict:
         return self._data_sources
+
+    @property
+    def data(self) -> pl.DataFrame:
+        if self.is_filtered:
+            return self._filtered_data
+        return self._data
 
     @data.setter
     def data(self, df: pl.DataFrame) -> None:
@@ -77,12 +103,24 @@ class DataHolder(ABC):
         self._data_structure = data_structure_lower
 
     @property
-    @abstractmethod
-    def data_type(self) -> str: ...
+    def data_type_obj(self) -> DataType:
+        return self._data_type_obj
 
     @property
-    @abstractmethod
-    def data_type_internal(self) -> str: ...
+    def data_type(self) -> str:
+        return self.data_type_obj.data_type
+
+    @property
+    def data_type_internal(self) -> str:
+        return self.data_type_obj.data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return self._data_type_obj.data_type_in_data
+
+    @property
+    def columns(self) -> list[str]:
+        return sorted(self.data.columns)
 
     @property
     @abstractmethod
@@ -91,10 +129,6 @@ class DataHolder(ABC):
     @property
     def number_metadata_rows(self) -> int:
         return self._number_metadata_rows
-
-    @property
-    @abstractmethod
-    def columns(self) -> list[str]: ...
 
     @property
     def mapped_columns(self) -> dict[str, str]:
@@ -131,10 +165,6 @@ class DataHolder(ABC):
     @property
     def original_qf_column_prefix(self) -> str | None:
         return self._qf_column_prefix
-
-    @property
-    @abstractmethod
-    def year_span(self) -> list[str]: ...
 
     @property
     def zip_archive_base(self) -> str:
@@ -177,75 +207,6 @@ class DataHolder(ABC):
     def _check_data_source(self, data_source: DataSource | PolarsDataSource) -> None:
         # Can be overwritten in child classes
         return
-
-
-class PolarsDataHolder(DataHolder, ABC):
-    _data_type_synonym = "unknown"
-
-    def __init__(self, *args, **kwargs):
-        self._data = pl.DataFrame()
-        self._filtered_data = None
-        self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
-            self._data_type_synonym
-        )
-        super().__init__(*args, **kwargs)
-
-    def __add__(self, other) -> "PolarsConcatDataHolder":
-        if self.data_type != other.data_type:
-            adm_logger.log_workflow(
-                f"Not allowed to merge data_sources of different data_types: "
-                f"{self.data_type} and {other.data_type}"
-            )
-            return
-        if self.dataset_name == other.dataset_name:
-            adm_logger.log_workflow(
-                f"Not allowed to merge to instances of the same dataset: "
-                f"{self.dataset_name}"
-            )
-            return
-        concat_data = pl.concat([self.data, other.data])
-        cdh = PolarsConcatDataHolder()
-        cdh.data = concat_data
-        cdh.set_data_type_obj(self.data_type_obj)
-        return cdh
-
-    def __radd__(self, other) -> "PolarsDataHolder":
-        return self
-
-    @property
-    def data(self) -> pl.DataFrame:
-        if self.is_filtered:
-            return self._filtered_data
-        return self._data
-
-    @data.setter
-    def data(self, df: pl.DataFrame) -> None:
-        if type(df) not in [pl.DataFrame, pd.DataFrame]:
-            raise TypeError(
-                "Data must be of type polars.DataFrame or pandas.DataFrame "
-                f"(was '{type(df)}')"
-            )
-        self._data = df
-
-    @property
-    def data_type_obj(self) -> DataType:
-        return self._data_type_obj
-
-    @property
-    def data_type(self) -> str:
-        return self.data_type_obj.data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        return self.data_type_obj.data_type_internal
-
-    @property
-    def data_type_in_data(self) -> str:
-        return self._data_type_obj.data_type_in_data
-
-    @property
-    def columns(self) -> list[str]:
-        return sorted(self.data.columns)
 
     @property
     def min_year(self) -> str:
@@ -298,6 +259,7 @@ class PolarsDataHolder(DataHolder, ABC):
     def reset_filter(self):
         self._filtered_data = None
 
+    @property
     def year_span(self) -> list[str]:
         years = list(set(self.data["visit_year"]))
         if len(years) == 1:

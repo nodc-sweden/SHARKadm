@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import logging
 import pathlib
 from typing import Protocol
 
@@ -9,8 +8,6 @@ import openpyxl
 import pandas as pd
 
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y-%m"]
 
@@ -78,7 +75,7 @@ class SamplingInfo:
         path = pathlib.Path(path)
         if path.suffix != ".txt":
             msg = f"File is not a valid sampling_info text file: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
         data = dict()
         data["path"] = path

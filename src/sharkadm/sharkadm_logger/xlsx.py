@@ -1,18 +1,10 @@
 import datetime
-import logging
-from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from sharkadm.utils.paths import get_next_incremented_file_path
 
 from .base import SharkadmLoggerExporter
-
-if TYPE_CHECKING:
-    pass
-
-
-logger = logging.getLogger(__name__)
 
 
 class XlsxExporter(SharkadmLoggerExporter):
@@ -30,11 +22,9 @@ class XlsxExporter(SharkadmLoggerExporter):
         df = self._extract_info()
         try:
             self._save_as_xlsx_with_table(df)
-            logger.info(f"Saving sharkadm xlsx log to {self.file_path}")
         except PermissionError:
             self.file_path = get_next_incremented_file_path(self.file_path)
             self._save_as_xlsx_with_table(df)
-            logger.info(f"Saving sharkadm xlsx log to {self.file_path}")
 
     def _extract_info(self) -> pd.DataFrame:
         header = self.adm_logger.keys

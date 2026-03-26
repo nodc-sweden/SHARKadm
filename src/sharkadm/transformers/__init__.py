@@ -12,9 +12,8 @@ from sharkadm.transformers.add_gsw_parameters import (
     PolarsAddOxygenSaturationWide,
     PolarsAddOxygenSaturation,
 )
-from sharkadm.transformers.add_lmqnt import AddLmqnt, PolarsAddLmqnt
+from sharkadm.transformers.add_lmqnt import PolarsAddLmqnt
 from sharkadm.transformers.add_uncertainty import (
-    AddUncertainty,
     PolarsAddUncertainty,
     PolarsAddStandardUncertainty,
 )
@@ -109,6 +108,12 @@ from sharkadm.transformers.dyntaxa import (
 )
 from sharkadm.transformers.fake import FakeAddCTDtagToColumns, FakeAddPressureFromDepth
 from sharkadm.transformers.flags import PolarsConvertFlagsToSDN
+from sharkadm.transformers.laboratory import (
+    PolarsAddEnglishSamplingLaboratory,
+    PolarsAddSwedishSamplingLaboratory,
+    PolarsAddEnglishAnalyticalLaboratory,
+    PolarsAddSwedishAnalyticalLaboratory,
+)
 from sharkadm.transformers.lims import (
     PolarsMoveLessThanFlagRowFormat,
     PolarsMoveLargerThanFlagRowFormat,
@@ -172,11 +177,11 @@ from sharkadm.transformers.project_code import (
     PolarsAddSwedishProjectName,
 )
 from sharkadm.transformers.red_list import AddRedList
-from sharkadm.transformers.replace import (
-    PolarsReplaceNanWithNone,
-)
-from sharkadm.transformers.replace_comma_with_dot import (
-    PolarsReplaceCommaWithDot,
+from sharkadm.transformers.replace import PolarsReplaceNanWithNone
+from sharkadm.transformers.replace_comma_with_dot import PolarsReplaceCommaWithDot
+from sharkadm.transformers.reporting_institute import (
+    PolarsAddEnglishReportingInstitute,
+    PolarsAddSwedishReportingInstitute,
 )
 from sharkadm.transformers.row import PolarsAddRowNumber
 from sharkadm.transformers.sampler_area import AddCalculatedSamplerArea

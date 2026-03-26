@@ -1,20 +1,13 @@
-import logging
 import pathlib
 from typing import Protocol
 
-import pandas as pd
 import polars as pl
 
 from sharkadm.data.archive import analyse_info, sampling_info
-from sharkadm.data.data_holder import PandasDataHolder, PolarsDataHolder
+from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.data_source.base import DataFile
-from sharkadm.data.data_source.txt_file import (
-    CsvRowFormatPolarsDataFile,
-    TxtColumnFormatDataFile,
-)
+from sharkadm.data.data_source.txt_file import CsvRowFormatPolarsDataFile
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 
 class HeaderMapper(Protocol):

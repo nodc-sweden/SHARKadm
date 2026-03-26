@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import logging
 import pathlib
 from typing import Protocol
 
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y-%m"]
 

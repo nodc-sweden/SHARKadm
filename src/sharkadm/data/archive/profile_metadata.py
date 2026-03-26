@@ -1,9 +1,7 @@
-import logging
 import pathlib
 
+from sharkadm import adm_logger
 from sharkadm.data.archive.shark_metadata import SharkMetadata
-
-logger = logging.getLogger(__name__)
 
 
 class ProfileMetadata:
@@ -26,7 +24,7 @@ class ProfileMetadata:
         path = pathlib.Path(path)
         if path.suffix != ".txt":
             msg = f"File is not a valid shark_metadata text file: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
         data = dict()
         data["path"] = path

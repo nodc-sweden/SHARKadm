@@ -1,10 +1,6 @@
-import logging
-
 import pandas as pd
 
 from .base import DataFile
-
-logger = logging.getLogger(__name__)
 
 
 class SkvDataFile(DataFile):

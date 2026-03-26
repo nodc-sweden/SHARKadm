@@ -1,11 +1,11 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import PolarsMultiTransformer
 from sharkadm.multi_transformers.dyntaxa import DyntaxaPolars
 from sharkadm.multi_transformers.location import LocationPolars
 from sharkadm.multi_transformers.translate import TranslatePolars
 
 
-class GeneralDVPolars(MultiTransformer):
+class GeneralDVPolars(PolarsMultiTransformer):
     _transformers = (
         transformers.PolarsWideToLong,
         transformers.PolarsAddDeliveryNoteInfo,

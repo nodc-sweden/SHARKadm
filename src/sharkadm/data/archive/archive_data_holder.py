@@ -1,4 +1,3 @@
-import logging
 import pathlib
 from abc import ABC
 
@@ -13,8 +12,6 @@ from sharkadm.data.data_source.txt_file import (
     CsvRowFormatPolarsDataFile,
 )
 from sharkadm.sharkadm_logger import adm_logger
-
-logger = logging.getLogger(__name__)
 
 
 class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
@@ -55,17 +52,17 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def _load_data(self) -> None:
         data_file_path = self.processed_data_directory / "data.txt"
         if not data_file_path.exists():
-            logger.info(
+            adm_logger.log_workflow(
                 f"No data file found in {self.processed_data_directory}. "
                 f"Looking for file with keyword 'data'..."
             )
             for path in self.processed_data_directory.iterdir():
                 if "data" in path.stem and path.suffix == ".txt":
                     data_file_path = path
-                    logger.info(f"Will use data file: {path}")
+                    adm_logger.log_workflow(f"Will use data file: {path}")
                     break
         if not data_file_path:
-            logger.error(
+            adm_logger.log_workflow(
                 f"Could not find any data file in delivery: {self.archive_root_directory}"
             )
             return
@@ -292,10 +289,10 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         #     self._data_type_mapper.get(data_source.data_type) !=
         #     self._data_type_mapper.get(self.data_type
         # ):
-        if data_source.data_type.lower() != self.data_type.lower().replace("_", ""):
-            msg = (
-                f"Data source {data_source} in data holder {self.name} "
-                f"is not of type {self.data_type}"
-            )
-            logger.error(msg)
-            raise ValueError(msg)
+        # if data_source.data_type.lower() != self.data_type.lower().replace("_", ""):
+        #     msg = (
+        #         f"Data source {data_source} in data holder {self.name} "
+        #         f"is not of type {self.data_type}"
+        #     )
+        #     logger.error(msg)
+        #     raise ValueError(msg)

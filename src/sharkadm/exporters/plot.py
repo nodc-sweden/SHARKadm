@@ -1,7 +1,7 @@
 from .. import adm_logger
 from ..data import PolarsDataHolder
 from ..utils.add_column import add_float_column
-from .base import FileExporter
+from .base import PolarsFileExporter
 
 plt = None
 sns = None
@@ -17,7 +17,7 @@ except ModuleNotFoundError as e:
     )
 
 
-class SimplePlot(FileExporter):
+class SimplePlot(PolarsFileExporter):
     def __init__(self, xcol: str, zcol: str = "sample_depth_m", **kwargs):
         super().__init__(**kwargs)
         self._xcol = xcol

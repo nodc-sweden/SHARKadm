@@ -1,11 +1,7 @@
-import logging
-
 import pandas as pd
 import polars as pl
 
 from .base import DataFile, PolarsDataFile
-
-logger = logging.getLogger(__name__)
 
 
 class XlsxFormatDataFile(DataFile):

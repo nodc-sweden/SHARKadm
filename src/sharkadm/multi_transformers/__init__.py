@@ -3,11 +3,11 @@ import pathlib
 from typing import Type
 
 from sharkadm import utils
-from sharkadm.multi_transformers.base import MultiTransformer, PolarsMultiTransformer
+from sharkadm.multi_transformers.base import PolarsMultiTransformer
 from sharkadm.multi_transformers.bvol import BvolPolars
 from sharkadm.multi_transformers.calculate import CalculatePolars
-from sharkadm.multi_transformers.date_time import DateTime, DateTimePolars
-from sharkadm.multi_transformers.dyntaxa import Dyntaxa, DyntaxaPolars
+from sharkadm.multi_transformers.date_time import DateTimePolars
+from sharkadm.multi_transformers.dyntaxa import DyntaxaPolars
 from sharkadm.multi_transformers.general_dv import GeneralDVPolars
 from sharkadm.multi_transformers.general_final import GeneralFinal
 from sharkadm.multi_transformers.general_initial import GeneralInitial
@@ -18,8 +18,8 @@ from sharkadm.multi_transformers.location import (
     LocationRPolars,
     LocationRredPolars,
 )
-from sharkadm.multi_transformers.position import Position, PositionPolars
-from sharkadm.multi_transformers.static_dv import StaticDV, StaticDVPolars
+from sharkadm.multi_transformers.position import PositionPolars
+from sharkadm.multi_transformers.static_dv import StaticDVPolars
 from sharkadm.multi_transformers.translate import TranslatePolars
 from sharkadm.multi_transformers.worms import WormsPolars
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
@@ -28,15 +28,15 @@ from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 @functools.cache
 def get_multi_transformer_list() -> list[str]:
     """Returns a sorted list of name of all available multi_transformers"""
-    return sorted(utils.get_all_class_children_names(MultiTransformer))
+    return sorted(utils.get_all_class_children_names(PolarsMultiTransformer))
 
 
-def get_multi_transformers() -> dict[str, Type[MultiTransformer]]:
+def get_multi_transformers() -> dict[str, Type[PolarsMultiTransformer]]:
     """Returns a dictionary with multi_transformers"""
-    return utils.get_all_class_children(MultiTransformer)
+    return utils.get_all_class_children(PolarsMultiTransformer)
 
 
-def get_multi_transformer_object(name: str, **kwargs) -> MultiTransformer | None:
+def get_multi_transformer_object(name: str, **kwargs) -> PolarsMultiTransformer | None:
     """Returns MultiTransformer object that matches the given multi transformer names"""
     all_trans = get_multi_transformers()
     tran = all_trans.get(name)

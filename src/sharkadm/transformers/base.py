@@ -1,6 +1,6 @@
 import time
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 import polars as pl
 
@@ -10,6 +10,11 @@ from sharkadm.sharkadm_logger import adm_logger
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PolarsDataHolder
+
+
+class PolarsDataHolderProtocol(Protocol):
+    @property
+    def data(self): ...
 
 
 class PolarsTransformer(ABC, Operator):
