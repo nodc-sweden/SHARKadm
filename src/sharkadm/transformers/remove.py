@@ -7,12 +7,8 @@ from sharkadm.data.zip_archive import PolarsZipArchiveDataHolder
 from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import modify
+from .base import PolarsTransformer
 
-from .base import (
-    DataHolderProtocol,
-    PolarsDataHolderProtocol,
-    PolarsTransformer,
-)
 
 # class RemoveReportedValueIfNotCalculated(Transformer):
 #     col_to_set = "reported_value"
@@ -549,7 +545,7 @@ class PolarsRemoveValueInRowsForParameters(PolarsTransformer):
             "Transformer also takes data filter. "
         )
 
-    def _transform(self, data_holder: PolarsDataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.parameter_column not in data_holder.data:
             adm_logger.log_transformation(
                 f"Can not remove values in rows. "
@@ -604,7 +600,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
             "Option to set replace_value. Transformer also takes data filter. "
         )
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         for col in self._get_apply_on_columns(data_holder):
             if col not in data_holder.data.columns:
                 continue
@@ -646,7 +642,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
                     level=adm_logger.WARNING,
                 )
 
-    def _get_apply_on_columns(self, data_holder: DataHolderProtocol):
+    def _get_apply_on_columns(self, data_holder: PolarsDataHolder):
         columns = []
         for col in data_holder.data.columns:
             for arg in self.apply_on_columns:

@@ -98,3 +98,25 @@ class PolarsDataFilterDepthDeeperThanIobisDepth(PolarsDataFilter):
             (pl.col(self.depth_column).cast(float) + self.margin)
             >= pl.col(self.ref_depth_column).cast(float)
         ).to_series()
+
+
+class PolarsDataFilterNegativeAndEmptyIobisDepth(PolarsDataFilter):
+
+    def __init__(self, iobis_depth: str):
+        super().__init__(iobis_depth=iobis_depth)
+        self.iobis_depth = iobis_depth
+
+    def _get_filter_mask(
+        self,
+        data_holder: PolarsDataHolder,
+    ) -> pl.Series:
+        if self.iobis_depth not in data_holder.data.columns:
+            adm_logger.log_transformation(
+                f"Missing column {self.iobis_depth}", level=adm_logger.ERROR
+            )
+            return pl.Series()
+        return data_holder.data.select(
+            (pl.col(self.iobis_depth) == "") |
+            (pl.col(self.iobis_depth).is_null()) |
+            (pl.col(self.iobis_depth).cast(pl.Float64, strict=False) <= 0)
+        ).to_series()

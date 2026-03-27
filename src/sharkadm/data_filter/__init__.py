@@ -16,6 +16,7 @@ from sharkadm.data_filter.data_filter_depth import (
     PolarsDataFilterDeepestDepthAtEachVisit,
     PolarsDataFilterDepthDeeperThanIobisDepth,
     PolarsDataFilterDepthDeeperThanWaterDepth,
+    PolarsDataFilterNegativeAndEmptyIobisDepth,
 )
 from sharkadm.data_filter.data_filter_location import (
     PolarsDataFilterLocation,

@@ -177,6 +177,15 @@ from sharkadm.transformers.project_code import (
     PolarsAddSwedishProjectName,
 )
 from sharkadm.transformers.red_list import AddRedList
+from sharkadm.transformers.remove import (
+    PolarsRemoveMask,
+    PolarsRemoveValueInColumns,
+    PolarsKeepMask,
+    PolarsRemoveProfiles,
+    PolarsRemoveBottomDepthInfoProfiles,
+    PolarsRemoveValueInRowsForParameters,
+    PolarsReplaceColumnWithMask,
+)
 from sharkadm.transformers.replace import PolarsReplaceNanWithNone
 from sharkadm.transformers.replace_comma_with_dot import PolarsReplaceCommaWithDot
 from sharkadm.transformers.reporting_institute import (
