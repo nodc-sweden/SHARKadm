@@ -7,8 +7,8 @@ from sharkadm.data.zip_archive import PolarsZipArchiveDataHolder
 from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import modify
-from .base import PolarsTransformer
 
+from .base import PolarsTransformer
 
 # class RemoveReportedValueIfNotCalculated(Transformer):
 #     col_to_set = "reported_value"

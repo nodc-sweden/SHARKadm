@@ -101,7 +101,6 @@ class PolarsDataFilterDepthDeeperThanIobisDepth(PolarsDataFilter):
 
 
 class PolarsDataFilterNegativeAndEmptyIobisDepth(PolarsDataFilter):
-
     def __init__(self, iobis_depth: str):
         super().__init__(iobis_depth=iobis_depth)
         self.iobis_depth = iobis_depth
@@ -116,7 +115,7 @@ class PolarsDataFilterNegativeAndEmptyIobisDepth(PolarsDataFilter):
             )
             return pl.Series()
         return data_holder.data.select(
-            (pl.col(self.iobis_depth) == "") |
-            (pl.col(self.iobis_depth).is_null()) |
-            (pl.col(self.iobis_depth).cast(pl.Float64, strict=False) <= 0)
+            (pl.col(self.iobis_depth) == "")
+            | (pl.col(self.iobis_depth).is_null())
+            | (pl.col(self.iobis_depth).cast(pl.Float64, strict=False) <= 0)
         ).to_series()
