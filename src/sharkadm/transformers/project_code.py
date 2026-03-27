@@ -3,27 +3,7 @@ import polars as pl
 from .. import adm_logger
 from ..data.zip_archive import PolarsZipArchiveDataHolder
 from . import PolarsTransformer
-from ._codes import _AddCodesProj, _PolarsAddCodesProj
-
-
-class AddSwedishProjectName(_AddCodesProj):
-    source_cols = ("sample_project_name", "sample_project_name_en")
-    col_to_set = "sample_project_name_sv"
-    lookup_key = "swedish_name"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adds project name in swedish"
-
-
-class AddEnglishProjectName(_AddCodesProj):
-    source_cols = ("sample_project_name", "sample_project_name_sv")
-    col_to_set = "sample_project_name_en"
-    lookup_key = "english_name"
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adds project name in english"
+from ._codes import _PolarsAddCodesProj
 
 
 class PolarsAddSwedishProjectName(_PolarsAddCodesProj):

@@ -1,8 +1,9 @@
 from sharkadm import event
 from sharkadm.sharkadm_logger import adm_logger
 
+from ..data import PolarsDataHolder
 from ..utils import svn
-from .base import DataHolderProtocol, Transformer
+from .base import PolarsTransformer
 
 nodc_occurrence_id = None
 try:
@@ -17,7 +18,8 @@ except ModuleNotFoundError as e:
     )
 
 
-class AddOccurrenceId(Transformer):
+# TODO: This is not yet in polars!
+class AddOccurrenceId(PolarsTransformer):
     valid_data_types = ("zoobenthos", "plankton_imaging")
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +33,7 @@ class AddOccurrenceId(Transformer):
     def get_transformer_description() -> str:
         return "Adds Occurrence Id to data"
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         if not nodc_occurrence_id:
             self._log(
                 "Missing package nodc_occurrence_id to add occurrence_id",

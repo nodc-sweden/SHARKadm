@@ -1,9 +1,9 @@
 from ..config import get_header_mapper_from_data_holder
 from ..data import PolarsDataHolder
-from .base import FileExporter
+from .base import PolarsFileExporter
 
 
-class ExportJellyfishRowsFromLimsExport(FileExporter):
+class ExportJellyfishRowsFromLimsExport(PolarsFileExporter):
     valid_data_holders = ("LimsDataHolder",)
 
     def __init__(self, header_as: str | None = None, **kwargs):

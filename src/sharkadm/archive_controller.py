@@ -10,7 +10,7 @@ from sharkadm import (
     sharkadm_exceptions,
     utils,
 )
-from sharkadm.data import get_data_holder
+from sharkadm.data import get_polars_archive_data_holder
 from sharkadm.data.archive.delivery_note import DeliveryNote
 from sharkadm.data.archive.shark_metadata import SharkMetadata
 from sharkadm.utils import matching_strings
@@ -337,7 +337,7 @@ class ArchiveController:
             line = dict(archive=path.name)
             mapped_columns = dict()
             try:
-                data_holder = get_data_holder(path)
+                data_holder = get_polars_archive_data_holder(path)
                 line["format"] = data_holder.delivery_note.import_matrix_key
                 mapped_columns = data_holder.mapped_columns
                 if all_columns:

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from sharkadm.data import PandasDataHolder
+from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -16,13 +16,13 @@ class DataFilter(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None: ...
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None: ...
 
 
 class DataFilterRestrictDepth(DataFilter):
     col_to_check = "location_wb"
 
-    def get_filter_mask(self, data_holder: PandasDataHolder) -> pd.Series | None:
+    def get_filter_mask(self, data_holder: PolarsDataHolder) -> pd.Series | None:
         col = "location_wb"
         if col not in data_holder.data:
             adm_logger.log_workflow(

@@ -1,11 +1,12 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 
-class Lims(MultiTransformer):
+class Lims(PolarsMultiTransformer):
     _transformers = (
-        transformers.RemoveNonDataLines,
-        transformers.MoveLessThanFlagColumnFormat,
+        transformers.PolarsRemoveNonDataLines,
+        transformers.PolarsMoveLessThanFlagRowFormat,
+        transformers.PolarsMoveLargerThanFlagRowFormat,
     )
 
     @staticmethod

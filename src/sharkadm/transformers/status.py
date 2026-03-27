@@ -1,36 +1,36 @@
+import polars as pl
+
 from sharkadm.config import adm_config_paths
-from sharkadm.data.archive import ArchiveDataHolder
 from sharkadm.utils import yaml_data
 
-from .base import Transformer
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 if _config_path := adm_config_paths("delivery_note_status"):
     STATUS_CONFIG = yaml_data.load_yaml(_config_path, encoding="utf8")
 else:
-    STATUS_CONFIG = None
+    STATUS_CONFIG = {}
 
 
-class SetStatusDataHost(Transformer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
+class SetStatusDataHost(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return "Sets status columns as checked by data host"
 
-    def _transform(self, data_holder: ArchiveDataHolder) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        args = []
         for col, value in STATUS_CONFIG["deliverer_and_datahost"].items():
-            data_holder.data[col] = value
+            args.append(pl.lit(value).alias(col))
+        data_holder.data = data_holder.data.with_columns(args)
 
 
-class SetStatusDeliverer(Transformer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
+class SetStatusDeliverer(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
         return "Sets status columns as checked by deliverer"
 
-    def _transform(self, data_holder: ArchiveDataHolder) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        args = []
         for col, value in STATUS_CONFIG["deliverer"].items():
-            data_holder.data[col] = value
+            args.append(pl.lit(value).alias(col))
+        data_holder.data = data_holder.data.with_columns(args)

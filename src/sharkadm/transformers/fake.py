@@ -1,19 +1,24 @@
-from .base import DataHolderProtocol, Transformer
+import polars as pl
+
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
-class FakeAddPressureFromDepth(Transformer):
+class FakeAddPressureFromDepth(PolarsTransformer):
     valid_data_holders = ("LimsDataHolder",)
 
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds pressure = depth to lims data"
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        data_holder.data["PRES"] = data_holder.data["DEPH"]
-        data_holder.data["Q_PRES"] = data_holder.data["Q_DEPH"]
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.col("DEPH").alias("PRES"),
+            pl.col("Q_DEPH").alias("Q_PRES"),
+        )
 
 
-class FakeAddCTDtagToColumns(Transformer):
+class FakeAddCTDtagToColumns(PolarsTransformer):
     valid_data_holders = ("LimsDataHolder",)
 
     @staticmethod
@@ -23,7 +28,7 @@ class FakeAddCTDtagToColumns(Transformer):
             "with the cdtvis bokeh visualization."
         )
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         new_column = []
         for col in data_holder.data.columns:
             if "CTD" in col:

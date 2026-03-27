@@ -1,10 +1,6 @@
-import logging
-
 import polars as pl
 
 from sharkadm.data.data_source.base import PolarsDataFile
-
-logger = logging.getLogger(__name__)
 
 
 class StandardFormatPolarsDataFile(PolarsDataFile):

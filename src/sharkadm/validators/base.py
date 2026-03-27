@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm import config
 from sharkadm.data import (
     PolarsDataHolder,
-    is_valid_data_holder,
+    is_valid_polars_data_holder,
 )
 from sharkadm.operator import OperationInfo, OperationType, Operator
 from sharkadm.sharkadm_logger import adm_logger
@@ -76,7 +76,7 @@ class Validator(ABC, Operator):
             )
             return
 
-        if not is_valid_data_holder(
+        if not is_valid_polars_data_holder(
             data_holder,
             valid=self.valid_data_holders,
             invalid=self.invalid_data_holders,

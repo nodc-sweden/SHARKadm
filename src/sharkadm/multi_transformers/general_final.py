@@ -1,11 +1,11 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 
-class GeneralFinal(MultiTransformer):
+class GeneralFinal(PolarsMultiTransformer):
     _transformers = (
-        transformers.StripAllValues,
-        transformers.SortData,
+        transformers.PolarsStripAllValues,
+        transformers.PolarsSortData,
     )
 
     @staticmethod

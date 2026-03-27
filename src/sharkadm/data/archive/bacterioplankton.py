@@ -1,19 +1,11 @@
-import logging
-
 from sharkadm.data import data_source
 
-from .archive_data_holder import ArchiveDataHolder, PolarsArchiveDataHolder
-
-logger = logging.getLogger(__name__)
+from ... import adm_logger
+from .archive_data_holder import PolarsArchiveDataHolder
 
 
 class PolarsBacterioplanktonArchiveDataHolder(PolarsArchiveDataHolder):
     _data_type_synonym = "bacterioplankton"
-    _data_format = "Bacterioplankton"
-
-
-class BacterioplanktonArchiveDataHolder(ArchiveDataHolder):
-    _data_type = "Bacterioplankton"
     _data_format = "Bacterioplankton"
 
     def _load_data(self) -> None:
@@ -36,22 +28,22 @@ class BacterioplanktonArchiveDataHolder(ArchiveDataHolder):
         data_file_path = self.processed_data_directory / "data.txt"
         if not data_file_path.exists():
             data_file_path = None
-            logger.info(
+            adm_logger.log_workflow(
                 f"No data file found in {self.processed_data_directory}. "
                 f"Looking for file with keyword 'data'..."
             )
             for path in self.processed_data_directory.iterdir():
                 if "data" in path.stem and path.suffix == ".txt":
                     data_file_path = path
-                    logger.info(f"Will use data file: {path}")
+                    adm_logger.log_workflow("Will use data file: {path}")
                     break
         if not data_file_path:
-            logger.error(
+            adm_logger.log_workflow(
                 f"Could not find any data file in delivery: {self.archive_root_directory}"
             )
             return
 
-        d_source = data_source.TxtRowFormatDataFile(
+        d_source = data_source.CsvRowFormatPolarsDataFile(
             path=data_file_path, data_type=self.delivery_note.data_type
         )
         return d_source

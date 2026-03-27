@@ -1,11 +1,6 @@
-import logging
-
-import pandas as pd
 import polars as pl
 
-from .base import DataFile, PolarsDataFile
-
-logger = logging.getLogger(__name__)
+from .base import PolarsDataFile
 
 
 class CsvRowFormatPolarsDataFile(PolarsDataFile):
@@ -21,13 +16,3 @@ class CsvRowFormatPolarsDataFile(PolarsDataFile):
             infer_schema=False,
             missing_utf8_is_empty_string=True,
         )
-
-
-class TxtRowFormatDataFile(DataFile):
-    def _load_file(self) -> None:
-        self._data = pd.read_csv(self._path, encoding=self._encoding, sep="\t", dtype=str)
-
-
-class TxtColumnFormatDataFile(DataFile):
-    def _load_file(self) -> None:
-        self._data = pd.read_csv(self._path, encoding=self._encoding, sep="\t", dtype=str)

@@ -1,9 +1,10 @@
 from sharkadm.config import get_column_views_config
 
-from .base import DataHolderProtocol, FileExporter
+from ..data import PolarsDataHolder
+from .base import PolarsFileExporter
 
 
-class ExportColumnViewsColumnsNotInData(FileExporter):
+class ExportColumnViewsColumnsNotInData(PolarsFileExporter):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._column_views = get_column_views_config()
@@ -12,7 +13,7 @@ class ExportColumnViewsColumnsNotInData(FileExporter):
     def get_exporter_description() -> str:
         return "Writes all columns in column_views that are not in data"
 
-    def _export(self, data_holder: DataHolderProtocol) -> None:
+    def _export(self, data_holder: PolarsDataHolder) -> None:
         if not self._export_file_name:
             self._export_file_name = (
                 f"missing_column_views_{data_holder.dataset_name}.txt"

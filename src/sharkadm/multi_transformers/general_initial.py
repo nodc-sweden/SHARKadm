@@ -1,18 +1,18 @@
 from sharkadm import transformers
-from sharkadm.multi_transformers.base import MultiTransformer
+from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 
-class GeneralInitial(MultiTransformer):
+class GeneralInitial(PolarsMultiTransformer):
     _transformers = (
-        transformers.AddRowNumber,
-        transformers.ReplaceCommaWithDot,
-        transformers.FixTimeFormat,
-        transformers.AddSampleDate,
-        transformers.AddDatetime,
-        transformers.AddMonth,
-        transformers.AddSamplePositionDD,
-        transformers.AddSamplePositionDM,
-        transformers.AddSamplePositionSweref99tm,
+        transformers.PolarsAddRowNumber,
+        transformers.PolarsReplaceCommaWithDot,
+        transformers.PolarsFixTimeFormat,
+        transformers.PolarsAddSampleDate,
+        transformers.PolarsAddDatetime,
+        transformers.PolarsAddMonth,
+        transformers.PolarsAddSamplePositionDD,
+        transformers.PolarsAddSamplePositionDM,
+        transformers.PolarsAddSamplePositionSweref99tm,
     )
 
     @staticmethod

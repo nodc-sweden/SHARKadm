@@ -1,14 +1,16 @@
-import logging
+import polars as pl
 
-import pandas as pd
-
-from .base import DataFile
-
-logger = logging.getLogger(__name__)
+from .base import PolarsDataFile
 
 
-class SkvDataFile(DataFile):
+class SkvDataFile(PolarsDataFile):
     """This is a csv style file typically linked to other skv files"""
 
     def _load_file(self) -> None:
-        self._data = pd.read_csv(self._path, encoding=self._encoding, sep=";", dtype=str)
+        self._data = pl.read_csv(
+            self._path,
+            encoding=self._encoding,
+            separator=";",
+            infer_schema=False,
+            missing_utf8_is_empty_string=True,
+        )

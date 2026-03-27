@@ -3,51 +3,22 @@ import pathlib
 from typing import Union
 
 from sharkadm import sharkadm_exceptions, utils
-from sharkadm.data.archive.archive_data_holder import (
-    ArchiveDataHolder,
-    PolarsArchiveDataHolder,
-)
-from sharkadm.data.archive.bacterioplankton import (
-    BacterioplanktonArchiveDataHolder,
-    PolarsBacterioplanktonArchiveDataHolder,
-)
-from sharkadm.data.archive.chlorophyll import (
-    ChlorophyllArchiveDataHolder,
-    PolarsChlorophyllArchiveDataHolder,
-)
+from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
+from sharkadm.data.archive.bacterioplankton import PolarsBacterioplanktonArchiveDataHolder
+from sharkadm.data.archive.chlorophyll import PolarsChlorophyllArchiveDataHolder
 from sharkadm.data.archive.delivery_note import DeliveryNote
-from sharkadm.data.archive.epibenthos import (
-    EpibenthosMartransArchiveDataHolder,
-    PolarsEpibenthosArchiveDataHolder,
-)
+from sharkadm.data.archive.epibenthos import PolarsEpibenthosArchiveDataHolder
 from sharkadm.data.archive.greyseal import PolarsGreySealArchiveDataHolder
-from sharkadm.data.archive.jellyfish import (
-    JellyfishArchiveDataHolder,
-    PolarsJellyfishArchiveDataHolder,
-)
+from sharkadm.data.archive.jellyfish import PolarsJellyfishArchiveDataHolder
 from sharkadm.data.archive.marine_biotoxins import PolarsMarineBiotoxinsArchiveDataHolder
-from sharkadm.data.archive.physicalchemical import (
-    PhysicalChemicalArchiveDataHolder,
-    PolarsPhysicalChemicalArchiveDataHolder,
-)
-from sharkadm.data.archive.phytoplankton import (
-    PhytoplanktonArchiveDataHolder,
-    PolarsPhytoplanktonArchiveDataHolder,
-)
+from sharkadm.data.archive.physicalchemical import PolarsPhysicalChemicalArchiveDataHolder
+from sharkadm.data.archive.phytoplankton import PolarsPhytoplanktonArchiveDataHolder
 from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHolder
 from sharkadm.data.archive.primaryproduction import (
     PolarsPrimaryProductionArchiveDataHolder,
 )
-from sharkadm.data.archive.zoobenthos import (
-    PolarsZoobenthosArchiveDataHolder,
-    ZoobenthosArchiveDataHolder,
-    ZoobenthosBedaArchiveDataHolder,
-    ZoobenthosBiomadArchiveDataHolder,
-)
-from sharkadm.data.archive.zooplankton import (
-    PolarsZooplanktonArchiveDataHolder,
-    ZooplanktonArchiveDataHolder,
-)
+from sharkadm.data.archive.zoobenthos import PolarsZoobenthosArchiveDataHolder
+from sharkadm.data.archive.zooplankton import PolarsZooplanktonArchiveDataHolder
 
 
 def all_subclasses(cls):
@@ -56,21 +27,9 @@ def all_subclasses(cls):
     )
 
 
-object_mapping = dict(
-    (cls._data_format, cls) for cls in all_subclasses(ArchiveDataHolder)
-)
 polars_object_mapping = dict(
     (cls._data_format, cls) for cls in all_subclasses(PolarsArchiveDataHolder)
 )
-
-
-def get_archive_data_holder(path: str | pathlib.Path) -> ArchiveDataHolder:
-    path = pathlib.Path(path)
-    d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
-    d_holder = object_mapping.get(d_note.data_format)
-    if not d_holder:
-        raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
-    return d_holder(path)
 
 
 def get_polars_archive_data_holder(path: str | pathlib.Path) -> PolarsArchiveDataHolder:
@@ -91,10 +50,6 @@ def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, F
             if name == "delivery_note.txt":
                 return pathlib.Path(root, name).parent.parent
     return False
-
-
-def get_archive_data_holder_names() -> list[str]:
-    return utils.get_all_class_children_names(ArchiveDataHolder)
 
 
 def get_polars_archive_data_holder_names() -> list[str]:

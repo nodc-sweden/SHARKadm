@@ -1,13 +1,4 @@
-import logging
-from typing import TYPE_CHECKING
-
 from .base import SharkadmLoggerExporter
-
-if TYPE_CHECKING:
-    pass
-
-
-logger = logging.getLogger(__name__)
 
 
 class PrintWarnings(SharkadmLoggerExporter):

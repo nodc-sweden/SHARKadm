@@ -1,21 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import logging
 import pathlib
 from typing import Protocol
 
 import pandas as pd
 
-from sharkadm import config, sharkadm_exceptions
+from sharkadm import adm_logger, config, sharkadm_exceptions
 from sharkadm.config.data_type import data_type_handler
 
 try:
     import nodc_codes
 except ImportError:
     pass
-
-logger = logging.getLogger(__name__)
 
 
 class Mapper(Protocol):
@@ -64,7 +61,7 @@ class DeliveryNote:
         path = pathlib.Path(path)
         if path.suffix != ".txt":
             msg = f"File is not a valid delivery_note text file: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
 
         dn_mapper = config.get_delivery_note_mapper()
@@ -104,7 +101,7 @@ class DeliveryNote:
         path = pathlib.Path(path)
         if path.suffix != ".xlsx":
             msg = f"File is not a valid xlsx dv template: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
 
         dn_mapper = config.get_delivery_note_mapper()

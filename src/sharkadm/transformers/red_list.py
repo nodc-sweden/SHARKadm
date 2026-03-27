@@ -1,8 +1,9 @@
-import pandas as pd
+import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
-from .base import DataHolderProtocol, Transformer
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 try:
     import nodc_dyntaxa
@@ -15,7 +16,7 @@ except ModuleNotFoundError as e:
     )
 
 
-class AddRedList(Transformer):
+class AddRedList(PolarsTransformer):
     invalid_data_types = ("physicalchemical", "chlorophyll")
 
     col_to_set = "red_listed"
@@ -30,25 +31,19 @@ class AddRedList(Transformer):
     def get_transformer_description() -> str:
         return "Adds info if red listed. Red listed species are marked with Y"
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
-        if self.col_to_set not in data_holder.data.columns:
-            self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
-            data_holder.data[self.col_to_set] = ""
-        data_holder.data[self.col_to_set] = data_holder.data.apply(
-            lambda row: self._add(row), axis=1
-        )
-
-    def _add(self, row: pd.Series) -> str:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._add_empty_col_to_set(data_holder)
         for col in self.source_cols:
-            value = row[col]
-            if not value.strip():
-                continue
-            info = self.mapped.get(value)
-            if info:
-                return "Y"
-            info = self.red_list_obj.get_info(value)
-            if info:
-                self.mapped[value] = True
-                self._log(f"{value} is marked as red listed", level=adm_logger.INFO)
-                return "Y"
-        return ""
+            for (name,), df in data_holder.data.group_by(col):
+                if not self.red_list_obj.get_info(name):
+                    continue
+                boolean = pl.col(col) == name
+                data_holder.data = data_holder.data.with_columns(
+                    pl.when(boolean)
+                    .then(pl.lit("Y"))
+                    .otherwise(pl.col(self.col_to_set))
+                    .alias(self.col_to_set)
+                )
+                self._log(
+                    f"{name} in column {col} is set as red listed ({len(df)} places)"
+                )

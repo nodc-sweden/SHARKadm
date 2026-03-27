@@ -1,9 +1,11 @@
 import pandas as pd
 
-from .base import DataHolderProtocol, Transformer
+from ..data import PolarsDataHolder
+from .base import PolarsTransformer
 
 
-class LongToWide(Transformer):
+# TODO: This is still written for pandas
+class LongToWide(PolarsTransformer):
     valid_data_types = ("physicalchemical",)
     valid_data_formats = ("row",)
 
@@ -11,7 +13,7 @@ class LongToWide(Transformer):
     def get_transformer_description() -> str:
         return "Adds visit key column"
 
-    def _transform(self, data_holder: DataHolderProtocol) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
         non_unique_columns = ["sample_orderer_name_en"]
 
         not_meta_columns = ["parameter", "value", "unit", "depth"]
@@ -58,6 +60,3 @@ class LongToWide(Transformer):
         data_holder.data = pd.DataFrame(
             data=data_list, columns=meta_columns + par_columns
         )
-
-
-#        print(time.time() - t0)

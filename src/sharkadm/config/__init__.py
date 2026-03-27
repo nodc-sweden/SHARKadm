@@ -1,4 +1,3 @@
-import logging
 import os
 import pathlib
 from typing import Protocol
@@ -12,8 +11,6 @@ from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.config.translate_headers import TranslateHeaders
 from sharkadm.config.trophic_type_smhi import TrophicTypeSMHI
-
-logger = logging.getLogger(__name__)
 
 DATA_STRUCTURES = ["row", "column", "profile"]
 

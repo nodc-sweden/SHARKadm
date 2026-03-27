@@ -1,4 +1,4 @@
-from sharkadm.data import PandasDataHolder
+from sharkadm.data import PolarsDataHolder
 
 from .base import PolarsExporter
 
@@ -13,5 +13,5 @@ class PrintDataFrame(PolarsExporter):
     def _get_default_file_name(self):
         return ""
 
-    def _export(self, data_holder: PandasDataHolder) -> None:
+    def _export(self, data_holder: PolarsDataHolder) -> None:
         print(data_holder.data)

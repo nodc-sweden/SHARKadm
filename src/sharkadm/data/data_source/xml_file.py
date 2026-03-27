@@ -1,41 +1,11 @@
-import logging
 import xml.etree.ElementTree as ET
 
 import pandas as pd
 
-from .base import DataFile
-
-logger = logging.getLogger(__name__)
+from .base import PolarsDataFile
 
 
-class old_XmlDataFile(DataFile):
-    @staticmethod
-    def extract_data_from_element(element, data):
-        for el in element:
-            if not el.text.strip():
-                old_XmlDataFile.extract_data_from_element(el, data)
-            else:
-                data[el.tag] = el.text
-
-    def _load_file(self) -> None:
-        tree = ET.parse(self._path)
-        root = tree.getroot()
-
-        rows = []
-        und_data = {}
-        for element in root.find("undersokning"):
-            if element.tag == "lokal":
-                line_data = und_data.copy()
-                old_XmlDataFile.extract_data_from_element(element, line_data)
-                rows.append(line_data)
-                # s = pd.Series(line_data)
-            else:
-                und_data[element.tag] = element.text
-
-        self._data = pd.DataFrame.from_dict(rows, orient="columns")
-
-
-class XmlMartransDataFile(DataFile):
+class XmlMartransDataFile(PolarsDataFile):
     def _load_file(self) -> None:
         all_tags = set()
         lines = []

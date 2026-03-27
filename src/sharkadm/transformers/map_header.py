@@ -1,11 +1,11 @@
 from sharkadm import config
 from sharkadm.data import archive
 
-from .base import Transformer
+from .base import PolarsTransformer
 
 
-class ArchiveMapper(Transformer):
-    valid_data_holders = archive.get_archive_data_holder_names()
+class ArchiveMapper(PolarsTransformer):
+    valid_data_holders = archive.get_polars_archive_data_holder_names()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -14,7 +14,7 @@ class ArchiveMapper(Transformer):
     def get_transformer_description() -> str:
         return "Maps the data header using import matrix"
 
-    def _transform(self, data_holder: archive.ArchiveDataHolder) -> None:
+    def _transform(self, data_holder: archive.PolarsArchiveDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(
             data_type=data_holder.delivery_note.data_type
         )

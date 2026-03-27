@@ -1,9 +1,6 @@
-import logging
 import pathlib
 
 import yaml
-
-logger = logging.getLogger(__name__)
 
 
 class CustomIdLevelHandler:

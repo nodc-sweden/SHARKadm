@@ -2,7 +2,7 @@ import pathlib
 
 from sharkadm import config
 
-from .shark_api import SHARKapiDataHolder
+# from .shark_api import SHARKapiDataHolder
 from .shark_format import PolarsSharkDataHolder
 
 mapper = {
@@ -22,9 +22,9 @@ def rename_columns(name: str) -> str:
     return mapper.get(name, name)
 
 
-def get_shark_api_data_holder(**kwargs) -> SHARKapiDataHolder:
-    mapper = config.get_import_matrix_mapper(**kwargs)
-    return SHARKapiDataHolder(header_mapper=mapper, **kwargs)
+# def get_shark_api_data_holder(**kwargs) -> SHARKapiDataHolder:
+#     mapper = config.get_import_matrix_mapper(**kwargs)
+#     return SHARKapiDataHolder(header_mapper=mapper, **kwargs)
 
 
 def get_polars_shark_data_holder(

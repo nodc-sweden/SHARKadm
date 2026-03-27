@@ -2,12 +2,9 @@ import polars as pl
 
 from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
-from .base import (
-    PolarsTransformer,
-)
+from .base import PolarsTransformer
 
 nodc_bvol = None
-
 try:
     import nodc_bvol
 except ModuleNotFoundError as e:

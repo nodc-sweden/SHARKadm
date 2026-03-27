@@ -1,25 +1,18 @@
 import functools
 import inspect
-import logging
 import pathlib
 from typing import Type
 
 from sharkadm import sharkadm_exceptions, utils
 from sharkadm.data.archive import (
     directory_is_archive,
-    get_archive_data_holder,
     get_polars_archive_data_holder,
 )
-from sharkadm.data.data_holder import DataHolder, PandasDataHolder, PolarsDataHolder
-from sharkadm.data.df import PandasDataFrameDataHolder, PolarsDataFrameDataHolder
-from sharkadm.data.dv_template import (
-    DvTemplateDataHolder,
-    get_dv_template_data_holder,
-    get_polars_dv_template_data_holder,
-)
+from sharkadm.data.data_holder import PolarsDataHolder
+from sharkadm.data.df import PolarsDataFrameDataHolder
+from sharkadm.data.dv_template import get_polars_dv_template_data_holder
 from sharkadm.data.lims import (
-    LimsDataHolder,
-    get_lims_data_holder,
+    PolarsLimsDataHolder,
     get_polars_lims_data_holder,
     is_lims_directory,
 )
@@ -33,29 +26,17 @@ from sharkadm.data.profile import (
     path_has_or_is_cnv_profile_data,
     path_has_or_is_standard_format_profile_data,
 )
-from sharkadm.data.shark import (
-    file_is_from_shark,
-    get_polars_shark_data_holder,
-    get_shark_api_data_holder,
-)
+from sharkadm.data.shark import file_is_from_shark, get_polars_shark_data_holder
 from sharkadm.data.zip_archive import (
     get_polars_zip_archive_data_holder,
-    get_zip_archive_data_holder,
     path_is_zip_archive,
 )
-
-logger = logging.getLogger(__name__)
 
 
 @functools.cache
 def get_data_holder_list() -> list[str]:
     """Returns a sorted list of name of all available data_holders"""
-    return sorted(utils.get_all_class_children_names(PandasDataHolder))
-
-
-def get_data_holders() -> dict[str, Type[PandasDataHolder]]:
-    """Returns a dictionary with data_holders"""
-    return utils.get_all_class_children(PandasDataHolder)
+    return sorted(utils.get_all_class_children_names(PolarsDataHolder))
 
 
 def get_polars_data_holders() -> dict[str, Type[PolarsDataHolder]]:
@@ -63,9 +44,9 @@ def get_polars_data_holders() -> dict[str, Type[PolarsDataHolder]]:
     return utils.get_all_class_children(PolarsDataHolder)
 
 
-def get_data_holder_object(trans_name: str, **kwargs) -> PandasDataHolder:
+def get_data_holder_object(trans_name: str, **kwargs) -> PolarsDataHolder:
     """Returns DataHolder object that matches the given data_holder names"""
-    all_trans = get_data_holders()
+    all_trans = get_polars_data_holders()
     tran = all_trans[trans_name]
     return tran(**kwargs)
 
@@ -73,14 +54,14 @@ def get_data_holder_object(trans_name: str, **kwargs) -> PandasDataHolder:
 def get_data_holders_description() -> dict[str, str]:
     """Returns a dictionary with data_holder name as key and the description as value"""
     result = dict()
-    for name, tran in get_data_holders().items():
+    for name, tran in get_polars_data_holders().items():
         result[name] = tran.get_data_holder_description()
     return result
 
 
 def get_data_holders_info() -> dict:
     result = dict()
-    for name, tran in get_data_holders().items():
+    for name, tran in get_polars_data_holders().items():
         result[name] = dict()
         result[name]["name"] = name
         result[name]["description"] = tran.get_data_holder_description()
@@ -114,31 +95,6 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
     """Prints all data_holders on screen"""
     with open(path, "w") as fid:
         fid.write(get_data_holders_description_text())
-
-
-def get_data_holder(
-    path: str | pathlib.Path | None = None, sharkweb: bool = False, **kwargs
-) -> PandasDataHolder:
-    if path:
-        path = pathlib.Path(path)
-        if not path.exists() and path.suffix:
-            raise FileNotFoundError(path)
-        if not path.exists():
-            raise NotADirectoryError(path)
-        if path.suffix == ".xlsx":
-            return get_dv_template_data_holder(path)
-        if path_is_zip_archive(path):
-            return get_zip_archive_data_holder(path)
-        if path.is_dir():
-            archive_directory = directory_is_archive(path)
-            if archive_directory:
-                return get_archive_data_holder(archive_directory)
-        lims_directory = is_lims_directory(path)
-        if lims_directory:
-            return get_lims_data_holder(lims_directory)
-    if sharkweb:
-        return get_shark_api_data_holder(**kwargs)
-    raise sharkadm_exceptions.DataHolderError(f"Could not find dataholder for: {path}")
 
 
 def get_polars_data_holder(
@@ -176,42 +132,6 @@ def get_polars_data_holder(
     # if sharkweb:
     #     return get_shark_api_data_holder(**kwargs)
     raise sharkadm_exceptions.DataHolderError(f"Could not find dataholder for: {path}")
-
-
-def get_valid_data_holders(
-    valid: tuple[str, ...] | None = None, invalid: tuple[str, ...] | None = None
-) -> list[str]:
-    if not any([valid, invalid]):
-        return get_data_holder_list()
-    data_holder_list_lower = [item.lower() for item in get_data_holder_list()]
-    data_holders = []
-    if valid:
-        valid_lower = [item.lower() for item in valid]
-        for item, item_lower in zip(get_data_holder_list(), data_holder_list_lower):
-            if item_lower in valid_lower:
-                data_holders.append(item)
-        return data_holders
-    elif invalid:
-        invalid_lower = [item.lower() for item in invalid]
-        for item, item_lower in zip(get_data_holder_list(), data_holder_list_lower):
-            if item_lower not in invalid_lower:
-                data_holders.append(item)
-        return data_holders
-
-
-def is_valid_data_holder(
-    data_holder: Type[DataHolder],
-    valid: list[str] | None = None,
-    invalid: list[str] | None = None,
-) -> bool:
-    if not any([valid, invalid]):
-        return True
-    holders = get_data_holders()
-    if any([val for val in invalid if isinstance(data_holder, holders[val])]):
-        return False
-    if any([val for val in valid if isinstance(data_holder, holders[val])]):
-        return True
-    return True
 
 
 def is_valid_polars_data_holder(

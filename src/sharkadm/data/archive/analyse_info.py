@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import logging
 import pathlib
 import re
 import string
@@ -13,8 +12,6 @@ import pandas as pd
 from sharkadm.sharkadm_logger import adm_logger
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y-%m"]
-
-logger = logging.getLogger(__name__)
 
 
 class Mapper(Protocol):
@@ -165,7 +162,7 @@ class AnalyseInfo:
         path = pathlib.Path(path)
         if path.suffix != ".txt":
             msg = f"File is not a valid analyse_info text file: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
         data = dict()
         data["path"] = path
@@ -208,7 +205,7 @@ class AnalyseInfo:
         path = pathlib.Path(path)
         if path.suffix != ".txt":
             msg = f"File is not a valid analyse_info text file: {path}"
-            logger.error(msg)
+            adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
         data = dict()
         data["path"] = path

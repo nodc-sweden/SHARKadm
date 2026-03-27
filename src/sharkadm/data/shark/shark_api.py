@@ -1,5 +1,4 @@
 import datetime
-import logging
 import shutil
 from typing import Any, Protocol, Type
 
@@ -7,18 +6,16 @@ import pandas as pd
 import requests
 
 from sharkadm import utils
-from sharkadm.data.data_holder import PandasDataHolder
-from sharkadm.data.data_source.base import DataFile
-from sharkadm.data.data_source.txt_file import TxtRowFormatDataFile
-
-logger = logging.getLogger(__name__)
+from sharkadm.data import PolarsDataHolder
+from sharkadm.data.data_source.base import PolarsDataFile
+from sharkadm.data.data_source.txt_file import CsvRowFormatPolarsDataFile
 
 
 class HeaderMapper(Protocol):
     def get_internal_name(self, external_par: str) -> str: ...
 
 
-class SHARKapiDataHolder(PandasDataHolder):
+class SHARKapiDataHolder(PolarsDataHolder):
     _data_type = ""
 
     def __init__(
@@ -133,7 +130,7 @@ class SHARKapiDataHolder(PandasDataHolder):
         return all_data
 
     def _load_file(self) -> None:
-        d_source = TxtRowFormatDataFile(
+        d_source = CsvRowFormatPolarsDataFile(
             path=self._temp_file_path, data_type=self.data_type
         )
         if self._header_mapper:
@@ -141,7 +138,7 @@ class SHARKapiDataHolder(PandasDataHolder):
         self._data = self._get_data_from_data_source(d_source)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)
