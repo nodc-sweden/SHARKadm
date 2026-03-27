@@ -5,7 +5,7 @@ import polars as pl
 from ...config import ImportMatrixConfig, ImportMatrixMapper
 from ...config.data_type import data_type_handler
 from .. import PolarsDataHolder
-from ..data_source.base import DataFile
+from ..data_source.base import PolarsDataFile
 from ..data_source.txt_file import CsvRowFormatPolarsDataFile
 
 
@@ -26,7 +26,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
 
-        self._data_sources: dict[str, DataFile] = {}
+        self._data_sources: dict[str, PolarsDataFile] = {}
 
         self._initiate()
         self._load_data()

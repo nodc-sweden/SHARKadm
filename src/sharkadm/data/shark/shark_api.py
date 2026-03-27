@@ -7,7 +7,7 @@ import requests
 
 from sharkadm import utils
 from sharkadm.data import PolarsDataHolder
-from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.txt_file import CsvRowFormatPolarsDataFile
 
 
@@ -138,7 +138,7 @@ class SHARKapiDataHolder(PolarsDataHolder):
         self._data = self._get_data_from_data_source(d_source)
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)

@@ -7,7 +7,7 @@ from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data import change_log
 from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.base import DataFile, PolarsDataFile
+from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.txt_file import (
     CsvRowFormatPolarsDataFile,
 )
@@ -37,7 +37,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         self._import_matrix_mapper: ImportMatrixMapper | None = None
         # self._data_type_mapper = get_data_type_mapper()
 
-        self._data_sources: dict[str, DataFile] = {}
+        self._data_sources: dict[str, PolarsDataFile] = {}
 
         self._initiate()
         self._load_delivery_note()

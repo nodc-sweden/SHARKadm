@@ -5,7 +5,7 @@ import polars as pl
 
 from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.base import DataFile
+from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.txt_file import CsvRowFormatPolarsDataFile
 from sharkadm.sharkadm_logger import adm_logger
 
@@ -106,7 +106,7 @@ class PolarsLimsDataHolder(PolarsDataHolder):
         )
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataFile) -> pl.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pl.DataFrame:
         data = data_source.get_data()
         data = data.fill_nan("")
         return data

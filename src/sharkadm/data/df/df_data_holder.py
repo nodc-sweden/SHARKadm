@@ -5,7 +5,7 @@ import polars as pl
 
 from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.base import DataDataFrame, DataFile
+from sharkadm.data.data_source.base import PolarsDataDataFrame, PolarsDataFile
 
 
 class HeaderMapper(Protocol):
@@ -37,14 +37,14 @@ class PolarsDataFrameDataHolder(PolarsDataHolder):
         return """Holds data from a given pandas dataframe"""
 
     def _load_data(self, df: pd.DataFrame) -> None:
-        d_source = DataDataFrame(df, data_type=self.data_type)
+        d_source = PolarsDataDataFrame(df, data_type=self.data_type)
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
         self._set_data_source(d_source)
         self._dataset_name = "Polars dataframe"
 
     @staticmethod
-    def _get_data_from_data_source(data_source: DataFile) -> pd.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataFile) -> pd.DataFrame:
         data = data_source.get_data()
         data = data.fillna("")
         data.reset_index(inplace=True, drop=True)

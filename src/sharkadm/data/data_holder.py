@@ -6,7 +6,6 @@ import polars as pl
 from sharkadm import config
 from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_source.base import (
-    DataSource,
     PolarsDataFile,
     PolarsDataSource,
 )
@@ -198,13 +197,13 @@ class PolarsDataHolder(ABC):
     def get_original_name(self, internal_name: str):
         return self.header_mapper.get_external_name(internal_name)
 
-    def _add_data_source(self, data_source: DataSource | PolarsDataSource) -> None:
+    def _add_data_source(self, data_source: PolarsDataSource) -> None:
         """Adds a data source to instance variable self._data_sources.
         This method is not adding to data itself."""
         self._check_data_source(data_source)
         self._data_sources[str(data_source)] = data_source
 
-    def _check_data_source(self, data_source: DataSource | PolarsDataSource) -> None:
+    def _check_data_source(self, data_source: PolarsDataSource) -> None:
         # Can be overwritten in child classes
         return
 
