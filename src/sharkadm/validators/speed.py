@@ -29,17 +29,16 @@ class ValidateSpeed(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         speed = (
             approximate_distance(
-                data_holder.data
-                .group_by([
-                    self._ship_column,
-                    self._longitude_column,
-                    self._latitude_column,
-                    self._datetime_column,
-                    self._visit_key_column
-                ])
-                .agg([
-                    pl.col(self._row_number_column).alias("row_numbers")
-                ])
+                data_holder.data.group_by(
+                    [
+                        self._ship_column,
+                        self._longitude_column,
+                        self._latitude_column,
+                        self._datetime_column,
+                        self._visit_key_column,
+                    ]
+                )
+                .agg([pl.col(self._row_number_column).alias("row_numbers")])
                 .sort([self._ship_column, self._datetime_column])
             )
             .with_columns(

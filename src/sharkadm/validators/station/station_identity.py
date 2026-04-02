@@ -75,7 +75,8 @@ class ValidateStationIdentity(Validator):
                 elif station := matching_stations.get_closest_station():
                     self._log_fail(
                         msg=f"To far from closest known station. {station}",
-                        row_numbers=row_numbers)
+                        row_numbers=row_numbers,
+                    )
                 elif name_matches := [s for s in matching_stations if s.accepted_name]:
                     station = next(iter(name_matches))
                     self._log_fail(

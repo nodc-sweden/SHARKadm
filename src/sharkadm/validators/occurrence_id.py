@@ -22,6 +22,4 @@ class ValidateOccurrenceId(Validator):
         df = data_holder.data.loc[missing_boolean, :]
         if df.empty:
             return
-        self._log_fail(
-            f"Missing {self.col_to_check} ({len(df)} places)"
-        )
+        self._log_fail(f"Missing {self.col_to_check} ({len(df)} places)")

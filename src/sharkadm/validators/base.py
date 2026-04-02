@@ -5,10 +5,8 @@ from typing import Protocol
 import pandas as pd
 import polars as pl
 
-from sharkadm import config
 from sharkadm.data import (
     PolarsDataHolder,
-    is_valid_polars_data_holder,
 )
 from sharkadm.operator import OperationInfo, OperationType, Operator
 from sharkadm.sharkadm_logger import adm_logger
@@ -88,7 +86,7 @@ class Validator(ABC, Operator):
     @abstractmethod
     def _validate(self, data_holder: PolarsDataHolder) -> None: ...
 
-    def _log_success(self, msg: str, level: str = adm_logger.INFO,**kwargs):
+    def _log_success(self, msg: str, level: str = adm_logger.INFO, **kwargs):
         adm_logger.log_validation(
             msg=msg,
             level=level,

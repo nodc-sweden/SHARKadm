@@ -129,17 +129,16 @@ class ValidateWeatherConsistency(Validator):
         invalid_row_numbers = df.filter(pl.col("is_valid"))["row_number"].to_list()
 
         invalid_unique = (
-            df
-            .filter(~pl.col("is_valid"))
-            .group_by([
-                "visit_date",
-                "reported_station_name",
-                "weather_observation_code",
-                "cloud_observation_code",
-            ])
-            .agg(
-                pl.col("row_number").alias("row_numbers")
+            df.filter(~pl.col("is_valid"))
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "weather_observation_code",
+                    "cloud_observation_code",
+                ]
             )
+            .agg(pl.col("row_number").alias("row_numbers"))
         )
 
         if len(invalid_row_numbers) == 0:

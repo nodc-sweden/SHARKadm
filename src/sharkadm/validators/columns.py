@@ -3,7 +3,6 @@ import logging
 import polars as pl
 
 from sharkadm import config
-from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import DataHolderProtocol, Validator

@@ -56,7 +56,9 @@ class ValidateCoordinatesDm(Validator):
 
             minutes = minutes_whole + minutes_decimals / 10000
             if minutes >= 60:
-                errors.append(f"Minutes in longitude '{longitude}' not strictly below 60.")
+                errors.append(
+                    f"Minutes in longitude '{longitude}' not strictly below 60."
+                )
             if degrees > 180 or (degrees == 180 and minutes > 0):
                 errors.append(f"Longitude '{longitude}' exceeds 180 degrees.")
         else:
