@@ -48,6 +48,7 @@ except ModuleNotFoundError as e:
 
 folium = None
 try:
+    import branca.colormap as cm
     import folium
     import geopandas as gpd
     import shapely
@@ -99,6 +100,186 @@ def get_popup_html_table(title: str, data: dict) -> str:
 
     html = "\n".join(lines)
     return html
+
+
+class PolarsHtmlScatterMap(PolarsFileExporter):
+    shape_layers: tuple[str, ...] = ()
+
+    def __init__(
+        self,
+        column_name: str,
+        by_percentage: bool = False,
+        export_directory: str | pathlib.Path | None = None,
+        export_file_name: str | pathlib.Path | None = None,
+        depth_column: str = "sample_depth_m",
+        **kwargs,
+    ):
+        super().__init__(export_directory, export_file_name, **kwargs)
+        self._column_name = column_name
+        self._by_percentage = by_percentage
+        self._depth_column = depth_column
+        self._colormap = cm.linear.YlGn_05
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return "Creates a html scatter map."
+
+    def _export(self, data_holder: PolarsDataHolder) -> None:
+        if not folium:
+            self._log(
+                f"Could not export {self.__class__.__name__}. folium package not found!",
+                level=adm_logger.WARNING,
+            )
+            return
+
+        # lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
+        self.m = folium.Map(
+            # location=(lat_mid, lon_mid),
+            zoom_start=6,
+            tiles="Cartodb Positron",
+        )
+        self.m.fit_bounds(
+            (
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).min(),
+                    data_holder.data["sample_longitude_dd"].cast(float).min(),
+                ),
+                (
+                    data_holder.data["sample_latitude_dd"].cast(float).max(),
+                    data_holder.data["sample_longitude_dd"].cast(float).max(),
+                ),
+            )
+        )
+
+        if self._by_percentage:
+            self._plot_by_percentage(data_holder)
+        else:
+            self._plot_boolean_column(data_holder)
+            self._plot_float_column(data_holder)
+
+        folium.LayerControl().add_to(self.m)
+        export_path = self._get_path(data_holder)
+        self.m.save(export_path)
+
+    def _plot_by_percentage(self, data_holder: PolarsDataHolder) -> None:
+        if not self._by_percentage:
+            return
+        lat_col = "sample_latitude_dd"
+        lon_col = "sample_longitude_dd"
+
+        lats = []
+        lons = []
+        vals = []
+        labels = []
+
+        for (dt,), df in data_holder.data.unique(
+            ["datetime", self._depth_column]
+        ).group_by("datetime"):
+            lats.append(float(df[lat_col][0]))
+            lons.append(float(df[lon_col][0]))
+            nr_vals = len(df)
+            nr_true_vals = len(df.filter(pl.col(self._column_name)))
+
+            val = nr_true_vals / nr_vals
+            val = val * 100
+            vals.append(val)
+            lab = f"{self._column_name}: {nr_true_vals} / {nr_vals}"
+            labels.append(lab)
+        colormap = cm.linear.RdYlGn_06
+        # colormap = colormap.scale(min(vals), max(vals))
+        colormap = colormap.scale(0, 100)
+
+        self._colormap = cm.LinearColormap(
+            colors=colormap.colors[::-1], vmin=colormap.vmin, vmax=colormap.vmax
+        )
+
+        self._colormap.caption = self._column_name  # legend title
+
+        for lat, lon, val, lab in zip(lats, lons, vals, labels):
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=7,
+                color=self._colormap(val),
+                fill=True,
+                fill_color=self._colormap(val),
+                fill_opacity=0.8,
+                popup=lab,
+            ).add_to(self.m)
+
+        self._colormap.add_to(self.m)
+
+    def _plot_boolean_column(self, data_holder: PolarsDataHolder) -> None:
+        if data_holder.data[self._column_name].dtype != pl.Boolean:
+            return
+        lat_col = "sample_latitude_dd"
+        lon_col = "sample_longitude_dd"
+        df = data_holder.data.unique([lat_col, lon_col])
+        lats = list(df[lat_col].cast(float))
+        lons = list(df[lon_col].cast(float))
+        vals = [int(val) for val in df[self._column_name]]
+
+        # self._colormap.scale(min(vals), max(vals))
+        self._colormap = cm.StepColormap(["red", "green"], vmin=0, vmax=1)
+        self._colormap.caption = self._column_name  # legend title
+
+        for lat, lon, val in zip(lats, lons, vals):
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=7,
+                color=self._colormap(val),
+                fill=True,
+                fill_color=self._colormap(val),
+                fill_opacity=0.8,
+                popup=f"Value: {val}",
+            ).add_to(self.m)
+
+        self._colormap.add_to(self.m)
+
+    def _plot_float_column(self, data_holder: PolarsDataHolder) -> None:
+        if data_holder.data[self._column_name].dtype == pl.Boolean:
+            return
+        lat_col = "sample_latitude_dd"
+        lon_col = "sample_longitude_dd"
+        df = data_holder.data.unique([lat_col, lon_col])
+        val_col = "val_col"
+        df = df.with_columns(
+            pl.when(pl.col(self._column_name).str.len_chars() == 0)
+            .then(None)
+            .otherwise(pl.col(self._column_name))
+            .cast(float)
+            .alias(val_col)
+        )
+        lats = list(df[lat_col])
+        lons = list(df[lon_col])
+        vals = list(df[val_col])
+
+        self._colormap.scale(min(vals), max(vals))
+        self._colormap.caption = self._column_name  # legend title
+
+        for lat, lon, val in zip(lats, lons, vals):
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=7,
+                color=self._colormap(val),
+                fill=True,
+                fill_color=self._colormap(val),
+                fill_opacity=0.8,
+                popup=f"Value: {val}",
+            ).add_to(self.m)
+
+        self._colormap.add_to(self.m)
+
+    def _get_path(self, data_holder: PolarsDataHolder) -> pathlib.Path:
+        if not self._export_file_name:
+            name = data_holder.dataset_name
+            if " " in name:
+                name = f"{name.split()[0]}___"
+            self._export_file_name = f"scatter_map_{name}.html"
+        path = pathlib.Path(self._export_directory, self._export_file_name)
+        if path.suffix != ".html":
+            path = pathlib.Path(str(path) + ".html")
+        self._export_file_name = path.name
+        return path
 
 
 class PolarsHtmlMap(PolarsFileExporter):
@@ -603,22 +784,3 @@ class PolarsHtmlMap(PolarsFileExporter):
                 weight=0.5,
             ).add_to(fg)
         fg.add_to(m)
-
-
-class PolarsHtmlMapR(PolarsHtmlMap):
-    shape_layers: tuple[str, ...] = (
-        "location_ra",
-        "location_rb",
-        "location_rc",
-        "location_rg",
-        "location_rh",
-        "location_ro",
-    )
-
-
-class PolarsHtmlMapRred(PolarsHtmlMap):
-    shape_layers: tuple[str, ...] = (
-        "location_rc",
-        "location_rg",
-        "location_ro",
-    )

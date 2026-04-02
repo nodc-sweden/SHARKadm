@@ -3,6 +3,7 @@ from types import MappingProxyType
 import polars as pl
 
 from sharkadm.data import PolarsDataHolder
+from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
 from sharkadm.utils import matching_strings
@@ -87,3 +88,18 @@ class PolarsFixTrueAndFalse(PolarsTransformer):
                 f"Translated {val} -> FALSE ({len(filtered_df)} places)",
                 level=adm_logger.INFO,
             )
+
+
+class PolarsAddDataFilterBooleanColumn(PolarsTransformer):
+    def __init__(self, data_filter: PolarsDataFilter, column_name: str, **kwargs):
+        super().__init__(**kwargs)
+        self._data_filter = data_filter
+        self._column_name = column_name
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds a boolean column from filter"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        mask = self._data_filter.get_filter_mask(data_holder).rename(self._column_name)
+        data_holder.data.insert_column(-1, mask)

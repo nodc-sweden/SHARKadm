@@ -3,7 +3,7 @@ import re
 import polars as pl
 
 from sharkadm.config import get_column_views_config
-from sharkadm.utils import add_column, approved_data, matching_strings
+from sharkadm.utils import add_column, matching_strings
 
 from .. import adm_logger
 from ..data import PolarsDataHolder
@@ -45,17 +45,6 @@ class PolarsClearColumns(PolarsTransformer):
             )
         for col in columns_to_clear:
             data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
-
-
-class PolarsAddApprovedKeyColumn(PolarsTransformer):
-    @staticmethod
-    def get_transformer_description() -> str:
-        return "Adds a column with keys to match against approved data"
-
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
-        data_holder.data = approved_data.add_concatenated_column(
-            data_holder.data,
-        )
 
 
 class PolarsAddColumnViewsColumns(PolarsTransformer):

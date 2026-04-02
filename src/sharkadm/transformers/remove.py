@@ -28,30 +28,6 @@ from .base import PolarsTransformer
 #         data_holder.data.loc[boolean, self.col_to_set] = ""
 
 
-# class RemoveRowsAtDepthRestriction(Transformer):
-#     valid_data_holders = ("ZipArchiveDataHolder",)
-#     valid_data_structures = ("row",)
-#
-#     def __init__(
-#         self, valid_data_types: list[str], data_filter: DataFilterRestrictDepth,**kwargs
-#     ) -> None:
-#         self.valid_data_types = valid_data_types
-#         super().__init__(data_filter=data_filter, **kwargs)
-#
-#     @staticmethod
-#     def get_transformer_description() -> str:
-#         return "Removes entire row for if in area of depth restriction"
-#
-#     def _transform(self, data_holder: DataHolderProtocol) -> None:
-#         filter_bool = self._get_filter_mask(data_holder)
-#         index = np.where(filter_bool)
-#         data_holder.data = data_holder.data[~filter_bool]
-#         adm_logger.log_transformation(
-#             f"Removing rows due to depth restrictions ({len(index)} rows)",
-#             level=adm_logger.WARNING,
-#         )
-
-
 class PolarsKeepMask(PolarsTransformer):
     def __init__(
         self,

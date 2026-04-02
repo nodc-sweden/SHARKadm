@@ -14,30 +14,3 @@ class PolarsDataFilterLocation(PolarsDataFilter):
         for col in self._locations[1:]:
             mask = mask | data_holder.data[col]
         return mask
-
-
-class PolarsDataFilterRestrictAreaR(PolarsDataFilter):
-    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        return (
-            data_holder.data["location_ra"]
-            | data_holder.data["location_rb"]
-            | data_holder.data["location_rc"]
-            | data_holder.data["location_rg"]
-            | data_holder.data["location_rh"]
-            # | data_holder.data["location_ro"]
-        )
-
-
-class PolarsDataFilterRestrictAreaRred(PolarsDataFilter):
-    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        return data_holder.data["location_rc"] | data_holder.data["location_rg"]
-
-
-# class PolarsDataFilterRestrictAreaGandC(PolarsDataFilter):
-#     def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-#         return data_holder.data["location_rc"] | data_holder.data["location_rg"]
-
-
-class PolarsDataFilterRestrictAreaO(PolarsDataFilter):
-    def _get_filter_mask(self, data_holder: PolarsDataHolder) -> pl.Series:
-        return data_holder.data["location_ro"]

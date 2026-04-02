@@ -35,6 +35,7 @@ from sharkadm.transformers.base import PolarsTransformer
 from sharkadm.transformers.boolean import (
     PolarsFixYesNo,
     PolarsFixTrueAndFalse,
+    PolarsAddDataFilterBooleanColumn,
 )
 from sharkadm.transformers.bvol import (
     PolarsAddBvolAphiaId,
@@ -52,7 +53,6 @@ from sharkadm.transformers.calculate import (
     PolarsOnlyKeepReportedIfCalcByDc,
 )
 from sharkadm.transformers.columns import (
-    PolarsAddApprovedKeyColumn,
     PolarsAddColumnViewsColumns,
     PolarsRemoveColumns,
     PolarsClearColumns,
@@ -96,7 +96,6 @@ from sharkadm.transformers.delivery_note_info import (
 from sharkadm.transformers.depth import (
     AddSampleMinAndMaxDepth,
     ReorderSampleMinAndMaxDepth,
-    PolarsAddIObisDepth,
 )
 from sharkadm.transformers.dyntaxa import (
     PolarsAddDyntaxaId,
@@ -133,13 +132,6 @@ from sharkadm.transformers.location import (
     PolarsAddLocationWaterDistrict,
     PolarsAddLocationWB,
     PolarsAddLocationCounty,
-    PolarsAddLocationR,
-    PolarsAddLocationRA,
-    PolarsAddLocationRB,
-    PolarsAddLocationRC,
-    PolarsAddLocationRG,
-    PolarsAddLocationRH,
-    PolarsAddLocationRO,
     PolarsAddLocationOnLand,
     PolarsAddLocations,
 )

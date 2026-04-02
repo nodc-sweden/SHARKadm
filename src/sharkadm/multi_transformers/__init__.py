@@ -15,8 +15,6 @@ from sharkadm.multi_transformers.lims import Lims
 from sharkadm.multi_transformers.location import (
     LocationIntWaterPolars,
     LocationPolars,
-    LocationRPolars,
-    LocationRredPolars,
 )
 from sharkadm.multi_transformers.position import PositionPolars
 from sharkadm.multi_transformers.static_dv import StaticDVPolars

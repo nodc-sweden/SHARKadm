@@ -1,7 +1,5 @@
 import polars as pl
 
-from sharkadm.utils import iobis
-
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
@@ -111,35 +109,3 @@ class ReorderSampleMinAndMaxDepth(PolarsTransformer):
             .alias(self.max_depth_col)
         )
         data_holder.data = data_holder.data.drop(temp_col)
-
-
-class PolarsAddIObisDepth(PolarsTransformer):
-    col_to_set = "iobis_depth"
-    lat_col = "sample_latitude_dd"
-    lon_col = "sample_longitude_dd"
-
-    def __init__(self, verify_ssl: bool = True, **kwargs):
-        self._verify_ssl = verify_ssl
-        super().__init__(**kwargs)
-
-    @staticmethod
-    def get_transformer_description() -> str:
-        return f"Adds {PolarsAddIObisDepth.col_to_set} from iobis api."
-
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
-        self._add_empty_col_to_set(data_holder)
-        for (lat, lon), df in data_holder.data.group_by([self.lat_col, self.lon_col]):
-            depth = iobis.get_obis_depth(lat, lon, verify_ssl=self._verify_ssl)
-            if not depth:
-                continue
-            data_holder.data = data_holder.data.with_columns(
-                pl.when(
-                    [
-                        pl.col(self.lat_col) == lat,
-                        pl.col(self.lon_col) == lon,
-                    ]
-                )
-                .then(pl.lit(str(depth)))
-                .otherwise(pl.col(self.col_to_set))
-                .alias(self.col_to_set)
-            )
