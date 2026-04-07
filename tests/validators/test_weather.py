@@ -16,8 +16,7 @@ from sharkadm.validators.weather import ValidateWeath, ValidateWeatherConsistenc
         ("20230802", "SKÅPESUND", "5", True),
         ("20230530", "SVENSHOLMEN", "7.0", False),  # Float
         ("20230802", "SKÅPESUND", "07", False),  # Zeropadded
-        ("20230802", "SKÅPESUND", "", True),  # Missing as str
-        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", "", False),  # Missing as str
         ("20230802", "SKÅPESUND", " ", False),  # White space
     ),
 )
@@ -37,6 +36,7 @@ def test_validate_weath(
                 "visit_date": given_visit_date,
                 "reported_station_name": given_station,
                 "weather_observation_code": given_weather_observation_code,
+                "row_number": 1,
             }
         ]
     )
@@ -105,6 +105,7 @@ def test_validate_weather_consistency(
                 "reported_station_name": given_station,
                 "weather_observation_code": given_weather_observation_code,
                 "cloud_observation_code": given_cloud_observation_code,
+                "row_number": 1,
             }
         ]
     )

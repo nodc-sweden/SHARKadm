@@ -1,3 +1,4 @@
+import polars as pl
 from nodc_station.station_file import StationFile
 from nodc_station.utils import transform_ref_system
 
@@ -12,14 +13,12 @@ class ValidateStationIdentity(Validator):
         self,
         stations: StationFile = None,
         station_name_key="reported_station_name",
-        visit_key="visit_key",
         latitude_key="LATIT",
         longitude_key="LONGI",
         **kwargs,
     ):
         super().__init__(**kwargs)
         self._station_name_key = station_name_key
-        self._visit_key = visit_key
         self._latitude_key = latitude_key
         self._longitude_key = longitude_key
         self._stations = stations
@@ -29,42 +28,76 @@ class ValidateStationIdentity(Validator):
         return "Checks if station name (or synonym) and position matches known stations."
 
     def _validate(self, data_holder: DataHolderProtocol) -> None:
-        for (name, visit_key, latitude, longitude), data in data_holder.data.group_by(
+        df = data_holder.data.with_columns(
+            [
+                pl.col(self._latitude_key).cast(pl.Float64, strict=False),
+                pl.col(self._longitude_key).cast(pl.Float64, strict=False),
+            ]
+        )
+
+        for (name, lat_orig, lon_orig), group in df.group_by(
             [
                 self._station_name_key,
-                self._visit_key,
                 self._latitude_key,
                 self._longitude_key,
             ]
         ):
-            latitude_dd, longitude_dd = transform_ref_system(latitude, longitude)
-            matching_stations = self._stations.get_matching_stations(
-                name, latitude_dd, longitude_dd
-            )
+            row_numbers = group["row_number"].to_list()
+
+            try:
+                lat_dd, lon_dd = transform_ref_system(lat_orig, lon_orig)
+            except Exception:
+                self._log_fail(
+                    msg=f"{name} at {lat_dd} N {lon_orig} E could not be transformed",
+                    row_numbers=row_numbers,
+                )
+                continue
+
+            try:
+                matching_stations = self._stations.get_matching_stations(
+                    name, lat_dd, lon_dd
+                )
+            except Exception:
+                self._log_fail(
+                    msg=f"{name} at {lat_dd} N {lon_orig} E could not be validated",
+                    row_numbers=row_numbers,
+                )
+                continue
+
             if matching_stations:
                 if station := matching_stations.get_accepted_station():
-                    if name != station.station:
-                        name = f"{station.station}(a.k.a. {name})"
-                    self._log_success(f"{visit_key}: {name} is a known station.")
-                elif name_matches := [
-                    station for station in matching_stations if station.accepted_name
-                ]:
+                    self._log_success(
+                        msg=f"{name} at {lat_dd} N {lon_dd} E "
+                        "is a known station. "
+                        f"{station}",
+                        row_numbers=row_numbers,
+                    )
+                elif station := matching_stations.get_closest_station():
+                    self._log_fail(
+                        msg=f"To far from closest known station. {station}",
+                        row_numbers=row_numbers,
+                    )
+                elif name_matches := [s for s in matching_stations if s.accepted_name]:
                     station = next(iter(name_matches))
-                    if name != station.station:
-                        f"{name} ({station.station})"
-                    self._log_fail(f"{visit_key}: {name} is not near any known stations.")
+                    self._log_fail(
+                        msg=f"{name} at {lat_dd} N {lon_dd} E "
+                        "is not near any known station.",
+                        row_numbers=row_numbers,
+                    )
                 elif position_matches := [
-                    station for station in matching_stations if station.accepted_position
+                    s for s in matching_stations if s.accepted_position
                 ]:
                     nearby_stations = ", ".join(
-                        f"'{station.station}'" for station in position_matches
+                        f"'{s.station}'" for s in position_matches
                     )
                     self._log_fail(
-                        f"{visit_key}: Unknown station '{name}' "
-                        f"is near {nearby_stations}."
+                        msg=f"{name} at {lat_dd} N {lon_dd} E "
+                        f"unknown station near {nearby_stations}.",
+                        row_numbers=row_numbers,
                     )
             else:
                 self._log_fail(
-                    f"{visit_key}: Unknown station '{name}' "
-                    "is not near any known station."
+                    msg=f"{name} at {lat_dd} N {lon_dd} E "
+                    "is an unknown station & not near any known station.",
+                    row_numbers=row_numbers,
                 )

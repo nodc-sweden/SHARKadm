@@ -14,8 +14,7 @@ from sharkadm.validators.air_temperature import ValidateAirtemp
         ("20230530", "SMÅHOLMARNA", "45.3", False),  # Possibly too high
         ("20230530", "SVENSHOLMEN", "0", True),  # Int
         ("20230802", "SKÅPESUND", "-40", False),  # Possibly too low
-        ("20230802", "SKÅPESUND", "", True),  # Missing as str
-        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", "", False),  # Missing as str
         ("20230802", "SKÅPESUND", " ", False),  # White space
     ),
 )
@@ -34,8 +33,15 @@ def test_validate_airtemp(
             {
                 "visit_date": given_date,
                 "reported_station_name": given_station,
+                "row_number": 1,
                 "air_temperature_degc": given_air_temperature_degc,
-            }
+            },
+            {
+                "visit_date": "20201010",
+                "reported_station_name": "ÅSTOL",
+                "row_number": 2,
+                "air_temperature_degc": "10",
+            },
         ]
     )
 

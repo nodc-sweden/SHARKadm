@@ -180,8 +180,9 @@ class Operation(ft.UserControl):
             if key == "export_directory":
                 self._settings_controls[key] = ft.Text()
                 pick_file_path = ft.FilePicker(
-                    on_result=lambda e,
-                    p=self._settings_controls[key]: self._on_pick_directory(e, p)
+                    on_result=lambda e, p=self._settings_controls[key]: (
+                        self._on_pick_directory(e, p)
+                    )
                 )
                 self.page.overlay.append(pick_file_path)
                 self.page.update()

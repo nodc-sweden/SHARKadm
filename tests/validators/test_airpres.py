@@ -14,9 +14,10 @@ from sharkadm.validators.air_pressure import ValidateAirpres
         ("20230530", "SMÅHOLMARNA", "1100.1", False),  # Possibly too high
         ("20230530", "SVENSHOLMEN", "1000", True),  # Int
         ("20230802", "SKÅPESUND", "850", False),  # Possibly too low
-        ("20230802", "SKÅPESUND", "", True),  # Missing as str
-        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", "", False),  # Missing as str
         ("20230802", "SKÅPESUND", " ", False),  # White space
+        ("20230802", "SKÅPESUND", "1010,1", False),  # White space
+        ("20230802", "SKÅPESUND", "abc", False),  # White space
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
@@ -34,8 +35,15 @@ def test_validate_airpres(
             {
                 "visit_date": given_date,
                 "reported_station_name": given_station,
+                "row_number": 1,
                 "air_pressure_hpa": given_air_pressure_hpa,
-            }
+            },
+            {
+                "visit_date": "20201010",
+                "reported_station_name": "ÅSTOL",
+                "row_number": 2,
+                "air_pressure_hpa": "1000",
+            },
         ]
     )
 

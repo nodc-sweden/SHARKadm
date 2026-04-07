@@ -3,7 +3,6 @@ import logging
 import polars as pl
 
 from sharkadm import config
-from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
 from .base import DataHolderProtocol, Validator
@@ -27,7 +26,7 @@ class ValidateColumnViewColumnsNotInDataset(Validator):
         for col in self._column_views.get_columns_for_view(data_holder.data_type):
             if col in data_holder.data.columns:
                 continue
-            adm_logger.log_validation_failed(f"Column view column not in data: {col}")
+            self._log_fail(f"Column view column not in data: {col}")
 
 
 class ValidateUnmappedColumnsHasData(Validator):
@@ -46,4 +45,4 @@ class ValidateUnmappedColumnsHasData(Validator):
                 continue
             if not len(data_holder.data.filter(pl.col(fr) != "")):
                 continue
-            adm_logger.log_validation_failed(f"Unmapped column {fr} has values")
+            self._log_fail(f"Unmapped column {fr} has values")

@@ -24,9 +24,9 @@ class PolarsAddLmqnt(PolarsTransformer):
             lmqnt_str = lmqnt_str.replace("µM", "umol/l")
             lmqnt_str = re.sub(
                 r"[a-zA-Z]",
-                lambda match: match.group(0).lower()
-                if match.group(0).lower() != "c"
-                else "C",
+                lambda match: (
+                    match.group(0).lower() if match.group(0).lower() != "c" else "C"
+                ),
                 lmqnt_str,
             )
             lmqnt_str = lmqnt_str.replace("psu", "o/oo psu")

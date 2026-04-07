@@ -39,11 +39,11 @@ class ValidateCoordinatesDm(Validator):
             if errors:
                 self._log_fail(
                     f"Bad DM coordinates. {' '.join(errors)}",
-                    row_numbers=list(data["row_number"]),
+                    row_numbers=set(data["row_number"]),
                 )
             else:
                 self._log_success(
-                    "Valid DM coordinates.", row_numbers=list(data["row_number"])
+                    "Valid DM coordinates.", row_numbers=set(data["row_number"])
                 )
 
     @staticmethod
@@ -56,9 +56,11 @@ class ValidateCoordinatesDm(Validator):
 
             minutes = minutes_whole + minutes_decimals / 10000
             if minutes >= 60:
-                errors.append(f"Minutes in '{longitude}' not strictly below 60.")
+                errors.append(
+                    f"Minutes in longitude '{longitude}' not strictly below 60."
+                )
             if degrees > 180 or (degrees == 180 and minutes > 0):
-                errors.append(f"Value '{longitude}' exceeds 180 degrees.")
+                errors.append(f"Longitude '{longitude}' exceeds 180 degrees.")
         else:
             errors.append(f"Value '{longitude}' is not a valid longitude.")
         return errors
@@ -73,9 +75,9 @@ class ValidateCoordinatesDm(Validator):
 
             minutes = minutes_whole + minutes_decimals / 10000
             if minutes >= 60:
-                errors.append(f"Minutes in '{latitude}' not strictly below 60.")
+                errors.append(f"Minutes in latitude '{latitude}' not strictly below 60.")
             if degrees > 90 or (degrees == 90 and minutes > 0):
-                errors.append(f"Value '{latitude}' exceeds 90 degrees.")
+                errors.append(f"Latitude '{latitude}' exceeds 90 degrees.")
         else:
             errors.append(f"Value '{latitude}' is not a valid latitude.")
         return errors

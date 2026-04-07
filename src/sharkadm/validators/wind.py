@@ -1,3 +1,5 @@
+import polars as pl
+
 from sharkadm.validators.base import DataHolderProtocol, Validator
 
 
@@ -24,8 +26,7 @@ class ValidateWindir(Validator):
             or "reported_station_name" not in data_holder.data.columns
         ):
             self._log_fail("Missing visit date or reported station name columns.")
-
-        error = False
+            return
 
         valid_values = (
             ["00"]
@@ -33,30 +34,61 @@ class ValidateWindir(Validator):
             + [f"{i:02d}" for i in range(1, 10)]
             + ["99"]
         )
-        unique_rows = data_holder.data.select(
-            ["visit_date", "reported_station_name", "wind_direction_code"]
-        ).unique()
-
-        for row in unique_rows.iter_rows(named=True):
-            visit_info = (
-                row["visit_date"] + " at station: " + row["reported_station_name"]
+        unique_rows = (
+            data_holder.data.select(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "wind_direction_code",
+                    "row_number",
+                ]
             )
-            code_str = row["wind_direction_code"]
+            .group_by(["visit_date", "reported_station_name", "wind_direction_code"])
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
 
-            if not code_str or code_str == "":
-                continue
-            if code_str not in valid_values:
-                error = True
-                self._log_fail(
-                    f"Wind direction code: {code_str} not in correct format {visit_info}",
+        unique_rows = unique_rows.with_columns(
+            pl.when(pl.col("wind_direction_code").is_in(valid_values))
+            .then(pl.lit("Wind direction code is ok"))
+            .when(
+                pl.col("wind_direction_code").is_null()
+                | (pl.col("wind_direction_code").str.strip_chars() == "")
+            )
+            .then(
+                pl.format(
+                    "{} on {}: Missing wind direction code: {}",
+                    pl.col("reported_station_name"),
+                    pl.col("visit_date"),
+                    pl.col("wind_direction_code"),
                 )
+            )
+            .otherwise(
+                pl.format(
+                    "{} on {}: Wind direction code has unexpected value: {}",
+                    pl.col("reported_station_name"),
+                    pl.col("visit_date"),
+                    pl.col("wind_direction_code"),
+                )
+            )
+            .alias("message")
+        )
 
-        if not error:
-            self._log_success("Wind direction code is ok")
+        if (
+            unique_rows.filter(pl.col("message") != "Wind direction code is ok").height
+            == 0
+        ):
+            self._log_success("All wind direction codes are ok")
+        else:
+            for (msg,), df in unique_rows.filter(
+                pl.col("message") != "Wind direction code is ok"
+            ).group_by("message"):
+                self._log_fail(msg=msg, row_numbers=df["row_numbers"][0])
 
 
 class ValidateWinsp(Validator):
     _display_name = "Wind speed (m/s)"
+    lower_limit = 0
+    upper_limit = 40
 
     @staticmethod
     def get_validator_description() -> str:
@@ -77,38 +109,63 @@ class ValidateWinsp(Validator):
             or "reported_station_name" not in data_holder.data.columns
         ):
             self._log_fail("Missing visit date or reported station name columns.")
+            return
 
-        error = False
-
-        lower_limit = 0
-        upper_limit = 40
-        unique_rows = data_holder.data.select(
-            ["visit_date", "reported_station_name", "wind_speed_ms"]
-        ).unique()
-
-        for row in unique_rows.iter_rows(named=True):
-            visit_info = (
-                row["visit_date"] + " at station: " + row["reported_station_name"]
+        unique_rows = (
+            data_holder.data.select(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "wind_speed_ms",
+                    "row_number",
+                ]
             )
-            winsp = row["wind_speed_ms"]
+            .group_by(["visit_date", "reported_station_name", "wind_speed_ms"])
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
 
-            if not winsp or winsp == "":
-                continue
-            try:
-                winsp = float(winsp)
-                if lower_limit <= float(winsp) <= upper_limit:
-                    continue
-                else:
-                    error = True
-                    self._log_fail(
-                        f"Wind speed (m/s): {winsp} is outside reasonable "
-                        f"ranges (0-40 m/s) {visit_info}",
+        unique_rows = unique_rows.with_columns(
+            pl.col("wind_speed_ms")
+            .cast(pl.Float64, strict=False)
+            .alias("wind_speed_float")
+        )
+        unique_rows = unique_rows.with_columns(
+            [
+                pl.when(pl.col("wind_speed_float").is_null())
+                .then(
+                    pl.format(
+                        "{} on {}: Missing or invalid wind speed (m/s): {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        pl.col("wind_speed_ms"),
                     )
-            except ValueError:
-                error = True
-                self._log_fail(
-                    f"Wind speed (m/s): {winsp} has unexpected format {visit_info}",
                 )
+                .when(
+                    pl.col("wind_speed_float").is_between(
+                        self.lower_limit, self.upper_limit, closed="both"
+                    )
+                )
+                .then(pl.lit("Wind speed (m/s) is ok"))
+                .otherwise(
+                    pl.format(
+                        "{} on {}: "
+                        "Wind speed (m/s) is outside acceptable ranges:"
+                        "{} > {} > {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        self.lower_limit,
+                        pl.col("wind_speed_ms"),
+                        self.upper_limit,
+                    )
+                )
+                .alias("message")
+            ]
+        )
 
-        if not error:
-            self._log_success("Wind speed (m/s) is ok")
+        if unique_rows.filter(pl.col("message") != "Wind speed (m/s) is ok").height == 0:
+            self._log_success("All wind speeds (m/s) are ok")
+        else:
+            for (msg,), df in unique_rows.filter(
+                pl.col("message") != "Wind speed (m/s) is ok"
+            ).group_by("message"):
+                self._log_fail(msg=msg, row_numbers=df["row_numbers"][0])

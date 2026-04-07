@@ -75,7 +75,7 @@ class ValidateCommonValuesByVisit(Validator):
             else:
                 missing_columns.append(c)
         if not existing_cols or not existing_visit_cols:
-            adm_logger.log_validation_failed(
+            self._log_fail(
                 "Not enough metadata columns to check for unique values.",
                 validator=self.get_display_name(),
                 level=adm_logger.WARNING,
@@ -95,9 +95,8 @@ class ValidateCommonValuesByVisit(Validator):
             c for c in existing_cols if df.select(pl.col(c).max()).item() > 1
         ]
         if not violating_cols:
-            adm_logger.log_validation_succeeded(
-                "All columns have one unique value per visit. ",
-                validator=self.get_display_name(),
+            self._log_success(
+                msg="All columns have one unique value per visit. ",
                 level=adm_logger.INFO,
             )
             return
@@ -121,11 +120,10 @@ class ValidateCommonValuesByVisit(Validator):
             for c in bad_cols:
                 values = values_df[c].to_list()
 
-                adm_logger.log_validation_failed(
+                self._log_fail(
                     f"Multiple values for '{c}' at visit "
                     f"{visit_date}_{visit_time}_{platform_code}_{station}: "
                     f"{values}",
-                    validator=self.get_display_name(),
                     column=c,
                     level=adm_logger.ERROR,
                 )

@@ -21,19 +21,19 @@ class MissingTime(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         for col in MissingTime.source_cols:
             if col not in data_holder.data.columns:
-                adm_logger.log_validation_failed(
-                    f'Missing column "{col}"', level=adm_logger.ERROR
-                )
+                self._log_fail(f'Missing column "{col}"', level=adm_logger.ERROR)
                 continue
             df = data_holder.data[data_holder.data[col].str.strip() == ""]
             if df.empty:
                 continue
-            nr_missing = len(df)
-            rows_str = ", ".join(list(df["row_number"].astype(str)))
-            adm_logger.log_validation_failed(
-                f"Missing {col} if {nr_missing} rows. Att rows: {rows_str}",
-                level=adm_logger.ERROR,
-            )
+            # nr_missing = len(df)
+            # rows_str = ", ".join(list(df["row_number"].astype(str)))
+            if len(df):
+                self._log_fail(
+                    f"Missing column {col} at {len(df)} rows",
+                    level=adm_logger.ERROR,
+                    row_numbers=df["row_number"].to_list(),
+                )
 
     @staticmethod
     def check(x):
@@ -61,7 +61,7 @@ class ValidateDateAndTime(Validator):
     def _validate(self, data_holder: PolarsDataHolder) -> OperationInfo | None:
         info = OperationInfo(operator=self)
         self._log_workflow(
-            "Checking that visit date and sample time.",
+            "Checking visit/sample date and sample time.",
         )
         error = False
         date_col = "visit_date"
@@ -72,18 +72,18 @@ class ValidateDateAndTime(Validator):
             [date_col, time_col]
         ):
             if not (time_component := self._time_component(sample_time)):
-                msg = f"Sample time ({time_col}) not valid: '{sample_time}'"
+                msg = f"Sample time from {time_col} not valid: '{sample_time}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"]),
+                    row_numbers=df["row_number"].to_list(),
                 )
                 error = True
 
             if not (date_component := self._date_component(visit_date)):
-                msg = f"Visit date {date_col} not valid: '{visit_date}'"
+                msg = f"Visit date from {date_col} not valid: '{visit_date}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"]),
+                    row_numbers=df["row_number"].to_list(),
                 )
                 error = True
 

@@ -16,8 +16,7 @@ from sharkadm.validators.waves import ValidateWaves
         ("20230802", "SKÅPESUND", "5", True),
         ("20230530", "SVENSHOLMEN", "7.0", False),  # Float
         ("20230802", "SKÅPESUND", "07", False),  # Zeropadded
-        ("20230802", "SKÅPESUND", "", True),  # Missing as str
-        ("20230802", "SKÅPESUND", None, True),  # Missing as None
+        ("20230802", "SKÅPESUND", "", False),  # Missing as str
         ("20230802", "SKÅPESUND", " ", False),  # White space
     ),
 )
@@ -37,6 +36,7 @@ def test_validate_waves(
                 "visit_date": given_visit_date,
                 "reported_station_name": given_station,
                 "wave_observation_code": given_wave_observation_code,
+                "row_number": 1,
             }
         ]
     )

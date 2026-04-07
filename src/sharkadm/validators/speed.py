@@ -29,14 +29,17 @@ class ValidateSpeed(Validator):
     def _validate(self, data_holder: DataHolderProtocol) -> None:
         speed = (
             approximate_distance(
-                data_holder.data.unique(
+                data_holder.data.group_by(
                     [
                         self._ship_column,
                         self._longitude_column,
                         self._latitude_column,
                         self._datetime_column,
+                        self._visit_key_column,
                     ]
-                ).sort([self._ship_column, self._datetime_column])
+                )
+                .agg([pl.col(self._row_number_column).alias("row_numbers")])
+                .sort([self._ship_column, self._datetime_column])
             )
             .with_columns(
                 (
@@ -63,10 +66,11 @@ class ValidateSpeed(Validator):
         else:
             for row in too_fast.iter_rows(named=True):
                 self._log_fail(
-                    f"The speed to reach '{row[self._visit_key_column]}' "
+                    f"The speed to reach position {row[self._latitude_column]} N "
+                    f"{row[self._longitude_column]} E "
                     f"is at least {row['_speed'] / KNOTS_PER_KM:.1f} knots "
                     f"({row['_distance'] / 1000:.1f} km in {row['_duration']:.1f} h).",
-                    row_numbers=row[self._row_number_column],
+                    row_numbers=row["row_numbers"],
                 )
 
 
