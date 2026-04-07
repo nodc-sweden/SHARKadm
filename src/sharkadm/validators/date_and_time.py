@@ -75,7 +75,7 @@ class ValidateDateAndTime(Validator):
                 msg = f"Sample time from {time_col} not valid: '{sample_time}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"].to_list()),
+                    row_numbers=df["row_number"].to_list(),
                 )
                 error = True
 
@@ -83,7 +83,7 @@ class ValidateDateAndTime(Validator):
                 msg = f"Visit date from {date_col} not valid: '{visit_date}'"
                 self._log_fail(
                     self._get_log_string(msg, df),
-                    row_numbers=list(df["row_number"].to_list()),
+                    row_numbers=df["row_number"].to_list(),
                 )
                 error = True
 
