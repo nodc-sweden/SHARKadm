@@ -27,48 +27,57 @@ class ValidateWaterDepth(Validator):
             or "reported_station_name" not in data_holder.data.columns
         ):
             self._log_fail("Missing visit date or reported station name columns.")
-        df = data_holder.data.with_columns(
-            [pl.col("water_depth_m").cast(pl.Float64, strict=False)]
-        )
+            return
 
-        df = df.with_columns(
+        unique_rows = (
+            data_holder.data.select(
+                ["visit_date", "reported_station_name", "water_depth_m", "row_number"]
+            )
+            .group_by(["visit_date", "reported_station_name", "water_depth_m"])
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
+        unique_rows = unique_rows.with_columns(
             [
                 pl.when(
-                    # valid numeric values within the limits
-                    (pl.col("water_depth_m").is_not_null())
-                    & pl.col("water_depth_m").is_between(
-                        self.lower_limit, self.upper_limit, closed="both"
+                    pl.col("water_depth_m").is_null()
+                    | (pl.col("water_depth_m").str.strip_chars() == "")
+                    | pl.col("water_depth_m").str.contains(r"[^0-9.]")
+                )
+                .then(
+                    pl.format(
+                        "{} on {}: Missing or invalid water depth: {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        pl.col("water_depth_m"),
                     )
                 )
-                .then(True)
-                .otherwise(False)
-                .alias("is_valid")
+                .when(
+                    pl.col("water_depth_m")
+                    .cast(pl.Float64, strict=False)
+                    .is_between(self.lower_limit, self.upper_limit, closed="both")
+                )
+                .then(pl.lit("Water depth is ok"))
+                .otherwise(
+                    pl.format(
+                        "{} on {}: Water depth is outside acceptable ranges:{} > {} > {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        self.lower_limit,
+                        pl.col("water_depth_m"),
+                        self.upper_limit,
+                    )
+                )
+                .alias("message")
             ]
         )
 
-        invalid_row_numbers = df.filter(pl.col("is_valid"))["row_number"].to_list()
-
-        invalid_unique = (
-            df.filter(~pl.col("is_valid"))
-            .group_by(
-                [
-                    "visit_date",
-                    "reported_station_name",
-                    "water_depth_m",
-                ]
-            )
-            .agg(pl.col("row_number").alias("row_numbers"))
-        )
-
-        if len(invalid_row_numbers) == 0:
-            self._log_success("Water depth is ok")
+        if unique_rows.filter(pl.col("message") != "Water depth is ok").height == 0:
+            self._log_success("All water depths are ok")
         else:
-            for row in invalid_unique.iter_rows(named=True):
-                message = (
-                    f"{row['reported_station_name']} on {row['visit_date']}: "
-                    f"water depth has unexpected value"
-                )
-                self._log_fail(msg=message, row_numbers=row["row_numbers"])
+            for (msg,), df in unique_rows.filter(
+                pl.col("message") != "Water depth is ok"
+            ).group_by("message"):
+                self._log_fail(msg=msg, row_numbers=df["row_numbers"][0])
 
 
 class ValidateSampleDepth(Validator):

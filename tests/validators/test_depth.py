@@ -16,8 +16,8 @@ from sharkadm.validators.depth import (
     (
         ("2023080", "SKÅPESUND", "0.2", True),  # Float
         ("20230802", "SKÅPESUND", "499.9", True),  # Float
-        ("20230530", "SMÅHOLMARNA", "500", False),  # Possibly too high
-        ("2023053", "SVENSHOLMEN", "0", False),  # limit
+        ("20230530", "SMÅHOLMARNA", "500.1", False),  # Possibly too high
+        ("2023053", "SVENSHOLMEN", "-0.0001", False),  # limit
         ("2023080", "SKÅPESUND", "", False),  # Missing as str
         ("202308", "SKÅPESUND", " ", False),  # White space
     ),
@@ -37,8 +37,15 @@ def test_validate_wadep(
             {
                 "visit_date": given_visit_date,
                 "reported_station_name": given_station,
+                "row_number": 1,
                 "water_depth_m": given_water_depth_m,
-            }
+            },
+            {
+                "visit_date": "20201010",
+                "reported_station_name": "ÅSTOL",
+                "row_number": 2,
+                "water_depth_m": "200",
+            },
         ]
     )
 
