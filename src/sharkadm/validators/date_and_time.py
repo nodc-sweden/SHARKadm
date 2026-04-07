@@ -32,7 +32,7 @@ class MissingTime(Validator):
                 self._log_fail(
                     f"Missing column {col} at {len(df)} rows",
                     level=adm_logger.ERROR,
-                    row_numbers=df["row_number"].to_list(9),
+                    row_numbers=df["row_number"].to_list(),
                 )
 
     @staticmethod
