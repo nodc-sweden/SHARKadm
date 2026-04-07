@@ -40,7 +40,7 @@ class ValidateAirpres(Validator):
             .group_by(["visit_date", "reported_station_name", "air_pressure_hpa"])
             .agg(pl.col("row_number").alias("row_numbers"))
         )
-        print(unique_rows["air_pressure_hpa"])
+
         unique_rows = unique_rows.with_columns(
             [
                 pl.when(

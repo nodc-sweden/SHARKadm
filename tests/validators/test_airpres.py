@@ -58,10 +58,6 @@ def test_validate_airpres(
     # Then there should be exactly one validation message
     all_logs = adm_logger.data
     validator_logs = [log for log in all_logs if log["log_type"] == adm_logger.VALIDATION]
-    print("\n==== VALIDATION LOGS ====")
-    for log in validator_logs:
-        print(log)
-    print("=========================\n")
     assert len(validator_logs) == 1
 
     # And the validation status is as expected
