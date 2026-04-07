@@ -37,12 +37,13 @@ class ValidateWaterDepth(Validator):
             .agg(pl.col("row_number").alias("row_numbers"))
         )
         unique_rows = unique_rows.with_columns(
+            pl.col("water_depth_m")
+            .cast(pl.Float64, strict=False)
+            .alias("water_depth_float")
+        )
+        unique_rows = unique_rows.with_columns(
             [
-                pl.when(
-                    pl.col("water_depth_m").is_null()
-                    | (pl.col("water_depth_m").str.strip_chars() == "")
-                    | pl.col("water_depth_m").str.contains(r"[^0-9.]")
-                )
+                pl.when(pl.col("water_depth_float").is_null())
                 .then(
                     pl.format(
                         "{} on {}: Missing or invalid water depth: {}",
@@ -52,9 +53,9 @@ class ValidateWaterDepth(Validator):
                     )
                 )
                 .when(
-                    pl.col("water_depth_m")
-                    .cast(pl.Float64, strict=False)
-                    .is_between(self.lower_limit, self.upper_limit, closed="both")
+                    pl.col("water_depth_float").is_between(
+                        self.lower_limit, self.upper_limit, closed="both"
+                    )
                 )
                 .then(pl.lit("Water depth is ok"))
                 .otherwise(
@@ -121,34 +122,35 @@ class ValidateSampleDepth(Validator):
             ]
         ).unique()
         unique_rows = unique_rows.with_columns(
+            pl.col("sample_depth_m")
+            .cast(pl.Float64, strict=False)
+            .alias("sample_depth_float"),
+            pl.col("water_depth_m")
+            .cast(pl.Float64, strict=False)
+            .alias("water_depth_float"),
+        )
+        unique_rows = unique_rows.with_columns(
             [
                 pl.when(
-                    pl.col("water_depth_m").is_null()
-                    | pl.col("sample_depth_m").is_null()
-                    | (pl.col("water_depth_m").str.strip_chars() == "")
-                    | (pl.col("sample_depth_m").str.strip_chars() == "")
-                    | pl.col("water_depth_m").str.contains(r"[^0-9.]")
-                    | pl.col("sample_depth_m").str.contains(r"[^0-9.]")
+                    pl.col("sample_depth_float").is_null()
+                    | pl.col("water_depth_float").is_null()
                 )
                 .then(
                     pl.format(
                         "{} on {}: "
-                        "Missing or invalid water depth {}, or sample depth {} ",
+                        "Missing or invalid sample depth {}, or water depth {} ",
                         pl.col("reported_station_name"),
                         pl.col("visit_date"),
-                        pl.col("water_depth_m"),
                         pl.col("sample_depth_m"),
+                        pl.col("water_depth_m"),
                     )
                 )
-                .when(
-                    pl.col("sample_depth_m").cast(pl.Float64, strict=False)
-                    < pl.col("water_depth_m").cast(pl.Float64, strict=False)
-                )
+                .when(pl.col("sample_depth_float") < pl.col("water_depth_float"))
                 .then(pl.lit("Sample depth is ok"))
                 .otherwise(
                     pl.format(
                         "{} on {}: "
-                        "Sample depth is equal to or larger water depth:"
+                        "Sample depth is equal to or larger than water depth:"
                         "{} >= {}",
                         pl.col("reported_station_name"),
                         pl.col("visit_date"),
@@ -195,46 +197,126 @@ class ValidateSecchiDepth(Validator):
                 "Could not validate secchi depth because secchi depth is missing.",
             )
             return
+        if (
+            "visit_date" not in data_holder.data.columns
+            or "reported_station_name" not in data_holder.data.columns
+        ):
+            self._log_fail("Missing visit date or reported station name columns.")
+            return
 
-        error = False
-        secchi_value_found = False
-        for (value, water_depth), df in data_holder.data.filter(
-            data_holder.data["parameter"] == "SECCHI"
-        ).group_by(["value", "water_depth_m"]):
-            secchi_value_found = True
-            visit_info = (
-                df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
+        unique_rows = (
+            data_holder.data.filter(pl.col("parameter") == "SECCHI")
+            .select(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "water_depth_m",
+                    "value",
+                    "row_number",
+                ]
             )
-            try:
-                secchi_depth_float = float(value)
-                water_depth_float = float(water_depth)
-            except (TypeError, ValueError):
-                self._log_fail(
-                    "Could not validate secchi depth:"
-                    " Invalid formats in . "
-                    f"secchi_depth={value!r} "
-                    f"and/or "
-                    f"water_depth={water_depth!r} "
-                    f"at visit date and station: {visit_info}",
-                    row_numbers=list(df["row_number"]),
-                )
-                error = True
-                continue
+            .group_by(
+                [
+                    "visit_date",
+                    "reported_station_name",
+                    "water_depth_m",
+                    "value",
+                ]
+            )
+            .agg(pl.col("row_number").alias("row_numbers"))
+        )
 
-            if secchi_depth_float >= water_depth_float:
-                self._log_fail(
-                    f"Secchi depth below water depth: {value} >= {df['water_depth_m']}"
-                    f" at visit date and station: "
-                    f"{visit_info}",
-                    row_numbers=list(df["row_number"]),
-                )
-                error = True
-
-        if not secchi_value_found:
+        if unique_rows.height == 0:
             self._log_fail(
                 "Could not validate secchi depth because secchi depth is missing.",
             )
             return
+        unique_rows = unique_rows.with_columns(
+            pl.col("value").cast(pl.Float64, strict=False).alias("value_float"),
+            pl.col("water_depth_m")
+            .cast(pl.Float64, strict=False)
+            .alias("water_depth_float"),
+        )
+        unique_rows = unique_rows.with_columns(
+            [
+                pl.when(
+                    pl.col("water_depth_float").is_null()
+                    | pl.col("value_float").is_null()
+                )
+                .then(
+                    pl.format(
+                        "{} on {}: "
+                        "Missing or invalid water depth ({}) or secchi depth ({})",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        pl.col("water_depth_m"),
+                        pl.col("value"),
+                    )
+                )
+                .when(pl.col("value_float") < pl.col("water_depth_float"))
+                .then(pl.lit("Secchi depth is ok"))
+                .otherwise(
+                    pl.format(
+                        "{} on {}: "
+                        "Secchi depth is equal to or larger than water depth:"
+                        "{} >= {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        pl.col("value"),
+                        pl.col("water_depth_m"),
+                    )
+                )
+                .alias("message")
+            ]
+        )
 
-        if not error:
-            self._log_success("All secchi depths above water depth.")
+        if unique_rows.filter(pl.col("message") != "Secchi depth is ok").height == 0:
+            self._log_success("All secchi depths are ok")
+        else:
+            for (msg,), df in unique_rows.filter(
+                pl.col("message") != "Secchi depth is ok"
+            ).group_by("message"):
+                self._log_fail(msg=msg, row_numbers=df["row_numbers"][0])
+
+        # error = False
+        # secchi_value_found = False
+        # for (value, water_depth), df in data_holder.data.filter(
+        #     data_holder.data["parameter"] == "SECCHI"
+        # ).group_by(["value", "water_depth_m"]):
+        #     secchi_value_found = True
+        #     visit_info = (
+        #         df.select(["visit_date", "reported_station_name"]).unique().to_dicts()
+        #     )
+        #     try:
+        #         secchi_depth_float = float(value)
+        #         water_depth_float = float(water_depth)
+        #     except (TypeError, ValueError):
+        #         self._log_fail(
+        #             "Could not validate secchi depth:"
+        #             " Invalid formats in . "
+        #             f"secchi_depth={value!r} "
+        #             f"and/or "
+        #             f"water_depth={water_depth!r} "
+        #             f"at visit date and station: {visit_info}",
+        #             row_numbers=list(df["row_number"]),
+        #         )
+        #         error = True
+        #         continue
+        #
+        #     if secchi_depth_float >= water_depth_float:
+        #         self._log_fail(
+        #             f"Secchi depth below water depth: {value} >= {df['water_depth_m']}"
+        #             f" at visit date and station: "
+        #             f"{visit_info}",
+        #             row_numbers=list(df["row_number"]),
+        #         )
+        #         error = True
+        #
+        # if not secchi_value_found:
+        #     self._log_fail(
+        #         "Could not validate secchi depth because secchi depth is missing.",
+        #     )
+        #     return
+        #
+        # if not error:
+        #     self._log_success("All secchi depths above water depth.")

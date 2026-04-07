@@ -40,14 +40,14 @@ class ValidateAirpres(Validator):
             .group_by(["visit_date", "reported_station_name", "air_pressure_hpa"])
             .agg(pl.col("row_number").alias("row_numbers"))
         )
-
+        unique_rows = unique_rows.with_columns(
+            pl.col("air_pressure_hpa")
+            .cast(pl.Float64, strict=False)
+            .alias("air_pressure_float")
+        )
         unique_rows = unique_rows.with_columns(
             [
-                pl.when(
-                    pl.col("air_pressure_hpa").is_null()
-                    | (pl.col("air_pressure_hpa").str.strip_chars() == "")
-                    | pl.col("air_pressure_hpa").str.contains(r"[^0-9.]")
-                )
+                pl.when(pl.col("air_pressure_float").is_null())
                 .then(
                     pl.format(
                         "{} on {}: Missing or invalid air pressure (hPa): {}",
@@ -57,9 +57,9 @@ class ValidateAirpres(Validator):
                     )
                 )
                 .when(
-                    pl.col("air_pressure_hpa")
-                    .cast(pl.Float64, strict=False)
-                    .is_between(self.lower_limit, self.upper_limit, closed="both")
+                    pl.col("air_pressure_float").is_between(
+                        self.lower_limit, self.upper_limit, closed="both"
+                    )
                 )
                 .then(pl.lit("Air pressure (hPa) is ok"))
                 .otherwise(
