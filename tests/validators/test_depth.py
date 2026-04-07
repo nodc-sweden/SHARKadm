@@ -70,9 +70,9 @@ def test_validate_wadep(
 @pytest.mark.parametrize(
     "given_sample_depth, given_water_depth, expected_success",
     (
-        (99.9, 100, True),
-        (100, 100, False),
-        (100.1, 100, False),
+        ("99.9", "100", True),
+        ("100", "100", False),
+        ("100.1", "100", False),
     ),
 )
 @patch("sharkadm.config.get_all_data_types")
