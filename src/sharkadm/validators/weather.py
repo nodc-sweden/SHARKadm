@@ -58,7 +58,7 @@ class ValidateWeath(Validator):
             )
             .otherwise(
                 pl.format(
-                    "{} on {}: Weather observation code has unexpected values: {}",
+                    "{} on {}: Weather observation code has unexpected value: {}",
                     pl.col("reported_station_name"),
                     pl.col("visit_date"),
                     pl.col("weather_observation_code"),

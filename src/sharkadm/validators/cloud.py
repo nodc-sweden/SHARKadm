@@ -57,7 +57,7 @@ class ValidateCloud(Validator):
             )
             .otherwise(
                 pl.format(
-                    "{} on {}: Cloud observation code has unexpected values: {}",
+                    "{} on {}: Cloud observation code has unexpected value: {}",
                     pl.col("reported_station_name"),
                     pl.col("visit_date"),
                     pl.col("cloud_observation_code"),
