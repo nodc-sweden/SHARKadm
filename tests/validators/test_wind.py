@@ -15,8 +15,7 @@ from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
         ("20230530", "SVENSHOLMEN", "08", True),  # zero padding before
         ("20230802", "SKÅPESUND", "99", True),
         ("20230802", "SKÅPESUND", "1", True),
-        ("20230802", "SKÅPESUND", "", True),
-        ("20230802", "SKÅPESUND", None, True),
+        ("20230802", "SKÅPESUND", "", False),
         ("20230802", "SKÅPESUND", " ", False),
     ),
 )
@@ -36,6 +35,7 @@ def test_validate_windir(
                 "visit_date": given_visit_date,
                 "reported_station_name": given_station,
                 "wind_direction_code": given_wind_direction_code,
+                "row_number": 1,
             }
         ]
     )
@@ -65,8 +65,7 @@ def test_validate_windir(
         ("20230530", "SMÅHOLMARNA", "45", False),
         ("20230530", "SVENSHOLMEN", "0", True),
         ("20230802", "SKÅPESUND", "40", True),
-        ("20230802", "SKÅPESUND", "", True),
-        ("20230802", "SKÅPESUND", None, True),
+        ("20230802", "SKÅPESUND", "", False),
         ("20230802", "SKÅPESUND", " ", False),
     ),
 )
@@ -86,6 +85,7 @@ def test_validate_winsp(
                 "visit_date": given_visit_date,
                 "reported_station_name": given_station,
                 "wind_speed_ms": given_wind_speed_ms,
+                "row_number": 1,
             }
         ]
     )
