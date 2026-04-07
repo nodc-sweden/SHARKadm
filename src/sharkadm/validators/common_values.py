@@ -124,7 +124,6 @@ class ValidateCommonValuesByVisit(Validator):
                     f"Multiple values for '{c}' at visit "
                     f"{visit_date}_{visit_time}_{platform_code}_{station}: "
                     f"{values}",
-                    validator=self.get_display_name(),
                     column=c,
                     level=adm_logger.ERROR,
                 )
