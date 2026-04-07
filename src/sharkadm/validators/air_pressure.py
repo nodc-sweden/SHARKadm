@@ -31,52 +31,60 @@ class ValidateAirpres(Validator):
             or "reported_station_name" not in data_holder.data.columns
         ):
             self._log_fail("Missing visit date or reported station name columns.")
+            return
 
-        df = data_holder.data.with_columns(
-            [pl.col("air_pressure_hpa").cast(pl.Float64, strict=False)]
-        )
-        df = df.with_columns(
-            [
-                (pl.col("air_pressure_hpa").is_null()).alias("fail_no_air_pressure"),
-                (
-                    ~pl.col("air_pressure_hpa").is_between(
-                        self.lower_limit, self.upper_limit, closed="both"
-                    )
-                ).alias("fail_air_pressure_out_of_range"),
-            ]
-        )
-
-        missing_groups = (
-            df.filter(pl.col("fail_no_air_pressure"))
-            .group_by(
-                [
-                    "visit_date",
-                    "reported_station_name",
-                ]
+        unique_rows = (
+            data_holder.data.select(
+                ["visit_date", "reported_station_name", "air_pressure_hpa", "row_number"]
             )
-            .agg(pl.col("row_number").alias("row_numbers"))
-        )
-
-        for row in missing_groups.iter_rows(named=True):
-            message = (
-                f"{row['reported_station_name']} on {row['visit_date']}: "
-                f"Missing air pressure ({row['air_pressure_hpa']})"
-            )
-            self._log_fail(msg=message, row_numbers=row["row_numbers"])
-
-        out_of_range_groups = (
-            df.filter(pl.col("fail_air_pressure_out_of_range"))
             .group_by(["visit_date", "reported_station_name", "air_pressure_hpa"])
             .agg(pl.col("row_number").alias("row_numbers"))
         )
+        print(unique_rows["air_pressure_hpa"])
+        unique_rows = unique_rows.with_columns(
+            [
+                pl.when(
+                    pl.col("air_pressure_hpa").is_null()
+                    | (pl.col("air_pressure_hpa").str.strip_chars() == "")
+                    | pl.col("air_pressure_hpa").str.contains(r"[^0-9.]")
+                )
+                .then(
+                    pl.format(
+                        "{} on {}: Missing or invalid air pressure (hPa): {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        pl.col("air_pressure_hpa"),
+                    )
+                )
+                .when(
+                    pl.col("air_pressure_hpa")
+                    .cast(pl.Float64, strict=False)
+                    .is_between(self.lower_limit, self.upper_limit, closed="both")
+                )
+                .then(pl.lit("Air pressure (hPa) is ok"))
+                .otherwise(
+                    pl.format(
+                        "{} on {}: "
+                        "Air pressure (hPa) is outside acceptable ranges:"
+                        "{} > {} > {}",
+                        pl.col("reported_station_name"),
+                        pl.col("visit_date"),
+                        self.lower_limit,
+                        pl.col("air_pressure_hpa"),
+                        self.upper_limit,
+                    )
+                )
+                .alias("message")
+            ]
+        )
 
-        for row in out_of_range_groups.iter_rows(named=True):
-            message = (
-                f"{row['reported_station_name']} on {row['visit_date']}: "
-                f"air pressure out of range: "
-                f"{self.lower_limit} > {row['air_pressure_hpa']} > {self.upper_limit}"
-            )
-            self._log_fail(msg=message, row_numbers=row["row_numbers"])
-
-        if missing_groups.height == 0 and out_of_range_groups.height == 0:
-            self._log_success("All airpressures are accepted.")
+        if (
+            unique_rows.filter(pl.col("message") != "Air pressure (hPa) is ok").height
+            == 0
+        ):
+            self._log_success("All air pressures (hPa) are ok")
+        else:
+            for (msg,), df in unique_rows.filter(
+                pl.col("message") != "Air pressure (hPa) is ok"
+            ).group_by("message"):
+                self._log_fail(msg=msg, row_numbers=df["row_numbers"][0])

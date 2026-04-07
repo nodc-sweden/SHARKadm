@@ -91,6 +91,7 @@ class Validator(ABC, Operator):
             msg=msg,
             level=level,
             validator=self.get_display_name(),
+            validation_success=True,
             cls=self.__class__.__name__,
             **kwargs,
         )
@@ -100,6 +101,7 @@ class Validator(ABC, Operator):
             msg=msg,
             level=level,
             validator=self.get_display_name(),
+            validation_success=False,
             cls=self.__class__.__name__,
             **kwargs,
         )
