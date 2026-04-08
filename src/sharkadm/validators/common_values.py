@@ -112,6 +112,7 @@ class ValidateCommonValuesByVisit(Validator):
 
             values_df = data_holder.data.filter(visit_filter).select(
                 [pl.col(c).unique().alias(c) for c in bad_cols]
+                + [pl.col("row_number").unique().alias("row_numbers")]
             )
             visit_date = row.get("visit_date") or row.get("sample_date")
             visit_time = row.get("visit_time") or row.get("sample_time")
@@ -119,11 +120,12 @@ class ValidateCommonValuesByVisit(Validator):
             station = row.get("reported_station_name")
             for c in bad_cols:
                 values = values_df[c].to_list()
+                rows = values_df["row_numbers"].to_list()
 
                 self._log_fail(
-                    f"Multiple values for '{c}' at visit "
-                    f"{visit_date}_{visit_time}_{platform_code}_{station}: "
-                    f"{values}",
+                    f"{station} on {visit_date} at {visit_time} with {platform_code}: "
+                    f"Multiple values ({values}) for column: '{c}'",
                     column=c,
                     level=adm_logger.ERROR,
+                    row_numbers=rows,
                 )
