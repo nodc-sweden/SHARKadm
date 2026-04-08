@@ -77,6 +77,7 @@ def test_conflicting_values_for_same_visit_are_found(
                 "sample_time": given_time,
                 "platform_code": given_platform_code,
                 "reported_station_name": given_station,
+                "row_number": 1,
                 given_column: given_value_a,
             },
             base_row
@@ -85,6 +86,7 @@ def test_conflicting_values_for_same_visit_are_found(
                 "sample_time": given_time,
                 "platform_code": given_platform_code,
                 "reported_station_name": given_station,
+                "row_number": 2,
                 given_column: given_value_b,
             },
         ]
