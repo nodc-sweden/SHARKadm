@@ -112,6 +112,10 @@ def test_conflicting_values_for_same_visit_are_found(
         if log["log_type"] == adm_logger.VALIDATION
         and log["cls"] == "ValidateCommonValuesByVisit"
     ]
+    print("\n==== specific_validation_logs ====")
+    for log in specific_validation_logs:
+        print(log)
+    print("=========================\n")
 
     failed_validations_logs = [
         log for log in specific_validation_logs if not log["validation_success"]
