@@ -11,8 +11,9 @@ from .base import PolarsTransformer
 
 
 class PolarsRemoveColumns(PolarsTransformer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, regex: bool = False, **kwargs):
         self._args = args
+        self._regex = regex
         super().__init__(**kwargs)
 
     @staticmethod
@@ -20,17 +21,23 @@ class PolarsRemoveColumns(PolarsTransformer):
         return "Removes columns matching given strings in args"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        columns_to_remove = set()
-        for arg in self._args:
-            columns_to_remove |= set(
-                filter(lambda x: re.search(arg, x), data_holder.data.columns)
-            )
+        if self._regex:
+            columns_to_remove = set()
+            for arg in self._args:
+                columns_to_remove |= set(
+                    filter(lambda x: re.search(arg, x), data_holder.data.columns)
+                )
+        else:
+            columns_to_remove = [
+                col for col in self._args if col in data_holder.data.columns
+            ]
         data_holder.data = data_holder.data.drop(columns_to_remove)
 
 
 class PolarsClearColumns(PolarsTransformer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, regex: bool = False, **kwargs):
         self._args = args
+        self._regex = regex
         super().__init__(**kwargs)
 
     @staticmethod
@@ -38,11 +45,16 @@ class PolarsClearColumns(PolarsTransformer):
         return "Clears columns matching given strings in args"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        columns_to_clear = set()
-        for arg in self._args:
-            columns_to_clear |= set(
-                filter(lambda x: re.search(arg, x), data_holder.data.columns)
-            )
+        if self._regex:
+            columns_to_clear = set()
+            for arg in self._args:
+                columns_to_clear |= set(
+                    filter(lambda x: re.search(arg, x), data_holder.data.columns)
+                )
+        else:
+            columns_to_clear = [
+                col for col in self._args if col in data_holder.data.columns
+            ]
         for col in columns_to_clear:
             data_holder.data = data_holder.data.with_columns(pl.lit("").alias(col))
 

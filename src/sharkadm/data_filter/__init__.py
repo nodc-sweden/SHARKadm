@@ -16,6 +16,7 @@ from sharkadm.data_filter.data_filter_on_land import PolarsDataFilterOnLand
 from sharkadm.data_filter.data_filter_parameter import PolarsDataFilterParameter
 from sharkadm.data_filter.data_filter_qflag import PolarsDataFilterQflag
 from sharkadm.data_filter.data_filter_value import (
+    PolarsDataFilterValueEquals,
     PolarsDataFilterValueLessThan,
     PolarsDataFilterValueMoreThan,
 )

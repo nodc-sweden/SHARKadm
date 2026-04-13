@@ -252,8 +252,7 @@ class PolarsHtmlScatterMap(PolarsFileExporter):
         lats = list(df[lat_col])
         lons = list(df[lon_col])
         vals = list(df[val_col])
-
-        self._colormap.scale(min(vals), max(vals))
+        self._colormap = self._colormap.scale(min(vals), max(vals))
         self._colormap.caption = self._column_name  # legend title
 
         for lat, lon, val in zip(lats, lons, vals):

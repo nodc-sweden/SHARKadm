@@ -7,8 +7,8 @@ from sharkadm.data.zip_archive import PolarsZipArchiveDataHolder
 from sharkadm.data_filter.base import PolarsDataFilter
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import modify
-
 from .base import PolarsTransformer
+
 
 # class RemoveReportedValueIfNotCalculated(Transformer):
 #     col_to_set = "reported_value"
@@ -556,6 +556,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
     def __init__(
         self,
         *columns: str,
+        regex: bool = False,
         replace_value: int | float | str = "",
         only_when_value: bool = True,
         **kwargs,
@@ -565,6 +566,7 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
         if isinstance(columns[0], list):
             self.apply_on_columns = columns[0]
 
+        self._regex = regex
         self._replace_value = str(replace_value)
         self._only_when_value = only_when_value
 
@@ -619,6 +621,11 @@ class PolarsRemoveValueInColumns(PolarsTransformer):
                 )
 
     def _get_apply_on_columns(self, data_holder: PolarsDataHolder):
+        if not self._regex:
+            return [
+                col for col in data_holder.data.columns if col in self.apply_on_columns
+            ]
+
         columns = []
         for col in data_holder.data.columns:
             for arg in self.apply_on_columns:
