@@ -7,7 +7,7 @@ from sharkadm.data import is_valid_polars_data_holder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.operator import OperationInfo
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.transformers import PolarsTransformer
+from sharkadm.transformers.base import PolarsTransformer
 
 
 class PolarsMultiTransformer(PolarsTransformer):

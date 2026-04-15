@@ -1,6 +1,5 @@
 import subprocess
 
-from sharkadm import plugin_operators
 from sharkadm.config import CONFIG_DIRECTORY
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import get_nodc_config_directory, get_svn_info, svn

@@ -224,6 +224,8 @@ from sharkadm.transformers.worms import (
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
+from sharkadm import plugin_operators
+
 
 @functools.cache
 def get_transformer_list() -> list[str]:
