@@ -17,6 +17,7 @@ from sharkadm.data.archive.plankton_imaging import PlanktonImagingArchiveDataHol
 from sharkadm.data.archive.primaryproduction import (
     PolarsPrimaryProductionArchiveDataHolder,
 )
+from sharkadm.data.archive.profile import PolarsProfileArchiveDataHolder
 from sharkadm.data.archive.zoobenthos import PolarsZoobenthosArchiveDataHolder
 from sharkadm.data.archive.zooplankton import PolarsZooplanktonArchiveDataHolder
 

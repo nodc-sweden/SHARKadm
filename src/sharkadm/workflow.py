@@ -3,6 +3,7 @@ import pathlib
 import yaml
 
 from sharkadm import (
+    data_filter,
     exporters,
     multi_transformers,
     operator,
@@ -109,6 +110,8 @@ class SHARKadmWorkflow:
     #     self._controller.set_transformers(*trans_list)
 
     def _get_transformer_object(self, tran) -> transformers.PolarsTransformer | None:
+        if tran.get("data_filter"):
+            tran["data_filter"] = self._get_data_filter(tran["data_filter"])
         tran_obj = transformers.get_transformer_object(**tran)
         if not tran_obj:
             tran_obj = multi_transformers.get_multi_transformer_object(**tran)
@@ -116,6 +119,9 @@ class SHARKadmWorkflow:
 
     def _get_validator_object(self, val) -> validators.Validator | None:
         return validators.get_validator_object(**val)
+
+    def _get_data_filter(self, filt):
+        return data_filter.get_data_filter_object(**filt)
 
     def _save_operators(self):
         self._operator_objects = []

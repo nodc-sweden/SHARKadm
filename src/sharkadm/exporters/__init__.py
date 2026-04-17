@@ -6,6 +6,7 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.exporters.base import PolarsExporter
 from sharkadm.exporters.columns import ExportColumnViewsColumnsNotInData
+from sharkadm.exporters.comment import ExportComment
 from sharkadm.exporters.dataframe import PolarsDataFrame
 from sharkadm.exporters.html_station_map import (
     PolarsHtmlMap,
