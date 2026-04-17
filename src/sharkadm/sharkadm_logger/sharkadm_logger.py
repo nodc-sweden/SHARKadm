@@ -184,6 +184,7 @@ class SHARKadmLogger:
         purpose: str = "",
         validator: str | None = None,
         column: str | None = None,
+        columns: list[str] | None = None,
         validation_success: bool | None = None,
         row_number: int | None = None,
         row_numbers: list[int] | None = None,
@@ -200,6 +201,11 @@ class SHARKadmLogger:
         if row_numbers is not None:
             row_numbers = list(set(row_numbers))
 
+        if column is not None:
+            columns = [column] + (columns or [])
+        if columns is not None:
+            columns = list(set(columns))
+
         data = dict(
             log_type=self.VALIDATION,
             msg=msg,
@@ -209,6 +215,7 @@ class SHARKadmLogger:
             purpose=purpose,
             validator=validator,
             column=column,
+            columns=columns,
             validation_success=validation_success,
             row_numbers=row_numbers,
         )
