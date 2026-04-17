@@ -7,6 +7,8 @@ from .base import PolarsTransformer
 
 
 class PolarsMapperParameterColumn(PolarsTransformer):
+    valid_data_structures = ("row",)
+
     def __init__(self, import_column=None, **kwargs):
         self._import_column = import_column
         super().__init__(**kwargs)
