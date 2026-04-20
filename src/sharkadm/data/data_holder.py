@@ -6,7 +6,6 @@ import polars as pl
 from sharkadm import config
 from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_source.base import (
-    PolarsDataFile,
     PolarsDataSource,
 )
 from sharkadm.sharkadm_logger import adm_logger
@@ -269,12 +268,12 @@ class PolarsDataHolder(ABC):
         return [sorted_years[0], sorted_years[-1]]
 
     @staticmethod
-    def _get_data_from_data_source(data_source: PolarsDataFile) -> pl.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataSource) -> pl.DataFrame:
         data = data_source.get_data()
         data = data.fill_nan("")
         return data
 
-    def _set_data_source(self, data_source: PolarsDataFile) -> None:
+    def _set_data_source(self, data_source: PolarsDataSource) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
