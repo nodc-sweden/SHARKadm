@@ -3,13 +3,18 @@ import inspect
 import pathlib
 from typing import Type
 
+import polars as pl
+
 from sharkadm import sharkadm_exceptions, utils
 from sharkadm.data.archive import (
     directory_is_archive,
     get_polars_archive_data_holder,
 )
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.df import PolarsDataFrameDataHolder
+from sharkadm.data.df import (
+    PolarsDataFrameDataHolder,
+    get_data_frame_data_holder,
+)
 from sharkadm.data.dv_template import get_polars_dv_template_data_holder
 from sharkadm.data.lims import (
     PolarsLimsDataHolder,
@@ -98,8 +103,12 @@ def write_data_holders_description_to_file(path: str | pathlib.Path) -> None:
 
 
 def get_polars_data_holder(
-    path: str | pathlib.Path | None = None, sharkweb: bool = False, **kwargs
+    path: str | pathlib.Path | pl.DataFrame | None = None,
+    sharkweb: bool = False,
+    **kwargs,
 ) -> PolarsDataHolder:
+    if isinstance(path, pl.DataFrame):
+        return get_data_frame_data_holder(path)
     if path:
         path = pathlib.Path(path)
         if not path.exists() and path.suffix:

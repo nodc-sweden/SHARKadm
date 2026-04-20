@@ -12,6 +12,7 @@ from sharkadm import (
     utils,
     validators,
 )
+from sharkadm.config.data_type import DataType
 from sharkadm.data import get_polars_data_holder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.exporters import PolarsExporter
@@ -139,6 +140,10 @@ class SHARKadmPolarsController:
     @property
     def data(self) -> pl.DataFrame:
         return self._data_holder.data
+
+    @property
+    def data_type_obj(self) -> DataType:
+        return self._data_holder.data_type_obj
 
     @property
     def data_type(self) -> str:
@@ -371,7 +376,7 @@ def _get_fixed_list(
 
 
 def get_polars_controller_with_data(
-    path: pathlib.Path | str, **kwargs
+    path: pathlib.Path | str | pl.DataFrame, **kwargs
 ) -> SHARKadmPolarsController:
     c = SHARKadmPolarsController()
     holder = get_polars_data_holder(path, **kwargs)

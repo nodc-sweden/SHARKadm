@@ -1,67 +1,41 @@
-from typing import Protocol
-
-import pandas as pd
 import polars as pl
 
-from sharkadm.config.data_type import DataType, data_type_handler
+from sharkadm.config import ImportMatrixMapper
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.data.data_source.base import PolarsDataDataFrame, PolarsDataFile
-
-
-class HeaderMapper(Protocol):
-    def get_internal_name(self, external_par: str) -> str: ...
+from sharkadm.data.data_source.base import PolarsDataDataFrame
 
 
 class PolarsDataFrameDataHolder(PolarsDataHolder):
-    _data_type: DataType = data_type_handler.get_data_type_obj("unknown")
-    _data_structure: str = "row"
-
     def __init__(
         self,
         df: pl.DataFrame,
-        header_mapper: HeaderMapper = None,
+        import_matrix_key: str = "",
+        header_mapper: ImportMatrixMapper = None,
+        data_type: str = "unknown",
+        data_structure: str = "row",
     ):
-        super().__init__()
+        assert isinstance(df, pl.DataFrame), (
+            f"Invalid input datatype {type(df)}, must be polars.DataFrame"
+        )
+        super().__init__(data_type=data_type, data_structure=data_structure)
 
+        self._import_matrix_key = import_matrix_key
         self._header_mapper = header_mapper
+        if self._import_matrix_key:
+            self._header_mapper = self.data_type_obj.get_mapper(self._import_matrix_key)
 
-        self._data: pl.DataFrame = df
-        self._dataset_name = "Polars dataframe"
-        # self._data_structure = data_structure
-        # self._data_type = data_type
-
-        # self._load_data(df)
-
-    @staticmethod
-    def get_data_holder_description() -> str:
-        return """Holds data from a given pandas dataframe"""
-
-    def _load_data(self, df: pd.DataFrame) -> None:
-        d_source = PolarsDataDataFrame(df, data_type=self.data_type)
+        self._dataset_name = "From polars dataframe"
+        d_source = PolarsDataDataFrame(
+            df, data_type=self.data_type, source=self._dataset_name
+        )
         if self._header_mapper:
             d_source.map_header(self._header_mapper)
+
         self._set_data_source(d_source)
-        self._dataset_name = "Polars dataframe"
 
-    @staticmethod
-    def _get_data_from_data_source(data_source: PolarsDataFile) -> pd.DataFrame:
-        data = data_source.get_data()
-        data = data.fillna("")
-        data.reset_index(inplace=True, drop=True)
-        return data
-
-    @property
-    def data_type(self) -> str:
-        return self._data_type.data_type
-
-    @property
-    def data_type_internal(self) -> str:
-        return self._data_type.data_type_internal
+    def get_data_holder_description(self) -> str:
+        return "Data holder holding given polars dataframe"
 
     @property
     def dataset_name(self) -> str:
         return self._dataset_name
-
-    @property
-    def columns(self) -> list[str]:
-        return sorted(self.data.columns)

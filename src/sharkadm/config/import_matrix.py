@@ -10,7 +10,6 @@ class ImportMatrixMapper:
         self._import_column = import_column
         self._data = data
         self._reverse_mapper = dict()
-        self._create_reverse_mapper()
 
     def __repr__(self) -> str:
         return (
@@ -43,6 +42,8 @@ class ImportMatrixMapper:
 
     @property
     def reverse_mapper(self):
+        if not self._reverse_mapper:
+            self._create_reverse_mapper()
         return self._reverse_mapper
 
     def get_internal_name(self, external_par: str) -> str:
@@ -75,14 +76,8 @@ class ImportMatrixConfig:
         data_type: str | None = None,
         encoding: str = "iso_8859_1",
     ) -> None:
-        # data_type_mapper: DataTypeMapper = None) -> None:
         self._path = pathlib.Path(path)
-        # self._data_type = data_type_mapper.get(data_type)
         self._data_type = data_type
-        # if self._data_type != data_type:
-        #     logger.warning(
-        #         f'Data type has been mapped: {data_type} -> {self._data_type}'
-        #     )
         self._encoding = encoding
         self._data = {}
         self._mappers = {}
@@ -150,6 +145,21 @@ class ImportMatrixConfig:
 
     def get_mapper(self, import_column: str) -> ImportMatrixMapper:
         """Returns a mapper object for the given institute. Creates it if not found"""
+        if not self._data.get(import_column):
+            suggestions = []
+            for col in self._data:
+                if import_column.lower() in col.lower():
+                    suggestions.append(col)
+            if len(suggestions) == 1:
+                raise KeyError(
+                    f"Invalid import matrix key '{import_column}'. "
+                    f"Did you mean '{suggestions[0]}'?"
+                )
+            elif suggestions:
+                raise KeyError(
+                    f"Invalid import matrix key '{import_column}'. "
+                    f"Did y'{suggestions[0]}'?"
+                )
         return self._mappers.setdefault(
             import_column,
             ImportMatrixMapper(self.data_type, import_column, self._data[import_column]),

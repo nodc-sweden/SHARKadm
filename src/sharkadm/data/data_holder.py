@@ -6,7 +6,6 @@ import polars as pl
 from sharkadm import config
 from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.data.data_source.base import (
-    PolarsDataFile,
     PolarsDataSource,
 )
 from sharkadm.sharkadm_logger import adm_logger
@@ -24,11 +23,13 @@ class PolarsDataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        # self._data_structure = "column"
+        self._data_structure = kwargs.get(
+            "data_structure", PolarsDataHolder._data_structure
+        )
         self._data = pl.DataFrame()
         self._filtered_data = None
         self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
-            self._data_type_synonym
+            kwargs.get("data_type", self._data_type_synonym)
         )
 
     def __repr__(self) -> str:
@@ -267,12 +268,12 @@ class PolarsDataHolder(ABC):
         return [sorted_years[0], sorted_years[-1]]
 
     @staticmethod
-    def _get_data_from_data_source(data_source: PolarsDataFile) -> pl.DataFrame:
+    def _get_data_from_data_source(data_source: PolarsDataSource) -> pl.DataFrame:
         data = data_source.get_data()
         data = data.fill_nan("")
         return data
 
-    def _set_data_source(self, data_source: PolarsDataFile) -> None:
+    def _set_data_source(self, data_source: PolarsDataSource) -> None:
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
