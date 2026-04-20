@@ -24,11 +24,13 @@ class PolarsDataHolder(ABC):
         self._number_metadata_rows = 0
         self._header_mapper = None
         self._qf_column_prefix = None
-        # self._data_structure = "column"
+        self._data_structure = kwargs.get(
+            "data_structure", PolarsDataHolder._data_structure
+        )
         self._data = pl.DataFrame()
         self._filtered_data = None
         self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
-            self._data_type_synonym
+            kwargs.get("data_type", self._data_type_synonym)
         )
 
     def __repr__(self) -> str:
