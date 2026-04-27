@@ -59,14 +59,14 @@ class ImportMatrixMapper:
 
     def get_external_name(self, internal_name: str) -> str:
         internal_name = internal_name.strip()
-        if not self._reverse_mapper.get(internal_name):
+        if not self.reverse_mapper.get(internal_name):
             adm_logger.log_workflow(
                 f'Could not map parameter "{internal_name}" to external name using '
                 f'mapping column "{self.import_column}" for data_type "{self.data_type}"',
                 level=adm_logger.DEBUG,
             )
             return internal_name
-        return self._reverse_mapper[internal_name].strip()
+        return self.reverse_mapper[internal_name].strip()
 
 
 class ImportMatrixConfig:
