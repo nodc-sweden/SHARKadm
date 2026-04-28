@@ -48,7 +48,7 @@ class ValidateStationIdentity(Validator):
                 lat_dd, lon_dd = transform_ref_system(lat_orig, lon_orig)
             except Exception:
                 self._log_fail(
-                    msg=f"{name} at {lat_dd} N {lon_orig} E could not be transformed",
+                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f} E could not be transformed",
                     row_numbers=row_numbers,
                 )
                 continue
@@ -59,7 +59,7 @@ class ValidateStationIdentity(Validator):
                 )
             except Exception:
                 self._log_fail(
-                    msg=f"{name} at {lat_dd} N {lon_orig} E could not be validated",
+                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f} E could not be validated",
                     row_numbers=row_numbers,
                 )
                 continue
@@ -67,20 +67,21 @@ class ValidateStationIdentity(Validator):
             if matching_stations:
                 if station := matching_stations.get_accepted_station():
                     self._log_success(
-                        msg=f"{name} at {lat_dd} N {lon_dd} E "
-                        "is a known station. "
+                        msg=f"{name} at {lat_dd:.2f} N {lon_dd:.2f} E "
+                        "is a known station within accepted radius. "
                         f"{station}",
                         row_numbers=row_numbers,
                     )
                 elif station := matching_stations.get_closest_station():
                     self._log_fail(
-                        msg=f"To far from closest known station. {station}",
+                        msg=f"{name} at {lat_dd:.2f} N {lon_dd:.2f} E "
+                        f"is close to known stations. {station}",
                         row_numbers=row_numbers,
                     )
                 elif name_matches := [s for s in matching_stations if s.accepted_name]:
                     station = next(iter(name_matches))
                     self._log_fail(
-                        msg=f"{name} at {lat_dd} N {lon_dd} E "
+                        msg=f"{name} at {lat_dd:.2f} N {lon_dd:.2f} E "
                         "is not near any known station.",
                         row_numbers=row_numbers,
                     )
@@ -96,8 +97,8 @@ class ValidateStationIdentity(Validator):
                         row_numbers=row_numbers,
                     )
             else:
-                self._log_fail(
-                    msg=f"{name} at {lat_dd} N {lon_dd} E "
+                self._log_success(
+                    msg=f"{name} at {lat_dd:.2f} N {lon_dd:.2f} E "
                     "is an unknown station & not near any known station.",
                     row_numbers=row_numbers,
                 )
