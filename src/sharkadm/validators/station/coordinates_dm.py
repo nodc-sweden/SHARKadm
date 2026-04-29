@@ -28,7 +28,7 @@ class ValidateCoordinatesDm(Validator):
             self._latitude_dm_column not in data_holder.data
             or self._longitude_dm_column not in data_holder.data
         ):
-            self._log_fail("No coordinates found in data.")
+            self._log_fail("No coordinates found in dataset.")
             return
 
         for (latitude, longitude), data in data_holder.data.group_by(

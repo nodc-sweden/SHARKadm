@@ -41,13 +41,16 @@ class ValidatePositionInOcean(Validator):
             if self._ocean_shapefile.contains(point).any():
                 self._log_success(f"Station '{name}' is inside ocean.")
             else:
-                if "reported_latitude" in data.columns and "reported_longitude" in data.columns:
+                if (
+                    "reported_latitude" in data.columns
+                    and "reported_longitude" in data.columns
+                ):
                     lat = data["reported_latitude"].first()
                     lon = data["reported_longitude"].first()
                 else:
                     lat = float(latitude)
                     lon = float(longitude)
                 self._log_fail(
-                    msg=f"Station '{name}' at {lat}, {lon} is not inside ocean.",  # noqa: E501
+                    msg=f"Station '{name}' at {lat}, {lon} is not inside ocean.",
                     row_numbers=data["row_number"].to_list(),
                 )

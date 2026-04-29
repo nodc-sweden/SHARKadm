@@ -19,7 +19,6 @@ dependencies = [
     "typer>=0.15.2",
     "geopandas>=1.1.0",
     "shapely>=2.1.1",
-    "nodc-station",
     "gsw>=3.6.20",
 ]
 requires-python = ">=3.11"
@@ -41,6 +40,7 @@ dev = [
     "ruff>=0.13.1",
     "pre-commit>=4.3.0",
     "freezegun>=1.5.4",
+    "nodc-station",
 ]
 
 [tool.ruff]
@@ -61,4 +61,4 @@ select = [
 per-file-ignores."__init__.py" = ["F401"]
 
 [tool.uv.sources]
-nodc-station = { git = "https://github.com/nodc-sweden/nodc-station" }
+nodc-station = { git = "https://github.com/nodc-sweden/nodc-station", rev = "v1.0.0" }

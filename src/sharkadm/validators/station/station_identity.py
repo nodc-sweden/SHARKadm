@@ -1,9 +1,20 @@
 import polars as pl
-from nodc_station.station_file import StationFile
-from nodc_station.utils import transform_ref_system
 
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.validators import Validator
 from sharkadm.validators.base import DataHolderProtocol
+
+nodc_station = None
+try:
+    from nodc_station.station_file import StationFile
+    from nodc_station.utils import transform_ref_system
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
+    adm_logger.log_workflow(
+        f'Could not import package "{module_name}" in module {__name__}. You need to '
+        f"install this dependency if you want to use this module.",
+        level=adm_logger.WARNING,
+    )
 
 
 class ValidateStationIdentity(Validator):
@@ -48,8 +59,8 @@ class ValidateStationIdentity(Validator):
                 lat_dd, lon_dd = transform_ref_system(lat_orig, lon_orig)
             except Exception:
                 self._log_fail(
-                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f} E could not be transformed",
-                    row_numbers=row_numbers,
+                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f}"
+                    f" E could not be transformed",
                 )
                 continue
 
@@ -59,7 +70,8 @@ class ValidateStationIdentity(Validator):
                 )
             except Exception:
                 self._log_fail(
-                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f} E could not be validated",
+                    msg=f"{name} at {lat_orig:.2f} N"
+                    f" {lon_orig:.2f} E could not be validated",
                     row_numbers=row_numbers,
                 )
                 continue

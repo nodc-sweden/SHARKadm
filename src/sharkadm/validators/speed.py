@@ -66,7 +66,8 @@ class ValidateSpeed(Validator):
         else:
             for row in too_fast.iter_rows(named=True):
                 self._log_fail(
-                    f"The speed to reach position {row[self._latitude_column]} N "
+                    f"The speed to reach {row['visit_key']} at "
+                    f"position {row[self._latitude_column]} N "
                     f"{row[self._longitude_column]} E "
                     f"is at least {row['_speed'] / KNOTS_PER_KM:.1f} knots "
                     f"({row['_distance'] / 1000:.1f} km in {row['_duration']:.1f} h).",

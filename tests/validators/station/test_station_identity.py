@@ -19,7 +19,7 @@ from sharkadm.validators.station.station_identity import ValidateStationIdentity
             "751000",
             "7010000",
             (("name y", {"synonym y"}, "750000", "7000000", 1000),),
-            False,
+            True,
         ),  # Nothing matches
         (
             "name x",
