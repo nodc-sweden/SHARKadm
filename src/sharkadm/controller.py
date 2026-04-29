@@ -17,10 +17,9 @@ from sharkadm.data import get_polars_data_holder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.exporters import PolarsExporter
 from sharkadm.multi_transformers import PolarsMultiTransformer
-from sharkadm.operator import OperationInfo, Operator
+from sharkadm.operator import Operator, OperatorsInfo
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers import PolarsTransformer
-from sharkadm.utils import data_structures
 from sharkadm.validators import Validator
 
 # class BaseSHARKadmController:
@@ -175,17 +174,6 @@ class SHARKadmPolarsController:
         self.transform(transformers.PolarsAddRowNumber())
         return self
 
-    def set_transformers(self, *args: PolarsTransformer | PolarsMultiTransformer) -> None:
-        """Add one or more Transformers to the data holder"""
-        self._transformers = args
-
-    def transform_all(self) -> Self:
-        if self.is_filtered:
-            raise sharkadm_exceptions.DataIsFilteredError(
-                "Not allowed to transform when data is filtered!"
-            )
-        return self.transform(*self._transformers)
-
     def transform(
         self,
         *transformers: PolarsTransformer | PolarsMultiTransformer,
@@ -195,21 +183,48 @@ class SHARKadmPolarsController:
             raise sharkadm_exceptions.DataIsFilteredError(
                 "Not allowed to transform when data is filtered!"
             )
-        return self.run_operators(*transformers)
+        return self.run_operators(
+            *transformers, return_if_cause_for_termination=return_if_cause_for_termination
+        )
+
+    def validate(
+        self,
+        *validators: Validator,
+    ) -> Self:
+        # if self.is_filtered:
+        #     raise sharkadm_exceptions.DataIsFilteredError(
+        #         "Not allowed to transform when data is filtered!"
+        #     )
+        return self.run_operators(*validators)
+
+    def export(self, *exporters: PolarsExporter) -> OperatorsInfo | Any:
+        return self.run_operators(*exporters)
+
+    # def validate(self, *validators: Validator) -> Self:
+    #     for val in validators:
+    #         val.validate(self._data_holder)
+    #     return self
+    #
+    # def export(self, *exporters: PolarsExporter) -> Any:
+    #     for exp in exporters:
+    #         data = exp.export(self._data_holder)
+    #         if isinstance(data, pl.DataFrame):
+    #             return data
+    #     return self
 
     def run_operators(
         self,
         *operators: Operator,
         return_if_cause_for_termination: bool = True,
-    ) -> dict[str, utils.data_structures.IndexDict[str, OperationInfo] | bool]:
+    ) -> OperatorsInfo:
         tot_nr_operators = len(operators)
-        infos = dict()
-        infos["terminated"] = False
-        infos["operators"] = data_structures.IndexDict()
+        operator_infos = OperatorsInfo()
         for i, oper in enumerate(operators):
             title = f"Running transformer...{oper.name}"
             if isinstance(oper, Validator):
                 title = f"Running validator...{oper.name}"
+            if isinstance(oper, PolarsExporter):
+                title = f"Running exporter...{oper.name}"
             event.post_event(
                 "progress",
                 dict(
@@ -218,7 +233,6 @@ class SHARKadmPolarsController:
                     title=title,
                 ),
             )
-            info = OperationInfo()
             if isinstance(oper, PolarsTransformer):
                 info = oper.transform(
                     self._data_holder,
@@ -228,119 +242,27 @@ class SHARKadmPolarsController:
                 info = oper.validate(
                     self._data_holder,
                 )
-            if isinstance(info, dict):
-                # Can be dict from multitransformers
-                for name, _info in info.items():
-                    infos["operators"][name] = _info
-                    if return_if_cause_for_termination and _info.cause_for_termination:
-                        infos["terminated"] = True
-                        break
-                if infos["terminated"]:
-                    break
+            elif isinstance(oper, PolarsExporter):
+                info = oper.export(
+                    self._data_holder,
+                )
+                return info
             else:
-                infos["operators"][oper.name] = info
-                if return_if_cause_for_termination and info.cause_for_termination:
-                    infos["terminated"] = True
-                    break
-        return infos
+                raise ValueError("Invalid operator")
+            operator_infos.add(info)
+            if not operator_infos.all_succeeded and return_if_cause_for_termination:
+                return operator_infos
+
+        return operator_infos
 
     def run_operator(
         self,
         operator: Operator,
         return_if_cause_for_termination: bool = True,
-    ) -> dict[str, dict[str, OperationInfo] | bool]:
+    ) -> OperatorsInfo:
         return self.run_operators(
             operator, return_if_cause_for_termination=return_if_cause_for_termination
         )
-
-    def set_validators_before(self, *args: Validator) -> None:
-        """Sets one or more Validators to the data holder"""
-        self._validators_before = args
-
-    def validate_before_all(self) -> OperationInfo:
-        """Runs all set validator objects in self._validators_before"""
-        tot_nr_operators = len(self._validators_before)
-        for i, val in enumerate(self._validators_before):
-            info = val.validate(self._data_holder)
-            event.post_event(
-                "progress",
-                dict(
-                    total=tot_nr_operators,
-                    current=i,
-                    title=f"Initial validation...{val.name}",
-                ),
-            )
-            if info.cause_for_termination:
-                return info
-
-    def validate(self, *validators: Validator) -> Self:
-        for val in validators:
-            val.validate(self._data_holder)
-        return self
-
-    def set_validators_after(self, *args: Validator) -> None:
-        """Sets one or more Validators to the data holder"""
-        self._validators_after = args
-
-    def validate_after_all(self) -> OperationInfo:
-        """Runs all set validator objects in self._validators_after"""
-        tot_nr_operators = len(self._validators_after)
-        for i, val in enumerate(self._validators_after):
-            info = val.validate(self._data_holder)
-            event.post_event(
-                "progress",
-                dict(
-                    total=tot_nr_operators,
-                    current=i,
-                    title=f"Final validation...{val.name}",
-                ),
-            )
-            if info.cause_for_termination:
-                return info
-
-    def set_exporters(self, *args: PolarsExporter) -> None:
-        """Add one or more Exporters to the data holder"""
-        self._exporters = args
-
-    def export_all(self) -> None:
-        """Runs all export objects in self._exporters"""
-        tot_nr_operators = len(self._exporters)
-        for i, exp in enumerate(self._exporters):
-            exp.export(self._data_holder)
-            event.post_event(
-                "progress",
-                dict(total=tot_nr_operators, current=i, title=f"Exporting...{exp.name}"),
-            )
-
-    def export(self, *exporters: PolarsExporter) -> Any:
-        for exp in exporters:
-            data = exp.export(self._data_holder)
-            if isinstance(data, pl.DataFrame):
-                return data
-        return self
-
-    def get_workflow_description(self):
-        lines = []
-        lines.append(f"Data holder: {self.data_holder}")
-        lines.append("Validators before:")
-        for oper in self._validators_before:
-            lines.append(f"  {oper.description} ({oper.name})")
-        lines.append("Transformers:")
-        for oper in self._transformers:
-            lines.append(f"  {oper.description} ({oper.name})")
-        lines.append("Validators after:")
-        for oper in self._validators_after:
-            lines.append(f"  {oper.description} ({oper.name})")
-        lines.append("Exporters:")
-        for oper in self._exporters:
-            lines.append(f"  {oper.description} ({oper.name})")
-        return "\n".join(lines)
-
-    def start_data_handling(self):
-        self.validate_before_all()
-        self.transform_all()
-        self.validate_after_all()
-        self.export_all()
 
     def get_columns(self, regex: str = "") -> list[str]:
         cols = []

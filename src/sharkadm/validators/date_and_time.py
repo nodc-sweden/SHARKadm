@@ -6,7 +6,7 @@ import polars as pl
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from ..operator import OperationInfo
+from ..operator import OperatorInfo
 from .base import DataHolderProtocol, Validator
 
 
@@ -58,8 +58,8 @@ class ValidateDateAndTime(Validator):
             return msg
         return f"{msg} at visit keys: {df['visit_key'].unique().to_list()}"
 
-    def _validate(self, data_holder: PolarsDataHolder) -> OperationInfo | None:
-        info = OperationInfo(operator=self)
+    def _validate(self, data_holder: PolarsDataHolder) -> OperatorInfo | None:
+        info = OperatorInfo(operator=self)
         self._log_workflow(
             "Checking visit/sample date and sample time.",
         )

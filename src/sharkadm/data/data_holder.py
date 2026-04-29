@@ -88,6 +88,7 @@ class PolarsDataHolder(ABC):
         if not isinstance(df, pl.DataFrame):
             raise "Data must be of type pl.DataFrame"
         self._data = df
+        self.reset_filter()
 
     @property
     def data_structure(self) -> str:

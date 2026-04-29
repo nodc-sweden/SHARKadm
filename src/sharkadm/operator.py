@@ -1,11 +1,13 @@
 import enum
+from dataclasses import dataclass
+from typing import Any, Self, get_type_hints
 
 from sharkadm import adm_logger, config
 from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 
 
-class OperationType(enum.StrEnum):
-    OPERATION = "operator"
+class OperatorType(enum.StrEnum):
+    OPERATOR = "operator"
     VALIDATOR = "validator"
     TRANSFORMER = "transformer"
 
@@ -20,7 +22,7 @@ class Operator:
     valid_data_structures: tuple[str, ...] = ()
     invalid_data_structures: tuple[str, ...] = ()
 
-    operation_type: str = OperationType.OPERATION
+    operation_type: str = OperatorType.OPERATOR
 
     @property
     def name(self) -> str:
@@ -50,7 +52,16 @@ class Operator:
         if data_holder.data_structure.lower() in config.get_valid_data_structures(
             valid=self.valid_data_structures, invalid=self.invalid_data_structures
         ):
+            print("-----")
+            print(data_holder.data_structure.lower())
+            print(
+                config.get_valid_data_structures(
+                    valid=self.valid_data_structures, invalid=self.invalid_data_structures
+                )
+            )
+            print("TRUE")
             return True
+        print("FALSE")
         return False
 
     def is_valid_data_holder(self, data_holder: PolarsDataHolder) -> bool:
@@ -73,7 +84,7 @@ class Operator:
             self._log_workflow(
                 f"Invalid data structure {data_holder.data_structure} "
                 f"for {self.operation_type} {self.name}",
-                level=adm_logger.DEBUG,
+                level=adm_logger.ERROR,
             )
             return False
         return True
@@ -82,91 +93,136 @@ class Operator:
         adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
 
 
-class OperationInfo:
+@dataclass(kw_only=True)
+class OperatorInfo:
+    operator: Operator | None = None
+    exception: Exception | None = None
+    msg: str = ""
+    cause_for_termination: bool = False
+    valid: bool = True
+    success: bool = True
     """This class is used as a return for operators
     (validator, transformer, exporter) to give information about the outcome."""
 
-    def __init__(
-        self,
-        operator: Operator = None,
-        valid: bool = True,
-        success: bool = True,
-        exception: Exception | None = None,
-        msg: str = "",
-        cause_for_termination: bool = False,
-    ):
-        self._operator = operator
-        self._valid = valid
-        self._success = success
-        self._exception = exception
-        self._msg = msg
-        self._cause_for_termination = cause_for_termination
-        self._has_subscribed: bool = False
-        self._logs = list()
+    def __setattr__(self, key: str, value: Any) -> None:
+        hints = get_type_hints(type(self))
 
-        self._subscribe()
+        if not hints.get(key):
+            raise AttributeError(f"Unknown attribute {key}")
+        expected = hints[key]
+        if not isinstance(value, expected):
+            raise TypeError(
+                f"{key} must be {expected.__name__}, got {type(value).__name__}"
+            )
+        super().__setattr__(key, value)
+
+    def __add__(self, other: Self):
+        infos = OperatorsInfo()
+        infos.add(self)
+        if isinstance(other, OperatorInfo):
+            infos.add(other)
+        elif isinstance(other, OperatorsInfo):
+            for info in other.operators_info:
+                infos.add(info)
+        return infos
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.__setattr__(key, value)
+
+    def update(self, **kwargs):
+        for key, value in kwargs.values():
+            self[key] = value
+
+
+class OperatorsInfo:
+    def __init__(self):
+        self._operators_info: list[OperatorInfo] = []
 
     def __repr__(self):
-        return f"{self.__class__.__name__} for operator: {self.operator}"
+        lines = [f"{self.__class__.__name__}:"]
+        for info in self.operators_info:
+            lines.append(f"  {info}")
+        return "\n".join(lines)
 
-    def _subscribe(self):
-        if not self.operator:
+    def __add__(self, other: Self):
+        infos = OperatorsInfo()
+        for info in self.operators_info:
+            infos.add(info)
+        if isinstance(other, OperatorInfo):
+            infos.add(other)
+        elif isinstance(other, OperatorsInfo):
+            for info in other.operators_info:
+                infos.add(info)
+        return infos
+
+    def __getitem__(self, index: int) -> OperatorInfo | None:
+        return self.operators_info[index]
+
+    def get(self, index: int) -> OperatorInfo | None:
+        try:
+            return self.operators_info[index]
+        except IndexError:
             return
-        if self._has_subscribed:
-            return
 
     @property
-    def operator(self) -> Operator:
-        return self._operator
+    def operators_info(self):
+        return self._operators_info
 
-    @operator.setter
-    def operator(self, operator: Operator):
-        if self._operator:
-            if self._operator == operator:
-                return
-            raise ValueError("Cannot set new operator!")
-        if not isinstance(operator, Operator):
-            raise ValueError("Invalid class!")
-        self._operator = operator
-        self._subscribe()
+    def add(self, info: OperatorInfo | Self):
+        if isinstance(info, OperatorInfo):
+            self._operators_info.append(info)
+        elif isinstance(info, OperatorsInfo):
+            for inf in info.operators_info:
+                self._operators_info.append(inf)
+        else:
+            raise TypeError(f"Invalid type {type(info)} for {info}")
 
     @property
-    def valid(self) -> bool:
-        return self._valid
-
-    @valid.setter
-    def valid(self, is_valid: bool) -> None:
-        self._valid = bool(is_valid)
-
-    @property
-    def success(self) -> bool:
-        return self._success
+    def all_is_valid(self) -> bool:
+        for info in self._operators_info:
+            if not info.valid:
+                return False
+        return True
 
     @property
-    def exception(self) -> Exception:
-        return self._exception
-
-    @property
-    def msg(self) -> str:
-        return self._msg
-
-    @property
-    def logs(self) -> list[dict]:
-        return self._logs
+    def all_succeeded(self) -> bool:
+        for info in self._operators_info:
+            if not info.success:
+                return False
+        return True
 
     @property
     def cause_for_termination(self) -> bool:
-        return self._cause_for_termination
+        for info in self._operators_info:
+            if info.cause_for_termination:
+                return True
+        return False
 
-    def _on_log(self, data: dict):
-        if not self.operator:
-            return
-        # print(f"::: {self.operator.name=} -> {data["cls"]=}")
-        # print(f"{data=}")
-        # print()
-        if self.operator.name != data["cls"]:
-            return
-        self._logs.append(data)
-        # print(f"_on_log {data['cls']=}: {data=}")
-        # print()
-        # print()
+
+def get_single_operators_info(
+    operator_info: OperatorInfo | None = None,
+    operator: Operator = None,
+    valid: bool = True,
+    success: bool = True,
+    exception: Exception | None = None,
+    msg: str = "",
+    cause_for_termination: bool = False,
+    **kwargs,
+):
+    """Returns a OperatorsInfo object containing one OperatorInfo object"""
+    all_info = OperatorsInfo()
+    if not operator_info:
+        operator_info = OperatorInfo(
+            operator=operator,
+            valid=valid,
+            success=success,
+            exception=exception,
+            msg=msg,
+            cause_for_termination=cause_for_termination,
+        )
+    if not isinstance(operator_info, OperatorInfo):
+        raise TypeError(
+            f"Invalid type {type(operator_info)} for operator_info object {operator_info}"
+        )
+    all_info.add(operator_info)
+    return all_info

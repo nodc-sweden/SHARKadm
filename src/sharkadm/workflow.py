@@ -151,7 +151,7 @@ class SHARKadmWorkflow:
             exporter_list.append(exporter)
         self._controller.set_exporters(*exporter_list)
 
-    def start_workflow(self) -> None | operator.OperationInfo:
+    def start_workflow(self) -> None | operator.OperatorInfo:
         """Sets upp the workflow in the controller and starts it"""
         self._initiate_workflow()
         print(f"{self._operator_objects=}")

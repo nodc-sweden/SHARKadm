@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING, Protocol
 import polars as pl
 
 from sharkadm.data_filter.base import PolarsDataFilter
-from sharkadm.operator import OperationInfo, OperationType, Operator
+from sharkadm.operator import (
+    Operator,
+    OperatorInfo,
+    OperatorsInfo,
+    OperatorType,
+    get_single_operators_info,
+)
 from sharkadm.sharkadm_logger import adm_logger
 
 if TYPE_CHECKING:
@@ -32,7 +38,7 @@ class PolarsTransformer(ABC, Operator):
     source_col: str = ""
     col_to_set: str = ""
 
-    operation_type: str = OperationType.TRANSFORMER
+    operation_type: str = OperatorType.TRANSFORMER
 
     def __init__(
         self,
@@ -75,15 +81,11 @@ class PolarsTransformer(ABC, Operator):
 
     @property
     def description(self) -> str:
-        # return self.get_transformer_description()
-        info_str = self.get_transformer_description()
-        # if self._data_filter:
-        #     info_str = f"{info_str} (With filter {self._data_filter.description})"
-        return info_str
+        return self.get_transformer_description()
 
-    def transform(self, data_holder: "PolarsDataHolder", **kwargs) -> OperationInfo:
+    def transform(self, data_holder: "PolarsDataHolder", **kwargs) -> OperatorsInfo:
         if not self.is_valid_data_holder(data_holder):
-            return OperationInfo(operator=self, valid=False)
+            return get_single_operators_info(operator=self, valid=False)
         self._log_workflow(
             f"Applying transformer: {self.__class__.__name__}",
             item=self.description,
@@ -97,14 +99,15 @@ class PolarsTransformer(ABC, Operator):
                 f"{time.perf_counter() - t0:.6f} seconds",
                 level=adm_logger.DEBUG,
             )
-            if isinstance(info, OperationInfo):
+            if isinstance(info, OperatorInfo):
                 info.operator = self
-                return info
+                return get_single_operators_info(operator_info=info)
+            else:
+                return get_single_operators_info(operator=self)
         except pl.exceptions.InvalidOperationError as e:
-            return OperationInfo(
+            return get_single_operators_info(
                 operator=self, exception=e, cause_for_termination=True, success=False
             )
-        return OperationInfo(operator=self)
 
     @abstractmethod
     def _transform(self, data_holder: "PolarsDataHolder") -> None: ...
