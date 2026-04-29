@@ -8,7 +8,12 @@ import polars as pl
 from sharkadm.data import (
     PolarsDataHolder,
 )
-from sharkadm.operator import OperationInfo, OperationType, Operator
+from sharkadm.operator import (
+    Operator,
+    OperatorInfo,
+    OperatorType,
+    get_single_operators_info,
+)
 from sharkadm.sharkadm_logger import adm_logger
 
 
@@ -37,7 +42,7 @@ class Validator(ABC, Operator):
 
     _display_name = None
 
-    operation_type = OperationType.VALIDATOR
+    operation_type = OperatorType.VALIDATOR
 
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -63,9 +68,9 @@ class Validator(ABC, Operator):
     def get_display_name(cls) -> str:
         return cls._display_name or cls.__name__
 
-    def validate(self, data_holder: PolarsDataHolder) -> OperationInfo:
+    def validate(self, data_holder: PolarsDataHolder) -> OperatorInfo:
         if not self.is_valid_data_holder(data_holder):
-            return OperationInfo(operator=self, valid=False)
+            return get_single_operators_info(operator=self, valid=False)
         adm_logger.log_workflow(
             f"Applying validator: {self.name}",
             item=self.get_validator_description(),
@@ -78,10 +83,10 @@ class Validator(ABC, Operator):
             f"Validator {self.name} executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
-        if isinstance(info, OperationInfo):
+        if isinstance(info, OperatorInfo):
             info.operator = self
-            return info
-        return OperationInfo(operator=self)
+            return get_single_operators_info(operator_info=info)
+        return get_single_operators_info(operator=self)
 
     @abstractmethod
     def _validate(self, data_holder: PolarsDataHolder) -> None: ...

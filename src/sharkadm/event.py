@@ -42,6 +42,7 @@ def subscribe(event: str | Events, func, prio: int = 50) -> None:
 
 def post_event(event: str | Events, data: dict | str) -> None:
     event = str(event)
+    # print(f"{event=}")
     if type(data) is str:
         data = dict(msg=data)
     if event not in _subscribers:

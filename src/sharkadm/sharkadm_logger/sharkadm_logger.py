@@ -337,7 +337,6 @@ class SHARKadmLogger:
         self._data.append(data)
 
         event.post_event(f"log_{data['log_type'].lower()}", data)
-        event.post_event("log", data)
 
     def reset_log(self) -> "SHARKadmLogger":
         """Resets all entries to the log"""
@@ -468,6 +467,7 @@ class SHARKadmLogger:
         log_types = self._get_log_types(*args, log_types=kwargs.get("log_types"))
         levels = self._get_levels(*args, levels=kwargs.get("levels"))
         purposes = self._get_purposes(*args, purposes=kwargs.get("purposes"))
+        print("-" * 50)
         print(f"{log_types=}")
         print(f"{levels=}")
         print(f"{purposes=}")

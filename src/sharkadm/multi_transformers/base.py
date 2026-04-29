@@ -2,10 +2,8 @@ import time
 from abc import abstractmethod
 from typing import Type
 
-from sharkadm import config
-from sharkadm.data import is_valid_polars_data_holder
 from sharkadm.data.data_holder import PolarsDataHolder
-from sharkadm.operator import OperationInfo
+from sharkadm.operator import OperatorsInfo, get_single_operators_info
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
 
@@ -27,9 +25,6 @@ class PolarsMultiTransformer(PolarsTransformer):
 
     _transformers: tuple[Type[PolarsTransformer], ...] = ()
 
-    def __init__(self, **kwargs):
-        self._kwargs = kwargs
-
     def __repr__(self) -> str:
         return f"Multi transformer: {self.__class__.__name__}"
 
@@ -47,81 +42,32 @@ class PolarsMultiTransformer(PolarsTransformer):
     def description(self) -> str:
         return self.get_transformer_description()
 
-    def transform_old(self, data_holder: "PolarsDataHolder") -> None:
-        if (
-            data_holder.data_type_internal != "unknown"
-            and data_holder.data_type_internal
-            not in config.get_valid_data_types(
-                valid=self.valid_data_types, invalid=self.invalid_data_types
-            )
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_type {data_holder.data_type_internal} "
-                f"for multi transformer {self.__class__.__name__}",
-                level=adm_logger.DEBUG,
-            )
-            return
-        if not is_valid_polars_data_holder(
-            data_holder,
-            valid=self.valid_data_holders,
-            invalid=self.invalid_data_holders,
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_holder {data_holder.__class__.__name__} for transformer"
-                f" {self.__class__.__name__}"
-            )
-            return
-
-        if data_holder.data_structure.lower() not in config.get_valid_data_structures(
-            valid=self.invalid_data_structures, invalid=self.invalid_data_structures
-        ):
-            adm_logger.log_workflow(
-                f"Invalid data_format {data_holder.data_structure} for multi transformer"
-                f" {self.__class__.__name__}",
-                level=adm_logger.DEBUG,
-            )
-            return
-
-        adm_logger.log_workflow(
-            f"Applying multi transformer: {self.__class__.__name__}",
-            item=self.get_transformer_description(),
-            level=adm_logger.DEBUG,
-        )
-        t0 = time.time()
-        for trans in self._transformers:
-            trans(**self._kwargs).transform(data_holder=data_holder)
-        adm_logger.log_workflow(
-            f"Multi transformer {self.__class__.__name__} executed "
-            f"in {time.time() - t0} seconds",
-            level=adm_logger.DEBUG,
-        )
-
     def transform(
         self,
         data_holder: "PolarsDataHolder",
         return_if_cause_for_termination: bool = True,
-    ) -> dict[str, OperationInfo]:
+    ) -> OperatorsInfo:
         if not self.is_valid_data_holder(data_holder):
-            return [OperationInfo(operator=self)]
+            return get_single_operators_info(operator=self, valid=False)
         self._log_workflow(
             f"Applying multi transformer: {self.name}",
             item=self.get_transformer_description(),
             level=adm_logger.DEBUG,
         )
-        infos = dict()
+        operators_info = OperatorsInfo()
         t0 = time.time()
         for trans in self._transformers:
             obj = trans(**self._kwargs)
             info = obj.transform(data_holder=data_holder)
-            infos[obj.name] = info
+            operators_info.add(info)
             if return_if_cause_for_termination and info.cause_for_termination:
-                return infos
+                return operators_info
         adm_logger.log_workflow(
             f"Multi transformer {self.__class__.__name__} executed "
             f"in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,
         )
-        return infos
+        return operators_info
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         # Dummy method must be present to implement MultiTransformers
