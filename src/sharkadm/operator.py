@@ -52,16 +52,7 @@ class Operator:
         if data_holder.data_structure.lower() in config.get_valid_data_structures(
             valid=self.valid_data_structures, invalid=self.invalid_data_structures
         ):
-            print("-----")
-            print(data_holder.data_structure.lower())
-            print(
-                config.get_valid_data_structures(
-                    valid=self.valid_data_structures, invalid=self.invalid_data_structures
-                )
-            )
-            print("TRUE")
             return True
-        print("FALSE")
         return False
 
     def is_valid_data_holder(self, data_holder: PolarsDataHolder) -> bool:

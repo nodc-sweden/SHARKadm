@@ -131,18 +131,17 @@ class ValidateSampleDepth(Validator):
         )
         unique_rows = unique_rows.with_columns(
             [
-                pl.when(
-                    pl.col("sample_depth_float").is_null()
-                    | pl.col("water_depth_float").is_null()
-                )
+                pl.when(pl.col("sample_depth_float").is_null())
                 .then(
                     pl.format(
-                        "{} on {}: "
-                        "Missing or invalid sample depth {}, or water depth {} ",
-                        pl.col("reported_station_name"),
-                        pl.col("visit_date"),
+                        "Missing or invalid sample depth {}",
                         pl.col("sample_depth_m"),
-                        pl.col("water_depth_m"),
+                    )
+                )
+                .when(pl.col("water_depth_float").is_null())
+                .then(
+                    pl.format(
+                        "Sample depth cannot be validate to missing water depth",
                     )
                 )
                 .when(pl.col("sample_depth_float") < pl.col("water_depth_float"))
