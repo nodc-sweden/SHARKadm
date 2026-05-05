@@ -28,6 +28,13 @@ class Operator:
     def name(self) -> str:
         return self.__class__.__name__
 
+    @property
+    def description(self) -> str:
+        return ""
+
+    def __str__(self) -> str:
+        return f"{self.__repr__()}\n- {self.description}"
+
     def _data_holder_has_valid_data_type(self, data_holder: PolarsDataHolder) -> bool:
         if data_holder.data_type_internal == "unknown":
             return True
@@ -128,6 +135,7 @@ class OperatorInfo:
 class OperatorsInfo:
     def __init__(self):
         self._operators_info: list[OperatorInfo] = []
+        self._terminated: bool = False
 
     def __repr__(self):
         lines = [f"{self.__class__.__name__}:"]
@@ -188,6 +196,17 @@ class OperatorsInfo:
             if info.cause_for_termination:
                 return True
         return False
+
+    @property
+    def terminated(self) -> bool:
+        return self._terminated
+
+    @terminated.setter
+    def terminated(self, value: bool):
+        assert isinstance(value, bool), (
+            f"Invalid data type {type(value)}. Should be boolean"
+        )
+        self._terminated = value
 
 
 def get_single_operators_info(

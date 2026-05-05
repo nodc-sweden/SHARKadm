@@ -78,7 +78,6 @@ class Validator(ABC, Operator):
         )
         t0 = time.time()
         info = self._validate(data_holder=data_holder)
-        print(f"IN Validator.validate: {info=}")
         adm_logger.log_workflow(
             f"Validator {self.name} executed in {time.time() - t0} seconds",
             level=adm_logger.DEBUG,

@@ -218,6 +218,7 @@ class SHARKadmPolarsController:
         return_if_cause_for_termination: bool = True,
     ) -> OperatorsInfo:
         tot_nr_operators = len(operators)
+
         operator_infos = OperatorsInfo()
         for i, oper in enumerate(operators):
             title = f"Running transformer...{oper.name}"
@@ -246,11 +247,11 @@ class SHARKadmPolarsController:
                 info = oper.export(
                     self._data_holder,
                 )
-                return info
             else:
                 raise ValueError("Invalid operator")
             operator_infos.add(info)
             if not operator_infos.all_succeeded and return_if_cause_for_termination:
+                operator_infos.terminated = True
                 return operator_infos
 
         return operator_infos

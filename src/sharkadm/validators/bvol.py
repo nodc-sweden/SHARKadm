@@ -25,7 +25,7 @@ class ValidateBvolSizeClass(Validator):
 
     @staticmethod
     def get_validator_description() -> str:
-        return "Check if bvol size class is is valid in nomp-list"
+        return "Check if bvol size class is valid in nomp-list"
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
         if not nodc_bvol:

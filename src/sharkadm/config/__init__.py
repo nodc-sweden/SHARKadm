@@ -36,6 +36,12 @@ if not CONFIG_DIRECTORY:
                 break
 
 
+def has_admin_config() -> bool:
+    if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
+        return True
+    return False
+
+
 def get_config_path(name: str | None = None) -> pathlib.Path:
     if not CONFIG_DIRECTORY:
         raise NotADirectoryError(

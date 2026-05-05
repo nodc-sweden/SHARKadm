@@ -4,7 +4,7 @@ from sharkadm.sharkadm_logger import adm_logger
 
 
 class ChangeLog:
-    def __init__(self, path: str | pathlib.Path, encoding="cp1252") -> None:
+    def __init__(self, path: str | pathlib.Path, encoding="utf8") -> None:
         self._path = pathlib.Path(path)
         # if self._path.name != "change_log.txt":
         #     raise NameError('Change log can only be named "change_log.txt"')

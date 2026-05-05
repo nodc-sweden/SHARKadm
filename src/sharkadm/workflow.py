@@ -13,16 +13,28 @@ from sharkadm import (
     validators,
 )
 from sharkadm.config import adm_config_paths
-from sharkadm.controller import SHARKadmPolarsController
-from sharkadm.data import get_polars_data_holder
+from sharkadm.controller import SHARKadmPolarsController, get_polars_controller_with_data
+from sharkadm.exporters import PolarsExporter
 from sharkadm.exporters.base import PolarsFileExporter
+from sharkadm.operator import Operator
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
+from sharkadm.transformers import PolarsTransformer
+from sharkadm.validators import Validator
 
 # VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
 # TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
 OPERATOR_DESCRIPTIONS = validators.get_validators_description()
 OPERATOR_DESCRIPTIONS.update(transformers.get_transformers_description())
+# OPERATOR_DESCRIPTIONS.update(exporters.get_exporters_description())
 EXPORTER_DESCRIPTIONS = exporters.get_exporters_description()
+
+
+class _Operators(list):
+    def get(self, item: str) -> Operator | None:
+        item = item.upper()
+        for oper in self:
+            if oper.name.upper() == item:
+                return oper
 
 
 class SHARKadmWorkflow:
@@ -38,15 +50,22 @@ class SHARKadmWorkflow:
         adm_logger_config: dict[str, str | list] | None = None,
         **kwargs,
     ) -> None:
-        self._controller = SHARKadmPolarsController()
-        self._data_sources = data_sources or []
-        self._operators = operators or []
-        # self._validators_before = validators_before or []
-        # self._transformers = transformers or []
-        # self._validators_after = validators_after or []
-        self._exporters = exporters or []
 
-        self.export_paths = {}
+        data_sources = data_sources or []
+
+        self._data_sources: list[str] = []
+        self._controller = SHARKadmPolarsController()
+        self._operators_info = operators or []
+        self._exporters_info = exporters or []
+
+        self._all_validator_objects: _Operators[Validator] = _Operators()
+        self._all_transformer_objects: _Operators[PolarsTransformer] = _Operators()
+        self._all_exporter_objects: _Operators[PolarsExporter] = _Operators()
+
+        self._operator_objects: _Operators[Operator] = _Operators()
+        self._exporter_objects: _Operators[PolarsExporter] = _Operators()
+
+        self._export_paths: dict[str, dict[str, pathlib.Path]] = {}
 
         self._file_path: pathlib.Path = kwargs.get("file_path")
 
@@ -60,6 +79,13 @@ class SHARKadmWorkflow:
 
         self._adm_logger_config = adm_logger_config
 
+        self.set_data_sources(*data_sources)
+
+        self.initiate_workflow()
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}: {self.path}"
+
     @property
     def path(self) -> pathlib.Path | None:
         return self._file_path
@@ -72,42 +98,19 @@ class SHARKadmWorkflow:
             raise NotADirectoryError(f"Path is not a directory: {path}")
         return path
 
-    def _initiate_workflow(self) -> None:
+    def initiate_workflow(self) -> None:
+        if self._adm_logger_config.get("reset_before_workflow"):
+            adm_logger.reset_log()
         adm_logger.log_workflow("Initiating workflow")
-        # self._set_validators_before()
-        # self._set_transformers()
-        # self._set_validators_after()
-        self._save_operators()
-        self._set_exporters()
 
-    # def _set_validators_before(self) -> None:
-    #     vals_list = []
-    #     for val in self._validators_before or []:
-    #         if not val.get("active", True):
-    #             continue
-    #         vals_list.append(validators.get_validator_object(**val))
-    #     self._controller.set_validators_before(*vals_list)
-    #
-    # def _set_validators_after(self) -> None:
-    #     vals_list = []
-    #     for val in self._validators_after or []:
-    #         if not val.get("active", True):
-    #             continue
-    #         vals_list.append(validators.get_validator_object(**val))
-    #     self._controller.set_validators_after(*vals_list)
-    #
-    # def _set_transformers(self) -> None:
-    #     trans_list = []
-    #     for tran in self._transformers or []:
-    #         if not tran.get("active", True):
-    #             continue
-    #         tran_obj = transformers.get_transformer_object(**tran)
-    #         if not tran_obj:
-    #             tran_obj = multi_transformers.get_multi_transformer_object(**tran)
-    #         if not tran_obj:
-    #             raise sharkadm_exceptions.InvalidTransformer(tran)
-    #         trans_list.append(tran_obj)
-    #     self._controller.set_transformers(*trans_list)
+        self._all_validator_objects: list[Validator] = _Operators()
+        self._all_transformer_objects: list[PolarsTransformer] = _Operators()
+        self._all_exporter_objects: list[PolarsExporter] = _Operators()
+        self._operator_objects: list[Operator] = _Operators()
+        self._exporter_objects: list[PolarsExporter] = _Operators()
+
+        self._update_operators()
+        self._update_exporters()
 
     def _get_transformer_object(self, tran) -> transformers.PolarsTransformer | None:
         if tran.get("data_filter"):
@@ -120,50 +123,62 @@ class SHARKadmWorkflow:
     def _get_validator_object(self, val) -> validators.Validator | None:
         return validators.get_validator_object(**val)
 
+    def _get_exporter_object(self, exp) -> exporters.PolarsExporter | None:
+        return exporters.get_exporter_object(**exp)
+
     def _get_data_filter(self, filt):
         return data_filter.get_data_filter_object(**filt)
 
-    def _save_operators(self):
-        self._operator_objects = []
-        for oper in self._operators:
+    def _update_operators(self):
+        for oper in self._operators_info:
             if not oper.get("active", True):
                 continue
-            obj = self._get_transformer_object(oper)
-            if not obj:
-                obj = self._get_validator_object(oper)
-            if not obj:
-                raise sharkadm_exceptions.InvalidOperator(obj)
-            self._operator_objects.append(obj)
+            obj = self._get_operator_object(oper)
+            self._save_operator_object(obj)
 
-    def _set_exporters(self) -> None:
-        exporter_list = []
-        self.export_paths = {}
-        for exp in self._exporters or []:
+    def _get_operator_object(self, oper: dict) -> Operator:
+        obj = self._get_transformer_object(oper)
+        if not obj:
+            obj = self._get_validator_object(oper)
+        if not obj:
+            obj = self._get_exporter_object(oper)
+        if not obj:
+            raise sharkadm_exceptions.InvalidOperator(obj)
+        return obj
+
+    def _save_operator_object(self, obj: Operator):
+        self._operator_objects.append(obj)
+        if isinstance(obj, Validator):
+            self._all_validator_objects.append(obj)
+        elif isinstance(obj, PolarsTransformer):
+            self._all_transformer_objects.append(obj)
+        elif isinstance(obj, PolarsExporter):
+            self._all_exporter_objects.append(obj)
+
+    def _update_exporters(self) -> None:
+        for exp in self._exporters_info or []:
             if not exp.get("active", True):
                 continue
             exporter = exporters.get_exporter_object(**exp)
             if isinstance(exporter, PolarsFileExporter):
-                self.export_paths[exporter.name] = dict(
+                self._export_paths[exporter.name] = dict(
                     directory=exporter.export_directory,
                     file_name=exporter.export_file_name,
                     file_path=exporter.export_file_path,
                 )
-            exporter_list.append(exporter)
-        self._controller.set_exporters(*exporter_list)
+            self._exporter_objects.append(exporter)
+            self._all_exporter_objects.append(exporter)
 
     def start_workflow(self) -> None | operator.OperatorInfo:
         """Sets upp the workflow in the controller and starts it"""
-        self._initiate_workflow()
-        print(f"{self._operator_objects=}")
         for data_source in self._data_sources:
-            adm_logger.reset_log()
-            d_holder = get_polars_data_holder(**data_source)
-            self._controller.set_data_holder(d_holder)
+            if self._adm_logger_config.get("reset_between_data_sources"):
+                adm_logger.reset_log()
+            self._controller = get_polars_controller_with_data(data_source)
             info = self._controller.run_operators(*self._operator_objects)
-            if info.get("terminated"):
-                return info["operators"][-1]
-            self._controller.export_all()
-            # self._controller.start_data_handling()
+            if info.terminated:
+                return info[-1]
+            self._controller.run_operators(*self._exporter_objects)
             self._do_adm_logger_stuff()
         self.save_config()
 
@@ -212,10 +227,7 @@ class SHARKadmWorkflow:
                     name_str = self._file_path.stem
                 else:
                     name_str = "-".join(
-                        [
-                            pathlib.Path(source["path"]).stem
-                            for source in self._data_sources
-                        ]
+                        [pathlib.Path(source).stem for source in self._data_sources]
                     )
                 file_name = f"config_{name_str}.yaml"
             config_save_path = self._workflow_config["export_directory"] / file_name
@@ -228,8 +240,8 @@ class SHARKadmWorkflow:
             # validators_before=self._paths_to_string(self._validators_before),
             # validators_after=self._paths_to_string(self._validators_after),
             # transformers=self._paths_to_string(self._transformers),
-            operators=self._paths_to_string(self._operators),
-            exporters=self._paths_to_string(self._exporters),
+            operators=self._paths_to_string(self._operators_info),
+            exporters=self._paths_to_string(self._exporters_info),
         )
 
         with open(config_save_path, "w") as fid:
@@ -237,53 +249,50 @@ class SHARKadmWorkflow:
 
     def get_operator_descriptions(self) -> dict[str, str]:
         return {
-            oper["name"]: OPERATOR_DESCRIPTIONS[oper["name"]] for oper in self._operators
+            oper["name"]: OPERATOR_DESCRIPTIONS[oper["name"]]
+            for oper in self._operators_info
         }
 
-    # def get_transformer_descriptions(self) -> dict[str, str]:
-    #     return {
-    #         tran["name"]: TRANSFORMER_DESCRIPTIONS[tran["name"]]
-    #         for tran in self._transformers
-    #     }
-    #
-    # def get_validator_before_descriptions(self) -> dict[str, str]:
-    #     print(f"{self._validators_before=}")
-    #     return {
-    #         val["name"]: VALIDATOR_DESCRIPTIONS[val["name"]]
-    #         for val in self._validators_before
-    #     }
-    #
-    # def get_validator_after_descriptions(self) -> dict[str, str]:
-    #     return {
-    #         val["name"]: VALIDATOR_DESCRIPTIONS[val["name"]]
-    #         for val in self._validators_after
-    #     }
-
     def get_exporter_descriptions(self) -> dict[str, str]:
-        # print(f"{self._exporters=}")
-        # print(f"{EXPORTER_DESCRIPTIONS.keys()=}")
         return {
-            exp["name"]: EXPORTER_DESCRIPTIONS[exp["name"]] for exp in self._exporters
+            exp["name"]: EXPORTER_DESCRIPTIONS[exp["name"]]
+            for exp in self._exporters_info
         }
 
     def set_data_sources(self, *paths: str | pathlib.Path) -> None:
-        sources = [dict(path=str(path)) for path in paths]
-        # self._workflow_config['data_source_paths'] = sources
-        self._data_sources = sources
+        self._data_sources = [str(path) for path in paths]
 
     @property
-    def exporters(self) -> list[dict]:
-        return self._exporters
+    def operators_info(self) -> list[dict]:
+        return self._operators_info
 
-    @exporters.setter
-    def exporters(self, exporters: list[dict]):
-        self._exporters = exporters
+    @property
+    def exporters_info(self) -> list[dict]:
+        return self._exporters_info
 
-    def export(self, **kwargs):
-        exp = exporters.get_exporter_object(**kwargs)
-        if not self._controller.data_holder:
-            raise sharkadm_exceptions.DataHolderError("No data holder set")
-        self._controller.export(exp)
+    @property
+    def operators(self) -> list[Operator]:
+        return self._operator_objects
+
+    @property
+    def exporters(self) -> list[PolarsExporter]:
+        return self._exporter_objects
+
+    @property
+    def all_validators(self) -> list[Validator]:
+        return self._all_validator_objects
+
+    @property
+    def all_transformers(self) -> list[PolarsTransformer]:
+        return self._all_transformer_objects
+
+    @property
+    def all_exporters(self) -> list[PolarsExporter]:
+        return self._all_exporter_objects
+
+    @property
+    def export_paths(self) -> dict[str, dict[str, pathlib.Path]]:
+        return self._export_paths
 
     @classmethod
     def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
