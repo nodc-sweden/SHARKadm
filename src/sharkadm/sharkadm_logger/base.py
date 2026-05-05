@@ -44,9 +44,11 @@ class SharkadmLoggerExporter(ABC):
             self.file_path = file_path
         else:
             if not export_directory:
-                export_directory = utils.get_export_directory()
-            print(export_directory)
-            print(file_name)
+                subdir = self.kwargs.get("subdir")
+                if subdir:
+                    export_directory = utils.get_export_directory(subdir)
+                else:
+                    export_directory = utils.get_export_directory()
             self.file_path = pathlib.Path(export_directory, file_name)
         if self.file_path.suffix != suffix:
             self.file_path = self.file_path.with_suffix(suffix)

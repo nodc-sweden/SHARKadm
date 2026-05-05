@@ -6,11 +6,28 @@ from sharkadm.utils.paths import get_next_incremented_file_path
 
 from .base import SharkadmLoggerExporter
 
+COLUMN_WIDTH = dict(
+    cls=33,
+    column=5,
+    columns=5,
+    dataset_name=40,
+    item=5,
+    level=15,
+    log_nr=10,
+    log_type=15,
+    msg=120,
+    purpose=5,
+    row_numbers=10,
+    validation_success=10,
+    validator=40,
+)
+
+
+def get_column_width(col: str) -> int:
+    return COLUMN_WIDTH.get(col, 30)
+
 
 class XlsxExporter(SharkadmLoggerExporter):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def _get_default_file_name(self):
         date_str = datetime.datetime.now().strftime("%Y%m%d")
         data_string = "-".join(self.adm_logger.filtered_on_levels)
@@ -96,23 +113,9 @@ class XlsxExporter(SharkadmLoggerExporter):
         worksheet.add_table(0, 0, max_row, max_col - 1, {"columns": column_settings})
 
         # Make the columns wider for clarity.
-        worksheet.set_column(0, 0, 40)
-        worksheet.set_column(1, 1, 10)
-        worksheet.set_column(2, 2, 40)
-        worksheet.set_column(3, 3, 20)
-        worksheet.set_column(4, 4, 30)
-        worksheet.set_column(5, 5, 10)
-        worksheet.set_column(6, 6, 12)
-        worksheet.set_column(7, 7, 100)
-        worksheet.set_column(8, 8, 20)
-
-        # worksheet.set_column(0, 0, 40)
-        # worksheet.set_column(1, 1, 10)
-        # worksheet.set_column(2, 2, 20)
-        # worksheet.set_column(3, 3, 40)
-        # worksheet.set_column(4, 4, 90)
-        # worksheet.set_column(5, 5, 8)
-        # worksheet.set_column(6, 6, 70)
+        for c, col in enumerate(df.columns):
+            width = get_column_width(col)
+            worksheet.set_column(c, c, width)
 
         # Close the Pandas Excel writer and output the Excel file.
         writer.close()
