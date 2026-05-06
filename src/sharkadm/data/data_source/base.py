@@ -88,7 +88,8 @@ class PolarsDataSource:
             internal_name = mapper.get_internal_name(item)
             if item == internal_name:
                 self._not_mapped_columns.append(item)
-            self._mapped_columns[item] = internal_name
+            else:
+                self._mapped_columns[item] = internal_name
             while internal_name in mapped_header:
                 internal_name = f"{internal_name}__duplicate"
             mapped_header.append(internal_name)

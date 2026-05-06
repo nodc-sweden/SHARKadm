@@ -32,7 +32,10 @@ from sharkadm.exporters.system import (
     TransformersSummaryFile,
     ValidatorsSummaryFile,
 )
-from sharkadm.exporters.txt_file import PolarsTxtAsIs
+from sharkadm.exporters.txt_file import (
+    PolarsTxtAsIs,
+    PolarsTxtWithImportedColumns,
+)
 from sharkadm.exporters.zip_archive import PolarsZipArchive
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 

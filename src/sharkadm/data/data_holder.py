@@ -138,10 +138,19 @@ class PolarsDataHolder(ABC):
 
     @property
     def not_mapped_columns(self) -> list[str]:
-        not_mapped = set()
+        not_mapped = []
         for name, source in self._data_sources.items():
-            not_mapped.update(source.not_mapped_columns)
-        return list(not_mapped)
+            to_add = [col for col in source.not_mapped_columns if col not in not_mapped]
+            not_mapped.extend(to_add)
+        return not_mapped
+
+    @property
+    def imported_columns(self) -> list[str]:
+        columns = list(self.mapped_columns.values())
+        columns.extend(self.not_mapped_columns)
+        if "source" in columns:
+            columns.pop(columns.index("source"))
+        return columns
 
     @property
     def header_mapper(self):
@@ -276,6 +285,8 @@ class PolarsDataHolder(ABC):
         """Sets a single data source to self._data"""
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
+        if "parameter" not in self._data.columns:
+            self._data_structure = "column"
 
 
 class PolarsConcatDataHolder(PolarsDataHolder):
