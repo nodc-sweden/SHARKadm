@@ -41,13 +41,19 @@ def subscribe(event: str | Events, func, prio: int = 50) -> None:
 
 
 def post_event(event: str | Events, data: dict | str) -> None:
-    event = str(event)
+    # print()
     # print(f"{event=}")
+    # print(f"{data=}")
+    # print(f"{_subscribers=}")
+    event = str(event)
     if type(data) is str:
         data = dict(msg=data)
     if event not in _subscribers:
         raise EventNotFound(event)
     for prio in sorted(_subscribers[event]):
         for func in _subscribers[event][prio]:
-            print(f"{func=}")
             func(data)
+    if event == Events.LOG_PROGRESS:
+        return
+    if event != Events.LOG:
+        post_event(Events.LOG, data)

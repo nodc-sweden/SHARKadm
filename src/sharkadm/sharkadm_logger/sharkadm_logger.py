@@ -431,7 +431,7 @@ class SHARKadmLogger:
         self._filtered_log_types = log_types
 
         self._filtered_data = []
-        for data in self.data:
+        for data in self._data:
             if data.get("level") and data.get("level") not in levels:
                 continue
             if data.get("purpose") and data.get("purpose") not in purposes:
@@ -448,19 +448,22 @@ class SHARKadmLogger:
 
     def print_on_screen(self, *args, **kwargs):
         def _print(data: dict):
-            if data["level"] not in levels:
+            if data.get("level") and data.get("level") not in levels:
                 return
-            if data["log_type"] not in log_types:
+            if data.get("log_type") and data.get("log_type") not in log_types:
                 return
-            if data["purpose"] and data["purpose"] not in purposes:
+            if data.get("purpose") and data.get("purpose") not in purposes:
                 return
             print(data)
 
         log_types = self._get_log_types(*args, log_types=kwargs.get("log_types"))
         levels = self._get_levels(*args, levels=kwargs.get("levels"))
         purposes = self._get_purposes(*args, purposes=kwargs.get("purposes"))
-        print("-" * 50)
+        print("=" * 100)
+        print("printing following config on screen: ")
+        print("-" * 100)
         print(f"{log_types=}")
         print(f"{levels=}")
         print(f"{purposes=}")
+        print()
         self.subscribe("log", _print)
