@@ -47,28 +47,21 @@ class SHARKadmLogger:
         self.feedback = Feedback()
 
         self._data: DATA_DTYPE = []
-        self._filtered_data: DATA_DTYPE = []
         self.name: str = ""
         self._nr_log_entries: int = 0
         self._dataset_name: str = ""
 
-        self._filtered_levels: list[str] = []
-        self._filtered_purposes: list[str] = []
-        self._filtered_log_types: list[str] = []
+        self._reset_filter()
 
     def _reset_log(self) -> None:
         self._data: DATA_DTYPE = []
-        self._filtered_data: DATA_DTYPE = []
         self.name: str = ""
         self._nr_log_entries: int = 0
         self._dataset_name: str = ""
-
-        self._filtered_levels: list[str] = []
-        self._filtered_purposes: list[str] = []
-        self._filtered_log_types: list[str] = []
+        self._reset_filter()
 
     def _reset_filter(self) -> None:
-        self._filtered_data: DATA_DTYPE = []
+        self._filtered_data: DATA_DTYPE | None = None
         self._filtered_levels: list[str] = []
         self._filtered_purposes: list[str] = []
         self._filtered_log_types: list[str] = []
@@ -83,7 +76,7 @@ class SHARKadmLogger:
 
     @property
     def data(self) -> DATA_DTYPE:
-        if self._filtered_data:
+        if self._filtered_data is not None:
             return self._filtered_data
         return self._data
 
@@ -433,7 +426,6 @@ class SHARKadmLogger:
         levels = self._get_levels(*args, levels=levels)
         purposes = self._get_purposes(*args, purposes=purposes)
 
-        print(f"{levels=}")
         self._filtered_levels = levels
         self._filtered_purposes = purposes
         self._filtered_log_types = log_types
