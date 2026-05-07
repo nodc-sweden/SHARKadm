@@ -216,7 +216,7 @@ class SHARKadmPolarsController:
         self,
         *operators: Operator,
         return_if_cause_for_termination: bool = True,
-    ) -> OperatorsInfo:
+    ) -> OperatorsInfo | Any:
         tot_nr_operators = len(operators)
 
         operator_infos = OperatorsInfo()
@@ -247,6 +247,8 @@ class SHARKadmPolarsController:
                 info = oper.export(
                     self._data_holder,
                 )
+                if isinstance(info, pl.DataFrame):
+                    return info
             else:
                 raise ValueError("Invalid operator")
             operator_infos.add(info)
