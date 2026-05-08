@@ -105,6 +105,11 @@ class PolarsTransformer(ABC, Operator):
             else:
                 return get_single_operators_info(operator=self)
         except pl.exceptions.InvalidOperationError as e:
+            self._log_workflow(
+                f"Failed to run transformer: {self.__class__.__name__}",
+                item=e,
+                level=adm_logger.CRITICAL,
+            )
             return get_single_operators_info(
                 operator=self, exception=e, cause_for_termination=True, success=False
             )
