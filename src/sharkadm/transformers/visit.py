@@ -13,14 +13,15 @@ class PolarsAddVisitKey(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder.data = data_holder.data.with_columns(
-            pl.when(pl.col("datetime").is_not_null()).then(
-                pl.concat_str(
-                    pl.col("datetime").dt.strftime("%Y%m%d_%H%M"),
+            pl.concat_str(
+                [
+                    pl.col("reported_visit_date"),
+                    pl.col("reported_sample_time"),
                     pl.col("platform_code"),
                     pl.col("reported_station_name"),
-                    separator="_",
-                ).alias("visit_key")
-            )
+                ],
+                separator="_",
+            ).alias("visit_key")
         )
 
 
