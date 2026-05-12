@@ -74,7 +74,7 @@ class ImportMatrixConfig:
         self,
         path: str | pathlib.Path,
         data_type: str | None = None,
-        encoding: str = "iso_8859_1",
+        encoding: str = "utf-8",  # Historically: encoding: str = "iso_8859_1",
     ) -> None:
         self._path = pathlib.Path(path)
         self._data_type = data_type
