@@ -1,4 +1,5 @@
 import re
+from typing import ClassVar
 
 import polars as pl
 
@@ -345,3 +346,92 @@ class AddColumnsWithPrefix(PolarsTransformer):
         return matching_strings.get_matching_strings(
             strings=data_holder.data.columns, match_strings=self.apply_on_columns
         )
+
+
+class RenameColumns(PolarsTransformer):
+    def __init__(self, apply_on_columns: dict | None) -> None:
+        super().__init__()
+        self.apply_on_columns = apply_on_columns
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Renames columns according to names in dictionary specified by the user"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        columns_to_rename = {}
+        for original_name, new_name in self.apply_on_columns.items():
+            if original_name not in data_holder.data.columns:
+                self._log(
+                    f"Column does not exist: {original_name}. Will do nothing.",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+            if new_name in data_holder.data.columns:
+                self._log(
+                    f"Column already present: {new_name}. Will do nothing.",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+            columns_to_rename[original_name] = new_name
+            self._log(
+                f"Column name {original_name} was replaced by: {new_name}",
+                level=adm_logger.DEBUG,
+            )
+        if columns_to_rename:
+            data_holder.data = data_holder.data.rename(columns_to_rename)
+
+
+class RenameProfileColumnsQctool(PolarsTransformer):
+    apply_on_columns: ClassVar[dict[str, str]] = {
+        "visit_year": "MYEAR",
+        "visit_date": "SDATE",
+        "MONTH": "visit_month",
+        "sample_time": "STIME",
+        "expedition_id": "CRUISE_NO",
+        "visit_reported_latitude": "LATIT",
+        "visit_reported_longitude": "LONGI",
+        "reported_station_name": "STATN",
+        "sample_depth_m": "DEPH",
+        "QV:SMHI:DEPH [m]": "Q_DEPTH_CTD",
+        "COPY_VARIABLE.Pressure CTD.dbar": "PRES_CTD",
+        "QFLAG.Pressure CTD": "Q_PRES_CTD",
+        "COPY_VARIABLE.Salinity CTD.o/oo psu": "SALT_CTD ",
+        "QFLAG.Salinity CTD": "Q_SALT_CTD",
+        "COPY_VARIABLE.Temperature CTD.C": "TEMP_CTD",
+        "QFLAG.Temperature CTD": "Q_TEMP_CTD",
+        "COPY_VARIABLE.Dissolved oxygen O2 CTD.ml/l": "DOXY_CTD",
+        "QFLAG.Dissolved oxygen O2 CTD": "Q_DOXY_CTD ",
+        "CHLFLUO_CTD [mg/m3]": "CHLFL",
+        "QV:SMHI:CHLFLUO_CTD [mg/m3]": "Q_CHLFL",
+        "sample_comment": "COMNT_SAMP",
+    }
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Renames columns according to names in dictionary specified by the user"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        columns_to_rename = {}
+        for original_name, new_name in self.apply_on_columns.items():
+            if original_name not in data_holder.data.columns:
+                self._log(
+                    f"Column does not exist: {original_name}. Will do nothing.",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+            if new_name in data_holder.data.columns:
+                self._log(
+                    f"Column already present: {new_name}. Will do nothing.",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+            columns_to_rename[original_name] = new_name
+            self._log(
+                f"Column name {original_name} was replaced by: {new_name}",
+                level=adm_logger.DEBUG,
+            )
+        if columns_to_rename:
+            data_holder.data = data_holder.data.rename(columns_to_rename)
