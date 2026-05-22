@@ -64,8 +64,6 @@ from sharkadm.transformers.columns import (
     PolarsAddBooleanLargerThan,
     PolarsAddIntColumns,
     PolarsFixDuplicateColumns,
-    RenameColumns,
-    RenameProfileColumnsQctool,
 )
 from sharkadm.transformers.coordinates import PolarsSetBoundingBox
 from sharkadm.transformers.cruise import PolarsAddCruiseId
@@ -143,7 +141,7 @@ from sharkadm.transformers.manual import (
     PolarsManualHarbourPorpoise,
     PolarsManualSealPathology,
 )
-from sharkadm.transformers.map_header import ArchiveMapper
+from sharkadm.transformers.map_header import ArchiveMapper, ExternalMapper
 from sharkadm.transformers.map_parameter_column import (
     PolarsMapperParameterColumn,
 )
