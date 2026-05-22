@@ -12,10 +12,19 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
             "nr_rows",
             kwargs.get("n_rows", kwargs.get("read_nr_rows", kwargs.get("read_n_rows"))),
         )
+        self.metadata = {}
 
         super().__init__(*args, **kwargs)
 
+    def _load_metadata(self):
+        with open(self._path, encoding=self._encoding) as f:
+            for line in f:
+                if line.startswith("//METADATA;"):
+                    line = line.removeprefix("//METADATA;").strip().split(";", maxsplit=1)
+                    self.metadata[line[0]] = line[1] if len(line) > 1 else ""
+
     def _load_file(self) -> None:
+        self._load_metadata()
         self._data = pl.read_csv(
             self._path,
             comment_prefix="//",
