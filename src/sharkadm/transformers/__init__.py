@@ -219,6 +219,7 @@ from sharkadm.transformers.trophic_type import PolarsSetTrophicTypeSMHI
 from sharkadm.transformers.visit import (
     PolarsAddPhysicalChemicalKey,
     PolarsAddVisitKey,
+    AddVisitKeyProfile,
 )
 from sharkadm.transformers.wide_to_long import PolarsWideToLong
 from sharkadm.transformers.worms import (
