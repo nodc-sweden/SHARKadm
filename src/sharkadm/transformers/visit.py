@@ -25,6 +25,25 @@ class PolarsAddVisitKey(PolarsTransformer):
         )
 
 
+class AddVisitKeyProfile(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds visit key column"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col("visit_date"),
+                    pl.col("sample_time"),
+                    pl.lit("10"),
+                    pl.col("reported_station_name"),
+                ],
+                separator="_",
+            ).alias("visit_key")
+        )
+
+
 class PolarsAddPhysicalChemicalKey(PolarsTransformer):
     valid_data_types = ("physicalchemical", "Profile")
     col_to_set = "key"

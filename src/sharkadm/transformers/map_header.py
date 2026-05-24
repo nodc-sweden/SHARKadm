@@ -32,8 +32,8 @@ class ArchiveMapper(PolarsTransformer):
 
 
 class ExternalMapper(PolarsTransformer):
-    def __init__(self, import_column=None, **kwargs):
-        self._import_column = import_column
+    def __init__(self, export_column=None, **kwargs):
+        self._export_column = export_column
         super().__init__(**kwargs)
 
     @staticmethod
@@ -48,7 +48,7 @@ class ExternalMapper(PolarsTransformer):
             import_matrix = config.get_import_matrix_config(
                 data_type=data_holder.delivery_note.data_format
             )
-        mapper = import_matrix.get_mapper(self._import_column)
+        mapper = import_matrix.get_mapper(self._export_column)
         mapped_header = []
         for item in data_holder.data.columns:
             mapped_header.append(mapper.get_external_name(item))
