@@ -54,6 +54,7 @@ from sharkadm.transformers.calculate import (
 )
 from sharkadm.transformers.columns import (
     PolarsAddColumnViewsColumns,
+    PolarsOnlyKeepColumnViewsColumns,
     PolarsRemoveColumns,
     PolarsClearColumns,
     PolarsSortColumns,
@@ -159,6 +160,7 @@ from sharkadm.transformers.position import (
     PolarsAddSamplePositionDDAsFloat,
     PolarsAddSamplePositionDM,
     PolarsAddSamplePositionSweref99tm,
+    PolarsSetPositionDDNumberOfDecimal,
 )
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,
@@ -223,8 +225,6 @@ from sharkadm.transformers.worms import (
     PolarsAddWormsScientificName,
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
-
-from sharkadm import plugin_operators
 
 
 @functools.cache

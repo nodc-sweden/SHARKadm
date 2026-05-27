@@ -6,6 +6,7 @@ from sharkadm import config
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
+from ..operator import OperatorsInfo, get_single_operators_info
 from .base import PolarsTransformer
 
 
@@ -20,41 +21,50 @@ class PolarsAddCustomId(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Adds custom key and md5 id if add_md5=True"
 
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
-        """custom_id in taken from self._id_handler"""
-        for level in self._id_handler.get_levels_for_datatype(data_holder.data_type):
+    def _transform(self, data_holder: PolarsDataHolder) -> OperatorsInfo:
+        infos = OperatorsInfo()
+        for level in self._id_handler.get_levels_for_datatype(
+            data_holder.data_type_internal
+        ):
             id_handler = self._id_handler.get_level_handler(
-                data_type=data_holder.data_type,
+                data_type=data_holder.data_type_internal,
                 level=level,
             )
-            col_name = f"custom_{level}_id"
+            # col_name = f"custom_{level}_id"
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
+                msg = (
+                    f"Missing columns for creating {id_handler.name}: "
+                    f"{', '.join(list(missing))}"
+                )
                 self._log(
-                    f"Missing columns for creating {col_name}: "
-                    f"{', '.join(list(missing))}",
+                    msg,
                     level=adm_logger.WARNING,
                 )
+                info = get_single_operators_info(
+                    operator=self, msg=msg, cause_for_termination=False, success=False
+                )
+                infos.add(info)
                 continue
             concat_cols = []
             for col in id_handler.id_columns:
                 concat_cols.append(pl.col(col).str.replace_all("/", "_"))
-
             data_holder.data = data_holder.data.with_columns(
-                pl.concat_str(concat_cols, separator="_").alias(col_name)
+                pl.concat_str(concat_cols, separator="_").alias(id_handler.name)
             )
             if self._add_md5:
-                col_name_md5 = f"{col_name}_md5"
+                col_name_md5 = f"{id_handler.name}_md5"
                 data_holder.data = data_holder.data.with_columns(
                     pl.lit("").alias(col_name_md5)
                 )
-                for (_id,), df in data_holder.data.group_by(col_name):
-                    data_holder.data.with_columns(
-                        pl.when(pl.col(col_name) == _id)
+                for (_id,), df in data_holder.data.group_by(id_handler.name):
+                    data_holder.data = data_holder.data.with_columns(
+                        pl.when(pl.col(id_handler.name) == _id)
                         .then(pl.lit(get_md5(str(_id))))
                         .otherwise(pl.col(col_name_md5))
                         .alias(col_name_md5)
                     )
+        return infos
 
 
 class PolarsAddSharkSampleMd5(PolarsTransformer):

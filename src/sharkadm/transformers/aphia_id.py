@@ -87,7 +87,7 @@ class PolarsSetAphiaIdFromBvolAphiaId(PolarsTransformer):
 
 
 class PolarsSetAphiaIdFromWormsAphiaId(PolarsTransformer):
-    valid_data_types = ("plankton_imaging", "phytoplankton")
+    # valid_data_types = ("plankton_imaging", "phytoplankton")
     source_col = "worms_aphia_id"
     col_to_set = "aphia_id"
 

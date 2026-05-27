@@ -5,7 +5,7 @@ from .base import PolarsTransformer
 
 
 class PolarsSortData(PolarsTransformer):
-    sort_by_columns: tuple[str] = (
+    sort_by_columns: tuple[str, ...] = (
         "sample_date",
         "sample_time",
         "station_name",
@@ -19,7 +19,7 @@ class PolarsSortData(PolarsTransformer):
 
     def __init__(
         self,
-        sort_by_columns: tuple[str] | None = None,
+        sort_by_columns: tuple[str, ...] | None = None,
         descending: bool | tuple[bool] | None = None,
     ) -> None:
         super().__init__()

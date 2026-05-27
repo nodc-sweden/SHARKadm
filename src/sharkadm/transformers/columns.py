@@ -5,7 +5,7 @@ import polars as pl
 from sharkadm.config import get_column_views_config
 from sharkadm.utils import add_column, matching_strings
 
-from .. import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
@@ -81,6 +81,21 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
                 continue
             empty_cols_to_add.append(pl.lit("").alias(col))
         data_holder.data = data_holder.data.with_columns(empty_cols_to_add)
+
+
+class PolarsOnlyKeepColumnViewsColumns(PolarsTransformer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._column_views = get_column_views_config()
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes columns not listed in column_views for data_type"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        columns = self._column_views.get_columns_for_view(data_holder.data_type_internal)
+        columns_to_keep = [col for col in columns if col in data_holder.columns]
+        data_holder.data = data_holder.data[columns_to_keep]
 
 
 class PolarsSortColumns(PolarsTransformer):

@@ -43,7 +43,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
         self._initiate()
         self._load_delivery_note()
-        self._load_mandatory_columns()
+        # self._load_mandatory_columns()
         self._load_import_matrix()
         self._load_data()
         self._load_delivery_note()  # Reload to map

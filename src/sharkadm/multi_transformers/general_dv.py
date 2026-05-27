@@ -7,7 +7,6 @@ from sharkadm.multi_transformers.translate import TranslatePolars
 
 class GeneralDVPolars(PolarsMultiTransformer):
     _transformers = (
-        transformers.PolarsWideToLong,
         transformers.PolarsAddDeliveryNoteInfo,
         transformers.PolarsAddAnalyseInfo,
         transformers.PolarsAddSamplingInfo,
@@ -18,6 +17,7 @@ class GeneralDVPolars(PolarsMultiTransformer):
         transformers.PolarsAddStaticInternetAccessInfo,
         transformers.PolarsAddStaticDataHoldingCenterSwedish,
         LocationPolars,
+        transformers.PolarsWideToLong,
         transformers.PolarsMultiply,
         transformers.PolarsDivide,
         DyntaxaPolars,

@@ -9,6 +9,7 @@ from sharkadm.data.archive.chlorophyll import PolarsChlorophyllArchiveDataHolder
 from sharkadm.data.archive.delivery_note import DeliveryNote
 from sharkadm.data.archive.epibenthos import PolarsEpibenthosArchiveDataHolder
 from sharkadm.data.archive.greyseal import PolarsGreySealArchiveDataHolder
+from sharkadm.data.archive.harbourseal import PolarsHarbourSealArchiveDataHolder
 from sharkadm.data.archive.jellyfish import PolarsJellyfishArchiveDataHolder
 from sharkadm.data.archive.marine_biotoxins import PolarsMarineBiotoxinsArchiveDataHolder
 from sharkadm.data.archive.physicalchemical import PolarsPhysicalChemicalArchiveDataHolder

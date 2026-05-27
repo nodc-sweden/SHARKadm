@@ -12,6 +12,7 @@ class PolarsAddDatatype(PolarsTransformer):
         return f"Adds {PolarsAddDatatype.col_to_set} column"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        print(f"{data_holder.data_type_in_data=}")
         data_holder.data = data_holder.data.with_columns(
             pl.lit(data_holder.data_type_in_data).alias(self.col_to_set)
         )

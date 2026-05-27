@@ -12,8 +12,13 @@ def _get_year_range_str(data_holder: PolarsDataHolder) -> str:
 
 def get_zip_archive_base(data_holder: PolarsDataHolder) -> str:
     parts = ["SHARK", data_holder.data_type, _get_year_range_str(data_holder)]
-    if hasattr(data_holder, "delivery_note"):
+    if (
+        hasattr(data_holder, "delivery_note")
+        and data_holder.delivery_note.sample_orderer_code
+    ):
         parts.append(data_holder.delivery_note.sample_orderer_code)
+    elif "sample_orderer_code" in data_holder.data.columns:
+        parts.append(data_holder.data[0, "sample_orderer_code"])
     return "_".join(parts)
 
 

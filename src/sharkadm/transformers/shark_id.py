@@ -19,7 +19,9 @@ class PolarsAddSharkId(PolarsTransformer):
         return "Adds shark_id and shark_md5_id"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        import_matrix = config.get_import_matrix_config(data_type=data_holder.data_type)
+        import_matrix = config.get_import_matrix_config(
+            data_type=data_holder.data_type_internal
+        )
         for level, cols in import_matrix.get_columns_by_level().items():
             if level == "variable":
                 continue
