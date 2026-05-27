@@ -1,4 +1,4 @@
-from .. import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 from ..utils.add_column import add_float_column
 from .base import PolarsFileExporter

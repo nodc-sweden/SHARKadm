@@ -2,7 +2,8 @@ import enum
 from dataclasses import dataclass
 from typing import Any, Self, get_type_hints
 
-from sharkadm import adm_logger, config
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm import config
 from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 
 

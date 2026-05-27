@@ -1,6 +1,6 @@
 import polars as pl
 
-from sharkadm import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.data import PolarsDataHolder
 from sharkadm.transformers import PolarsTransformer
 

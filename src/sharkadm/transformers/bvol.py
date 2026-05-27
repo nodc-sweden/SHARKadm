@@ -143,7 +143,7 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
 
 
 class PolarsAddBvolAphiaId(PolarsTransformer):
-    valid_data_types = ("Phytoplankton",)
+    valid_data_types = ("Phytoplankton", "harbourseal")
 
     scientific_name_col = "bvol_scientific_name"
     # size_class_col = "bvol_size_class"

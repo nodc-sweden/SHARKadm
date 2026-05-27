@@ -85,9 +85,9 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def name(self) -> str:
         return self.__class__.__name__
 
-    @property
-    def data_format(self) -> str:
-        return self._data_format
+    # @property
+    # def data_format(self) -> str:
+    #     return self._data_format
 
     @property
     def header_mapper(self):

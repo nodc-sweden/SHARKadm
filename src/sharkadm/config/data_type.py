@@ -84,6 +84,34 @@ class DataTypePhysicalChemical(DataType):
         return "Physical and Chemical"
 
 
+class DataTypeGraySeal(DataType):
+    @property
+    def data_type(self) -> str:
+        return "GraySeal"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return "Gray seal"
+
+
+class DataTypeHarbourSeal(DataType):
+    @property
+    def data_type(self) -> str:
+        return "HarbourSeal"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return "Harbour seal"
+
+
 class DataTypeMarineBiotoxins(DataType):
     @property
     def data_type(self) -> str:
@@ -122,6 +150,8 @@ CLASS_MAPPER = {
     "unknown": DataTypeUnknown,
     "physicalchemical": DataTypePhysicalChemical,
     "marine_biotoxins": DataTypeMarineBiotoxins,
+    "harbourseal": DataTypeHarbourSeal,
+    "grayseal": DataTypeGraySeal,
 }
 
 

@@ -11,6 +11,7 @@ DATETIME_FORMATS = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d")
 
 
 class PolarsAddSampleTime(PolarsTransformer):
+    invalid_data_types = ("harbourseal",)
     source_col = "visit_time"
     col_to_set = "sample_time"
 
@@ -303,6 +304,7 @@ class PolarsFixDateFormat(PolarsTransformer):
 
 
 class PolarsFixTimeFormat(PolarsTransformer):
+    invalid_data_types = ("harbourseal",)
     time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod

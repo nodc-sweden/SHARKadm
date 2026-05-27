@@ -1,6 +1,6 @@
 from sharkadm.validators.base import DataHolderProtocol, Validator
 
-from .. import adm_logger
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class ValidatePositiveValues(Validator):

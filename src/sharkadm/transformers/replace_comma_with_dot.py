@@ -6,7 +6,7 @@ from sharkadm.utils import matching_strings
 
 
 class PolarsReplaceCommaWithDot(PolarsTransformer):
-    apply_on_columns = (
+    apply_on_columns: tuple[str, ...] = (
         "latitude",
         "longitude",
         "depth",
@@ -20,7 +20,7 @@ class PolarsReplaceCommaWithDot(PolarsTransformer):
         "temperature",
     )
 
-    def __init__(self, apply_on_columns: tuple[str] | None = None) -> None:
+    def __init__(self, apply_on_columns: tuple[str, ...] | None = None) -> None:
         super().__init__()
         if apply_on_columns:
             self.apply_on_columns = apply_on_columns

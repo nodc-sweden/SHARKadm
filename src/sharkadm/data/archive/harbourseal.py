@@ -1,12 +1,14 @@
-from sharkadm.data import data_source
+import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
+from .. import data_source
+from ..data_source.base import PolarsDataDataFrame
 from .archive_data_holder import PolarsArchiveDataHolder
 
 
-class PolarsBacterioplanktonArchiveDataHolder(PolarsArchiveDataHolder):
-    _data_type_synonym = "bacterioplankton"
-    _data_format = "Bacterioplankton"
+class PolarsHarbourSealArchiveDataHolder(PolarsArchiveDataHolder):
+    _data_type_synonym = "harbourseal"
+    _data_format = "Harbourseal"
 
     def _load_data(self) -> None:
         d_source = self._load_skv_data_source()
@@ -19,9 +21,29 @@ class PolarsBacterioplanktonArchiveDataHolder(PolarsArchiveDataHolder):
         data_file_path = self.processed_data_directory / "data.skv"
         if not data_file_path.exists():
             return False
+        lokaler_file_path = self.processed_data_directory / "lokaler.skv"
+        if not lokaler_file_path.exists():
+            return False
+
         d_source = data_source.SkvDataFile(
             path=data_file_path, data_type=self.delivery_note.data_type
         )
+        l_source = data_source.SkvDataFile(
+            path=lokaler_file_path, data_type=self.delivery_note.data_type
+        )
+        ddf = d_source.data.filter(pl.col("STATN") != "")
+        ldf = l_source.data.filter(pl.col("Lokal") != "")
+
+        for col in ["LATIT", "LONGI"]:
+            if col in ddf.columns[:]:
+                ddf = ddf.drop(col)
+
+        df = ddf.join(ldf, left_on="STATN", right_on="Lokal", how="inner")
+
+        d_source = PolarsDataDataFrame(
+            df, data_type=self.data_type, source=self.archive_root_directory
+        )
+
         return d_source
 
     def _load_txt_data_source(self):

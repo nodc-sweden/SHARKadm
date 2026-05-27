@@ -99,7 +99,9 @@ class PolarsTransformer(ABC, Operator):
                 f"{time.perf_counter() - t0:.6f} seconds",
                 level=adm_logger.DEBUG,
             )
-            if isinstance(info, OperatorInfo):
+            if isinstance(info, OperatorsInfo) and info.operators_info:
+                return info
+            elif isinstance(info, OperatorInfo):
                 info.operator = self
                 return get_single_operators_info(operator_info=info)
             else:
