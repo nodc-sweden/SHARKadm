@@ -1,15 +1,15 @@
-import openpyxl
 import pathlib
-from openpyxl.utils import get_column_letter
+
+import openpyxl
 from openpyxl.comments import Comment
-from sharkadm.exporters.base import PolarsFileExporter
+from openpyxl.utils import get_column_letter
+
 from sharkadm.data.data_holder import PolarsDataHolder
+from sharkadm.exporters.base import PolarsFileExporter
 
 
 class ExportDvTemplateWithQcResult(PolarsFileExporter):
-    def __init__(self,
-                 dv_template_file,
-                 **kwargs):
+    def __init__(self, dv_template_file, **kwargs):
         self._dv_template_file = pathlib.Path(dv_template_file)
         super().__init__(**kwargs)
         if not kwargs.get("export_file_name"):
@@ -21,8 +21,7 @@ class ExportDvTemplateWithQcResult(PolarsFileExporter):
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
         indata = openpyxl.load_workbook(self._dv_template_file)
-        tab = indata['Kolumner']
-
+        tab = indata["Kolumner"]
 
         parameter_to_column = {}
         for col in tab.iter_cols(min_row=3, max_row=3):
@@ -34,9 +33,13 @@ class ExportDvTemplateWithQcResult(PolarsFileExporter):
         print(parameter_to_column)
 
         unique_parameters = sorted(
-            {row["parameter"] for row in data_holder.data.iter_rows(named=True) if row["parameter"] in parameter_to_column},
+            {
+                row["parameter"]
+                for row in data_holder.data.iter_rows(named=True)
+                if row["parameter"] in parameter_to_column
+            },
             key=lambda p: openpyxl.utils.column_index_from_string(parameter_to_column[p]),
-            reverse=True
+            reverse=True,
         )
 
         for parameter in unique_parameters:
@@ -60,14 +63,18 @@ class ExportDvTemplateWithQcResult(PolarsFileExporter):
                     if row.get("total_automatic_info"):
                         cell = tab[cell_ref]
                         cell.comment = Comment(
-                            text=row["total_automatic_info"],
-                            author="SHARKadm QC Tool"
+                            text=row["total_automatic_info"], author="SHARKadm QC Tool"
                         )
 
-        all_parameters = {row["parameter"] for row in data_holder.data.iter_rows(named=True)}
+        all_parameters = {
+            row["parameter"] for row in data_holder.data.iter_rows(named=True)
+        }
         missing_parameters = all_parameters - parameter_to_column.keys()
         if missing_parameters:
-            print(f"Varning: Följande parametrar hittades inte i Excel-filen: {missing_parameters}")
+            print(
+                f"Varning: Följande parametrar hittades inte i Excel-filen: "
+                f"{missing_parameters}"
+            )
 
-        indata.save(self.export_file_path)# Savea som ny fil
+        indata.save(self.export_file_path)  # Savea som ny fil
         print("TOTAL_QC-kolumner har lagts till och fyllts i Excel-filen.")
