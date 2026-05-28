@@ -13,14 +13,13 @@ dependencies = [
     "pandas>=2.2.1",
     "requests>=2.31.0",
     "xlsxwriter>=3.2.0",
-    "polars>=1.26.0",
+    "polars==1.31.0",
     "fastexcel>=0.13.0",
     "rich>=14.0.0",
     "typer>=0.15.2",
     "geopandas>=1.1.0",
     "shapely>=2.1.1",
     "gsw>=3.6.20",
-    "nodc-codes",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -63,4 +62,3 @@ per-file-ignores."__init__.py" = ["F401"]
 
 [tool.uv.sources]
 nodc-station = { git = "https://github.com/nodc-sweden/nodc-station", rev = "v1.0.0" }
-nodc-codes = { git = "https://github.com/nodc-sweden/nodc-codes.git" }
