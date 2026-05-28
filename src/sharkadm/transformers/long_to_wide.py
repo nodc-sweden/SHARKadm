@@ -1,8 +1,8 @@
 import pandas as pd
+import polars as pl
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
-import polars as pl
 
 
 # TODO: This is still written for pandas
@@ -74,10 +74,12 @@ class PolarsLongToWide(PolarsTransformer):
         df = data_holder.data
         self._metadata_columns = []
 
-        df2 = data_holder.data.select(['row_number', 'parameter', 'value', 'quality_flag', 'unit']).pivot(
+        df2 = data_holder.data.select(
+            ["row_number", "parameter", "value", "quality_flag", "unit"]
+        ).pivot(
             index="row_number",
             columns="parameter",
-            values=["value", "quality_flag", "unit"]
+            values=["value", "quality_flag", "unit"],
         )
 
         rename_dict = {
@@ -149,35 +151,27 @@ class PolarsLongToWide(PolarsTransformer):
 
         df2 = df2.select([col for col in df2.columns if "unit" not in col.lower()])
 
-        # print(f"Print här df2:{df2}")
-        # df2.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\result.txt", separator="\t")
-        # print(f"Print här df:{df}")
-        # df.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\innan_result.txt", separator="\t")
-
         not_meta_columns = [
-            'row_number',
-            'parameter',
-            'value',
-            'quality_flag',
-            'unit',
-            'reported_parameter',
-            'reported_value',
-            'reported_quality_flag',
-            'reported_unit'
+            "row_number",
+            "parameter",
+            "value",
+            "quality_flag",
+            "unit",
+            "reported_parameter",
+            "reported_value",
+            "reported_quality_flag",
+            "reported_unit",
         ]
 
-        _metadata_columns = [
-            col for col in df.columns if col not in not_meta_columns
-        ]
+        _metadata_columns = [col for col in df.columns if col not in not_meta_columns]
 
-        # print(f"metadata här:{_metadata_columns}")
-
-        df_filtered = df.select(["row_number"] + [col for col in _metadata_columns if col in df.columns])
+        df_filtered = df.select(
+            ["row_number"] + [col for col in _metadata_columns if col in df.columns]
+        )
         df3 = df_filtered.join(df2, on="row_number", how="left")
         df3 = df3.group_by("row_number").first()
         df3 = df3.with_columns(pl.col("row_number").cast(pl.Int64))
         df3 = df3.sort("row_number")
         df3 = df3.select([col for col in df3.columns if "_right" not in col.lower()])
-        # df3.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\efter_result.txt", separator="\t")
 
         data_holder.data = df3
