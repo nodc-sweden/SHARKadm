@@ -2,6 +2,7 @@ import pandas as pd
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
+import polars as pl
 
 
 # TODO: This is still written for pandas
@@ -60,3 +61,123 @@ class LongToWide(PolarsTransformer):
         data_holder.data = pd.DataFrame(
             data=data_list, columns=meta_columns + par_columns
         )
+
+
+class PolarsLongToWide(PolarsTransformer):
+    valid_data_formats = "row"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Transposes data from row data to column data"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        df = data_holder.data
+        self._metadata_columns = []
+
+        df2 = data_holder.data.select(['row_number', 'parameter', 'value', 'quality_flag', 'unit']).pivot(
+            index="row_number",
+            columns="parameter",
+            values=["value", "quality_flag", "unit"]
+        )
+
+        rename_dict = {
+            col: col.replace("value_", "COPY_VARIABLE.")
+            for col in df2.columns
+            if "value" in col
+        }
+        df2 = df2.rename(rename_dict)
+
+        rename_dict = {
+            col: col.replace("quality_flag_", "QFLAG.")
+            for col in df2.columns
+            if "quality_flag" in col
+        }
+        df2 = df2.rename(rename_dict)
+
+        unit_mapping = {
+            "Secchi depth": "m",
+            "Pressure CTD": "dbar",
+            "Pressure": "dbar",
+            "Temperature bottle": "C",
+            "Temperature CTD": "C",
+            "Salinity bottle": "o/oo psu",
+            "Salinity CTD": "o/oo psu",
+            "Conductivity_25 bottle": "mS/m",
+            "Conductivity CTD": "mS/m",
+            "Dissolved oxygen O2 bottle": "ml/l",
+            "Dissolved oxygen O2 CTD": "ml/l",
+            "Hydrogen sulphide H2S": "umol/l",
+            "pH": "",
+            "pH Laboratory": "",
+            "Temperature pH Laboratory": "C",
+            "Alkalinity": "mmol/kg",
+            "Alkalinity_2": "mmol/l",
+            "Phosphate PO4-P": "umol/l",
+            "Total phosphorus Tot-P": "umol/l",
+            "Nitrite NO2-N": "umol/l",
+            "Nitrate NO3-N": "umol/l",
+            "Nitrite+Nitrate NO2+NO3-N": "umol/l",
+            "Ammonium NH4-N": "umol/l",
+            "Total Nitrogen Tot-N": "umol/l",
+            "Silicate SiO3-Si": "umol/l",
+            "Humus": "ug/l",
+            "Chlorophyll-a bottle": "ug/l",
+            "Dissolved organic carbon DOC": "umol/l",
+            "Particulate organic carbon POC": "umol/l",
+            "Total organic carbon TOC": "mg/l",
+            "Particulate organic nitrogen PON": "umol/l",
+            "Current direction": "deca degrees",
+            "Current velocity": "cm/s",
+            "Lignin": "mg/l",
+            "Yellow substance": "1/l",
+            "Aluminium": "ug/l",
+            "Urea": "umol/l",
+            "Coloured dissolved organic matter CDOM": "1/m",
+            "Turbidity TURB": "FNU",
+        }
+
+        rename_dict = {}
+
+        for col in df2.columns:
+            if col.startswith("COPY_VARIABLE."):
+                parameter = col.replace("COPY_VARIABLE.", "")
+                unit = unit_mapping.get(parameter, "")
+                new_col_name = f"{col}.{unit}"
+                rename_dict[col] = new_col_name
+
+        df2 = df2.rename(rename_dict)
+
+        df2 = df2.select([col for col in df2.columns if "unit" not in col.lower()])
+
+        # print(f"Print här df2:{df2}")
+        # df2.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\result.txt", separator="\t")
+        # print(f"Print här df:{df}")
+        # df.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\innan_result.txt", separator="\t")
+
+        not_meta_columns = [
+            'row_number',
+            'parameter',
+            'value',
+            'quality_flag',
+            'unit',
+            'reported_parameter',
+            'reported_value',
+            'reported_quality_flag',
+            'reported_unit'
+        ]
+
+        _metadata_columns = [
+            col for col in df.columns if col not in not_meta_columns
+        ]
+
+        # print(f"metadata här:{_metadata_columns}")
+
+        df_filtered = df.select(["row_number"] + [col for col in _metadata_columns if col in df.columns])
+        df3 = df_filtered.join(df2, on="row_number", how="left")
+        df3 = df3.group_by("row_number").first()
+        df3 = df3.with_columns(pl.col("row_number").cast(pl.Int64))
+        df3 = df3.sort("row_number")
+        df3 = df3.select([col for col in df3.columns if "_right" not in col.lower()])
+        # df3.write_csv(r"C:\Users\a002572\Desktop\Python\SHARKadm\efter_result.txt", separator="\t")
+
+        data_holder.data = df3

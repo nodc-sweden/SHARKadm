@@ -135,7 +135,7 @@ from sharkadm.transformers.location import (
     PolarsAddLocationOnLand,
     PolarsAddLocations,
 )
-from sharkadm.transformers.long_to_wide import LongToWide
+from sharkadm.transformers.long_to_wide import LongToWide, PolarsLongToWide
 from sharkadm.transformers.manual import (
     PolarsManualEpibenthos,
     PolarsManualHarbourPorpoise,
