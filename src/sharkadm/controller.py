@@ -191,26 +191,10 @@ class SHARKadmPolarsController:
         self,
         *validators: Validator,
     ) -> Self:
-        # if self.is_filtered:
-        #     raise sharkadm_exceptions.DataIsFilteredError(
-        #         "Not allowed to transform when data is filtered!"
-        #     )
         return self.run_operators(*validators)
 
     def export(self, *exporters: PolarsExporter) -> OperatorsInfo | Any:
         return self.run_operators(*exporters)
-
-    # def validate(self, *validators: Validator) -> Self:
-    #     for val in validators:
-    #         val.validate(self._data_holder)
-    #     return self
-    #
-    # def export(self, *exporters: PolarsExporter) -> Any:
-    #     for exp in exporters:
-    #         data = exp.export(self._data_holder)
-    #         if isinstance(data, pl.DataFrame):
-    #             return data
-    #     return self
 
     def run_operators(
         self,

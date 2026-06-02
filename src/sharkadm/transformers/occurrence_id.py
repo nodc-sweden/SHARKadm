@@ -19,9 +19,13 @@ except ModuleNotFoundError as e:
 
 
 class AddOccurrenceId(PolarsTransformer):
-    valid_data_types = ("zoobenthos", "plankton_imaging")
+    valid_data_types = (
+        "zoobenthos",
+        "plankton_imaging",
+        "harbourseal",
+    )
 
-    def __init__(self, *args, add_if_valid: bool = True, **kwargs):
+    def __init__(self, *args, add_if_valid: bool = False, **kwargs):
         super().__init__(*args, *kwargs)
         self._add_if_valid = add_if_valid
         self.col_to_set = ""  # Is set in self._transform
@@ -51,11 +55,24 @@ class AddOccurrenceId(PolarsTransformer):
         # 3: Om när match. Logga _temp_occurence_id som man sedan kan sätta nya ????
 
         occurrence_event.subscribe(
-            "missing_mandatory_columns", self._on_missing_mandatory_columns
+            occurrence_event.Events.MISSING_MANDATORY_COLUMNS,
+            self._on_missing_mandatory_columns,
         )
 
-        occurrence_event.subscribe("progress", self._on_progress)
-        occurrence_event.subscribe("result", self._on_result)
+        occurrence_event.subscribe(occurrence_event.Events.PROGRESS, self._on_progress)
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid_not_added
+        )
+        occurrence_event.subscribe(occurrence_event.Events.NR_NEW, self._on_other_result)
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_VALID_ADDED, self._on_other_result
+        )
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_PERFECT_MATCH, self._on_other_result
+        )
+        occurrence_event.subscribe(
+            occurrence_event.Events.DATABASE_IS_UPDATED, self._on_db_updated
+        )
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
             data_holder.data_type_internal
@@ -80,5 +97,16 @@ class AddOccurrenceId(PolarsTransformer):
     def _on_progress(self, data: dict) -> None:
         event.post_event("progress", data)
 
-    def _on_result(self, data: dict) -> None:
-        self._log(data.get("msg", ""), level=adm_logger.INFO)
+    def _on_valid_not_added(self, data: dict) -> None:
+        level = adm_logger.WARNING
+        self._log(data.get("msg", ""), level=level)
+
+    def _on_other_result(self, data: dict) -> None:
+        level = adm_logger.INFO
+        self._log(data.get("msg", ""), level=level)
+
+    def _on_db_updated(self, data: dict) -> None:
+        self._log(
+            data.get("Occurrencedatabas(er) är uppdaterad(e)", ""),
+            level=adm_logger.WARNING,
+        )

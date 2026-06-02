@@ -3,9 +3,9 @@ import re
 import polars as pl
 
 from sharkadm.config import get_column_views_config
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import add_column, matching_strings
 
-from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
