@@ -1,6 +1,7 @@
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
+
 from .. import data_source
 from ..data_source.base import PolarsDataDataFrame
 from .archive_data_holder import PolarsArchiveDataHolder

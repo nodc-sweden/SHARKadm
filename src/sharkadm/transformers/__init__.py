@@ -161,6 +161,7 @@ from sharkadm.transformers.position import (
     PolarsAddSamplePositionDM,
     PolarsAddSamplePositionSweref99tm,
     PolarsSetPositionDDNumberOfDecimal,
+    PolarsAddReportedPositionString,
 )
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,

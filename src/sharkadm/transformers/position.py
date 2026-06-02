@@ -350,3 +350,27 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
                 separator=".",
             ),
         )
+
+
+class PolarsAddReportedPositionString(PolarsTransformer):
+    lat_source_col = "reported_latitude"
+    lon_source_col = "reported_longitude"
+    col_to_set = "reported_position_str"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Creates a concatenated position column "
+            f"named {PolarsAddReportedPositionString.col_to_set}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col(self.lat_source_col),
+                    pl.col(self.lon_source_col),
+                ],
+                separator="_",
+            ).alias(self.col_to_set),
+        )

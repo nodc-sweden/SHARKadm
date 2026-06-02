@@ -1,8 +1,8 @@
 import polars as pl
 
-from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.data import PolarsDataHolder
 from sharkadm.data_filter.base import PolarsDataFilter
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class PolarsDataFilterInside12nm(PolarsDataFilter):
