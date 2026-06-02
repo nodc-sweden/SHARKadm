@@ -31,8 +31,13 @@ class CustomIdLevelHandler:
     def id_columns(self) -> list[str]:
         return self._id_columns
 
+    @property
+    def name(self) -> str:
+        return self._config["levels"][self.level].get("name", f"custom_{self.level}_id")
+
     def _load_id_columns(self) -> None:
-        self._id_columns = self._config["levels"][self.level]
+        print(f'{self._config["levels"][self.level]=}')
+        self._id_columns = self._config["levels"][self.level]["columns"]
 
     def get_id(self, data: dict) -> str:
         """Returns the id based on the given data"""
@@ -96,7 +101,6 @@ class CustomIdsHandler:
         # data_type_mapper: DataTypeMapper = None) -> SharkadmIdLevelHandler | None:
         # data_type = data_type_mapper.get(data_type)
         data_type = data_type.lower()
-        print(f"{self._id_objects=}")
         if level not in self._id_objects[data_type]:
             return
         return self._id_objects[data_type][level]

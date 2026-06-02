@@ -1,4 +1,5 @@
 import pathlib
+from typing import Any
 
 import yaml
 
@@ -68,6 +69,7 @@ class SHARKadmWorkflow:
         self._export_paths: dict[str, dict[str, pathlib.Path]] = {}
 
         self._file_path: pathlib.Path = kwargs.get("file_path")
+        self._kwargs = kwargs
 
         self._workflow_config = dict(
             export_directory=utils.get_export_directory(),
@@ -85,6 +87,9 @@ class SHARKadmWorkflow:
 
     def __repr__(self) -> str:
         return f"{__class__.__name__}: {self.path}"
+
+    def get(self, item: str, default: Any = None) -> Any:
+        return self._kwargs.get(item, default)
 
     @property
     def path(self) -> pathlib.Path | None:
@@ -168,6 +173,10 @@ class SHARKadmWorkflow:
                 )
             self._exporter_objects.append(exporter)
             self._all_exporter_objects.append(exporter)
+
+    def export(self, **exp):
+        exporter = exporters.get_exporter_object(**exp)
+        self._controller.run_operator(exporter)
 
     def start_workflow(self) -> None | operator.OperatorInfo:
         """Sets upp the workflow in the controller and starts it"""

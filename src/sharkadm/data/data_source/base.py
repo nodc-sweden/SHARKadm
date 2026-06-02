@@ -105,6 +105,12 @@ class PolarsDataSource:
         return self._data
 
     @property
+    def metadata(self) -> pl.DataFrame:
+        if not self._metadata:
+            self._load_metadata()
+        return self._metadata
+
+    @property
     def mapped_columns(self) -> dict[str, str]:
         return self._mapped_columns
 

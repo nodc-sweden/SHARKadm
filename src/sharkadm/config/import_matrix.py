@@ -123,6 +123,7 @@ class ImportMatrixConfig:
                         # self._data[inst][par.split('.', 1)[-1]] = (
                         #     split_line[0].split('.', 1)[-1]
                         # )
+                        par = par.strip()
                         value = split_line[0].split(".", 1)[-1]
                         self._data[inst][par] = value
                         self._data["all"][par] = value

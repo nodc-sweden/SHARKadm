@@ -90,6 +90,7 @@ class PolarsSHARKdataTxtAsGiven(PolarsFileExporter):
         self._export_file_name = export_file_name
         exclude_columns = exclude_columns or []
         self.exclude_columns = tuple(list(self.exclude_columns) + exclude_columns)
+        self._separator = kwargs.get("separator", "\t")
 
     @property
     def export_file_path(self):
@@ -108,4 +109,14 @@ class PolarsSHARKdataTxtAsGiven(PolarsFileExporter):
             col for col in data_holder.data.columns if col not in self.exclude_columns
         ]
         df = data_holder.data[columns]
-        df.write_csv(self.export_file_path, encoding=self._encoding, separator="\t")
+        if self._encoding == "utf8":
+            df.write_csv(self.export_file_path, separator=self._separator)
+        else:
+            pdf = df.to_pandas()
+            pdf.to_csv(
+                self.export_file_path,
+                sep=self._separator,
+                index=False,
+                encoding=self._encoding,
+            )
+        # df.write_csv(self.export_file_path, encoding=self._encoding, separator="\t")

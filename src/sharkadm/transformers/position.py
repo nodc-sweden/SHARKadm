@@ -1,7 +1,7 @@
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import geography
+from sharkadm.utils import geography, mellifica
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
@@ -203,6 +203,8 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
             return lat, lon
         elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
             return geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon)
+        elif self._is_rt90(value=lat) and self._is_rt90(value=lon):
+            return mellifica.rt90_to_wgs84(float(lon), float(lat))
         else:
             self._log(
                 f"Unknown format of reported_latitude and/or "
@@ -215,6 +217,11 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
 
     def _is_sweref99tm(self, value: str, nr_digits: int) -> bool:
         if len(value.split(".")[0]) == nr_digits:
+            return True
+        return False
+
+    def _is_rt90(self, value: str) -> bool:
+        if len(value) == 7:
             return True
         return False
 
@@ -305,4 +312,65 @@ class PolarsAddSamplePositionDDAsFloat(PolarsTransformer):
             .cast(float)
             .round(self._nr_decimals)
             .alias(self.lon_col_to_set),
+        )
+
+
+class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
+    lat_col = "sample_latitude_dd"
+    lon_col = "sample_longitude_dd"
+
+    def __init__(self, nr_decimals: int = 2, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._nr_decimals = nr_decimals
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Creates position_dd columns with float values"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col(self.lat_col).str.split(".").list[0],
+                    pl.col(self.lat_col)
+                    .str.split(".")
+                    .list[1]
+                    .str.slice(0, self._nr_decimals),
+                ],
+                separator=".",
+            ),
+            pl.concat_str(
+                [
+                    pl.col(self.lon_col).str.split(".").list[0],
+                    pl.col(self.lon_col)
+                    .str.split(".")
+                    .list[1]
+                    .str.slice(0, self._nr_decimals),
+                ],
+                separator=".",
+            ),
+        )
+
+
+class PolarsAddReportedPositionString(PolarsTransformer):
+    lat_source_col = "reported_latitude"
+    lon_source_col = "reported_longitude"
+    col_to_set = "reported_position_str"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Creates a concatenated position column "
+            f"named {PolarsAddReportedPositionString.col_to_set}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col(self.lat_source_col),
+                    pl.col(self.lon_source_col),
+                ],
+                separator="_",
+            ).alias(self.col_to_set),
         )

@@ -96,3 +96,14 @@ def sweref99tm_to_decdeg(x: float | str, y: float | str) -> (float, float):
     # Konvertera från SWEREF 99TM till decimalgrader
     lon, lat = transformer.transform(x, y)
     return lat, lon
+
+
+def rt90_to_decdeg(x: float | str, y: float | str) -> (float, float):
+    x = float(x)
+    y = float(y)
+    wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
+    rt90_25_gon_V = pyproj.CRS("EPSG:3021")  # https://epsg.io/3021
+    transformer = pyproj.Transformer.from_crs(rt90_25_gon_V, wgs84, always_xy=True)
+    # Konvertera från SWEREF 99TM till decimalgrader
+    lat, lon = transformer.transform(x, y)
+    return lat, lon

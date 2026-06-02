@@ -6,8 +6,9 @@ from typing import Protocol
 
 import pandas as pd
 
-from sharkadm import adm_logger, config, sharkadm_exceptions
+from sharkadm import config, sharkadm_exceptions
 from sharkadm.config.data_type import data_type_handler
+from sharkadm.sharkadm_logger import adm_logger
 
 try:
     import nodc_codes

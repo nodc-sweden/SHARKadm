@@ -1,7 +1,7 @@
 import pathlib
 
-from sharkadm import adm_logger
 from sharkadm.data.archive.shark_metadata import SharkMetadata
+from sharkadm.sharkadm_logger import adm_logger
 
 
 class ProfileMetadata:
