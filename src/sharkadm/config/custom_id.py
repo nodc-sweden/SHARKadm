@@ -36,7 +36,6 @@ class CustomIdLevelHandler:
         return self._config["levels"][self.level].get("name", f"custom_{self.level}_id")
 
     def _load_id_columns(self) -> None:
-        print(f'{self._config["levels"][self.level]=}')
         self._id_columns = self._config["levels"][self.level]["columns"]
 
     def get_id(self, data: dict) -> str:
