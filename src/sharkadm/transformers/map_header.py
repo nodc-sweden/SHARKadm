@@ -44,10 +44,6 @@ class ExternalMapper(PolarsTransformer):
         import_matrix = config.get_import_matrix_config(
             data_type=data_holder.data_type_internal
         )
-        if not import_matrix:
-            import_matrix = config.get_import_matrix_config(
-                data_type=data_holder.delivery_note.data_format
-            )
         mapper = import_matrix.get_mapper(self._export_column)
         mapped_header = []
         for item in data_holder.data.columns:

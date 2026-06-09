@@ -166,6 +166,7 @@ from sharkadm.transformers.position import (
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,
     PolarsLoadSensorInfoToProfileData,
+    AddMetadataToStandardFormat,
 )
 from sharkadm.transformers.project_code import (
     PolarsAddEnglishProjectName,

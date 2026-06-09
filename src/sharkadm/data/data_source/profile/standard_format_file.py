@@ -12,13 +12,10 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
             "nr_rows",
             kwargs.get("n_rows", kwargs.get("read_nr_rows", kwargs.get("read_n_rows"))),
         )
-        self._get_metadata = kwargs.get("get_metadata", False)
-        self._metadata: dict[str, str] = {}
+        self._metadata = {}
         super().__init__(*args, **kwargs)
 
     def _load_file(self) -> None:
-        if self._get_metadata:
-            self._load_metadata()
         self._data = pl.read_csv(
             self._path,
             comment_prefix="//",
@@ -50,7 +47,7 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
             ).alias("STIME"),
         )
 
-    def _load_metadata(self):
+    def _load_metadata(self) -> None:
         with open(self._path, encoding=self._encoding) as f:
             for line in f:
                 if line.startswith("//SENSORINFO"):

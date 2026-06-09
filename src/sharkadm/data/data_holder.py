@@ -21,8 +21,6 @@ class PolarsDataHolder(ABC):
     def __init__(self, *args, **kwargs):
         self._data_sources: dict[str, PolarsDataSource] = dict()
         self._number_metadata_rows = 0
-        self._get_metadata = kwargs.get("get_metadata", False)
-        self._metadata: dict[str, dict[str, str]] = {}
         self._header_mapper = None
         self._qf_column_prefix = None
         self._data_structure = kwargs.get("data_structure", self._data_structure)
@@ -130,12 +128,6 @@ class PolarsDataHolder(ABC):
     @property
     def number_metadata_rows(self) -> int:
         return self._number_metadata_rows
-
-    @property
-    def metadata(self) -> dict[str, dict[str, str]] | None:
-        if not self._get_metadata:
-            return None
-        return self._metadata
 
     @property
     def mapped_columns(self) -> dict[str, str]:

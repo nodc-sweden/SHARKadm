@@ -47,7 +47,6 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
         self._data: pl.DataFrame = pl.DataFrame()
         self._dataset_name = f"ProfileStandardFormat_{root_path.name}"
 
-        self._metadata: dict[str, dict[str, str]] = {}
         self._sampling_info: sampling_info.SamplingInfo | None = None
         self._analyse_info: analyse_info.AnalyseInfo | None = None
 
@@ -91,8 +90,6 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
             if self._header_mapper:
                 data_source.map_header(self._header_mapper)
             dfs.append(data_source.data)
-            if self._get_metadata and data_source._metadata:
-                self._metadata[data_source.path.name] = data_source._metadata
             self._data_sources[str(data_source)] = data_source
         columns = sorted(set().union(*(df.columns for df in dfs)))
         dfs = [

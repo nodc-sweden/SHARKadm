@@ -13,7 +13,7 @@ def get_polars_profile_standard_format_data_holder(
 ) -> PolarsProfileStandardFormatDataHolder:
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(
-        data_type="profile", import_column="STANDARD_FORMAT"
+        data_type="profile", import_column="STANDARD_FORMAT", encoding="utf-8"
     )
     return PolarsProfileStandardFormatDataHolder(
         path=path, header_mapper=mapper, **kwargs
