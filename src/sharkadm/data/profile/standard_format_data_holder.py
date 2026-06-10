@@ -25,7 +25,7 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
         header_mapper: HeaderMapper = None,
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         root_path = pathlib.Path(path)
         self._kwargs = kwargs
 
@@ -44,7 +44,6 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
                     self._paths.append(p)
 
         self._header_mapper = header_mapper
-
         self._data: pl.DataFrame = pl.DataFrame()
         self._dataset_name = f"ProfileStandardFormat_{root_path.name}"
 
@@ -83,7 +82,6 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
 
     def _load_data(self) -> None:
         dfs = []
-        columns = None
         for path in self._paths:
             print(f"{path=}")
             data_source = StandardFormatPolarsDataFile(
@@ -91,14 +89,16 @@ class PolarsProfileStandardFormatDataHolder(PolarsDataHolder):
             )
             if self._header_mapper:
                 data_source.map_header(self._header_mapper)
-            if not columns:
-                columns = set(data_source.data.columns)
-            columns.intersection_update(data_source.data.columns)
             dfs.append(data_source.data)
             self._data_sources[str(data_source)] = data_source
-        dfs = [df.select(sorted(columns)) for df in dfs]
+        columns = sorted(set().union(*(df.columns for df in dfs)))
+        dfs = [
+            df.select(
+                [pl.col(c) if c in df.columns else pl.lit(None).alias(c) for c in columns]
+            ).fill_null("")
+            for df in dfs
+        ]
         self._data = pl.concat(dfs, how="vertical_relaxed")
-        self._data.fill_nan("")
 
     # def _load_sampling_info(self) -> None:
     #     #TODO: To be added

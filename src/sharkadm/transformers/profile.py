@@ -2,8 +2,13 @@ import pathlib
 
 import polars as pl
 
+from sharkadm import config
 from sharkadm.data.archive import metadata
-from sharkadm.data.profile import PolarsCnvDataHolder, sensorinfo
+from sharkadm.data.profile import (
+    PolarsCnvDataHolder,
+    PolarsProfileStandardFormatDataHolder,
+    sensorinfo,
+)
 from sharkadm.transformers.base import PolarsTransformer
 
 
@@ -94,3 +99,42 @@ class PolarsLoadSensorInfoToProfileData(PolarsTransformer):
             if path.suffix == ".sensorinfo":
                 paths.append(path)
         return paths
+
+
+class AddMetadataToStandardFormat(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds metadata columns"
+
+    def _transform(self, data_holder: PolarsProfileStandardFormatDataHolder) -> None:
+        rows = []
+
+        for data_source in data_holder.data_sources.values():
+            data_source._load_metadata()
+
+            rows.append(
+                {
+                    **data_source._metadata,
+                    "source": data_source._source,
+                }
+            )
+
+        df = pl.DataFrame(rows)
+
+        import_matrix = config.get_import_matrix_config(data_type="profile")
+        mapper = import_matrix.get_mapper("PROFILE")
+        df = df.rename(
+            {col: mapper.get_internal_name(col) for col in df.columns if col != "source"}
+        )
+
+        metadata_columns_to_add = [
+            col
+            for col in df.columns
+            if col == "source" or col not in data_holder.data.columns
+        ]
+
+        data_holder.data = data_holder.data.join(
+            df.select(metadata_columns_to_add),
+            on="source",
+            how="left",
+        )

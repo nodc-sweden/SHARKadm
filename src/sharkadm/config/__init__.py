@@ -81,14 +81,11 @@ def get_trophic_type_smhi_object(
     return TrophicTypeSMHI(path)
 
 
-def get_import_matrix_config(data_type: str) -> ImportMatrixConfig | None:
+def get_import_matrix_config(data_type: str, **kwargs) -> ImportMatrixConfig | None:
     path = import_matrix_paths.get(data_type)
     if not path:
         return
-    return ImportMatrixConfig(
-        path,
-        data_type=data_type,
-    )
+    return ImportMatrixConfig(path, data_type=data_type, **kwargs)
     # for name, path in import_matrix_paths.items():
     #     if data_type == name:
     #         return ImportMatrixConfig(
@@ -103,7 +100,7 @@ def get_import_matrix_mapper(
     directory: str | pathlib.Path | None = None,
     **kwargs,
 ) -> ImportMatrixMapper | None:
-    config = get_import_matrix_config(data_type)
+    config = get_import_matrix_config(data_type, **kwargs)
     if not config:
         return
     return config.get_mapper(import_column)

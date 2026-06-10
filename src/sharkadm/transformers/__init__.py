@@ -142,7 +142,7 @@ from sharkadm.transformers.manual import (
     PolarsManualHarbourPorpoise,
     PolarsManualSealPathology,
 )
-from sharkadm.transformers.map_header import ArchiveMapper
+from sharkadm.transformers.map_header import ArchiveMapper, ExternalMapper
 from sharkadm.transformers.map_parameter_column import (
     PolarsMapperParameterColumn,
 )
@@ -166,6 +166,7 @@ from sharkadm.transformers.position import (
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,
     PolarsLoadSensorInfoToProfileData,
+    AddMetadataToStandardFormat,
 )
 from sharkadm.transformers.project_code import (
     PolarsAddEnglishProjectName,
@@ -219,6 +220,7 @@ from sharkadm.transformers.trophic_type import PolarsSetTrophicTypeSMHI
 from sharkadm.transformers.visit import (
     PolarsAddPhysicalChemicalKey,
     PolarsAddVisitKey,
+    AddVisitKeyProfile,
 )
 from sharkadm.transformers.wide_to_long import PolarsWideToLong
 from sharkadm.transformers.worms import (

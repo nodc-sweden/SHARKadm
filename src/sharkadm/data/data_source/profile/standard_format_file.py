@@ -12,7 +12,7 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
             "nr_rows",
             kwargs.get("n_rows", kwargs.get("read_nr_rows", kwargs.get("read_n_rows"))),
         )
-
+        self._metadata = {}
         super().__init__(*args, **kwargs)
 
     def _load_file(self) -> None:
@@ -46,6 +46,15 @@ class StandardFormatPolarsDataFile(PolarsDataFile):
                 separator=":",
             ).alias("STIME"),
         )
+
+    def _load_metadata(self) -> None:
+        with open(self._path, encoding=self._encoding) as f:
+            for line in f:
+                if line.startswith("//SENSORINFO"):
+                    break
+                if line.startswith("//METADATA;"):
+                    line = line.removeprefix("//METADATA;").strip().split(";", maxsplit=1)
+                    self._metadata[line[0]] = line[1] if len(line) > 1 else ""
 
 
 class OdvProfilePolarsDataFile(PolarsDataFile):
