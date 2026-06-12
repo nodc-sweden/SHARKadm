@@ -5,6 +5,7 @@ from typing import Protocol
 from sharkadm import config_paths
 from sharkadm.config import utils
 from sharkadm.config.column_views import ColumnViews
+from sharkadm.config.config import Config
 from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
 from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
@@ -195,6 +196,15 @@ def get_import_matrix_config_paths(
         key = path.stem.split("_", 2)[-1]
         paths[key] = path
     return paths
+
+
+def get_sharkadm_config(path: pathlib.Path | str | None = None) -> Config:
+    if not path:
+        path = CONFIG_DIRECTORY
+    return Config(path)
+
+
+sharkadm_config = get_sharkadm_config()
 
 
 DEFAULT_COLUMN_VIEWS_PATH = (

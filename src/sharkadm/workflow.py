@@ -21,6 +21,7 @@ from sharkadm.operator import Operator
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
 from sharkadm.transformers import PolarsTransformer
 from sharkadm.validators import Validator
+from sharkadm.config.data_type import DataType, data_type_handler
 
 # VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
 # TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
@@ -94,6 +95,12 @@ class SHARKadmWorkflow:
     @property
     def path(self) -> pathlib.Path | None:
         return self._file_path
+
+    @property
+    def data_type(self) -> DataType:
+        return data_type_handler.get_data_type_obj(self._workflow_config.get("name",
+                                                           self._workflow_config.get("data_type",
+                                                                                     "unknown")))
 
     def _get_directory(self, path: str | pathlib.Path) -> pathlib.Path:
         path = pathlib.Path(path)
@@ -324,7 +331,7 @@ def get_workflow(workflow_name: str) -> SHARKadmWorkflow:
 
 def get_dv_workflow_for_data_type(
     data_type: str, default_if_missing: bool = True
-) -> SHARKadmWorkflow | None:
+) -> SHARKadmWorkflow:
     name = f"workflow_dv_{data_type.lower()}"
     workflows = get_workflows()
     if workflows.get(name):
