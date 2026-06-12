@@ -15,6 +15,8 @@ from sharkadm.exporters.html_station_map import (
 
 # from sharkadm.exporters.ifcb_visualization import IfcbVisualizationFiles
 from sharkadm.exporters.jellyfish import ExportJellyfishRowsFromLimsExport
+from sharkadm.exporters.zoopl import ExportZooplRowsFromLimsExport
+from sharkadm.exporters.hose import ExportHoseRowsFromLimsExport
 from sharkadm.exporters.plot import SimplePlot
 from sharkadm.exporters.print_on_screen import PrintDataFrame
 from sharkadm.exporters.profile import ExportStandardFormat

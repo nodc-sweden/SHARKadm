@@ -3,7 +3,7 @@ from ..data import PolarsDataHolder
 from .base import PolarsFileExporter
 
 
-class ExportJellyfishRowsFromLimsExport(PolarsFileExporter):
+class ExportZooplRowsFromLimsExport(PolarsFileExporter):
     valid_data_holders = ("PolarsLimsDataHolder",)
 
     def __init__(self, header_as: str | None = None, **kwargs):
@@ -13,11 +13,11 @@ class ExportJellyfishRowsFromLimsExport(PolarsFileExporter):
 
     @staticmethod
     def get_exporter_description() -> str:
-        return "Creates a LIMS jellyfish txt file"
+        return "Creates a LIMS zooplankton txt file"
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
         if not self._export_file_name:
-            self._export_file_name = f"data_jellyfish_{data_holder.dataset_name}.txt"
+            self._export_file_name = f"data_zoopl_{data_holder.dataset_name}.txt"
 
         df = data_holder.data.with_columns()
         if self._header_as:

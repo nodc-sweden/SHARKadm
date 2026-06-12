@@ -114,3 +114,51 @@ class PolarsKeepOnlyJellyfishLines(PolarsTransformer):
         ]
 
         data_holder.data = data_holder.data.filter(conds)
+
+
+class PolarsKeepOnlyZooplLines(PolarsTransformer):
+    valid_data_holders = ("PolarsLimsDataHolder",)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Keep all rows identified as zooplankton rows from LIMS export"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        samp_nr_col = "SMPNO"
+        if samp_nr_col not in data_holder.data.columns:
+            samp_nr_col = "sample_id"
+        conds = [
+            pl.col(samp_nr_col).str.contains("ZOO_")
+            & (
+                (pl.col("WIRAN") != "")
+                | (pl.col("MNDEP") != "")
+                | (pl.col("MXDEP") != "")
+                | (pl.col("FLOWMETER_READING_START") != "")
+                | (pl.col("FLOWMETER_READING") != "")
+                | (pl.col("NUM_VIALS") != "")
+                | (pl.col("FLOWMETER_READING_STOP") != "")
+            )
+        ]
+
+        data_holder.data = data_holder.data.filter(conds)
+
+class PolarsKeepOnlyHoseLines(PolarsTransformer):
+    valid_data_holders = ("PolarsLimsDataHolder",)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Keep all rows identified as hose rows from LIMS export"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        samp_nr_col = "SMPNO"
+        if samp_nr_col not in data_holder.data.columns:
+            samp_nr_col = "sample_id"
+        conds = [pl.col(samp_nr_col).str.contains("SLA_")]
+
+        data_holder.data = data_holder.data.filter(conds)

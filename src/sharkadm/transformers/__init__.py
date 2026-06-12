@@ -119,6 +119,8 @@ from sharkadm.transformers.lims import (
     PolarsMoveLargerThanFlagRowFormat,
     PolarsRemoveNonDataLines,
     PolarsKeepOnlyJellyfishLines,
+    PolarsKeepOnlyZooplLines,
+    PolarsKeepOnlyHoseLines,
 )
 from sharkadm.transformers.location import (
     PolarsAddLocationHelcomOsparArea,
