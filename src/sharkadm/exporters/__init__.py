@@ -37,7 +37,10 @@ from sharkadm.exporters.txt_file import (
     PolarsTxtWithImportedColumns,
 )
 from sharkadm.exporters.zip_archive import PolarsZipArchive
-from sharkadm.exporters.dv_template_qc_result import ExportDvTemplateWithQcResult
+from sharkadm.exporters.dv_template_qc_result import (
+    ExportDvTemplateWithQcResult,
+    LimsExportDvTemplateWithQcResult,
+)
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
 
