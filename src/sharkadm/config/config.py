@@ -119,18 +119,19 @@ class ConfigSync:
             shutil.copy2(source_path, target_path)
             event.post_event(
                 event.Events.LOG_PROGRESS,
-                dict(total=tot_nr, current=n, title=f"Copying config file {rel}..."),
+                dict(total=tot_nr,
+                     current=n,
+                     title=f'Copying config file "{rel}" from {self._prod_dir} to {self._test_dir}'),
             )
 
     def _check_files(self):
         for name in self._prod_files.keys() & self._test_files.keys():
             f1 = self.get_prod_path(name)
             f2 = self.get_test_path(name)
-
+            if f1.is_dir():
+                continue
             if f1.stat().st_size != f2.stat().st_size:
                 self._changed_files.add(name)
-                continue
-            if f1.is_dir():
                 continue
             self._check_hash_files.append((f1, f2, name))
 
@@ -235,8 +236,14 @@ class Config:
         self.state: ConfigState = ProdState(self)
         self.config_sync = ConfigSync(config_root)
 
-    def __str__(self) -> str:
-        return str(self.state)
+    # def __repr__(self) -> str:
+    #     return f"SHARKadm config with state {self.state} with id {id(self)}"
+
+    def __repr__(self) -> str:
+        return f"{self.state} with id {id(self)}"
+
+    # def __str__(self) -> str:
+    #     return str(self.state)
 
     def __call__(self, name: str) -> Path | None:
         return self.get_path(name)
@@ -263,6 +270,9 @@ class Config:
         return not bool(self.unsynced_files)
 
     def sync_test_with_prod(self) -> None:
+        self.sync()
+
+    def sync(self) -> None:
         self.config_sync.sync()
 
     def get_path(self, name: str) -> Path | None:
