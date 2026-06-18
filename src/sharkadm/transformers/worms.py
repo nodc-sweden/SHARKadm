@@ -43,7 +43,12 @@ class PolarsAddWormsScientificName(PolarsTransformer):
             return
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
-            new_name = translate_worms.get(str(name))
+            try:
+                new_name = translate_worms.get(str(name))
+            except Exception as e:
+                self._log(
+                    f"Could not translate worms name {name}: {e}", level=adm_logger.ERROR)
+                continue
             if new_name:
                 self._log(
                     f"Translated using {translate_worms.source}. "

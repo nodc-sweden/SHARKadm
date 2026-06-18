@@ -23,20 +23,21 @@ class PolarsAddSampleTime(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit("").alias(self.col_to_set)
+        )
+        if self.source_col not in data_holder.data.columns:
+            return
         if self.col_to_set in data_holder.data:
-            data_holder.data = data_holder.data.with_columns(
-                pl.col(self.col_to_set).alias(f"reported_{self.col_to_set}")
+            has_no_sample_date = (
+                data_holder.data[self.col_to_set].str.strip_chars() == ""
             )
-            if self.source_col in data_holder.data:
-                has_no_sample_date = (
-                    data_holder.data[self.col_to_set].str.strip_chars() == ""
-                )
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(has_no_sample_date)
-                    .then(pl.col(self.source_col))
-                    .otherwise(pl.col(self.col_to_set))
-                    .alias(self.col_to_set)
-                )
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(has_no_sample_date)
+                .then(pl.col(self.source_col))
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set)
+            )
         else:
             data_holder.data = data_holder.data.with_columns(
                 pl.col(self.source_col).alias(self.col_to_set)
@@ -155,6 +156,44 @@ class PolarsAddReportedDates(PolarsTransformer):
                 f"Column {target_col} set from source column {source_col}",
                 level=adm_logger.DEBUG,
             )
+
+class PolarsAddReportedTimes(PolarsTransformer):
+    source_columns = ("visit_time", "sample_time")
+    reported_col_prefix = "reported"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        rep_cols = [
+            f"{PolarsAddReportedDates.reported_col_prefix}_{item}"
+            for item in PolarsAddReportedDates.source_columns
+        ]
+        return (
+            f"Copies columns {PolarsAddReportedDates.source_columns} "
+            f"to columns {rep_cols}"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        for source_col in self.source_columns:
+            if source_col not in data_holder.data.columns:
+                self._log(f"Missing column: {source_col}", level=adm_logger.WARNING)
+                continue
+            target_col = f"{self.reported_col_prefix}_{source_col}"
+            if target_col in data_holder.data.columns:
+                self._log(
+                    f"Column already present. Will do nothing: {target_col}",
+                    level=adm_logger.DEBUG,
+                )
+                continue
+
+            data_holder.data = data_holder.data.with_columns(
+                [pl.col(source_col).alias(target_col)]
+            )
+            self._log(
+                f"Column {target_col} set from source column {source_col}",
+                level=adm_logger.DEBUG,
+            )
+
+
 
 
 class PolarsCreateFakeFullDates(PolarsTransformer):

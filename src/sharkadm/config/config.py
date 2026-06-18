@@ -7,6 +7,12 @@ from typing import Protocol
 
 from sharkadm import event
 from sharkadm.utils import svn
+from enum import StrEnum, auto
+
+
+class ConfigStates(StrEnum):
+    PROD = auto()
+    TEST = auto()
 
 
 class ConfigSync:
@@ -196,8 +202,8 @@ class ConfigState(Protocol):
 
 @dataclass
 class ProdState:
-    # config: ConfigContext
     config: "Config"
+    state: str = ConfigStates.PROD
 
     def update(self) -> None:
         info = svn.get_svn_info(self.get_root_dir())
@@ -223,8 +229,8 @@ class ProdState:
 
 @dataclass
 class TestState:
-    # config: ConfigContext
     config: "Config"
+    state: str = ConfigStates.TEST
 
     def update(self) -> None:
         self.config.config_sync.sync()
@@ -250,6 +256,9 @@ class Config:
         self.state: ConfigState = ProdState(self)
         self.config_sync = ConfigSync(config_root)
 
+    def __str__(self) -> str:
+        return str(self.state)
+
     def set_state(self, state: ConfigState):
         self.state = state
 
@@ -258,6 +267,18 @@ class Config:
 
     def commit(self) -> None:
         self.state.commit()
+
+    @property
+    def unsynced_files(self) -> list[str]:
+        self.config_sync.new_or_updated_files_in_prod
+
+    @property
+    def test_is_synced_with_prod(self) -> bool:
+        self.config_sync.check()
+        return not bool(self.config_sync.new_or_updated_files_in_prod)
+
+    def sync_test_with_prod(self) -> None:
+        self.config_sync.sync()
 
     def get_path(self, name: str) -> Path | None:
         return self.state.get_path(name)
@@ -271,6 +292,10 @@ class Config:
         self.state.set_to_test()
         if update:
             self.update()
+
+    # @property
+    # def states(self) -> list[str]:
+    #     return ["PROD", "TEST"]
 
     @property
     def root_dir(self) -> Path:

@@ -185,6 +185,14 @@ class SHARKadmWorkflow:
         exporter = exporters.get_exporter_object(**exp)
         self._controller.run_operator(exporter)
 
+    def set_export_directory_for_exporters(self, directory: pathlib.Path | str) -> None:
+        if not pathlib.Path(directory).exists():
+            raise NotADirectoryError(f"Invalid export directory: {directory}")
+        for exp in self.exporters:
+            if not hasattr(exp, "export_directory"):
+                continue
+            exp.export_directory = directory
+
     def start_workflow(self) -> None | operator.OperatorInfo:
         """Sets upp the workflow in the controller and starts it"""
         for data_source in self._data_sources:
@@ -192,8 +200,10 @@ class SHARKadmWorkflow:
                 adm_logger.reset_log()
             self._controller = get_polars_controller_with_data(data_source)
             info = self._controller.run_operators(*self._operator_objects)
+            print(f"{info=}")
             if info.terminated:
                 return info[-1]
+            print("RUNNING EXPORTERS")
             self._controller.run_operators(*self._exporter_objects)
             self._do_adm_logger_stuff()
         self.save_config()

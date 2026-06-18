@@ -327,29 +327,90 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Creates position_dd columns with float values"
 
+    # def _transform(self, data_holder: PolarsDataHolder) -> None:
+    #     data_holder.data = data_holder.data.with_columns(
+    #         pl.concat_str(
+    #             [
+    #                 pl.col(self.lat_col).str.split(".").list[0],
+    #                 pl.col(self.lat_col)
+    #                 .str.split(".")
+    #                 .list[1]
+    #                 .str.slice(0, self._nr_decimals),
+    #             ],
+    #             separator=".",
+    #         ),
+    #         pl.concat_str(
+    #             [
+    #                 pl.col(self.lon_col).str.split(".").list[0],
+    #                 pl.col(self.lon_col)
+    #                 .str.split(".")
+    #                 .list[1]
+    #                 .str.slice(0, self._nr_decimals),
+    #             ],
+    #             separator=".",
+    #         ),
+    #     )
+
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        # data_holder.data = data_holder.data.with_columns(
+        #     pl.when(pl.col(self.lat_col) != "")
+        #     .then(
+        #         pl.concat_str(
+        #             [
+        #                 pl.col(self.lat_col).str.split(".").list.get(0),
+        #                 pl.col(self.lat_col)
+        #                 .str.split(".")
+        #                 .list.get(1)
+        #                 .str.slice(0, self._nr_decimals),
+        #             ],
+        #             separator=".",
+        #         )
+        #     )
+        #     .otherwise(pl.col(self.lat_col))
+        #     .alias(self.lat_col)
+        # )
+
         data_holder.data = data_holder.data.with_columns(
-            pl.concat_str(
-                [
-                    pl.col(self.lat_col).str.split(".").list[0],
-                    pl.col(self.lat_col)
-                    .str.split(".")
-                    .list[1]
-                    .str.slice(0, self._nr_decimals),
-                ],
-                separator=".",
-            ),
-            pl.concat_str(
-                [
-                    pl.col(self.lon_col).str.split(".").list[0],
-                    pl.col(self.lon_col)
-                    .str.split(".")
-                    .list[1]
-                    .str.slice(0, self._nr_decimals),
-                ],
-                separator=".",
-            ),
+            pl.when(pl.col(self.lat_col) != "")
+            .then(
+                pl.col(self.lat_col).str.replace(
+                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$",
+                    r"$1"
+                )
+            )
+            .otherwise(pl.col(self.lat_col))
+            .alias(self.lat_col)
         )
+
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(self.lon_col) != "")
+            .then(
+                pl.col(self.lon_col).str.replace(
+                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$",
+                    r"$1"
+                )
+            )
+            .otherwise(pl.col(self.lon_col))
+            .alias(self.lon_col)
+        )
+
+        # data_holder.data = data_holder.data.with_columns(
+        #     pl.when(pl.col(self.lon_col) != "")
+        #     .then(
+        #         pl.concat_str(
+        #             [
+        #                 pl.col(self.lon_col).str.split(".").list.get(0),
+        #                 pl.col(self.lon_col)
+        #                 .str.split(".")
+        #                 .list.get(1)
+        #                 .str.slice(0, self._nr_decimals),
+        #             ],
+        #             separator=".",
+        #         )
+        #     )
+        #     .otherwise(pl.col(self.lon_col))
+        #     .alias(self.lon_col),
+        # )
 
 
 class PolarsAddReportedPositionString(PolarsTransformer):
