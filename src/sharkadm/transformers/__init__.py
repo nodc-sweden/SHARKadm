@@ -83,6 +83,7 @@ from sharkadm.transformers.datatype import (
 from sharkadm.transformers.date_and_time import (
     PolarsAddDatetime,
     PolarsAddMonth,
+    PolarsAddReportedTimes,
     PolarsAddReportedDates,
     PolarsAddSampleDate,
     PolarsAddSampleTime,

@@ -130,6 +130,11 @@ class PolarsFileExporter(PolarsExporter, ABC):
     def export_directory(self):
         return self._export_directory
 
+    @export_directory.setter
+    def export_directory(self, export_directory: str | pathlib.Path) -> None:
+        self._export_directory = pathlib.Path(export_directory)
+        self._export_directory.mkdir(parents=True, exist_ok=True)
+
     @property
     def export_file_name(self):
         return self._export_file_name

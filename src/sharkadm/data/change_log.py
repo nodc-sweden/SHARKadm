@@ -17,12 +17,24 @@ class ChangeLog:
     def _load_file(self) -> None:
         if not self._path.exists():
             return
-        with open(self._path, encoding=self._encoding) as fid:
+        print(f"{self._path=}")
+        try:
+            self._load_file_with_encoding(encoding=self._encoding)
+            adm_logger.log_workflow(f"Change log loaded with encoding: {self._encoding}", level=adm_logger.DEBUG)
+        except UnicodeError:
+            self._load_file_with_encoding(encoding="cp1252")
+            adm_logger.log_workflow(f"Change log loaded with encoding cp1252 (not the default)", level=adm_logger.WARNING)
+
+
+
+    def _load_file_with_encoding(self, encoding: str) -> bool:
+        with open(self._path, encoding=encoding) as fid:
             for line in fid:
                 strip_line = line.strip()
                 if not strip_line:
                     continue
                 self._data.append(strip_line)
+
 
     def get_log_lines(self) -> list[str]:
         return [*self._data, "", *self._sharkadm_logger_info]

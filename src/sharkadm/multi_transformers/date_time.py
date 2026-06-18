@@ -4,6 +4,7 @@ from sharkadm.multi_transformers.base import PolarsMultiTransformer
 
 class DateTimePolars(PolarsMultiTransformer):
     _transformers = (
+        transformers.PolarsAddReportedTimes,
         transformers.PolarsAddReportedDates,
         transformers.PolarsFixDateFormat,
         transformers.PolarsFixTimeFormat,
