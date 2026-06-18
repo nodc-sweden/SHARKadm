@@ -13,7 +13,8 @@ from sharkadm import (
     utils,
     validators,
 )
-from sharkadm.config import adm_config_paths
+from sharkadm.config import sharkadm_config
+from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.controller import SHARKadmPolarsController, get_polars_controller_with_data
 from sharkadm.exporters import PolarsExporter
 from sharkadm.exporters.base import PolarsFileExporter
@@ -21,7 +22,6 @@ from sharkadm.operator import Operator
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
 from sharkadm.transformers import PolarsTransformer
 from sharkadm.validators import Validator
-from sharkadm.config.data_type import DataType, data_type_handler
 
 # VALIDATOR_DESCRIPTIONS = validators.get_validators_description()
 # TRANSFORMER_DESCRIPTIONS = transformers.get_transformers_description()
@@ -98,9 +98,11 @@ class SHARKadmWorkflow:
 
     @property
     def data_type(self) -> DataType:
-        return data_type_handler.get_data_type_obj(self._workflow_config.get("name",
-                                                           self._workflow_config.get("data_type",
-                                                                                     "unknown")))
+        return data_type_handler.get_data_type_obj(
+            self._workflow_config.get(
+                "name", self._workflow_config.get("data_type", "unknown")
+            )
+        )
 
     def _get_directory(self, path: str | pathlib.Path) -> pathlib.Path:
         path = pathlib.Path(path)
@@ -329,7 +331,7 @@ class SHARKadmWorkflow:
 
 
 def get_workflows() -> dict[str, pathlib.Path]:
-    return {path.stem: path for path in adm_config_paths["workflow"].iterdir()}
+    return {path.stem: path for path in sharkadm_config["workflow"].iterdir()}
 
 
 def get_workflow(workflow_name: str) -> SHARKadmWorkflow:

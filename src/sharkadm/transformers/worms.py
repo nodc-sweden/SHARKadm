@@ -47,7 +47,8 @@ class PolarsAddWormsScientificName(PolarsTransformer):
                 new_name = translate_worms.get(str(name))
             except Exception as e:
                 self._log(
-                    f"Could not translate worms name {name}: {e}", level=adm_logger.ERROR)
+                    f"Could not translate worms name {name}: {e}", level=adm_logger.ERROR
+                )
                 continue
             if new_name:
                 self._log(

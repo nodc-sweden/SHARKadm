@@ -1,4 +1,4 @@
-from sharkadm.config import get_import_matrix_config, import_matrix_paths
+from sharkadm.config import get_import_matrix_config, get_import_matrix_config_paths
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 
 DTYPE_MAPPER = {
@@ -159,7 +159,7 @@ def _get_data_type(data_type_synonym: str) -> DataType | None:
     dtype_str = _get_mapped_datatype(data_type_synonym)
     if dtype_str == "unknown":
         return CLASS_MAPPER.get(dtype_str)(dtype_str)
-    if not import_matrix_paths.get(dtype_str):
+    if not get_import_matrix_config_paths().get(dtype_str):
         return
     cls = CLASS_MAPPER.get(dtype_str, DataType)
     return cls(dtype_str)

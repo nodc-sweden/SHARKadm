@@ -1,13 +1,13 @@
 import hashlib
 import shutil
 from dataclasses import dataclass
+from enum import StrEnum, auto
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 from typing import Protocol
 
 from sharkadm import event
 from sharkadm.utils import svn
-from enum import StrEnum, auto
 
 
 class ConfigStates(StrEnum):
@@ -41,6 +41,7 @@ class ConfigSync:
 
         self._changed_files: set[str] = set()
         self._check_hash_files: list[tuple[Path, Path, str]] = []
+        self.check()
 
     def _check_and_fix_test_dir(self) -> None:
         if self._test_dir is None:
@@ -129,6 +130,8 @@ class ConfigSync:
             if f1.stat().st_size != f2.stat().st_size:
                 self._changed_files.add(name)
                 continue
+            if f1.is_dir():
+                continue
             self._check_hash_files.append((f1, f2, name))
 
     def _add_hash_diff(self):
@@ -141,8 +144,8 @@ class ConfigSync:
         root = Path(root)
         files = dict()
         for path in root.rglob("*"):
-            if path.is_dir():
-                continue
+            # if path.is_dir():
+            #     continue
             path_str = str(path)
             if ".svn" in path_str:
                 continue
@@ -174,30 +177,6 @@ class ConfigState(Protocol):
     def set_to_prod(self) -> None: ...
 
     def set_to_test(self) -> None: ...
-
-
-#
-#
-# class ConfigContext(Protocol):
-#     config_sync: ConfigSync
-#
-#     def set_state(self, state: ConfigState) -> None: ...
-#
-#     def update(self) -> None: ...
-#
-#     def commit(self) -> None: ...
-#
-#     def get_path(self, name: str) -> Path | None: ...
-#
-#     def set_to_prod(self) -> None: ...
-#
-#     def set_to_test(self) -> None: ...
-
-# def get_prod_path(self, name: str) -> Path | None:
-#     ...
-#
-# def get_test_path(self, name: str) -> Path | None:
-#     ...
 
 
 @dataclass
@@ -259,6 +238,12 @@ class Config:
     def __str__(self) -> str:
         return str(self.state)
 
+    def __call__(self, name: str) -> Path | None:
+        return self.get_path(name)
+
+    def __getitem__(self, item: str) -> Path | None:
+        return self(item)
+
     def set_state(self, state: ConfigState):
         self.state = state
 
@@ -275,7 +260,7 @@ class Config:
     @property
     def test_is_synced_with_prod(self) -> bool:
         self.config_sync.check()
-        return not bool(self.config_sync.new_or_updated_files_in_prod)
+        return not bool(self.unsynced_files)
 
     def sync_test_with_prod(self) -> None:
         self.config_sync.sync()
@@ -287,11 +272,13 @@ class Config:
         self.state.set_to_prod()
         if update:
             self.update()
+        self.config_sync.check()
 
     def set_to_test(self, update: bool = False) -> None:
         self.state.set_to_test()
         if update:
             self.update()
+        self.config_sync.check()
 
     # @property
     # def states(self) -> list[str]:

@@ -34,4 +34,4 @@ class ProfileMapper:
 
 
 def get_profile_mapper() -> ProfileMapper:
-    return ProfileMapper(config.adm_config_paths("profile_mapping"))
+    return ProfileMapper(config.sharkadm_config("profile_mapping"))

@@ -374,8 +374,7 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
             pl.when(pl.col(self.lat_col) != "")
             .then(
                 pl.col(self.lat_col).str.replace(
-                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$",
-                    r"$1"
+                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$", r"$1"
                 )
             )
             .otherwise(pl.col(self.lat_col))
@@ -386,8 +385,7 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
             pl.when(pl.col(self.lon_col) != "")
             .then(
                 pl.col(self.lon_col).str.replace(
-                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$",
-                    r"$1"
+                    rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$", r"$1"
                 )
             )
             .otherwise(pl.col(self.lon_col))
