@@ -29,9 +29,7 @@ class PolarsAddSampleTime(PolarsTransformer):
         if self.source_col not in data_holder.data.columns:
             return
         if self.col_to_set in data_holder.data:
-            has_no_sample_date = (
-                data_holder.data[self.col_to_set].str.strip_chars() == ""
-            )
+            has_no_sample_date = data_holder.data[self.col_to_set].str.strip_chars() == ""
             data_holder.data = data_holder.data.with_columns(
                 pl.when(has_no_sample_date)
                 .then(pl.col(self.source_col))
@@ -157,6 +155,7 @@ class PolarsAddReportedDates(PolarsTransformer):
                 level=adm_logger.DEBUG,
             )
 
+
 class PolarsAddReportedTimes(PolarsTransformer):
     source_columns = ("visit_time", "sample_time")
     reported_col_prefix = "reported"
@@ -192,8 +191,6 @@ class PolarsAddReportedTimes(PolarsTransformer):
                 f"Column {target_col} set from source column {source_col}",
                 level=adm_logger.DEBUG,
             )
-
-
 
 
 class PolarsCreateFakeFullDates(PolarsTransformer):
