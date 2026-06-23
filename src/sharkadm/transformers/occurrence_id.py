@@ -79,7 +79,7 @@ class AddOccurrenceId(PolarsTransformer):
         )
         self.col_to_set = self.database.id_column
         self.valid_matches = []
-        self.database.add_uuid_to_data_and_database(
+        data_holder.data = self.database.add_uuid_to_data_and_database(
             data_holder.data, add_if_valid=self._add_if_valid
         )
 

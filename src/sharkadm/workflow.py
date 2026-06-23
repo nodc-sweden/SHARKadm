@@ -150,6 +150,16 @@ class SHARKadmWorkflow:
             obj = self._get_operator_object(oper)
             self._save_operator_object(obj)
 
+    def update_operators(self, opers: list[dict[str, Any]]) -> None:
+        for oper in opers:
+            if not oper.get("name"):
+                continue
+            for oper_info in self._operators_info:
+                if oper.get("name") == oper_info["name"]:
+                    oper_info.update(oper)
+                    continue
+        self.initiate_workflow()
+
     def _get_operator_object(self, oper: dict) -> Operator:
         obj = self._get_transformer_object(oper)
         if not obj:

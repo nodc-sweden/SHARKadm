@@ -115,13 +115,19 @@ class ConfigSync:
             rel = self.prod_files[name]
             source_path = self._prod_dir / rel
             target_path = self._test_dir / rel
+            if source_path.is_dir():
+                continue
             target_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source_path, target_path)
+
             event.post_event(
                 event.Events.LOG_PROGRESS,
-                dict(total=tot_nr,
-                     current=n,
-                     title=f'Copying config file "{rel}" from {self._prod_dir} to {self._test_dir}'),
+                dict(
+                    total=tot_nr,
+                    current=n,
+                    title=f'Copying config file "{rel}" from {self._prod_dir} to '
+                    f"{self._test_dir}",
+                ),
             )
 
     def _check_files(self):
@@ -262,7 +268,7 @@ class Config:
 
     @property
     def unsynced_files(self) -> list[str]:
-        self.config_sync.new_or_updated_files_in_prod
+        return self.config_sync.new_or_updated_files_in_prod
 
     @property
     def test_is_synced_with_prod(self) -> bool:
