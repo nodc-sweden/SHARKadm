@@ -60,11 +60,12 @@ def commit_files(*paths: pathlib.Path, msg: str = "Auto commit by sharkadm") -> 
     return True
 
 
-def _split_svn_status_message(msg: bytes) -> dict[str, pathlib.Path]:
+def _split_svn_status_message(msg: bytes) -> dict[str, list[pathlib.Path]]:
     files = dict()
     for row in msg.decode().split("\r\n"):
+        print(f"{row=}")
         if row.startswith("?"):
-            _, path_str = row.split()
+            _, path_str = row.rsplit(" ", 1)
             files.setdefault("new", [])
             files["new"].append(pathlib.Path(path_str))
         elif row.startswith("M"):
@@ -88,6 +89,15 @@ def get_modified_svn_files(
         if path in match_paths:
             paths.append(path)
     return paths
+
+
+def get_modified_or_new_svn_files(
+    repo: pathlib.Path | str,
+) -> dict[str, list[pathlib.Path]]:
+    args = ["svn", "status", repo]
+    ans = subprocess.check_output(args)
+    result = _split_svn_status_message(ans)
+    return result
 
 
 # def get_nodc_config_svn_revision() -> str:
