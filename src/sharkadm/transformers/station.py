@@ -88,6 +88,7 @@ class PolarsAddStationInfo(PolarsTransformer):
         return "Adds station information to all places"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+
         self._create_columns_if_missing(data_holder)
 
         for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
