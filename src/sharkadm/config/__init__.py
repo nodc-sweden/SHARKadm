@@ -200,4 +200,8 @@ def get_sharkadm_config(path: pathlib.Path | str | None = None) -> Config:
     return Config(path)
 
 
-sharkadm_config = get_sharkadm_config()
+sharkadm_config = None
+try:
+    sharkadm_config = get_sharkadm_config()
+except TypeError:
+    pass
