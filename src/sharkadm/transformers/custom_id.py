@@ -11,7 +11,6 @@ from .base import PolarsTransformer
 
 
 class PolarsAddCustomId(PolarsTransformer):
-
     def __init__(self, add_md5: bool = False):
         super().__init__()
         self._id_handler = config.get_custom_id_handler()
