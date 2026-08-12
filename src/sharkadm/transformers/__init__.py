@@ -72,6 +72,7 @@ from sharkadm.transformers.custom_id import (
     PolarsAddCustomId,
     PolarsAddSharkSampleMd5,
 )
+from sharkadm.transformers.data_holder import AddDataHolderName
 from sharkadm.transformers.dataset_name import (
     PolarsAddDatasetFileName,
     PolarsAddDatasetName,

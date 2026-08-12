@@ -59,6 +59,10 @@ class PolarsDataHolder(ABC):
         return self
 
     @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    @property
     def workflow_message(self) -> str:
         return f"Using DataHolder: {self.__class__.__name__}"
 
