@@ -187,6 +187,9 @@ def get_import_matrix_config_paths(
     if not config_directory and sharkadm_config:
         config_directory = sharkadm_config.root_dir
 
+    if not config_directory:
+        return paths
+
     for path in config_directory.iterdir():
         if "import_matrix" not in path.name:
             continue
