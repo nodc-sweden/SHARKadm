@@ -184,7 +184,8 @@ def get_import_matrix_config_paths(
     config_directory: pathlib.Path | None = None,
 ) -> dict[str, pathlib.Path]:
     paths = {}
-    config_directory = config_directory or sharkadm_config.root_dir
+    if not config_directory and sharkadm_config:
+        config_directory = sharkadm_config.root_dir
 
     for path in config_directory.iterdir():
         if "import_matrix" not in path.name:
