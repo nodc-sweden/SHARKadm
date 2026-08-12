@@ -5,7 +5,7 @@ from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
 
 try:
-    from nodc_station import get_station_object
+    import nodc_station
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -79,7 +79,7 @@ class PolarsAddStationInfo(PolarsTransformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._stations = get_station_object()
+        # self._stations = get_station_object()
         self._station_synonyms = {}
         self._loaded_stations_info = {}
 
@@ -88,6 +88,7 @@ class PolarsAddStationInfo(PolarsTransformer):
         return "Adds station information to all places"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+
         self._create_columns_if_missing(data_holder)
 
         for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
@@ -112,7 +113,8 @@ class PolarsAddStationInfo(PolarsTransformer):
             lat = float(lat_str)
             lon = float(lon_str)
 
-            matching_stations = self._stations.get_matching_stations(
+            # matching_stations = self._stations.get_matching_stations(
+            matching_stations = nodc_station.get_matching_stations(
                 name=reported_station, lat_dd=lat, lon_dd=lon
             )
             if not matching_stations:

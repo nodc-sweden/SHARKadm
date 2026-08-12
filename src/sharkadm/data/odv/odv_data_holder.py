@@ -12,7 +12,6 @@ from sharkadm.data.data_source.profile.standard_format_file import (
 
 
 class PolarsOdvDataHolder(PolarsDataHolder):
-    _data_type_obj = data_type_handler.get_data_type_obj("physicalchemical")
     _data_format = "ODV"
     _data_structure = "profile"
 
@@ -25,6 +24,7 @@ class PolarsOdvDataHolder(PolarsDataHolder):
         super().__init__()
         root_path = pathlib.Path(path)
         self._kwargs = kwargs
+        self._data_type_obj = data_type_handler.get_data_type_obj("physicalchemical")
 
         if not root_path.exists():
             raise FileNotFoundError(path)

@@ -11,10 +11,9 @@ from .base import PolarsTransformer
 
 
 class PolarsAddCustomId(PolarsTransformer):
-    _id_handler = config.get_custom_id_handler()
-
     def __init__(self, add_md5: bool = False):
         super().__init__()
+        self._id_handler = config.get_custom_id_handler()
         self._add_md5 = add_md5
 
     @staticmethod
@@ -30,7 +29,6 @@ class PolarsAddCustomId(PolarsTransformer):
                 data_type=data_holder.data_type_internal,
                 level=level,
             )
-            # col_name = f"custom_{level}_id"
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
             if missing:
                 msg = (
@@ -69,7 +67,10 @@ class PolarsAddCustomId(PolarsTransformer):
 
 class PolarsAddSharkSampleMd5(PolarsTransformer):
     col_to_set = "shark_sample_md5"
-    _id_handler = config.get_custom_id_handler()
+
+    def __init__(self):
+        super().__init__()
+        self._id_handler = config.get_custom_id_handler()
 
     @staticmethod
     def get_transformer_description() -> str:

@@ -227,3 +227,12 @@ def _normalize_zip_content(zip_reference: zipfile.ZipFile) -> list[zipfile.ZipIn
         info.filename = normalized_relative_path
         members.append(info)
     return members
+
+
+def clear_cache() -> None:
+    try:
+        import nodc_station
+
+        nodc_station.clear_cache()
+    except ModuleNotFoundError:
+        pass

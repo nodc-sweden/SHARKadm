@@ -2,9 +2,9 @@ import os
 import pathlib
 from typing import Protocol
 
-from sharkadm import config_paths
 from sharkadm.config import utils
 from sharkadm.config.column_views import ColumnViews
+from sharkadm.config.config import Config
 from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
 from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
@@ -36,10 +36,10 @@ if not CONFIG_DIRECTORY:
                 break
 
 
-def has_admin_config() -> bool:
-    if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
-        return True
-    return False
+# def has_admin_config() -> bool:
+#     if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
+#         return True
+#     return False
 
 
 def get_config_path(name: str | None = None) -> pathlib.Path:
@@ -63,30 +63,30 @@ class DataHolderProtocol(Protocol):
 
 
 def get_column_views_config(path: str | pathlib.Path | None = None) -> ColumnViews:
-    path = path or DEFAULT_COLUMN_VIEWS_PATH
+    path = path or sharkadm_config.get_path("column_views")
     return ColumnViews(path)
 
 
 def get_translate_headers_config(
     path: str | pathlib.Path | None = None,
 ) -> TranslateHeaders:
-    path = path or DEFAULT_TRANSLATE_HEADERS_PATH
+    path = path or sharkadm_config.get_path("translate_headers")
     return TranslateHeaders(path)
 
 
 def get_trophic_type_smhi_object(
     path: str | pathlib.Path | None = None,
 ) -> TrophicTypeSMHI:
-    path = path or DEFAULT_TROPHIC_TYPE_PATH
+    path = path or sharkadm_config.get_path("trophictype_smhi")
     return TrophicTypeSMHI(path)
 
 
 def get_import_matrix_config(data_type: str, **kwargs) -> ImportMatrixConfig | None:
-    path = import_matrix_paths.get(data_type)
+    path = get_import_matrix_config_paths().get(data_type)
     if not path:
         return
     return ImportMatrixConfig(path, data_type=data_type, **kwargs)
-    # for name, path in import_matrix_paths.items():
+    # for name, path in get_import_matrix_config_paths().items():
     #     if data_type == name:
     #         return ImportMatrixConfig(
     #             path,
@@ -115,36 +115,39 @@ def get_header_mapper_from_data_holder(
 
 
 def get_custom_id_handler(config_directory: str | pathlib.Path | None = None):
-    config_directory = config_directory or adm_config_paths("ids")
+    config_directory = config_directory or sharkadm_config("ids")
     return CustomIdsHandler(config_directory) if config_directory else None
 
 
 def get_delivery_note_mapper(
     path: str | pathlib.Path | None = None,
 ) -> DeliveryNoteMapper:
-    path = path or adm_config_paths("delivery_note_mapping")
+    path = path or sharkadm_config("delivery_note_mapping")
     return DeliveryNoteMapper(path)
 
 
 def get_data_type_mapper(path: str | pathlib.Path | None = None) -> DataTypeMapper:
-    path = path or adm_config_paths("data_type_mapping")
+    path = path or sharkadm_config("data_type_mapping")
     return DataTypeMapper(path)
 
 
 def get_mapper_data_type_to_internal(
     path: str | pathlib.Path | None = None,
 ) -> DataTypeMapper:
-    if not any((path, adm_config_paths)):
+    if not any((path, sharkadm_config)):
         return None
 
-    path = path or adm_config_paths("mapper_data_type_to_internal")
+    path = path or sharkadm_config("mapper_data_type_to_internal")
     if not path:
         return None
     return DataTypeMapper(path)
 
 
 def get_all_data_types() -> list[str]:
-    return [path.stem.split("_", 2)[-1].lower() for path in import_matrix_paths.values()]
+    return [
+        path.stem.split("_", 2)[-1].lower()
+        for path in get_import_matrix_config_paths().values()
+    ]
 
 
 def get_all_data_structures() -> list[str]:
@@ -177,15 +180,13 @@ def get_valid_data_structures(
         return [item for item in get_all_data_structures() if item not in invalid_lower]
 
 
-def get_adm_config_paths(config_directory=None):
-    root = config_directory / "sharkadm" if config_directory else None
-    return config_paths.ConfigPaths(root)
-
-
 def get_import_matrix_config_paths(
     config_directory: pathlib.Path | None = None,
 ) -> dict[str, pathlib.Path]:
     paths = {}
+    if not config_directory and sharkadm_config:
+        config_directory = sharkadm_config.root_dir
+
     if not config_directory:
         return paths
 
@@ -197,15 +198,14 @@ def get_import_matrix_config_paths(
     return paths
 
 
-DEFAULT_COLUMN_VIEWS_PATH = (
-    CONFIG_DIRECTORY / "column_views.txt" if CONFIG_DIRECTORY else None
-)
-DEFAULT_TRANSLATE_HEADERS_PATH = (
-    CONFIG_DIRECTORY / "translate_headers.txt" if CONFIG_DIRECTORY else None
-)
-DEFAULT_TROPHIC_TYPE_PATH = (
-    CONFIG_DIRECTORY / "trophictype_smhi.txt" if CONFIG_DIRECTORY else None
-)
-adm_config_paths = get_adm_config_paths(CONFIG_DIRECTORY)
-import_matrix_paths = get_import_matrix_config_paths(CONFIG_DIRECTORY)
-mapper_data_type_to_internal = get_mapper_data_type_to_internal()
+def get_sharkadm_config(path: pathlib.Path | str | None = None) -> Config:
+    if not path:
+        path = CONFIG_DIRECTORY
+    return Config(path)
+
+
+sharkadm_config = None
+try:
+    sharkadm_config = get_sharkadm_config()
+except TypeError:
+    print("sharkadm config not found!!!")

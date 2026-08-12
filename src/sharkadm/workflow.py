@@ -13,7 +13,8 @@ from sharkadm import (
     utils,
     validators,
 )
-from sharkadm.config import adm_config_paths
+from sharkadm.config import sharkadm_config
+from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.controller import SHARKadmPolarsController, get_polars_controller_with_data
 from sharkadm.exporters import PolarsExporter
 from sharkadm.exporters.base import PolarsFileExporter
@@ -95,6 +96,14 @@ class SHARKadmWorkflow:
     def path(self) -> pathlib.Path | None:
         return self._file_path
 
+    @property
+    def data_type(self) -> DataType:
+        return data_type_handler.get_data_type_obj(
+            self._workflow_config.get(
+                "name", self._workflow_config.get("data_type", "unknown")
+            )
+        )
+
     def _get_directory(self, path: str | pathlib.Path) -> pathlib.Path:
         path = pathlib.Path(path)
         if not path.exists():
@@ -141,6 +150,16 @@ class SHARKadmWorkflow:
             obj = self._get_operator_object(oper)
             self._save_operator_object(obj)
 
+    def update_operators(self, opers: list[dict[str, Any]]) -> None:
+        for oper in opers:
+            if not oper.get("name"):
+                continue
+            for oper_info in self._operators_info:
+                if oper.get("name") == oper_info["name"]:
+                    oper_info.update(oper)
+                    continue
+        self.initiate_workflow()
+
     def _get_operator_object(self, oper: dict) -> Operator:
         obj = self._get_transformer_object(oper)
         if not obj:
@@ -178,6 +197,14 @@ class SHARKadmWorkflow:
         exporter = exporters.get_exporter_object(**exp)
         self._controller.run_operator(exporter)
 
+    def set_export_directory_for_exporters(self, directory: pathlib.Path | str) -> None:
+        if not pathlib.Path(directory).exists():
+            raise NotADirectoryError(f"Invalid export directory: {directory}")
+        for exp in self.exporters:
+            if not hasattr(exp, "export_directory"):
+                continue
+            exp.export_directory = directory
+
     def start_workflow(self) -> None | operator.OperatorInfo:
         """Sets upp the workflow in the controller and starts it"""
         for data_source in self._data_sources:
@@ -185,8 +212,10 @@ class SHARKadmWorkflow:
                 adm_logger.reset_log()
             self._controller = get_polars_controller_with_data(data_source)
             info = self._controller.run_operators(*self._operator_objects)
+            print(f"{info=}")
             if info.terminated:
                 return info[-1]
+            print("RUNNING EXPORTERS")
             self._controller.run_operators(*self._exporter_objects)
             self._do_adm_logger_stuff()
         self.save_config()
@@ -312,7 +341,7 @@ class SHARKadmWorkflow:
 
 
 def get_workflows() -> dict[str, pathlib.Path]:
-    return {path.stem: path for path in adm_config_paths["workflow"].iterdir()}
+    return {path.stem: path for path in sharkadm_config["workflow"].iterdir()}
 
 
 def get_workflow(workflow_name: str) -> SHARKadmWorkflow:
@@ -324,7 +353,7 @@ def get_workflow(workflow_name: str) -> SHARKadmWorkflow:
 
 def get_dv_workflow_for_data_type(
     data_type: str, default_if_missing: bool = True
-) -> SHARKadmWorkflow | None:
+) -> SHARKadmWorkflow:
     name = f"workflow_dv_{data_type.lower()}"
     workflows = get_workflows()
     if workflows.get(name):
