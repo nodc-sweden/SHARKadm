@@ -267,7 +267,7 @@ class Config:
         self.state.commit()
 
     @property
-    def unsynced_files(self) -> list[str]:
+    def unsynced_files(self) -> set[str]:
         return self.config_sync.new_or_updated_files_in_prod
 
     @property

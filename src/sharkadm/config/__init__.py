@@ -208,4 +208,4 @@ sharkadm_config = None
 try:
     sharkadm_config = get_sharkadm_config()
 except TypeError:
-    pass
+    print("sharkadm config not found!!!")
