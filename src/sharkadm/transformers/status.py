@@ -6,10 +6,12 @@ from sharkadm.utils import yaml_data
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
-if _config_path := sharkadm_config("delivery_note_status"):
-    STATUS_CONFIG = yaml_data.load_yaml(_config_path, encoding="utf8")
-else:
-    STATUS_CONFIG = {}
+STATUS_CONFIG = dict()
+
+if sharkadm_config:
+    if _config_path := sharkadm_config("delivery_note_status"):
+        STATUS_CONFIG = yaml_data.load_yaml(_config_path, encoding="utf8")
+    
 
 
 class SetStatusDataHost(PolarsTransformer):
