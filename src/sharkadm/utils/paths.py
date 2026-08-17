@@ -1,7 +1,7 @@
 import pathlib
 
 
-def get_next_incremented_file_path(path: pathlib.Path):
+def get_next_incremented_file_path(path: pathlib.Path) -> pathlib.Path:
     if not path.exists():
         return path
     i = 1
@@ -12,5 +12,5 @@ def get_next_incremented_file_path(path: pathlib.Path):
     return new_path
 
 
-def _get_incremented_file_path(path, nr):
+def _get_incremented_file_path(path, nr) -> pathlib.Path:
     return path.parent / f"{path.stem}({nr}){path.suffix}"

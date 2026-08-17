@@ -38,10 +38,18 @@ class XlsxExporter(SharkadmLoggerExporter):
         self._set_save_path(suffix=".xlsx")
         df = self._extract_info()
         try:
-            self._save_as_xlsx_with_table(df)
+            self._save(df)
         except PermissionError:
             self.file_path = get_next_incremented_file_path(self.file_path)
+            self._save(df)
+
+    def _save(self, df: pd.DataFrame) -> None:
+        if self.kwargs.get("as_table"):
             self._save_as_xlsx_with_table(df)
+        elif self.kwargs.get("with_filter"):
+            self._save_as_xlsx_with_filter(df)
+        else:
+            self._save_as_xlsx(df)
 
     def _extract_info(self) -> pd.DataFrame:
         header = self.adm_logger.keys
@@ -84,38 +92,52 @@ class XlsxExporter(SharkadmLoggerExporter):
             lst = [lst]
         return [self._compress_item(item) for item in lst]
 
-    def _save_as_xlsx_with_table(self, df: pd.DataFrame):
-        """
-        https://stackoverflow.com/questions/58326392/how-to-create-excel-table-with-pandas-to-excel
-        """
+    @property
+    def writer(self) -> pd.ExcelWriter:
+        return pd.ExcelWriter(str(self.file_path), engine="xlsxwriter")
 
-        # Create a Pandas Excel writer using XlsxWriter as the engine.
-        writer = pd.ExcelWriter(str(self.file_path), engine="xlsxwriter")
+    @property
+    def sheet_name(self) -> str:
+        return self.file_path.stem.split("SHARK_")[-1][:30]
 
-        # Convert the dataframe to an XlsxWriter Excel object. Turn off the default
-        # header and index and skip one row to allow us to insert a user defined
-        # header.
-        sheet_name = self.file_path.stem.split("SHARK_")[-1][:30]
-        df.to_excel(writer, sheet_name=sheet_name, startrow=1, header=False, index=False)
-
-        # Get the xlsxwriter worksheet object.
-        worksheet = writer.sheets[sheet_name]
-
-        # Get the dimensions of the dataframe.
-        (max_row, max_col) = df.shape
-
-        # Create a list of column headers, to use in add_table().
-        column_settings = []
-        for header in df.columns:
-            column_settings.append({"header": header})
-
-        # Add the table.
-        worksheet.add_table(0, 0, max_row, max_col - 1, {"columns": column_settings})
-
-        # Make the columns wider for clarity.
+    @staticmethod
+    def _set_column_width(df: pd.DataFrame, worksheet):
         for c, col in enumerate(df.columns):
             width = get_column_width(col)
             worksheet.set_column(c, c, width)
 
-        # Close the Pandas Excel writer and output the Excel file.
-        writer.close()
+    def _save_as_xlsx(self, df: pd.DataFrame):
+        with self.writer as writer:
+            df.to_excel(
+                writer, sheet_name=self.sheet_name, startrow=0, header=True, index=False
+            )
+            worksheet = writer.sheets[self.sheet_name]
+            self._set_column_width(df, worksheet)
+
+    def _save_as_xlsx_with_filter(self, df: pd.DataFrame):
+        with self.writer as writer:
+            df.to_excel(
+                writer, sheet_name=self.sheet_name, startrow=0, header=True, index=False
+            )
+            worksheet = writer.sheets[self.sheet_name]
+
+            (max_row, max_col) = df.shape
+            worksheet.autofilter(0, 0, max_row, max_col - 1)
+            self._set_column_width(df, worksheet)
+
+    def _save_as_xlsx_with_table(self, df: pd.DataFrame):
+        """
+        https://stackoverflow.com/questions/58326392/how-to-create-excel-table-with-pandas-to-excel
+        """
+        with self.writer as writer:
+            df.to_excel(
+                writer, sheet_name=self.sheet_name, startrow=1, header=False, index=False
+            )
+
+            worksheet = writer.sheets[self.sheet_name]
+            (max_row, max_col) = df.shape
+            column_settings = []
+            for header in df.columns:
+                column_settings.append({"header": header})
+            worksheet.add_table(0, 0, max_row, max_col - 1, {"columns": column_settings})
+            self._set_column_width(df, worksheet)
