@@ -150,6 +150,20 @@ class SHARKadmWorkflow:
             obj = self._get_operator_object(oper)
             self._save_operator_object(obj)
 
+    def _update_exporters(self) -> None:
+        for exp in self._exporters_info or []:
+            if not exp.get("active", True):
+                continue
+            exporter = exporters.get_exporter_object(**exp)
+            if isinstance(exporter, PolarsFileExporter):
+                self._export_paths[exporter.name] = dict(
+                    directory=exporter.export_directory,
+                    file_name=exporter.export_file_name,
+                    file_path=exporter.export_file_path,
+                )
+            self._exporter_objects.append(exporter)
+            self._all_exporter_objects.append(exporter)
+
     def update_operators(self, opers: list[dict[str, Any]]) -> None:
         for oper in opers:
             if not oper.get("name"):
@@ -157,6 +171,16 @@ class SHARKadmWorkflow:
             for oper_info in self._operators_info:
                 if oper.get("name") == oper_info["name"]:
                     oper_info.update(oper)
+                    continue
+        self.initiate_workflow()
+
+    def update_exporters(self, exps: list[dict[str, Any]]) -> None:
+        for exp in exps:
+            if not exp.get("name"):
+                continue
+            for exp_info in self._exporters_info:
+                if exp.get("name") == exp_info["name"]:
+                    exp_info.update(exp)
                     continue
         self.initiate_workflow()
 
@@ -178,20 +202,6 @@ class SHARKadmWorkflow:
             self._all_transformer_objects.append(obj)
         elif isinstance(obj, PolarsExporter):
             self._all_exporter_objects.append(obj)
-
-    def _update_exporters(self) -> None:
-        for exp in self._exporters_info or []:
-            if not exp.get("active", True):
-                continue
-            exporter = exporters.get_exporter_object(**exp)
-            if isinstance(exporter, PolarsFileExporter):
-                self._export_paths[exporter.name] = dict(
-                    directory=exporter.export_directory,
-                    file_name=exporter.export_file_name,
-                    file_path=exporter.export_file_path,
-                )
-            self._exporter_objects.append(exporter)
-            self._all_exporter_objects.append(exporter)
 
     def export(self, **exp):
         exporter = exporters.get_exporter_object(**exp)

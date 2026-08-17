@@ -104,9 +104,13 @@ class ConfigSync:
         return self.files_not_in_test | self.changed_files
 
     def get_prod_path(self, name: str) -> Path | None:
+        if not self._prod_files.get(name):
+            return None
         return self.prod_dir / self._prod_files.get(name)
 
     def get_test_path(self, name: str) -> Path | None:
+        if not self._test_files.get(name):
+            return None
         return self.test_dir / self._test_files.get(name)
 
     def copy_new_or_updated_files_to_test(self) -> None:
