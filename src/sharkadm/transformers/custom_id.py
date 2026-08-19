@@ -3,10 +3,10 @@ import hashlib
 import polars as pl
 
 from sharkadm import config
+from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import OperatorsInfo, get_single_operators_info
 
-from ..data import PolarsDataHolder
-from ..operator import OperatorsInfo, get_single_operators_info
 from .base import PolarsTransformer
 
 

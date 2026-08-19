@@ -1,5 +1,5 @@
-import enum
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any, Self, get_type_hints
 
 from sharkadm import config
@@ -7,7 +7,7 @@ from sharkadm.data import PolarsDataHolder, is_valid_polars_data_holder
 from sharkadm.sharkadm_logger import adm_logger
 
 
-class OperatorType(enum.StrEnum):
+class OperatorType(StrEnum):
     OPERATOR = "operator"
     VALIDATOR = "validator"
     TRANSFORMER = "transformer"

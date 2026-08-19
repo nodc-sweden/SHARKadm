@@ -5,13 +5,13 @@ from typing import Any
 
 from sharkadm import utils
 from sharkadm.data import PolarsDataHolder
-from sharkadm.operator import (
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
     OperatorsInfo,
     get_single_operators_info,
 )
-from sharkadm.sharkadm_logger import adm_logger
 
 # class DataHolderProtocol(Protocol):
 #     @property

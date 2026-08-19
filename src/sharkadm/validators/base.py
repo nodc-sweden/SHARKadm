@@ -8,13 +8,13 @@ import polars as pl
 from sharkadm.data import (
     PolarsDataHolder,
 )
-from sharkadm.operator import (
+from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
     OperatorType,
     get_single_operators_info,
 )
-from sharkadm.sharkadm_logger import adm_logger
 
 
 class DataHolderProtocol(Protocol):

@@ -1,4 +1,8 @@
-from sharkadm import event
+import pathlib
+import shutil
+
+from sharkadm import event, utils
+from sharkadm.config import sharkadm_config
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
@@ -9,6 +13,8 @@ nodc_occurrence_id = None
 try:
     import nodc_occurrence_id
     from nodc_occurrence_id import event as occurrence_event
+    from nodc_occurrence_id.occurrence import OccurrencesDatabase
+    from nodc_occurrence_id.utils import CONFIG_SUBDIRECTORY
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -25,12 +31,22 @@ class AddOccurrenceId(PolarsTransformer):
         "harbourseal",
     )
 
-    def __init__(self, *args, add_if_valid: bool = False, **kwargs):
+    def __init__(
+        self,
+        *args,
+        add_if_valid: bool = False,
+        create_backup_db: bool = False,
+        inspect_diff_in_winmerge: bool = False,
+        **kwargs,
+    ):
         super().__init__(*args, *kwargs)
         self._add_if_valid = add_if_valid
+        self._create_backup_db = create_backup_db
+        self._inspect_diff_in_winmerge = inspect_diff_in_winmerge
         self.col_to_set = ""  # Is set in self._transform
-        self.database = None
+        self.database: OccurrencesDatabase | None = None
         self.valid_matches = []
+        self._backup_db_path: pathlib.Path | None = None
         self._svn_commit = kwargs.get("svn_commit", False)
 
     @staticmethod
@@ -44,7 +60,6 @@ class AddOccurrenceId(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
-        self._current_data_holder = data_holder
 
         # 1: Kolla om perfekt match finns i databas
         #    Lägg till dessa id i data
@@ -61,12 +76,10 @@ class AddOccurrenceId(PolarsTransformer):
 
         occurrence_event.subscribe(occurrence_event.Events.PROGRESS, self._on_progress)
         occurrence_event.subscribe(
-            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid_not_added
+            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid
         )
         occurrence_event.subscribe(occurrence_event.Events.NR_NEW, self._on_other_result)
-        occurrence_event.subscribe(
-            occurrence_event.Events.NR_VALID_ADDED, self._on_other_result
-        )
+        occurrence_event.subscribe(occurrence_event.Events.NR_VALID_ADDED, self._on_valid)
         occurrence_event.subscribe(
             occurrence_event.Events.NR_PERFECT_MATCH, self._on_other_result
         )
@@ -75,16 +88,36 @@ class AddOccurrenceId(PolarsTransformer):
         )
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
-            data_holder.data_type_internal
+            data_holder.data_type_internal,
+            root_directory=sharkadm_config.root_dir / CONFIG_SUBDIRECTORY,
         )
         self.col_to_set = self.database.id_column
         self.valid_matches = []
+
+        if self._create_backup_db:
+            self._create_db_backup()
+
         data_holder.data = self.database.add_uuid_to_data_and_database(
             data_holder.data, add_if_valid=self._add_if_valid
         )
 
         if self._svn_commit:
             svn.commit_files(self.database.db_path)
+
+        if self._inspect_diff_in_winmerge and self._backup_db_path:
+            try:
+                utils.open_files_in_winmerge(
+                    str(self._backup_db_path), str(self.database.db_path)
+                )
+            except Exception as e:
+                self._log(str(e), level=adm_logger.DEBUG)
+
+    def _create_db_backup(self) -> None:
+        self._backup_db_path = (
+            utils.TEMP_DIRECTORY
+            / f"{self.database.db_path.stem}_old{self.database.db_path.suffix}"
+        )
+        shutil.copy2(self.database.db_path, self._backup_db_path)
 
     def _on_missing_mandatory_columns(self, data: dict) -> None:
         self._svn_commit = False
@@ -97,7 +130,7 @@ class AddOccurrenceId(PolarsTransformer):
     def _on_progress(self, data: dict) -> None:
         event.post_event("progress", data)
 
-    def _on_valid_not_added(self, data: dict) -> None:
+    def _on_valid(self, data: dict) -> None:
         level = adm_logger.WARNING
         self._log(data.get("msg", ""), level=level)
 

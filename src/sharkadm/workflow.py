@@ -7,7 +7,6 @@ from sharkadm import (
     data_filter,
     exporters,
     multi_transformers,
-    operator,
     sharkadm_exceptions,
     transformers,
     utils,
@@ -18,8 +17,8 @@ from sharkadm.config.data_type import DataType, data_type_handler
 from sharkadm.controller import SHARKadmPolarsController, get_polars_controller_with_data
 from sharkadm.exporters import PolarsExporter
 from sharkadm.exporters.base import PolarsFileExporter
-from sharkadm.operator import Operator
 from sharkadm.sharkadm_logger import adm_logger, get_exporter
+from sharkadm.sharkadm_operator import Operator, OperatorInfo
 from sharkadm.transformers import PolarsTransformer
 from sharkadm.validators import Validator
 
@@ -215,7 +214,7 @@ class SHARKadmWorkflow:
                 continue
             exp.export_directory = directory
 
-    def start_workflow(self) -> None | operator.OperatorInfo:
+    def start_workflow(self) -> OperatorInfo | None:
         """Sets upp the workflow in the controller and starts it"""
         for data_source in self._data_sources:
             if self._adm_logger_config.get("reset_between_data_sources"):
