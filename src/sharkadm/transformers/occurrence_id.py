@@ -1,8 +1,6 @@
 import pathlib
 import shutil
 
-from nodc_occurrence_id.utils import CONFIG_SUBDIRECTORY
-
 from sharkadm import event, utils
 from sharkadm.config import sharkadm_config
 from sharkadm.sharkadm_logger import adm_logger
@@ -16,6 +14,7 @@ try:
     import nodc_occurrence_id
     from nodc_occurrence_id import event as occurrence_event
     from nodc_occurrence_id.occurrence import OccurrencesDatabase
+    from nodc_occurrence_id.utils import CONFIG_SUBDIRECTORY
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
