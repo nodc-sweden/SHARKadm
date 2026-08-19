@@ -8,7 +8,7 @@ import polars as pl
 from sharkadm.data import (
     PolarsDataHolder,
 )
-from sharkadm.operator import (
+from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
     OperatorType,

@@ -5,7 +5,7 @@ from typing import Any
 
 from sharkadm import utils
 from sharkadm.data import PolarsDataHolder
-from sharkadm.operator import (
+from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
     OperatorsInfo,

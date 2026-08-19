@@ -1,4 +1,3 @@
-import subprocess
 
 from sharkadm import plugin_operators
 from sharkadm.sharkadm_logger import adm_logger

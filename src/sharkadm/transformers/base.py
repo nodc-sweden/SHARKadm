@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Protocol
 import polars as pl
 
 from sharkadm.data_filter.base import PolarsDataFilter
-from sharkadm.operator import (
+from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
     OperatorsInfo,
