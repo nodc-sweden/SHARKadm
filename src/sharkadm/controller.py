@@ -17,8 +17,8 @@ from sharkadm.data import get_polars_data_holder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.exporters import PolarsExporter
 from sharkadm.multi_transformers import PolarsMultiTransformer
-from sharkadm.sharkadm_operator import Operator, OperatorsInfo
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import Operator, OperatorsInfo
 from sharkadm.transformers import PolarsTransformer
 from sharkadm.validators import Validator
 

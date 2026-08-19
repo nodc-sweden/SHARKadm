@@ -3,10 +3,10 @@ import re
 
 import polars as pl
 
-from sharkadm.sharkadm_logger import adm_logger
-
 from sharkadm.data import PolarsDataHolder
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.sharkadm_operator import OperatorInfo
+
 from .base import DataHolderProtocol, Validator
 
 

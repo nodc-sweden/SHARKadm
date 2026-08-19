@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Protocol
 import polars as pl
 
 from sharkadm.data_filter.base import PolarsDataFilter
+from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.sharkadm_operator import (
     Operator,
     OperatorInfo,
@@ -12,7 +13,6 @@ from sharkadm.sharkadm_operator import (
     OperatorType,
     get_single_operators_info,
 )
-from sharkadm.sharkadm_logger import adm_logger
 
 if TYPE_CHECKING:
     from sharkadm.data.data_holder import PolarsDataHolder
