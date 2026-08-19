@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import pathlib
@@ -18,10 +19,12 @@ class PolarsZipArchive(PolarsFileExporter):
         self,
         export_directory: str | pathlib.Path | None = None,
         export_file_name: str | pathlib.Path | None = None,
+        keep_source_name: bool = False,
         **kwargs,
     ):
         super().__init__(export_directory, export_file_name, **kwargs)
 
+        self._keep_source_name = keep_source_name
         self._data_holder: PolarsDataHolder | None = None
         self._metadata_auto: exporters.PolarsSHARKMetadataAuto | None = None
 
@@ -31,9 +34,15 @@ class PolarsZipArchive(PolarsFileExporter):
 
     @property
     def _temp_target_directory(self) -> pathlib.Path:
-        return utils.get_temp_directory(
-            f"{archive.get_zip_archive_file_base(self._data_holder)}"
-        )
+        if self._keep_source_name:
+            sub_directory = self._data_holder.dataset_name
+            today = datetime.datetime.now().strftime("%Y-%m-%d")
+            sub_directory = f"{sub_directory}_version_{today}"
+        elif self.export_file_name:
+            sub_directory = self.export_file_name.with_suffix()
+        else:
+            sub_directory = archive.get_zip_archive_file_base(self._data_holder)
+        return utils.get_temp_directory(sub_directory)
 
     @property
     def _save_zip_path(self) -> pathlib.Path:
@@ -134,7 +143,7 @@ class PolarsZipArchive(PolarsFileExporter):
         exporter = exporters.PolarsSHARKdataTxt(
             export_directory=self._temp_target_directory,
             export_file_name="shark_data.txt",
-            **self._kwargs,
+            # **self._kwargs,
         )
         exporter.export(self._data_holder)
 
