@@ -82,14 +82,11 @@ class PolarsAddPressure(PolarsTransformer):
             )
             return
 
-        valid_rows = (
-            data_holder.data[self.latitude_col]
-            .cast(pl.Float64, strict=False)
-            .is_not_null()
-            & data_holder.data[self.depth_col]
-            .cast(pl.Float64, strict=False)
-            .is_not_null()
-        )
+        valid_rows = data_holder.data[self.latitude_col].cast(
+            pl.Float64, strict=False
+        ).is_not_null() & data_holder.data[self.depth_col].cast(
+            pl.Float64, strict=False
+        ).is_between(0, 10000)
 
         if valid_rows.any():
             valid_data = data_holder.data.filter(valid_rows)
@@ -173,10 +170,10 @@ class PolarsAddDensityWide(PolarsTransformer):
             .is_not_null()
             & data_holder.data[self.depth_col]
             .cast(pl.Float64, strict=False)
-            .is_not_null()
+            .is_between(0, 10000)
             & data_holder.data[self.practical_salinity]
             .cast(pl.Float64, strict=False)
-            .is_not_null()
+            .is_between(0, 50)
             & data_holder.data[self.temperature]
             .cast(pl.Float64, strict=False)
             .is_not_null()
@@ -262,17 +259,24 @@ class PolarsAddDensity(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
+        # Ensure required parameters are available for pivoting
         if (
             sum(
                 [
                     data_holder.data.filter(
                         (pl.col("parameter") == self.practical_salinity)
-                        & pl.col("value").is_not_null()
+                        & pl.col("value").is_between(0, 50)
+                        & pl.col(self.longitude_col).is_not_null()
+                        & pl.col(self.latitude_col).is_not_null()
+                        & pl.col(self.depth_col).is_between(0, 10000)
                     ).height
                     > 0,
                     data_holder.data.filter(
                         (pl.col("parameter") == self.temperature)
                         & pl.col("value").is_not_null()
+                        & pl.col(self.longitude_col).is_not_null()
+                        & pl.col(self.latitude_col).is_not_null()
+                        & pl.col(self.depth_col).is_between(0, 10000)
                     ).height
                     > 0,
                 ]
@@ -291,7 +295,7 @@ class PolarsAddDensity(PolarsTransformer):
                 & pl.col("value").is_not_null()
                 & pl.col(self.longitude_col).is_not_null()
                 & pl.col(self.latitude_col).is_not_null()
-                & pl.col(self.depth_col).is_not_null()
+                & pl.col(self.depth_col).is_between(0, 10000)
             )
             .select(
                 [
@@ -315,9 +319,10 @@ class PolarsAddDensity(PolarsTransformer):
                 aggregate_function="first",
             )
         )
-
+        # Ensure valid data rows before calculations
         if (
-            df[self.practical_salinity].is_not_null() & df[self.temperature].is_not_null()
+            df[self.practical_salinity].is_between(0, 50)
+            & df[self.temperature].is_not_null()
         ).sum() == 0:
             adm_logger.log_transformation(
                 f"Not enough {self.practical_salinity} and "
@@ -325,7 +330,7 @@ class PolarsAddDensity(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-
+        df = df.filter(pl.col(self.practical_salinity).is_between(0, 50))
         practical_salinity = df[self.practical_salinity].to_numpy().astype(float)
         temperature = df[self.temperature].to_numpy().astype(float)
         depth = df[self.depth_col].to_numpy().astype(float)
@@ -421,10 +426,10 @@ class PolarsAddOxygenSaturationWide(PolarsTransformer):
             .is_not_null()
             & data_holder.data[self.depth_col]
             .cast(pl.Float64, strict=False)
-            .is_not_null()
+            .is_between(0, 10000)
             & data_holder.data[self.practical_salinity]
             .cast(pl.Float64, strict=False)
-            .is_not_null()
+            .is_between(0, 50)
             & data_holder.data[self.temperature]
             .cast(pl.Float64, strict=False)
             .is_not_null()
@@ -561,23 +566,35 @@ class PolarsAddOxygenSaturation(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-
+        # Ensure required parameters are available for pivoting
         if (
             sum(
                 [
                     data_holder.data.filter(
                         (pl.col("parameter") == self.practical_salinity)
-                        & pl.col("value").is_not_null()
+                        & pl.col("value").is_between(0, 50)
+                        & pl.col(self.longitude_col).is_not_null()
+                        & pl.col(self.latitude_col).is_not_null()
+                        & pl.col(self.depth_col).is_between(0, 10000)
+                        & pl.col(self.density_col).is_not_null()
                     ).height
                     > 0,
                     data_holder.data.filter(
                         (pl.col("parameter") == self.temperature)
                         & pl.col("value").is_not_null()
+                        & pl.col(self.longitude_col).is_not_null()
+                        & pl.col(self.latitude_col).is_not_null()
+                        & pl.col(self.depth_col).is_between(0, 10000)
+                        & pl.col(self.density_col).is_not_null()
                     ).height
                     > 0,
                     data_holder.data.filter(
                         (pl.col("parameter") == self.oxygen)
                         & pl.col("value").is_not_null()
+                        & pl.col(self.longitude_col).is_not_null()
+                        & pl.col(self.latitude_col).is_not_null()
+                        & pl.col(self.depth_col).is_between(0, 10000)
+                        & pl.col(self.density_col).is_not_null()
                     ).height
                     > 0,
                 ]
@@ -599,7 +616,7 @@ class PolarsAddOxygenSaturation(PolarsTransformer):
                 & pl.col("value").is_not_null()
                 & pl.col(self.longitude_col).is_not_null()
                 & pl.col(self.latitude_col).is_not_null()
-                & pl.col(self.depth_col).is_not_null()
+                & pl.col(self.depth_col).is_between(0, 10000)
                 & pl.col(self.density_col).is_not_null()
             )
             .select(
@@ -626,9 +643,9 @@ class PolarsAddOxygenSaturation(PolarsTransformer):
                 aggregate_function="first",
             )
         )
-
+        # Ensure valid data rows before calculations
         if (
-            df[self.practical_salinity].is_not_null()
+            df[self.practical_salinity].is_between(0, 50)
             & df[self.temperature].is_not_null()
             & df[self.oxygen].is_not_null()
         ).sum() == 0:
@@ -638,7 +655,7 @@ class PolarsAddOxygenSaturation(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-
+        df = df.filter(pl.col(self.practical_salinity).is_between(0, 50))
         practical_salinity = df[self.practical_salinity].to_numpy().astype(float)
         temperature = df[self.temperature].to_numpy().astype(float)
         oxygen = df[self.oxygen].to_numpy().astype(float)
