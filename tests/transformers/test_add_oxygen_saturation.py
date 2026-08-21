@@ -60,11 +60,7 @@ def test_validate_add_oxygen_wide(
         not in given_data_holder.data.columns
     ), "Oxygen saturation column already exist"
 
-    print(given_data_holder.data.columns)
-
     PolarsAddOxygenSaturationWide("CTD").transform(given_data_holder)
-
-    print(given_data_holder.data.columns)
 
     # After transformation the derived oxygen columns
     # should exist
@@ -125,17 +121,6 @@ def test_validate_add_oxygen_wide(
             [6.217121, 6.217121, 6.217121],
             [120.9563, 120.9563, 120.9563],
         ),  # ok data
-        (
-            ["DEF456", "DEF456", "DEF456"],
-            [57.58, 57.58, 57.58],
-            [11.91, 11.91, 11.91],
-            [5, 5, 5],
-            ["Salinity CTD", "Temperature CTD", "Dissolved oxygen O2 CTD"],
-            [-5.2, 13.16, 7.2],
-            [1017.492126, 1017.492126, 1017.492126],
-            [None, None, None],
-            [None, None, None],
-        ),  # erroneous salinity
     ),
 )
 @patch("sharkadm.config.get_all_data_types", return_value=[])
@@ -176,10 +161,8 @@ def test_validate_add_oxygen(
             f"Column for calculated {col} exists before transformation"
         )
 
-    print(given_data_holder.data.columns)
     # Transforming the data
     PolarsAddOxygenSaturation("CTD").transform(given_data_holder)
-    print(given_data_holder.data.columns)
 
     # After transformation the calculated oxygen properties
     # should exist
@@ -207,4 +190,75 @@ def test_validate_add_oxygen(
     else:
         assert oxygen_saturation_value is None, (
             f"Expected None, but got value {oxygen_saturation_value}"
+        )
+
+
+@pytest.mark.parametrize(
+    "given_visit_key, given_latitude, given_longitude, given_depth, "
+    "given_parameter, given_value, given_density, ",
+    (
+        (
+            ["DEF456", "DEF456", "DEF456"],
+            [57.58, 57.58, 57.58],
+            [11.91, 11.91, 11.91],
+            [-0.5, -0.5, -0.5],
+            ["Salinity CTD", "Temperature CTD", "Dissolved oxygen O2 CTD"],
+            [20.65, 15.00, 7.52],
+            [1014.973459, 1014.973459, 1014.973459],
+        ),  # erroneous depth
+        (
+            ["DEF456", "DEF456", "DEF456"],
+            [57.58, 57.58, 57.58],
+            [11.91, 11.91, 11.91],
+            [5, 5, 5],
+            ["Salinity CTD", "Temperature CTD", "Dissolved oxygen O2 CTD"],
+            [-5.2, 13.16, 7.2],
+            [1017.492126, 1017.492126, 1017.492126],
+        ),  # erroneous salinity
+    ),
+)
+@patch("sharkadm.config.get_all_data_types", return_value=[])
+def test_validate_add_oxygen_erroneous_data(
+    mocked_data_types,
+    polars_data_frame_holder_class,
+    given_visit_key,
+    given_latitude,
+    given_longitude,
+    given_depth,
+    given_parameter,
+    given_value,
+    given_density,
+):
+    # Arrange
+    given_data = pl.DataFrame(
+        {
+            "visit_key": given_visit_key,
+            "sample_latitude_dd": given_latitude,
+            "sample_longitude_dd": given_longitude,
+            "sample_depth_m": given_depth,
+            "parameter": given_parameter,
+            "value": given_value,
+            "Derived in situ density CTD": given_density,
+        }
+    )
+
+    # Given a valid data holder
+    given_data_holder = polars_data_frame_holder_class(given_data)
+    mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
+
+    # There should be no column with in situ density
+    # before application of transformer
+    for col in ["Derived oxygen at saturation CTD", "Derived oxygen saturation CTD"]:
+        assert col not in given_data_holder.data.columns, (
+            f"Column for calculated {col} exists before transformation"
+        )
+
+    # Transforming the data
+    PolarsAddOxygenSaturation("CTD").transform(given_data_holder)
+
+    # After transformation the calculated oxygen properties
+    # should still not exist
+    for col in ["Derived oxygen at saturation CTD", "Derived oxygen saturation CTD"]:
+        assert col not in given_data_holder.data.columns, (
+            f"Column for calculated {col} was not added"
         )
