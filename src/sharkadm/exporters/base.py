@@ -183,6 +183,14 @@ class PolarsFileExporter(PolarsExporter, ABC):
 
     def open_directory(self):
         if self._kwargs.get("open_directory") and self.export_directory:
+            print()
+            print(f"{self.export_directory=}")
+            print()
+            if "_temp" in str(self.export_directory):
+                print("-" * 100)
+                print(self.name)
+                print()
+                # raise
             utils.open_file_or_directory(self.export_directory)
         return self
 
