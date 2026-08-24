@@ -29,7 +29,7 @@ class PolarsAddSharkId(PolarsTransformer):
             cols = self._filter_cols(cols)
             if not all([col in data_holder.data.columns for col in cols]):
                 self._log(
-                    "Can not create shark_id. All columns are not in data",
+                    f"Can not create shark_id. Missing columns: {', '.join(cols)}",
                     item=", ".join(cols),
                     level=adm_logger.WARNING,
                 )
