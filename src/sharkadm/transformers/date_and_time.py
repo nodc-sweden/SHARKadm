@@ -23,9 +23,10 @@ class PolarsAddSampleTime(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        data_holder.data = data_holder.data.with_columns(
-            pl.lit("").alias(self.col_to_set)
-        )
+        if self.col_to_set not in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(
+                pl.lit("").alias(self.col_to_set)
+            )
         if self.source_col not in data_holder.data.columns:
             return
         if self.col_to_set in data_holder.data:
