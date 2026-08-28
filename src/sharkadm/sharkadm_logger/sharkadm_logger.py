@@ -1,3 +1,4 @@
+import datetime
 import inspect
 import logging
 import time
@@ -326,6 +327,7 @@ class SHARKadmLogger:
         self._nr_log_entries += 1
         data["log_nr"] = self._nr_log_entries
         data["dataset_name"] = self.dataset_name
+        data["log_time"] = str(datetime.datetime.now())
 
         self._data.append(data)
 
