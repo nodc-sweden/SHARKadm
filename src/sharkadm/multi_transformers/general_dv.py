@@ -30,7 +30,7 @@ class GeneralDVPolars(PolarsMultiTransformer):
         transformers.PolarsAddDatasetName,
         transformers.PolarsFixYesNo,
         # transformers.PolarsAddColumnViewsColumns,
-        transformers.PolarsAddSharkId,
+        # transformers.PolarsAddSharkId,
         # Temp
         transformers.PolarsSortColumns,
     )

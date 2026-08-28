@@ -202,7 +202,7 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
         elif self._is_dd(lat) and self._is_dd(lon):
             return lat, lon
         elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
-            return geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon)
+            return (geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon))
         elif self._is_rt90(value=lat) and self._is_rt90(value=lon):
             return mellifica.rt90_to_wgs84(float(lon), float(lat))
         else:
@@ -319,57 +319,19 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
     lat_col = "sample_latitude_dd"
     lon_col = "sample_longitude_dd"
 
-    def __init__(self, nr_decimals: int = 2, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, nr_decimals: int = 2, pad_end: bool = False, **kwargs):
+        super().__init__(**kwargs)
         self._nr_decimals = nr_decimals
+        self._pad_end = pad_end
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Creates position_dd columns with float values"
-
-    # def _transform(self, data_holder: PolarsDataHolder) -> None:
-    #     data_holder.data = data_holder.data.with_columns(
-    #         pl.concat_str(
-    #             [
-    #                 pl.col(self.lat_col).str.split(".").list[0],
-    #                 pl.col(self.lat_col)
-    #                 .str.split(".")
-    #                 .list[1]
-    #                 .str.slice(0, self._nr_decimals),
-    #             ],
-    #             separator=".",
-    #         ),
-    #         pl.concat_str(
-    #             [
-    #                 pl.col(self.lon_col).str.split(".").list[0],
-    #                 pl.col(self.lon_col)
-    #                 .str.split(".")
-    #                 .list[1]
-    #                 .str.slice(0, self._nr_decimals),
-    #             ],
-    #             separator=".",
-    #         ),
-    #     )
+        return (
+            f"Sets nr decimals to {PolarsSetPositionDDNumberOfDecimal.lat_col} and "
+            f"{PolarsSetPositionDDNumberOfDecimal.lon_col}"
+        )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col(self.lat_col) != "")
-        #     .then(
-        #         pl.concat_str(
-        #             [
-        #                 pl.col(self.lat_col).str.split(".").list.get(0),
-        #                 pl.col(self.lat_col)
-        #                 .str.split(".")
-        #                 .list.get(1)
-        #                 .str.slice(0, self._nr_decimals),
-        #             ],
-        #             separator=".",
-        #         )
-        #     )
-        #     .otherwise(pl.col(self.lat_col))
-        #     .alias(self.lat_col)
-        # )
-
         data_holder.data = data_holder.data.with_columns(
             pl.when(pl.col(self.lat_col) != "")
             .then(
@@ -392,23 +354,11 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
             .alias(self.lon_col)
         )
 
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col(self.lon_col) != "")
-        #     .then(
-        #         pl.concat_str(
-        #             [
-        #                 pl.col(self.lon_col).str.split(".").list.get(0),
-        #                 pl.col(self.lon_col)
-        #                 .str.split(".")
-        #                 .list.get(1)
-        #                 .str.slice(0, self._nr_decimals),
-        #             ],
-        #             separator=".",
-        #         )
-        #     )
-        #     .otherwise(pl.col(self.lon_col))
-        #     .alias(self.lon_col),
-        # )
+        if self._pad_end:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.lat_col).str.pad_end(3 + self._nr_decimals, fill_char="0"),
+                pl.col(self.lon_col).str.pad_end(3 + self._nr_decimals, fill_char="0"),
+            )
 
 
 class PolarsAddReportedPositionString(PolarsTransformer):
@@ -432,4 +382,53 @@ class PolarsAddReportedPositionString(PolarsTransformer):
                 ],
                 separator="_",
             ).alias(self.col_to_set),
+        )
+
+
+class PolarsAddPositionDirection(PolarsTransformer):
+    lat_source_col = "sample_latitude_dd"
+    lon_source_col = "sample_longitude_dd"
+    lat_col_to_set = "lat_direction"
+    lon_col_to_set = "lon_direction"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds column with position direction [N, E, S, W]"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(pl.col(self.lat_source_col).cast(float) < 0)
+            .then(pl.lit("S"))
+            .otherwise(pl.lit("N"))
+            .alias(self.lat_col_to_set),
+            pl.when(pl.col(self.lon_source_col).cast(float) < 0)
+            .then(pl.lit("W"))
+            .otherwise(pl.lit("E"))
+            .alias(self.lon_col_to_set),
+        )
+
+
+class PolarsAddPositionDDId(PolarsTransformer):
+    col_to_set = "position_dd_id"
+
+    def __init__(self, separator: str = "", **kwargs):
+        super().__init__(**kwargs)
+        self._separator = separator
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f"Creates a {PolarsAddPositionDDId.col_to_set} as in old Java code"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.concat_str(
+                [
+                    pl.col("lat_direction"),
+                    pl.col("sample_latitude_dd").cast(float).abs().round(5).cast(str),
+                    pl.lit(self._separator),
+                    pl.col("lon_direction"),
+                    pl.col("sample_longitude_dd").cast(float).abs().round(4).cast(str),
+                ],
+                separator="",
+            ).alias(self.col_to_set)
         )

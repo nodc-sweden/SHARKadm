@@ -164,6 +164,8 @@ from sharkadm.transformers.position import (
     PolarsAddSamplePositionSweref99tm,
     PolarsSetPositionDDNumberOfDecimal,
     PolarsAddReportedPositionString,
+    PolarsAddPositionDirection,
+    PolarsAddPositionDDId,
 )
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,
@@ -198,7 +200,8 @@ from sharkadm.transformers.scientific_name import (
     PolarsSetScientificNameFromReportedScientificName,
 )
 from sharkadm.transformers.serial_number import FormatSerialNumber
-from sharkadm.transformers.shark_id import PolarsAddSharkId
+
+# from sharkadm.transformers.shark_id import PolarsAddSharkId
 from sharkadm.transformers.sort_data import (
     PolarsSortData,
     SortDataPlanktonImaging,

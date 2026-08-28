@@ -16,7 +16,9 @@ from sharkadm.multi_transformers.location import (
     LocationIntWaterPolars,
     LocationPolars,
 )
+from sharkadm.multi_transformers.occurrence_id import OccurrenceIdPolars
 from sharkadm.multi_transformers.position import PositionPolars
+from sharkadm.multi_transformers.shark_md5 import SharkMd5Polars
 from sharkadm.multi_transformers.static_dv import StaticDVPolars
 from sharkadm.multi_transformers.translate import TranslatePolars
 from sharkadm.multi_transformers.worms import WormsPolars
