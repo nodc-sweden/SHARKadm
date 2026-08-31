@@ -13,4 +13,5 @@ class SkvDataFile(PolarsDataFile):
             separator=";",
             infer_schema=False,
             missing_utf8_is_empty_string=True,
+            truncate_ragged_lines=True,
         )
