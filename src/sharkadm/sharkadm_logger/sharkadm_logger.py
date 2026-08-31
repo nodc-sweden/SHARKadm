@@ -1,6 +1,7 @@
 import datetime
 import inspect
 import logging
+import re
 import time
 from functools import wraps
 
@@ -356,6 +357,7 @@ class SHARKadmLogger:
         level: str | None = None,
         levels: str | list | None = None,
         in_msg: str | None = None,
+        exclude_operator_msg: tuple[str, str] | None = None,
         **kwargs,
     ) -> "SHARKadmLogger":
         if level and type(level) is str:
@@ -363,7 +365,12 @@ class SHARKadmLogger:
         if log_type and type(log_type) is str:
             log_types = [log_type]
         self._filter_data(
-            *args, log_types=log_types, levels=levels, in_msg=in_msg, **kwargs
+            *args,
+            log_types=log_types,
+            levels=levels,
+            in_msg=in_msg,
+            exclude_operator_msg=exclude_operator_msg,
+            **kwargs,
         )
         return self
 
@@ -422,6 +429,7 @@ class SHARKadmLogger:
         levels: str | list | None = None,
         purposes: str | list | None = None,
         in_msg: str | None = None,
+        exclude_operator_msg: tuple[str, str] | None = None,
         **kwargs,
     ) -> None:
         log_types = self._get_log_types(*args, log_types=log_types)
@@ -434,18 +442,59 @@ class SHARKadmLogger:
         self._filtered_levels = levels
         self._filtered_purposes = purposes
         self._filtered_log_types = log_types
+        self._exclude_operator_msg = exclude_operator_msg
 
         self._filtered_data = []
         for data in self._data:
-            if data.get("level") and data.get("level") not in levels:
+            if self._exclude_log(
+                data, levels, purposes, log_types, in_msg, exclude_operator_msg
+            ):
                 continue
-            if data.get("purpose") and data.get("purpose") not in purposes:
-                continue
-            if data.get("log_type") and data.get("log_type") not in log_types:
-                continue
-            if in_msg and in_msg not in data.get("msg", ""):
-                continue
+            # if data.get("level") and data.get("level") not in levels:
+            #     continue
+            # if data.get("purpose") and data.get("purpose") not in purposes:
+            #     continue
+            # if data.get("log_type") and data.get("log_type") not in log_types:
+            #     continue
+            # if in_msg and in_msg not in data.get("msg", ""):
+            #     continue
+            # if (exclude_operator_msg and data.get("cls") == exclude_operator_msg[0] and
+            #         exclude_operator_msg[1] in data.get("msg", "")):
+            #     continue
+
             self._filtered_data.append(data)
+
+    def _exclude_log(
+        self,
+        data: dict,
+        levels: list[str] | None = None,
+        purposes: list[str] | None = None,
+        log_types: list[str] | None = None,
+        in_msg: str | None = None,
+        exclude_operator_msg: tuple[str, str] | None = None,
+    ) -> bool:
+        # print(f"{levels=} : {purposes=} : {log_types=} : {data=}")
+        if data.get("level") not in levels:
+            return True
+        if data.get("purpose") and data.get("purpose") not in purposes:
+            return True
+        if data.get("log_type") not in log_types:
+            return True
+        if in_msg and in_msg not in data.get("msg", ""):
+            return True
+        if exclude_operator_msg:
+            if type(exclude_operator_msg[0]) is list:
+                for operator_msg in exclude_operator_msg:
+                    if data.get("cls") == operator_msg[0] and re.search(
+                        operator_msg[1], data.get("msg", "")
+                    ):
+                        return True
+            else:
+                if data.get("cls") == exclude_operator_msg[0] and re.search(
+                    exclude_operator_msg[1], data.get("msg", "")
+                ):
+                    return True
+        return False
 
     @staticmethod
     def subscribe(ev: str, func, prio: int = 50) -> None:
@@ -453,22 +502,32 @@ class SHARKadmLogger:
 
     def print_on_screen(self, *args, **kwargs):
         def _print(data: dict):
-            if data.get("level") and data.get("level") not in levels:
+            if self._exclude_log(
+                data, levels, purposes, log_types, in_msg, exclude_operator_msg
+            ):
                 return
-            if data.get("log_type") and data.get("log_type") not in log_types:
-                return
-            if data.get("purpose") and data.get("purpose") not in purposes:
-                return
+
+            # if data.get("level") and data.get("level") not in levels:
+            #     return
+            # if data.get("log_type") and data.get("log_type") not in log_types:
+            #     return
+            # if data.get("purpose") and data.get("purpose") not in purposes:
+            #     return
+
             print(data)
 
         log_types = self._get_log_types(*args, log_types=kwargs.get("log_types"))
         levels = self._get_levels(*args, levels=kwargs.get("levels"))
         purposes = self._get_purposes(*args, purposes=kwargs.get("purposes"))
+        in_msg = kwargs.get("msg")
+        exclude_operator_msg = kwargs.get("exclude_operator_msg")
         print("=" * 100)
         print("printing following config on screen: ")
         print("-" * 100)
         print(f"{log_types=}")
         print(f"{levels=}")
         print(f"{purposes=}")
+        print(f"{in_msg=}")
+        print(f"{exclude_operator_msg=}")
         print()
         self.subscribe("log", _print)
