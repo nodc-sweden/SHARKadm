@@ -35,16 +35,14 @@ def subscribe(event: str | Events, func, prio: int = 50) -> None:
     if event not in _subscribers:
         raise EventNotFound(event)
     _subscribers[event].setdefault(prio, [])
-    if func in _subscribers[event][prio]:
+    # if func in _subscribers[event][prio]:
+    #     return
+    if str(func) in [str(f) for f in _subscribers[event][prio]]:
         return
     _subscribers[event][prio].append(func)
 
 
 def post_event(event: str | Events, data: dict | str) -> None:
-    # print()
-    # print(f"{event=}")
-    # print(f"{data=}")
-    # print(f"{_subscribers=}")
     event = str(event)
     if type(data) is str:
         data = dict(msg=data)

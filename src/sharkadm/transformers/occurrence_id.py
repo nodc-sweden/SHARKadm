@@ -49,6 +49,24 @@ class AddOccurrenceId(PolarsTransformer):
         self._backup_db_path: pathlib.Path | None = None
         self._svn_commit = kwargs.get("svn_commit", False)
 
+        occurrence_event.subscribe(
+            occurrence_event.Events.MISSING_MANDATORY_COLUMNS,
+            self._on_missing_mandatory_columns,
+        )
+
+        occurrence_event.subscribe(occurrence_event.Events.PROGRESS, self._on_progress)
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid
+        )
+        occurrence_event.subscribe(occurrence_event.Events.NR_NEW, self._on_other_result)
+        occurrence_event.subscribe(occurrence_event.Events.NR_VALID_ADDED, self._on_valid)
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_PERFECT_MATCH, self._on_other_result
+        )
+        occurrence_event.subscribe(
+            occurrence_event.Events.DATABASE_IS_UPDATED, self._on_db_updated
+        )
+
     @staticmethod
     def get_transformer_description() -> str:
         return "Adds Occurrence Id to data"
@@ -68,24 +86,6 @@ class AddOccurrenceId(PolarsTransformer):
         #    Skapa nytt id och lägg till i data och databas
 
         # 3: Om när match. Logga _temp_occurence_id som man sedan kan sätta nya ????
-
-        occurrence_event.subscribe(
-            occurrence_event.Events.MISSING_MANDATORY_COLUMNS,
-            self._on_missing_mandatory_columns,
-        )
-
-        occurrence_event.subscribe(occurrence_event.Events.PROGRESS, self._on_progress)
-        occurrence_event.subscribe(
-            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid
-        )
-        occurrence_event.subscribe(occurrence_event.Events.NR_NEW, self._on_other_result)
-        occurrence_event.subscribe(occurrence_event.Events.NR_VALID_ADDED, self._on_valid)
-        occurrence_event.subscribe(
-            occurrence_event.Events.NR_PERFECT_MATCH, self._on_other_result
-        )
-        occurrence_event.subscribe(
-            occurrence_event.Events.DATABASE_IS_UPDATED, self._on_db_updated
-        )
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
             data_holder.data_type_internal,
@@ -122,8 +122,7 @@ class AddOccurrenceId(PolarsTransformer):
     def _on_missing_mandatory_columns(self, data: dict) -> None:
         self._svn_commit = False
         self._log(
-            f"Could not add {self.col_to_set}. "
-            f"Missing columns: {data['missing_columns']}",
+            f"Could not add {self.col_to_set}: {data['msg']}",
             level=adm_logger.WARNING,
         )
 
@@ -139,7 +138,12 @@ class AddOccurrenceId(PolarsTransformer):
         self._log(data.get("msg", ""), level=level)
 
     def _on_db_updated(self, data: dict) -> None:
+        msg = "There are indications that occurrence databases are updated..."
+        if data.get("new_db"):
+            msg = f"New occurrence databases created: {data.get('new_db')}"
+        if data.get("updated_db"):
+            msg = f"Occurrence databases updated: {data.get('updated_db')}"
         self._log(
-            data.get("Occurrencedatabas(er) är uppdaterad(e)", ""),
+            msg,
             level=adm_logger.WARNING,
         )

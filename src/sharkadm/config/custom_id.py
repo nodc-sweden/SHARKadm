@@ -35,6 +35,14 @@ class CustomIdLevelHandler:
     def name(self) -> str:
         return self._config["levels"][self.level].get("name", f"custom_{self.level}_id")
 
+    @property
+    def prefix(self) -> str | None:
+        return self._config["levels"][self.level].get("prefix", None)
+
+    @property
+    def separator(self) -> str | None:
+        return self._config["levels"][self.level].get("separator", "_")
+
     def _load_id_columns(self) -> None:
         self._id_columns = self._config["levels"][self.level]["columns"]
 

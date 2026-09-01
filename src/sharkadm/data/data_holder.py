@@ -292,6 +292,9 @@ class PolarsDataHolder(ABC):
         if "parameter" not in self._data.columns:
             self._data_structure = "column"
 
+    def get_columns_containing_string(self, string: str) -> list[str]:
+        return [col for col in self.data.columns if string in col]
+
 
 class PolarsConcatDataHolder(PolarsDataHolder):
     def __init__(self, *args, **kwargs):

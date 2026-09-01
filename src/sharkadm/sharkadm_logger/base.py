@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class SharkadmLoggerExporter(ABC):
     def __init__(self, **kwargs):
-        self.adm_logger: "SHARKadmLogger" | None = None
+        self.adm_logger: "SHARKadmLogger | None" = None
         self.file_path: pathlib.Path | str | None = None
         self.kwargs = kwargs
 
