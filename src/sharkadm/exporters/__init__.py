@@ -22,6 +22,7 @@ from sharkadm.exporters.shark_data_txt_file import (
     PolarsSHARKdataTxtAsGiven,
     PolarsSHARKdataTxt,
 )
+from sharkadm.exporters.shark_metadata import PolarsSHARKMetadata
 from sharkadm.exporters.shark_metadata_auto import PolarsSHARKMetadataAuto
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 
