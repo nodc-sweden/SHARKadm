@@ -76,6 +76,8 @@ class _PolarsReportingInstitute(PolarsTransformer):
             names = []
             for part in code.split(","):
                 part = part.strip()
+                if not part:
+                    continue
                 info = _translate_codes.get_info(self.lookup_field, part)
                 if info:
                     names.append(info[self.lookup_key])

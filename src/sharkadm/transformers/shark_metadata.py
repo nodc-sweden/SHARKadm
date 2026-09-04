@@ -54,6 +54,8 @@ class PolarsAddSharkMetadataInfo(PolarsTransformer):
             for col_name, val in get_col_and_value(key, value).items():
                 if col_name in self.exclude_columns:
                     continue
+                if not val:
+                    continue
                 if self._prefix:
                     col_name = f"{self._prefix}_{col_name}"
                 exps.append(pl.lit(val).alias(col_name))
@@ -70,4 +72,4 @@ def get_col_and_value(key: str, value: str | list | dict) -> dict[str, str]:
         for k, v in value.items():
             data.update(get_col_and_value(f"{key}-{k}", v))
         return data
-    raise ValueError(f"Could not get shark_metadata for {key}")
+    return {key: ""}
