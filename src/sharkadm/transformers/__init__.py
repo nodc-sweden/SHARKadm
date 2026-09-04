@@ -92,6 +92,7 @@ from sharkadm.transformers.date_and_time import (
     PolarsCreateFakeFullDates,
     PolarsFixDateFormat,
     PolarsFixTimeFormat,
+    PolarsAddCurrentDate,
 )
 from sharkadm.transformers.delivery_note_info import (
     PolarsAddDeliveryNoteInfo,
@@ -200,6 +201,7 @@ from sharkadm.transformers.scientific_name import (
     PolarsSetScientificNameFromReportedScientificName,
 )
 from sharkadm.transformers.serial_number import FormatSerialNumber
+from sharkadm.transformers.shark_metadata import PolarsAddSharkMetadataInfo
 
 # from sharkadm.transformers.shark_id import PolarsAddSharkId
 from sharkadm.transformers.sort_data import (

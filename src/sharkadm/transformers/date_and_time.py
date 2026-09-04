@@ -488,3 +488,28 @@ class PolarsAddMonth(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.col("datetime").dt.month().cast(str).str.zfill(2).alias(col)
             )
+
+
+class PolarsAddCurrentDate(PolarsTransformer):
+    col_to_set: str = "current_date"
+
+    def __init__(
+        self,
+        col_to_set: str = "",
+        **kwargs,
+    ):
+        self.col_to_set: str = col_to_set or self.col_to_set
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return (
+            f"Adds current date to given column name. "
+            f"Default is {PolarsAddCurrentDate.col_to_set}. Option to change via"
+            f"col_to_set"
+        )
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit(datetime.datetime.now().strftime("%Y-%m-%d")).alias(self.col_to_set)
+        )
