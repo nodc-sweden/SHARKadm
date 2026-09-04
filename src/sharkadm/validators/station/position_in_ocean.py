@@ -37,7 +37,11 @@ class ValidatePositionInOcean(Validator):
         for (name, latitude, longitude), data in data_holder.data.group_by(
             [self._station_name_key, self._latitude_key, self._longitude_key]
         ):
-            point = Point(longitude, latitude)
+            try:
+                point = Point(longitude, latitude)
+            except (TypeError, ValueError):
+                self._log_fail(f"Station '{name}': missing or invalid coordinates.")
+                continue
             if self._ocean_shapefile.contains(point).any():
                 self._log_success(f"Station '{name}' is inside ocean.")
             else:

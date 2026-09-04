@@ -80,14 +80,20 @@ def approximate_distance(df: pl.DataFrame) -> pl.DataFrame:
     earth_radius = 6_371_008.8
     radians_per_degree = math.pi / 180.0
 
-    latitude = pl.col("sample_latitude_dd").cast(pl.Float64) * radians_per_degree
-    longitude = pl.col("sample_longitude_dd").cast(pl.Float64) * radians_per_degree
+    latitude = (
+        pl.col("sample_latitude_dd").cast(pl.Float64, strict=False) * radians_per_degree
+    )
+    longitude = (
+        pl.col("sample_longitude_dd").cast(pl.Float64, strict=False) * radians_per_degree
+    )
 
     previous_latitude = (
-        pl.col("sample_latitude_dd").shift(1).cast(pl.Float64) * radians_per_degree
+        pl.col("sample_latitude_dd").shift(1).cast(pl.Float64, strict=False)
+        * radians_per_degree
     )
     previous_longitude = (
-        pl.col("sample_longitude_dd").shift(1).cast(pl.Float64) * radians_per_degree
+        pl.col("sample_longitude_dd").shift(1).cast(pl.Float64, strict=False)
+        * radians_per_degree
     )
 
     haversine = ((latitude - previous_latitude) / 2).sin() ** 2 + (
