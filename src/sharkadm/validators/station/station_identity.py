@@ -58,9 +58,10 @@ class ValidateStationIdentity(Validator):
             try:
                 lat_dd, lon_dd = transform_ref_system(lat_orig, lon_orig)
             except Exception:
+                lat_str = f"{lat_orig:.2f}" if lat_orig else ""
+                lon_str = f"{lon_orig:.2f}" if lon_orig else ""
                 self._log_fail(
-                    msg=f"{name} at {lat_orig:.2f} N {lon_orig:.2f}"
-                    f" E could not be transformed",
+                    msg=f"{name} at {lat_str} N {lon_str} E could not be transformed",
                 )
                 continue
 
@@ -69,9 +70,10 @@ class ValidateStationIdentity(Validator):
                     name, lat_dd, lon_dd
                 )
             except Exception:
+                lat_str = f"{lat_orig:.2f}" if lat_orig else ""
+                lon_str = f"{lon_orig:.2f}" if lon_orig else ""
                 self._log_fail(
-                    msg=f"{name} at {lat_orig:.2f} N"
-                    f" {lon_orig:.2f} E could not be validated",
+                    msg=f"{name} at {lat_str} N {lon_str} E could not be validated",
                     row_numbers=row_numbers,
                 )
                 continue
