@@ -1,16 +1,16 @@
 import polars as pl
+from nodc_config import nodc_conf
 
-from sharkadm.config import sharkadm_config
 from sharkadm.utils import yaml_data
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
-STATUS_CONFIG = dict()
 
-if sharkadm_config:
-    if _config_path := sharkadm_config("delivery_note_status"):
-        STATUS_CONFIG = yaml_data.load_yaml(_config_path, encoding="utf8")
+def get_status_config() -> dict:
+    if _config_path := nodc_conf("delivery_note_status"):
+        return yaml_data.load_yaml(_config_path, encoding="utf8")
+    return dict()
 
 
 class SetStatusDataHost(PolarsTransformer):
@@ -20,7 +20,7 @@ class SetStatusDataHost(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         args = []
-        for col, value in STATUS_CONFIG["deliverer_and_datahost"].items():
+        for col, value in get_status_config()["deliverer_and_datahost"].items():
             args.append(pl.lit(value).alias(col))
         data_holder.data = data_holder.data.with_columns(args)
 
@@ -32,6 +32,6 @@ class SetStatusDeliverer(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         args = []
-        for col, value in STATUS_CONFIG["deliverer"].items():
+        for col, value in get_status_config()["deliverer"].items():
             args.append(pl.lit(value).alias(col))
         data_holder.data = data_holder.data.with_columns(args)

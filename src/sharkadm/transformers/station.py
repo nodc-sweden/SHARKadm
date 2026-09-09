@@ -79,7 +79,7 @@ class PolarsAddStationInfo(PolarsTransformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self._stations = get_station_object()
+        self._stations = nodc_station.get_station_object()
         self._station_synonyms = {}
         self._loaded_stations_info = {}
 
@@ -113,9 +113,11 @@ class PolarsAddStationInfo(PolarsTransformer):
             lat = float(lat_str)
             lon = float(lon_str)
 
-            # matching_stations = self._stations.get_matching_stations(
-            matching_stations = nodc_station.get_matching_stations(
-                name=reported_station, lat_dd=lat, lon_dd=lon
+            matching_stations = self._stations.get_matching_stations(
+                # matching_stations = nodc_station.get_matching_stations(
+                name=reported_station,
+                lat_dd=lat,
+                lon_dd=lon,
             )
             if not matching_stations:
                 self._log(

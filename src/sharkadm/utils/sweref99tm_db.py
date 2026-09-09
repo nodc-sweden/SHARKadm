@@ -1,17 +1,19 @@
+import pathlib
 import sqlite3
 
-from sharkadm.config import CONFIG_DIRECTORY
+from nodc_config import nodc_conf
 
-DB_PATH = None
-if CONFIG_DIRECTORY:
-    DB_PATH = CONFIG_DIRECTORY / "sharkadm" / "sweref99tm_database.db"
+
+def get_db_path() -> pathlib.Path:
+    return nodc_conf.root_dir / "sharkadm" / "sweref99tm_database.db"
 
 
 def create_database():
-    if DB_PATH.exists():
+    db_path = get_db_path()
+    if db_path.exists():
         return
-    print(f"Creating sweref99tm database at: {DB_PATH}")
-    with sqlite3.connect(DB_PATH) as connection:
+    print(f"Creating sweref99tm database at: {db_path}")
+    with sqlite3.connect(db_path) as connection:
         cursor = connection.cursor()
 
         create_table_query = """
@@ -32,7 +34,7 @@ def create_database():
 
 def add(lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
     create_database()
-    with sqlite3.connect(DB_PATH) as connection:
+    with sqlite3.connect(get_db_path()) as connection:
         cursor = connection.cursor()
 
         insert_query = """
@@ -48,7 +50,7 @@ def add(lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
 
 def get(lat_dd: str, lon_dd: str) -> dict:
     create_database()
-    with sqlite3.connect(DB_PATH) as connection:
+    with sqlite3.connect(get_db_path()) as connection:
         cursor = connection.cursor()
 
         query = """
@@ -72,7 +74,7 @@ def get(lat_dd: str, lon_dd: str) -> dict:
 
 def get_mapper() -> dict:
     create_database()
-    with sqlite3.connect(DB_PATH) as connection:
+    with sqlite3.connect(get_db_path()) as connection:
         cursor = connection.cursor()
 
         query = """
