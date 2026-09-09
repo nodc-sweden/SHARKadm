@@ -1,6 +1,7 @@
 import polars as pl
 
-from sharkadm.config import nodc_conf
+from nodc_config import nodc_conf
+
 from sharkadm.data.archive import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
