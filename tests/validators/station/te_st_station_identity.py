@@ -3,8 +3,8 @@ from unittest.mock import patch
 import pandas as pd
 import polars as pl
 import pytest
-from nodc_station.station_file import StationFile
-from nodc_station.utils import transform_ref_system
+# from nodc_station.station_file import StationFile
+# from nodc_station.utils import transform_ref_system
 
 from sharkadm import adm_logger
 from sharkadm.validators.station.station_identity import ValidateStationIdentity

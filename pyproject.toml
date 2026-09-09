@@ -1,6 +1,6 @@
 [project]
 name = "sharkadm"
-version = "v3.4.1"
+version = "v4.0.0"
 description = "Handles workflows for Swedish NODC"
 authors = [
     {name = "Magnus Wenzer", email = "magnus.wenzer@smhi.se"},
@@ -20,6 +20,8 @@ dependencies = [
     "geopandas>=1.1.0",
     "shapely>=2.1.1",
     "gsw>=3.6.20",
+    "nodc-config",
+    "pyarrow>=25.0.1",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -40,7 +42,6 @@ dev = [
     "ruff>=0.13.1",
     "pre-commit>=4.3.0",
     "freezegun>=1.5.4",
-    "nodc-station",
 ]
 
 [tool.ruff]
@@ -61,4 +62,4 @@ select = [
 per-file-ignores."__init__.py" = ["F401"]
 
 [tool.uv.sources]
-nodc-station = { git = "https://github.com/nodc-sweden/nodc-station", rev = "v1.0.0" }
+nodc-config = { git = "https://github.com/nodc-sweden/nodc-config.git", rev = "v0.1.0" }

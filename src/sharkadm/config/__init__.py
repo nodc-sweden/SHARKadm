@@ -2,9 +2,10 @@ import os
 import pathlib
 from typing import Protocol
 
+from nodc_config import nodc_conf
+
 from sharkadm.config import utils
 from sharkadm.config.column_views import ColumnViews
-from sharkadm.config.config import Config
 from sharkadm.config.custom_id import CustomIdsHandler
 from sharkadm.config.data_type_mapper import DataTypeMapper
 from sharkadm.config.delivery_note_mapper import DeliveryNoteMapper
@@ -14,47 +15,6 @@ from sharkadm.config.trophic_type_smhi import TrophicTypeSMHI
 
 DATA_STRUCTURES = ["row", "column", "profile"]
 
-CONFIG_ENV = "NODC_CONFIG"
-
-home = pathlib.Path.home()
-OTHER_CONFIG_SOURCES = [
-    home / "NODC_CONFIG",
-    home / ".NODC_CONFIG",
-    home / "nodc_config",
-    home / ".nodc_config",
-]
-
-# CONFIG_DIRECTORY = None
-CONFIG_DIRECTORY = utils.get_user_given_config_dir()
-if not CONFIG_DIRECTORY:
-    if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
-        CONFIG_DIRECTORY = pathlib.Path(os.getenv(CONFIG_ENV))
-    else:
-        for directory in OTHER_CONFIG_SOURCES:
-            if directory.exists():
-                CONFIG_DIRECTORY = directory
-                break
-
-
-# def has_admin_config() -> bool:
-#     if os.getenv(CONFIG_ENV) and pathlib.Path(os.getenv(CONFIG_ENV)).exists():
-#         return True
-#     return False
-
-
-def get_config_path(name: str | None = None) -> pathlib.Path:
-    if not CONFIG_DIRECTORY:
-        raise NotADirectoryError(
-            f"Config directory not found. Environment path {CONFIG_ENV} does not seem to "
-            f"be set and not other config directory was found. "
-        )
-    if not name:
-        return CONFIG_DIRECTORY
-    path = CONFIG_DIRECTORY / name
-    if not path.exists():
-        raise FileNotFoundError(f"Could not find config file {name}")
-    return path
-
 
 class DataHolderProtocol(Protocol):
     data_type = None
@@ -63,21 +23,21 @@ class DataHolderProtocol(Protocol):
 
 
 def get_column_views_config(path: str | pathlib.Path | None = None) -> ColumnViews:
-    path = path or sharkadm_config.get_path("column_views")
+    path = path or nodc_conf.get_path("column_views")
     return ColumnViews(path)
 
 
 def get_translate_headers_config(
     path: str | pathlib.Path | None = None,
 ) -> TranslateHeaders:
-    path = path or sharkadm_config.get_path("translate_headers")
+    path = path or nodc_conf.get_path("translate_headers")
     return TranslateHeaders(path)
 
 
 def get_trophic_type_smhi_object(
     path: str | pathlib.Path | None = None,
 ) -> TrophicTypeSMHI:
-    path = path or sharkadm_config.get_path("trophictype_smhi")
+    path = path or nodc_conf.get_path("trophictype_smhi")
     return TrophicTypeSMHI(path)
 
 
@@ -115,29 +75,29 @@ def get_header_mapper_from_data_holder(
 
 
 def get_custom_id_handler(config_directory: str | pathlib.Path | None = None):
-    config_directory = config_directory or sharkadm_config("ids")
+    config_directory = config_directory or nodc_conf("ids")
     return CustomIdsHandler(config_directory) if config_directory else None
 
 
 def get_delivery_note_mapper(
     path: str | pathlib.Path | None = None,
 ) -> DeliveryNoteMapper:
-    path = path or sharkadm_config("delivery_note_mapping")
+    path = path or nodc_conf("delivery_note_mapping")
     return DeliveryNoteMapper(path)
 
 
 def get_data_type_mapper(path: str | pathlib.Path | None = None) -> DataTypeMapper:
-    path = path or sharkadm_config("data_type_mapping")
+    path = path or nodc_conf("data_type_mapping")
     return DataTypeMapper(path)
 
 
 def get_mapper_data_type_to_internal(
     path: str | pathlib.Path | None = None,
 ) -> DataTypeMapper:
-    if not any((path, sharkadm_config)):
+    if not any((path, nodc_conf)):
         return None
 
-    path = path or sharkadm_config("mapper_data_type_to_internal")
+    path = path or nodc_conf("mapper_data_type_to_internal")
     if not path:
         return None
     return DataTypeMapper(path)
@@ -180,32 +140,12 @@ def get_valid_data_structures(
         return [item for item in get_all_data_structures() if item not in invalid_lower]
 
 
-def get_import_matrix_config_paths(
-    config_directory: pathlib.Path | None = None,
-) -> dict[str, pathlib.Path]:
+def get_import_matrix_config_paths() -> dict[str, pathlib.Path]:
     paths = {}
-    if not config_directory and sharkadm_config:
-        config_directory = sharkadm_config.root_dir
-
-    if not config_directory:
-        return paths
-
-    for path in config_directory.iterdir():
-        if "import_matrix" not in path.name:
-            continue
+    for name, path in nodc_conf.get_paths("import_matrix").items():
         key = path.stem.split("_", 2)[-1]
         paths[key] = path
     return paths
 
 
-def get_sharkadm_config(path: pathlib.Path | str | None = None) -> Config:
-    if not path:
-        path = CONFIG_DIRECTORY
-    return Config(path)
-
-
-sharkadm_config = None
-try:
-    sharkadm_config = get_sharkadm_config()
-except TypeError:
-    print("sharkadm config not found!!!")
+# Fixa vidare med nodc_config. Synca mikrotjänster och sharkadm. se över svn-funktionen

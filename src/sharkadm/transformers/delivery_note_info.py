@@ -1,6 +1,6 @@
 import polars as pl
 
-from sharkadm.config import sharkadm_config
+from sharkadm.config import nodc_conf
 from sharkadm.data.archive import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
@@ -19,7 +19,7 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
         self._columns = columns
         self._overwrite = overwrite
         self._status_config = yaml_data.load_yaml(
-            sharkadm_config("delivery_note_status"), encoding="utf8"
+            nodc_conf("delivery_note_status"), encoding="utf8"
         )
 
     @staticmethod
