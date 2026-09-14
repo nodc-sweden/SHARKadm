@@ -1,7 +1,5 @@
 import polars as pl
 
-from nodc_config import nodc_conf
-
 from sharkadm.data.archive import PolarsArchiveDataHolder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
@@ -19,9 +17,6 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
         super().__init__(**kwargs)
         self._columns = columns
         self._overwrite = overwrite
-        self._status_config = yaml_data.load_yaml(
-            nodc_conf("delivery_note_status"), encoding="utf8"
-        )
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -34,6 +29,9 @@ class PolarsAddDeliveryNoteInfo(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
+        self._status_config = yaml_data.load_yaml(
+            data_holder.config("delivery_note_status"), encoding="utf8"
+        )
         self._add_delivery_note_info(data_holder)
         self._add_status(data_holder)
 

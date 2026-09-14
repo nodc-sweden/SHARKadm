@@ -2,7 +2,7 @@ import pathlib
 
 import polars as pl
 
-from sharkadm.config.data_type import data_type_handler
+from sharkadm.config.data_type import get_data_type_handler
 from sharkadm.data.archive import analyse_info, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.data_source.base import ImportMapper
@@ -21,10 +21,11 @@ class PolarsOdvDataHolder(PolarsDataHolder):
         header_mapper: ImportMapper = None,
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         root_path = pathlib.Path(path)
-        self._kwargs = kwargs
-        self._data_type_obj = data_type_handler.get_data_type_obj("physicalchemical")
+        self._data_type_obj = get_data_type_handler(self.config).get_data_type_obj(
+            "physicalchemical"
+        )
 
         if not root_path.exists():
             raise FileNotFoundError(path)

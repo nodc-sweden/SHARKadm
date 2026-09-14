@@ -4,8 +4,9 @@ from typing import Protocol
 
 import pandas as pd
 import polars as pl
+from nodc_config import Config
 
-from sharkadm.config.data_type import DataType, data_type_handler
+from sharkadm.config.data_type import DataType, get_data_type_handler
 
 
 class ImportMapper(Protocol):
@@ -17,11 +18,14 @@ class ImportMapper(Protocol):
 class PolarsDataSource:
     def __init__(
         self,
+        nodc_conf: Config,
         data_type: str | None = None,
     ) -> None:
         self._data_type_obj: DataType | None = None
         if data_type:
-            self._data_type_obj = data_type_handler.get_data_type_obj(data_type)
+            self._data_type_obj = get_data_type_handler(nodc_conf).get_data_type_obj(
+                data_type
+            )
         self._source = None
         self._data: pl.DataFrame = pl.DataFrame()
         self._original_header: list = []
@@ -127,7 +131,7 @@ class PolarsDataFile(PolarsDataSource, ABC):
         encoding: str = "cp1252",
         **kwargs,
     ) -> None:
-        super().__init__(data_type=data_type)
+        super().__init__(data_type=data_type, **kwargs)
         self._path: pathlib.Path = pathlib.Path(path)
         self._source: str = str(self._path)
         self._encoding: str = encoding

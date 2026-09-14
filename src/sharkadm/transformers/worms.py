@@ -6,9 +6,6 @@ from .base import PolarsTransformer
 nodc_worms = None
 try:
     import nodc_worms
-
-    taxa_worms = nodc_worms.get_taxa_worms_object()
-    translate_worms = nodc_worms.get_translate_worms_object()
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -41,6 +38,7 @@ class PolarsAddWormsScientificName(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        translate_worms = nodc_worms.get_translate_worms_object(data_holder.config)
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             try:
@@ -88,7 +86,7 @@ class PolarsAddWormsAphiaId(PolarsTransformer):
         if self.col_to_set not in data_holder.data.columns:
             self._log(f"Adding column {self.col_to_set}", level=adm_logger.DEBUG)
             self._add_empty_col_to_set(data_holder)
-
+        taxa_worms = nodc_worms.get_taxa_worms_object(data_holder.config)
         for (source_name,), df in data_holder.data.group_by(self.source_col):
             try:
                 aphia_id = taxa_worms.get_aphia_id(str(source_name))

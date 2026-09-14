@@ -5,17 +5,15 @@ from sharkadm.sharkadm_logger import adm_logger
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
 
+nodc_codes = None
 try:
     from nodc_codes import get_translate_codes_object
-
-    _translate_codes = get_translate_codes_object()
 except ModuleNotFoundError as e:
-    _translate_codes = None
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
         f'Could not import package "{module_name}" in module {__name__}. '
         f"You need to install this dependency if you want to use this module.",
-        level=adm_logger.WARNING,
+        level=adm_logger.DEBUG,
     )
 
 
@@ -34,6 +32,15 @@ class _PolarsAddCodes(PolarsTransformer):
         return ""
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_codes:
+            self._log(
+                'Package "nodc_codes" not found. '
+                "You need to install this dependency if you want to use this "
+                "transformer.",
+                level=adm_logger.WARNING,
+            )
+            return
+        self._translate_codes = get_translate_codes_object(data_holder.config)
         source_col = ""
         for col in self.source_cols:
             if col in data_holder.data.columns:
@@ -71,7 +78,8 @@ class _PolarsAddCodes(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return []
-        info = _translate_codes.get_info(self.lookup_field, code)
+
+        info = self._translate_codes.get_info(self.lookup_field, code)
         if not info:
             if "," in code:
                 names = []

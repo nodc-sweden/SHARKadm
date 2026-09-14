@@ -26,7 +26,7 @@ class SHARKapiDataHolder(PolarsDataHolder):
         encoding: str = "utf8",
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
 
         self._data_type = data_type
         self._encoding = encoding

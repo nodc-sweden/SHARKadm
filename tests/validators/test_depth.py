@@ -1,7 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm import adm_logger
 from sharkadm.validators.depth import (
@@ -50,7 +51,8 @@ def test_validate_wadep(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -97,7 +99,8 @@ def test_sample_depth_is_validated_against_water_depth(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -133,7 +136,8 @@ def test_sample_depth_cant_be_validated_if_missing_parameters(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -181,7 +185,8 @@ def test_secchi_depth_is_validated_against_water_depth(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -230,7 +235,8 @@ def test_secchi_depth_cant_be_validated_if_missing_parameters(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

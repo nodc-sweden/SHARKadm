@@ -1,7 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm.transformers.add_gsw_parameters import (
     PolarsAddDensity,
@@ -39,7 +40,8 @@ def test_validate_add_density_wide_erroneous_data(
         }
     )
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
 
     # There should be no column with in situ density
     # before application of transformer
@@ -90,7 +92,8 @@ def test_validate_add_density_wide(
         }
     )
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
 
     # There should be no column with in situ density
     # before application of transformer
@@ -167,7 +170,8 @@ def test_validate_add_density_erroneous_data(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
 
     # There should be no column with in situ density
     # before application of the transformer
@@ -236,7 +240,8 @@ def test_validate_add_density(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
 
     # There should be no column with in situ density
     # before application of the transformer

@@ -1,18 +1,19 @@
-from importlib.util import find_spec
-
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
-from ._codes import _translate_codes
 from .base import PolarsTransformer
 
-if not find_spec("nodc_codes"):
+nodc_codes = None
+try:
+    from nodc_codes import get_translate_codes_object
+except ModuleNotFoundError as e:
+    module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
-        f"Could not import package 'nodc_codes' in module {__name__}. "
+        f'Could not import package "{module_name}" in module {__name__}. '
         f"You need to install this dependency if you want to use this module.",
-        level=adm_logger.WARNING,
+        level=adm_logger.DEBUG,
     )
 
 
@@ -31,6 +32,15 @@ class _PolarsReportingInstitute(PolarsTransformer):
         return ""
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        if not nodc_codes:
+            self._log(
+                'Package "nodc_codes" not found. '
+                "You need to install this dependency if you want to use this "
+                "transformer.",
+                level=adm_logger.WARNING,
+            )
+            return
+        self._translate_codes = get_translate_codes_object(data_holder.config)
         if self._set_from_data(data_holder=data_holder):
             return
         if not self._set_from_other(data_holder=data_holder):
@@ -45,7 +55,7 @@ class _PolarsReportingInstitute(PolarsTransformer):
             hasattr(data_holder, "reporting_institute")
             and data_holder.reporting_institute
         ):
-            info = _translate_codes.get_info(
+            info = self._translate_codes.get_info(
                 self.lookup_field, data_holder.reporting_institute
             )
             self._log(
@@ -78,7 +88,7 @@ class _PolarsReportingInstitute(PolarsTransformer):
                 part = part.strip()
                 if not part:
                     continue
-                info = _translate_codes.get_info(self.lookup_field, part)
+                info = self._translate_codes.get_info(self.lookup_field, part)
                 if info:
                     names.append(info[self.lookup_key])
                 else:

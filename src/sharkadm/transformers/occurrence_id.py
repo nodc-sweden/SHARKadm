@@ -86,6 +86,7 @@ class AddOccurrenceId(PolarsTransformer):
         # 3: Om när match. Logga _temp_occurence_id som man sedan kan sätta nya ????
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
+            data_holder.config,
             data_holder.data_type_internal,
         )
         self.col_to_set = self.database.id_column

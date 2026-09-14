@@ -1,92 +1,92 @@
 import pathlib
 import sqlite3
 
-from nodc_config import nodc_conf
+from nodc_config import Config
 
 
-def get_db_path() -> pathlib.Path:
-    return nodc_conf.root_dir / "sharkadm" / "sweref99tm_database.db"
+class Sweref99tmDatabase:
+    def __init__(self, nodc_conf: Config):
+        self._nodc_conf = nodc_conf
 
+    def get_db_path(self) -> pathlib.Path:
+        return self._nodc_conf.root_dir / "sharkadm" / "sweref99tm_database.db"
 
-def create_database():
-    db_path = get_db_path()
-    if db_path.exists():
-        return
-    print(f"Creating sweref99tm database at: {db_path}")
-    with sqlite3.connect(db_path) as connection:
-        cursor = connection.cursor()
+    def create_database(self):
+        db_path = self.get_db_path()
+        if db_path.exists():
+            return
+        print(f"Creating sweref99tm database at: {db_path}")
+        with sqlite3.connect(db_path) as connection:
+            cursor = connection.cursor()
 
-        create_table_query = """
-        CREATE TABLE IF NOT EXISTS sweref99tm (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lat_dd TEXT,
-            lon_dd TEXT,
-            x_pos TEXT,
-            y_pos TEXT,
-            UNIQUE(lat_dd, lon_dd)
-        );
-        """
+            create_table_query = """
+            CREATE TABLE IF NOT EXISTS sweref99tm (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lat_dd TEXT,
+                lon_dd TEXT,
+                x_pos TEXT,
+                y_pos TEXT,
+                UNIQUE(lat_dd, lon_dd)
+            );
+            """
 
-        cursor.execute(create_table_query)
+            cursor.execute(create_table_query)
 
-        connection.commit()
+            connection.commit()
 
+    def add(self, lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
+        self.create_database()
+        with sqlite3.connect(self.get_db_path()) as connection:
+            cursor = connection.cursor()
 
-def add(lat_dd: str, lon_dd: str, x_pos: str, y_pos: str):
-    create_database()
-    with sqlite3.connect(get_db_path()) as connection:
-        cursor = connection.cursor()
+            insert_query = """
+            INSERT INTO sweref99tm (lat_dd, lon_dd, x_pos, y_pos)
+            VALUES (?, ?, ?, ?);
+            """
+            data = (lat_dd, lon_dd, x_pos, y_pos)
 
-        insert_query = """
-        INSERT INTO sweref99tm (lat_dd, lon_dd, x_pos, y_pos)
-        VALUES (?, ?, ?, ?);
-        """
-        data = (lat_dd, lon_dd, x_pos, y_pos)
+            cursor.execute(insert_query, data)
 
-        cursor.execute(insert_query, data)
+            connection.commit()
 
-        connection.commit()
+    def get(self, lat_dd: str, lon_dd: str) -> dict:
+        self.create_database()
+        with sqlite3.connect(self.get_db_path()) as connection:
+            cursor = connection.cursor()
 
+            query = """
+               SELECT * FROM sweref99tm
+               WHERE lat_dd = ?
+               AND lon_dd = ?
+               ;
+               """
+            data = (lat_dd, lon_dd)
 
-def get(lat_dd: str, lon_dd: str) -> dict:
-    create_database()
-    with sqlite3.connect(get_db_path()) as connection:
-        cursor = connection.cursor()
+            cursor.execute(query, data)
+            result = cursor.fetchone()
 
-        query = """
-           SELECT * FROM sweref99tm
-           WHERE lat_dd = ?
-           AND lon_dd = ?
-           ;
-           """
-        data = (lat_dd, lon_dd)
+            connection.commit()
+            info = dict()
+            if result:
+                info["x_pos"] = result[3]
+                info["y_pos"] = result[4]
+            return info
 
-        cursor.execute(query, data)
-        result = cursor.fetchone()
+    def get_mapper(self) -> dict:
+        self.create_database()
+        with sqlite3.connect(self.get_db_path()) as connection:
+            cursor = connection.cursor()
 
-        connection.commit()
-        info = dict()
-        if result:
-            info["x_pos"] = result[3]
-            info["y_pos"] = result[4]
-        return info
+            query = """
+               SELECT * FROM sweref99tm
+               ;
+               """
 
+            cursor.execute(query)
+            result = cursor.fetchall()
 
-def get_mapper() -> dict:
-    create_database()
-    with sqlite3.connect(get_db_path()) as connection:
-        cursor = connection.cursor()
-
-        query = """
-           SELECT * FROM sweref99tm
-           ;
-           """
-
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-        connection.commit()
-        info = dict()
-        for res in result:
-            info[(res[1], res[2])] = (res[3], res[4])
-        return info
+            connection.commit()
+            info = dict()
+            for res in result:
+                info[(res[1], res[2])] = (res[3], res[4])
+            return info

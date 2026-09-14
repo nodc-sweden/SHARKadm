@@ -5,10 +5,6 @@ from .base import PolarsFileExporter
 
 
 class ExportColumnViewsColumnsNotInData(PolarsFileExporter):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._column_views = get_column_views_config()
-
     @staticmethod
     def get_exporter_description() -> str:
         return "Writes all columns in column_views that are not in data"
@@ -20,7 +16,8 @@ class ExportColumnViewsColumnsNotInData(PolarsFileExporter):
             )
 
         cols_to_write = []
-        column_views_columns = self._column_views.get_columns_for_view(
+        column_views = get_column_views_config()
+        column_views_columns = column_views.get_columns_for_view(
             data_holder.data_type_internal
         )
         for col in column_views_columns:

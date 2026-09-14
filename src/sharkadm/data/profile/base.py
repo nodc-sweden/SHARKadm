@@ -14,8 +14,8 @@ class PolarsProfileDataHolder(PolarsDataHolder):
 
     _header_mapper = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         _sensor_info: dict[str, sensorinfo.Sensorinfo] = dict()
 
     @property

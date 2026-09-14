@@ -1,8 +1,8 @@
 import yaml
-from nodc_config import nodc_conf
+from nodc_config import Config
 
 
-def get_mandatory_columns(data_type: str) -> list[str]:
+def get_mandatory_columns(nodc_conf: Config, data_type: str) -> list[str]:
     path = nodc_conf("mandatory_columns")
     if not path:
         raise FileNotFoundError("File not found for mandatory columns")

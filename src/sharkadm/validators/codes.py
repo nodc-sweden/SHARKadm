@@ -8,10 +8,7 @@ from .base import Validator
 
 try:
     from nodc_codes import get_translate_codes_object
-
-    _translate_codes = get_translate_codes_object()
 except ModuleNotFoundError as e:
-    _translate_codes = None
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
         f'Could not import package "{module_name}" in module {__name__}. '
@@ -33,6 +30,7 @@ class _ValidateCodes(Validator):
         return ""
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
+        self._translate_codes = get_translate_codes_object(data_holder.config)
         for col in self.columns:
             if col not in data_holder.data.columns:
                 self._log_fail(f"No column named {col} in data", level=adm_logger.DEBUG)
@@ -72,8 +70,7 @@ class _ValidateCodes(Validator):
             for part in code.split(" "):
                 self._validate_code_and_log(part, source_col, df)
             return
-
-        info = _translate_codes.get_info(self.lookup_field, code)
+        info = self._translate_codes.get_info(self.lookup_field, code)
         if info is not None:
             return
         self._log_fail(

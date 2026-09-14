@@ -7,9 +7,6 @@ from .base import PolarsTransformer
 nodc_dyntaxa = None
 try:
     import nodc_dyntaxa
-
-    translate_dyntaxa = nodc_dyntaxa.get_translate_dyntaxa_object()
-    dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object()
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -105,6 +102,7 @@ class PolarsAddDyntaxaScientificName(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        translate_dyntaxa = nodc_dyntaxa.get_translate_dyntaxa_object(data_holder.config)
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
@@ -191,6 +189,9 @@ class PolarsAddDyntaxaTranslatedScientificNameDyntaxaId(PolarsTransformer):
         self._add_empty_col_to_set(data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             name = str(name)
+            translate_dyntaxa = nodc_dyntaxa.get_translate_dyntaxa_object(
+                data_holder.config
+            )
             _id = translate_dyntaxa.get_dyntaxa_id(name)
             if not _id:
                 continue
@@ -242,6 +243,7 @@ class PolarsAddTaxonRanks(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object(data_holder.config)
         self._add_columns(data_holder=data_holder)
         for (name,), df in data_holder.data.group_by(self.source_col):
             info = dyntaxa_taxon.get_info(scientificName=name, taxonomicStatus="accepted")
@@ -308,6 +310,7 @@ class PolarsAddDyntaxaId(PolarsTransformer):
                 level=adm_logger.ERROR,
             )
             return
+        dyntaxa_taxon = nodc_dyntaxa.get_dyntaxa_taxon_object(data_holder.config)
         if self.col_to_set not in data_holder.data.columns:
             self._log(f"Adding empty column {self.col_to_set}", level=adm_logger.DEBUG)
             self._add_empty_col_to_set(data_holder)

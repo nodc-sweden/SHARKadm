@@ -25,8 +25,9 @@ class PolarsLimsDataHolder(PolarsDataHolder):
         self,
         lims_root_directory: str | pathlib.Path | None = None,
         header_mapper: HeaderMapper = None,
+        **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self._lims_root_directory = pathlib.Path(lims_root_directory)
         if not self._lims_root_directory.is_dir():
             raise NotADirectoryError(self._lims_root_directory)
