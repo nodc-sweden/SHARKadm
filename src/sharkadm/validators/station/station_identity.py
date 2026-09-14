@@ -22,7 +22,7 @@ class ValidateStationIdentity(Validator):
 
     def __init__(
         self,
-        stations: StationFile = None,
+        stations: "StationFile" = None,
         station_name_key="reported_station_name",
         latitude_key="LATIT",
         longitude_key="LONGI",
