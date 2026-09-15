@@ -43,7 +43,7 @@ class PolarsQcToolDataHolder(PolarsDataHolder):
 
     def _load_data(self) -> None:
         data_source = CsvRowFormatPolarsDataFile(
-            path=self._qc_file_path, data_type=self.data_type
+            path=self._qc_file_path, data_type=self.data_type, nodc_conf=self.config
         )
         if self._header_mapper:
             data_source.map_header(self._header_mapper)

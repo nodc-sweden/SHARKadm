@@ -44,6 +44,8 @@ class PolarsBacterioplanktonArchiveDataHolder(PolarsArchiveDataHolder):
             return
 
         d_source = data_source.CsvRowFormatPolarsDataFile(
-            path=data_file_path, data_type=self.delivery_note.data_type
+            path=data_file_path,
+            data_type=self.delivery_note.data_type,
+            nodc_conf=self.config,
         )
         return d_source

@@ -38,7 +38,9 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._import_matrix_mapper = self.data_type_obj.get_mapper(self.data_format)
 
     def _load_data(self) -> None:
-        d_source = CsvRowFormatPolarsDataFile(path=self._path, encoding=self._encoding)
+        d_source = CsvRowFormatPolarsDataFile(
+            path=self._path, encoding=self._encoding, nodc_conf=self.config
+        )
         for col in ["Datatyp", "Data type", "DTYPE", "delivery_datatype", "data_type"]:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])

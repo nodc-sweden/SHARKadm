@@ -258,7 +258,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder):
             )
             return
         d_source = CsvRowFormatPolarsDataFile(
-            path=self.shark_data_path, data_type=self.data_type
+            path=self.shark_data_path, data_type=self.data_type, nodc_conf=self.config
         )
         self._set_data_source(d_source)
 
