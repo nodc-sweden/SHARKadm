@@ -9,7 +9,7 @@ from .zip_archive_data_holder import PolarsZipArchiveDataHolder
 def get_polars_zip_archive_data_holder(
     nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsZipArchiveDataHolder:
-    return PolarsZipArchiveDataHolder(path, **kwargs)
+    return PolarsZipArchiveDataHolder(path, nodc_conf=nodc_conf, **kwargs)
 
 
 def path_is_zip_archive(path: str | pathlib.Path) -> Union[pathlib.Path, False]:

@@ -12,4 +12,4 @@ def get_polars_dv_template_data_holder(
     path = pathlib.Path(path)
     if not path.suffix == ".xlsx":
         raise NotImplementedError(f"Invalid template path: {path}")
-    return PolarsDvTemplateDataHolder(template_path=path)
+    return PolarsDvTemplateDataHolder(template_path=path, nodc_conf=nodc_conf)

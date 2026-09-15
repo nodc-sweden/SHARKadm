@@ -71,9 +71,11 @@ def path_has_or_is_cnv_profile_data(
 
 
 def get_polars_profile_cnv_data_holder(
-    path: str | pathlib.Path, **kwargs
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsCnvDataHolder:
     path = pathlib.Path(path)
-    mapper = config.get_import_matrix_mapper(data_type="profile", import_column="PROFILE")
+    mapper = config.get_import_matrix_mapper(
+        data_type="profile", import_column="PROFILE", nodc_conf=nodc_conf
+    )
     return PolarsCnvDataHolder(path=path, header_mapper=mapper, **kwargs)
     # return PolarsCnvDataHolder(path=path, **kwargs)

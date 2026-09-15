@@ -1,17 +1,23 @@
 import pathlib
 from typing import Union
 
+from nodc_config import Config
+
 from sharkadm import config
 
 from .odv_data_holder import PolarsOdvDataHolder
 
 
-def get_polars_odv_data_holder(path: str | pathlib.Path, **kwargs) -> PolarsOdvDataHolder:
+def get_polars_odv_data_holder(
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
+) -> PolarsOdvDataHolder:
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(
         data_type="physicalchemical", import_column="ODV"
     )
-    return PolarsOdvDataHolder(path=path, header_mapper=mapper, **kwargs)
+    return PolarsOdvDataHolder(
+        path=path, header_mapper=mapper, nodc_conf=nodc_conf, **kwargs
+    )
 
 
 def path_has_or_is_odv_data(path: str | pathlib.Path) -> Union[pathlib.Path, False]:

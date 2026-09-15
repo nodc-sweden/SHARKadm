@@ -21,7 +21,9 @@ def get_polars_lims_data_holder(
         mapper = config.get_import_matrix_mapper(
             nodc_conf=nodc_conf, data_type="physicalchemical", import_column="LIMS"
         )
-    return PolarsLimsDataHolder(lims_root_directory=path, header_mapper=mapper)
+    return PolarsLimsDataHolder(
+        lims_root_directory=path, header_mapper=mapper, nodc_conf=nodc_conf
+    )
 
 
 def is_lims_directory(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:
