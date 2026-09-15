@@ -60,10 +60,6 @@ class PolarsClearColumns(PolarsTransformer):
 
 
 class PolarsAddColumnViewsColumns(PolarsTransformer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._column_views = get_column_views_config()
-
     @staticmethod
     def get_transformer_description() -> str:
         return (
@@ -72,6 +68,7 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._column_views = get_column_views_config(data_holder.config)
         columns_to_add = self._column_views.get_columns_for_view(
             data_holder.data_type_internal
         )
@@ -84,15 +81,12 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
 
 
 class PolarsOnlyKeepColumnViewsColumns(PolarsTransformer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._column_views = get_column_views_config()
-
     @staticmethod
     def get_transformer_description() -> str:
         return "Removes columns not listed in column_views for data_type"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._column_views = get_column_views_config(data_holder.config)
         columns = self._column_views.get_columns_for_view(data_holder.data_type_internal)
         columns_to_keep = [col for col in columns if col in data_holder.columns]
         data_holder.data = data_holder.data[columns_to_keep]

@@ -3,6 +3,7 @@ import re
 from typing import Any, Self
 
 import polars as pl
+from nodc_config import Config
 
 from sharkadm import (
     event,
@@ -69,7 +70,9 @@ from sharkadm.validators import Validator
 
 
 class SHARKadmPolarsController:
+    # def __init__(self, nodc_conf: Config) -> None:
     def __init__(self) -> None:
+        # self._config: Config = nodc_conf
         self._data_holder: PolarsDataHolder | None = None
         self._transformers: list[PolarsTransformer | PolarsMultiTransformer] = []
         self._validators_before: list[Validator] = []
@@ -84,7 +87,7 @@ class SHARKadmPolarsController:
 
     def __add__(self, other):
         cdh = self.data_holder + other.data_holder
-        new_controller = SHARKadmPolarsController()
+        new_controller = SHARKadmPolarsController(self._config)
         new_controller.set_data_holder(cdh)
         return new_controller
 
@@ -159,6 +162,10 @@ class SHARKadmPolarsController:
     @property
     def is_filtered(self) -> bool:
         return self._data_holder.is_filtered
+
+    # @property
+    # def config(self) -> Config | None:
+    #     return self._config
 
     def filter(self, data_filter) -> Self:
         self._data_holder.filter(data_filter)
@@ -285,9 +292,9 @@ def _get_fixed_list(
 
 
 def get_polars_controller_with_data(
-    path: pathlib.Path | str | pl.DataFrame, **kwargs
+    nodc_conf: Config, path: pathlib.Path | str | pl.DataFrame, **kwargs
 ) -> SHARKadmPolarsController:
     c = SHARKadmPolarsController()
-    holder = get_polars_data_holder(path, **kwargs)
+    holder = get_polars_data_holder(nodc_conf, path, **kwargs)
     c.set_data_holder(holder)
     return c

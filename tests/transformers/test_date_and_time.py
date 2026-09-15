@@ -1,8 +1,9 @@
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm.transformers.date_and_time import PolarsAddDatetime
 
@@ -33,7 +34,8 @@ def test_data_and_time(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     assert "datetime" not in given_data_holder.data.columns, (

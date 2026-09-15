@@ -1,5 +1,7 @@
 import pathlib
 
+from nodc_config import Config
+
 from sharkadm import config
 
 # from .shark_api import SHARKapiDataHolder
@@ -28,9 +30,9 @@ def rename_columns(name: str) -> str:
 
 
 def get_polars_shark_data_holder(
-    path: str | pathlib.Path, **kwargs
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsSharkDataHolder:
-    holder = PolarsSharkDataHolder(path=path, **kwargs)
+    holder = PolarsSharkDataHolder(path=path, nodc_conf=nodc_conf, **kwargs)
     holder.data = holder.data.rename(rename_columns)
     return holder
 

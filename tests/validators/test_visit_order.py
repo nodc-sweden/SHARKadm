@@ -1,8 +1,9 @@
 import datetime
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm import adm_logger
 from sharkadm.validators.visit_order import ValidateVisitOrder
@@ -66,7 +67,8 @@ def test_validate_order_of_visits(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

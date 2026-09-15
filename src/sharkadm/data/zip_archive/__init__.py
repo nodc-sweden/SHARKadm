@@ -1,11 +1,13 @@
 import pathlib
 from typing import Union
 
+from nodc_config import Config
+
 from .zip_archive_data_holder import PolarsZipArchiveDataHolder
 
 
 def get_polars_zip_archive_data_holder(
-    path: str | pathlib.Path, **kwargs
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsZipArchiveDataHolder:
     return PolarsZipArchiveDataHolder(path, **kwargs)
 

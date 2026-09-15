@@ -5,8 +5,8 @@ from sharkadm.data import PolarsDataHolder
 
 
 class PolarsDataFrameHolder(PolarsDataHolder):
-    def __init__(self, data: pl.DataFrame):
-        super().__init__()
+    def __init__(self, data: pl.DataFrame, **kwargs):
+        super().__init__(**kwargs)
         self._data = data
 
     @property

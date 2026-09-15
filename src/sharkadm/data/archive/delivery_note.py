@@ -1,19 +1,13 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 import pathlib
 from typing import Protocol
 
 import pandas as pd
+from nodc_config import Config
 
 from sharkadm import config, sharkadm_exceptions
-from sharkadm.config.data_type import data_type_handler
+from sharkadm.config.data_type import get_data_type_handler
 from sharkadm.sharkadm_logger import adm_logger
-
-try:
-    import nodc_codes
-except ImportError:
-    pass
 
 
 class Mapper(Protocol):
@@ -21,14 +15,21 @@ class Mapper(Protocol):
 
 
 class DeliveryNote:
-    def __init__(self, data: dict, mapper: Mapper = None) -> None:
-        self.translate_codes = nodc_codes.get_translate_codes_object()
+    def __init__(
+        self,
+        nodc_conf: Config,
+        data: dict,
+        mapper: Mapper = None,
+    ) -> None:
         self._data = {key.upper(): value for key, value in data.items()}
         self._path = data.pop("path", None)
         self._data_format = data.get("data_format", None)
         self._import_matrix_key = data.get("import_matrix_key", None)
         self._mapper = mapper
-        self._data_type_obj = data_type_handler.get_data_type_obj(self._data["DTYPE"])
+        self._nodc_conf = nodc_conf
+        self._data_type_obj = get_data_type_handler(nodc_conf).get_data_type_obj(
+            self._data["DTYPE"]
+        )
         if not self._mapper and self._data_type_obj:
             self._mapper = self._data_type_obj.get_mapper(self._import_matrix_key)
 
@@ -54,6 +55,7 @@ class DeliveryNote:
     @classmethod
     def from_txt_file(
         cls,
+        nodc_conf: Config,
         path: str | pathlib.Path,
         mapper: Mapper = None,
         encoding: str = "cp1252",
@@ -65,7 +67,7 @@ class DeliveryNote:
             adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
 
-        dn_mapper = config.get_delivery_note_mapper()
+        dn_mapper = config.get_delivery_note_mapper(nodc_conf=nodc_conf)
 
         data = dict()
         data["path"] = path
@@ -95,7 +97,7 @@ class DeliveryNote:
         if include_all_column:
             with open(path, encoding=encoding) as fid:
                 data["all"] = fid.read()
-        return DeliveryNote(data, mapper=mapper)
+        return DeliveryNote(nodc_conf, data, mapper=mapper)
 
     @classmethod
     def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None):

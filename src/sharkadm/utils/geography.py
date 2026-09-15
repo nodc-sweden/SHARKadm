@@ -62,7 +62,7 @@ def decdeg_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> (float, fl
 
 def get_decdeg_to_sweref99tm_mapper(
     lat: list[str], lon: list[str], use_db: bool = False
-) -> dict[(str, str), (str, str)]:
+) -> (dict)[(str, str), (str, str)]:
     mapper = {}
     if use_db:
         mapper = sweref99tm_db.get_mapper()

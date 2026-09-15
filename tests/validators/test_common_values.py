@@ -1,7 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm import adm_logger
 from sharkadm.validators import ValidateCommonValuesByVisit
@@ -93,7 +94,8 @@ def test_conflicting_values_for_same_visit_are_found(
     )
 
     # Given a data holder
-    given_data_holder = polars_data_frame_holder_class(data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(data, nodc_conf=config)
 
     # Given the local configurations lists the data type of the data holder as valid
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)

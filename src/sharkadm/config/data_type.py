@@ -1,3 +1,5 @@
+from nodc_config import Config
+
 from sharkadm.config import get_import_matrix_config, get_import_matrix_config_paths
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 
@@ -17,7 +19,8 @@ def _get_mapped_datatype(data_type_synonym: str) -> str:
 
 
 class DataType:
-    def __init__(self, data_type_internal: str | None = None):
+    def __init__(self, nodc_conf: Config, data_type_internal: str | None = None):
+        self._nodc_conf: Config = nodc_conf
         self._data_type_internal = data_type_internal
         self._import_matrix_config: ImportMatrixConfig | None = None
 
@@ -40,7 +43,7 @@ class DataType:
     def import_matrix(self) -> ImportMatrixConfig:
         if not self._import_matrix_config:
             self._import_matrix_config = get_import_matrix_config(
-                self._data_type_internal
+                self._nodc_conf, self._data_type_internal
             )
         return self._import_matrix_config
 
@@ -127,20 +130,15 @@ class DataTypeMarineBiotoxins(DataType):
 
 
 class DataTypeHandler:
-    def __init__(self):
+    def __init__(self, nodc_conf: Config):
+        self._nodc_conf: Config = nodc_conf
         self._data_types: dict[str, DataType] = {}
 
     def get_data_type_obj(self, data_type_synonym: str) -> DataType:
-        # print()
-        # print("="*100)
-        # print(f"{data_type_synonym=}")
-        # for line in traceback.format_stack():
-        #     print("    ", line.strip())
-        # print("-" * 100)
         obj = self._data_types.get(data_type_synonym)
         if obj:
             return obj
-        obj = _get_data_type(data_type_synonym)
+        obj = _get_data_type(self._nodc_conf, data_type_synonym)
         if obj:
             self._data_types[data_type_synonym] = obj
         return obj
@@ -155,19 +153,15 @@ CLASS_MAPPER = {
 }
 
 
-def _get_data_type(data_type_synonym: str) -> DataType | None:
+def _get_data_type(nodc_conf: Config, data_type_synonym: str) -> DataType | None:
     dtype_str = _get_mapped_datatype(data_type_synonym)
     if dtype_str == "unknown":
         return CLASS_MAPPER.get(dtype_str)(dtype_str)
-    if not get_import_matrix_config_paths().get(dtype_str):
+    if not get_import_matrix_config_paths(nodc_conf).get(dtype_str):
         return
     cls = CLASS_MAPPER.get(dtype_str, DataType)
-    return cls(dtype_str)
+    return cls(nodc_conf, dtype_str)
 
 
-data_type_handler = DataTypeHandler()
-
-
-if __name__ == "__main__":
-    dtype = data_type_handler.get_data_type_obj("profile")
-    print(f"{dtype=}")
+def get_data_type_handler(nodc_conf: Config) -> DataTypeHandler:
+    return DataTypeHandler(nodc_conf)

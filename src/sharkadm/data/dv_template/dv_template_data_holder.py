@@ -4,7 +4,7 @@ import re
 import openpyxl
 import pandas as pd
 
-from sharkadm.config.data_type import DataType, data_type_handler
+from sharkadm.config.data_type import DataType, get_data_type_handler
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
@@ -21,8 +21,8 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, template_path: str | pathlib.Path | None = None):
-        super().__init__()
+    def __init__(self, template_path: str | pathlib.Path | None = None, **kwargs):
+        super().__init__(**kwargs)
         self._template_path = pathlib.Path(template_path)
         adm_logger.dataset_name = self._template_path.name
 
@@ -186,7 +186,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
         """Loads the import matrix for the given data type"""
         # return
         #
-        self._data_type_obj = data_type_handler.get_data_type_obj(
+        self._data_type_obj = get_data_type_handler(self.config).get_data_type_obj(
             self.delivery_note.data_type
         )
         print(f"{self._data_type_obj=}")
@@ -243,7 +243,9 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     def _set_data_source(self, data_source: PolarsDataFile) -> None:
         """Sets a single data source to self._data"""
-        self._data_type_obj = data_type_handler.get_data_type_obj(data_source.data_type)
+        self._data_type_obj = get_data_type_handler(self.config).get_data_type_obj(
+            data_source.data_type
+        )
         self._add_data_source(data_source)
         self._data = self._get_data_from_data_source(data_source)
 

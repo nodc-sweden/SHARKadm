@@ -4,6 +4,7 @@ from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.transformers.base import PolarsTransformer
 
+nodc_station = None
 try:
     import nodc_station
 except ModuleNotFoundError as e:
@@ -16,46 +17,57 @@ except ModuleNotFoundError as e:
 
 
 class PolarsSetStationNameFromReportedStationNameIfMissing(PolarsTransformer):
-    source_column = "reported_station_name"
+    source_col = "reported_station_name"
     col_to_set = "station_name"
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Sets {PolarsSetStationNameFromReportedStationNameIfMissing.source_column} "
+            f"Sets {PolarsSetStationNameFromReportedStationNameIfMissing.source_col} "
             f"to {PolarsSetStationNameFromReportedStationNameIfMissing.col_to_set} "
             f"if missing"
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        mask = pl.col(self.col_to_set) == ""
-        missing_df = data_holder.data.filter(mask)
-        if not len(missing_df):
-            return
-        data_holder.data = data_holder.data.with_columns(
-            pl.when(mask)
-            .then(pl.col(self.source_column))
-            .otherwise(pl.col(self.col_to_set))
-            .alias(self.col_to_set)
-        )
-        adm_logger.log_transformation(
-            f"Missing {self.col_to_set} set "
-            f"from {self.source_column} "
-            f"({len(missing_df)} places)",
-            level=adm_logger.DEBUG,
-        )
+        if self.col_to_set not in data_holder.data.columns:
+            data_holder.data = data_holder.data.with_columns(
+                pl.col(self.source_col).alias(self.col_to_set)
+            )
+            adm_logger.log_transformation(
+                f"Missing {self.col_to_set} set "
+                f"from {self.source_col} "
+                f"(all {len(data_holder.data)} places)",
+                level=adm_logger.DEBUG,
+            )
+        else:
+            mask = pl.col(self.col_to_set) == ""
+            missing_df = data_holder.data.filter(mask)
+            if not len(missing_df):
+                return
+            data_holder.data = data_holder.data.with_columns(
+                pl.when(mask)
+                .then(pl.col(self.source_col))
+                .otherwise(pl.col(self.col_to_set))
+                .alias(self.col_to_set)
+            )
+            adm_logger.log_transformation(
+                f"Missing {self.col_to_set} set "
+                f"from {self.source_col} "
+                f"({len(missing_df)} places)",
+                level=adm_logger.DEBUG,
+            )
 
 
 class PolarsCopyReportedStationNameToStationName(PolarsTransformer):
     valid_data_types = ("plankton_imaging",)
 
-    source_column = "reported_station_name"
+    source_col = "reported_station_name"
     col_to_set = "station_name"
 
     @staticmethod
     def get_transformer_description() -> str:
         return (
-            f"Copies {PolarsCopyReportedStationNameToStationName.source_column} to "
+            f"Copies {PolarsCopyReportedStationNameToStationName.source_col} to "
             f"{PolarsCopyReportedStationNameToStationName.col_to_set}"
         )
 
@@ -79,7 +91,6 @@ class PolarsAddStationInfo(PolarsTransformer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self._stations = get_station_object()
         self._station_synonyms = {}
         self._loaded_stations_info = {}
 
@@ -88,7 +99,15 @@ class PolarsAddStationInfo(PolarsTransformer):
         return "Adds station information to all places"
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-
+        if not nodc_station:
+            self._log(
+                'Package "nodc_station" not found. '
+                "You need to install this dependency if you want to use this "
+                "transformer.",
+                level=adm_logger.WARNING,
+            )
+            return
+        self._stations = nodc_station.get_station_object(data_holder.config)
         self._create_columns_if_missing(data_holder)
 
         for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
@@ -113,9 +132,11 @@ class PolarsAddStationInfo(PolarsTransformer):
             lat = float(lat_str)
             lon = float(lon_str)
 
-            # matching_stations = self._stations.get_matching_stations(
-            matching_stations = nodc_station.get_matching_stations(
-                name=reported_station, lat_dd=lat, lon_dd=lon
+            matching_stations = self._stations.get_matching_stations(
+                # matching_stations = nodc_station.get_matching_stations(
+                name=reported_station,
+                lat_dd=lat,
+                lon_dd=lon,
             )
             if not matching_stations:
                 self._log(

@@ -1,13 +1,15 @@
 import pathlib
 from typing import Union
 
+from nodc_config import Config
+
 from sharkadm import config
 
 from .lims_data_holder import PolarsLimsDataHolder
 
 
 def get_polars_lims_data_holder(
-    path: str | pathlib.Path, **kwargs
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsLimsDataHolder:
     path = pathlib.Path(path)
     if path.name == "data.txt" and path.parent.name.lower() == "raw_data":
@@ -17,7 +19,7 @@ def get_polars_lims_data_holder(
     mapper = None
     if not kwargs.get("keep_header"):
         mapper = config.get_import_matrix_mapper(
-            data_type="physicalchemical", import_column="LIMS"
+            nodc_conf=nodc_conf, data_type="physicalchemical", import_column="LIMS"
         )
     return PolarsLimsDataHolder(lims_root_directory=path, header_mapper=mapper)
 

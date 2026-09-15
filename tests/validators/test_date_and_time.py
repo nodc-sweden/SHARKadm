@@ -1,8 +1,9 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import freezegun
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm import adm_logger
 from sharkadm.validators.date_and_time import ValidateDateAndTime
@@ -45,7 +46,8 @@ def test_validate_visit_date(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -93,7 +95,8 @@ def test_validate_sample_time(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data
@@ -143,7 +146,8 @@ def test_future_datetime_not_allowed(
     )
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # Given a specific time for the validation

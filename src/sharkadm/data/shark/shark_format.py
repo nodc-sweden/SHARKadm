@@ -3,7 +3,7 @@ import pathlib
 import polars as pl
 
 from ...config import ImportMatrixConfig, ImportMatrixMapper
-from ...config.data_type import data_type_handler
+from ...config.data_type import get_data_type_handler
 from .. import PolarsDataHolder
 from ..data_source.base import PolarsDataFile
 from ..data_source.txt_file import CsvRowFormatPolarsDataFile
@@ -14,7 +14,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
     _date_str_format = "%Y-%m-%d"
 
     def __init__(self, path: str | pathlib.Path | None = None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         self._path = pathlib.Path(path)
         self._encoding = kwargs.get("encoding", "cp1252")
         self._separator = kwargs.get("separator", kwargs.get("delimiter", "\t"))
@@ -46,9 +46,9 @@ class PolarsSharkDataHolder(PolarsDataHolder):
                 # if len(all_data_types) > 1:
                 #     raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
                 data_type = all_data_types.pop()
-                self._data_type_obj = data_type_handler.get_data_type_obj(
-                    data_type.lower().replace(" ", "")
-                )
+                self._data_type_obj = get_data_type_handler(
+                    self.config
+                ).get_data_type_obj(data_type.lower().replace(" ", ""))
                 d_source.data_type_obj = self._data_type_obj
                 break
 

@@ -2,9 +2,10 @@ import datetime
 from abc import ABC, abstractmethod
 
 import polars as pl
+from nodc_config import Config
 
 from sharkadm import config
-from sharkadm.config.data_type import DataType, data_type_handler
+from sharkadm.config.data_type import DataType, get_data_type_handler
 from sharkadm.data.data_source.base import (
     PolarsDataSource,
 )
@@ -18,7 +19,8 @@ class PolarsDataHolder(ABC):
     _data_type_synonym = "unknown"
     _data_structure = "row"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, nodc_conf: Config, **kwargs):
+        self._nodc_config: Config = nodc_conf
         self._data_sources: dict[str, PolarsDataSource] = dict()
         self._number_metadata_rows = 0
         self._header_mapper = None
@@ -26,9 +28,10 @@ class PolarsDataHolder(ABC):
         self._data_structure = kwargs.get("data_structure", self._data_structure)
         self._data = pl.DataFrame()
         self._filtered_data = None
-        self._data_type_obj: DataType = data_type_handler.get_data_type_obj(
-            kwargs.get("data_type", self._data_type_synonym)
-        )
+        self._data_type_obj: DataType = get_data_type_handler(
+            self._nodc_config
+        ).get_data_type_obj(kwargs.get("data_type", self._data_type_synonym))
+        self._kwargs = kwargs
 
     def __repr__(self) -> str:
         return (
@@ -57,6 +60,10 @@ class PolarsDataHolder(ABC):
 
     def __radd__(self, other) -> "PolarsDataHolder":
         return self
+
+    @property
+    def config(self) -> Config:
+        return self._nodc_config
 
     @property
     def name(self) -> str:
@@ -297,8 +304,8 @@ class PolarsDataHolder(ABC):
 
 
 class PolarsConcatDataHolder(PolarsDataHolder):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     @staticmethod
     def get_data_holder_description() -> str:

@@ -2,6 +2,8 @@ import os
 import pathlib
 from typing import Union
 
+from nodc_config import Config
+
 from sharkadm import sharkadm_exceptions, utils
 from sharkadm.data.archive.archive_data_holder import PolarsArchiveDataHolder
 from sharkadm.data.archive.bacterioplankton import PolarsBacterioplanktonArchiveDataHolder
@@ -34,13 +36,17 @@ polars_object_mapping = dict(
 )
 
 
-def get_polars_archive_data_holder(path: str | pathlib.Path) -> PolarsArchiveDataHolder:
+def get_polars_archive_data_holder(
+    nodc_conf: Config, path: str | pathlib.Path
+) -> PolarsArchiveDataHolder:
     path = pathlib.Path(path)
-    d_note = DeliveryNote.from_txt_file(path / "processed_data/delivery_note.txt")
+    d_note = DeliveryNote.from_txt_file(
+        nodc_conf, path / "processed_data/delivery_note.txt"
+    )
     d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
-    return d_holder(path)
+    return d_holder(path, nodc_conf=nodc_conf)
 
 
 def directory_is_archive(directory: str | pathlib.Path) -> Union[pathlib.Path, False]:

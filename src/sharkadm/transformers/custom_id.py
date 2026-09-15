@@ -15,7 +15,6 @@ class PolarsAddCustomId(PolarsTransformer):
         self, *names, add_column_if_missing: bool = False, add_md5: bool = False
     ):
         super().__init__()
-        self._id_handler = config.get_custom_id_handler()
         self._names = names
         self._add_column_if_missing = add_column_if_missing
         self._add_md5 = add_md5
@@ -26,6 +25,7 @@ class PolarsAddCustomId(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> OperatorsInfo:
         infos = OperatorsInfo()
+        self._id_handler = config.get_custom_id_handler(data_holder.config)
         for level in self._id_handler.get_levels_for_datatype(
             data_holder.data_type_internal
         ):
@@ -49,7 +49,6 @@ class PolarsAddCustomId(PolarsTransformer):
                     operator=self, msg=msg, cause_for_termination=False, success=False
                 )
             missing = set(id_handler.id_columns) - set(data_holder.data.columns)
-            # print(f"{missing=}")
             if missing:
                 if self._add_column_if_missing:
                     self._log(

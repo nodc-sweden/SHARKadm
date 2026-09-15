@@ -1,13 +1,12 @@
 import os
 import pathlib
 import shutil
-from abc import ABC
 from typing import Callable
 
 import pandas as pd
 
 from sharkadm import utils
-from sharkadm.config.data_type import data_type_handler
+from sharkadm.config.data_type import get_data_type_handler
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.archive import analyse_info, delivery_note, metadata, sampling_info
 from sharkadm.data.data_holder import PolarsDataHolder
@@ -18,7 +17,7 @@ from sharkadm.data.data_source.txt_file import (
 from sharkadm.sharkadm_logger import adm_logger
 
 
-class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
+class PolarsZipArchiveDataHolder(PolarsDataHolder):
     _data_format: str | None = None
     _data_structure = "row"
     _date_str_format = "%Y-%m-%d"
@@ -29,7 +28,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
         load_from_temp_folder: bool = False,
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self._zip_archive_path = pathlib.Path(zip_archive_path)
         self._load_from_temp_folder = load_from_temp_folder
 
@@ -60,7 +59,7 @@ class PolarsZipArchiveDataHolder(PolarsDataHolder, ABC):
 
     def _initiate(self) -> None:
         self._dataset_name = self.zip_archive_path.stem
-        self._data_type_obj = data_type_handler.get_data_type_obj(
+        self._data_type_obj = get_data_type_handler(self.config).get_data_type_obj(
             self.zip_archive_path.stem.split("_")[1]
         )
         # self._data_type = self.zip_archive_path.stem.split("_")[1]

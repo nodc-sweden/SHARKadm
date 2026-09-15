@@ -23,8 +23,9 @@ class PolarsQcToolDataHolder(PolarsDataHolder):
         self,
         qc_file_path: str | pathlib.Path | None = None,
         header_mapper: HeaderMapper = None,
+        **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
 
         self._qc_file_path = pathlib.Path(qc_file_path)
 

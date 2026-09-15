@@ -30,7 +30,9 @@ class ValidateMandatoryColumns(Validator):
         return "Checks if mandatory columns listed in sharkadm config have values."
 
     def _validate(self, data_holder: PolarsDataHolder):
-        mandatory_columns = get_mandatory_columns(data_holder.data_type_internal)
+        mandatory_columns = get_mandatory_columns(
+            data_holder.config, data_holder.data_type_internal
+        )
         for col in mandatory_columns:
             if col not in data_holder.data.columns:
                 self._log_fail(f"Mandatory column {col} not in data")

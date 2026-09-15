@@ -1,6 +1,8 @@
 import pathlib
 from typing import Union
 
+from nodc_config import Config
+
 from sharkadm import config
 from sharkadm.data.profile.cnv_data_holder import PolarsCnvDataHolder
 from sharkadm.data.profile.standard_format_data_holder import (
@@ -9,14 +11,14 @@ from sharkadm.data.profile.standard_format_data_holder import (
 
 
 def get_polars_profile_standard_format_data_holder(
-    path: str | pathlib.Path, **kwargs
+    nodc_conf: Config, path: str | pathlib.Path, **kwargs
 ) -> PolarsProfileStandardFormatDataHolder:
     path = pathlib.Path(path)
     mapper = config.get_import_matrix_mapper(
         data_type="profile", import_column="STANDARD_FORMAT", encoding="utf-8"
     )
     return PolarsProfileStandardFormatDataHolder(
-        path=path, header_mapper=mapper, **kwargs
+        path=path, header_mapper=mapper, nodc_conf=nodc_conf, **kwargs
     )
 
 

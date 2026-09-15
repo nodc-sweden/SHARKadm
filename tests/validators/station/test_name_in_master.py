@@ -1,7 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import polars as pl
 import pytest
+from nodc_config import Config
 
 from sharkadm import adm_logger
 from sharkadm.validators.station.name_in_master import ValidateNameInMaster
@@ -12,7 +13,8 @@ def test_name_validation_fails_if_no_station_list(
     mocked_data_types, polars_data_frame_holder_class
 ):
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(pl.DataFrame())
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(pl.DataFrame(), nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data without a set of known station names
@@ -52,7 +54,8 @@ def test_validate_station_name(
     given_data = pl.DataFrame([{"reported_station_name": given_station_name}])
 
     # Given a valid data holder
-    given_data_holder = polars_data_frame_holder_class(given_data)
+    config = Mock(spec=Config)
+    given_data_holder = polars_data_frame_holder_class(given_data, nodc_conf=config)
     mocked_data_types.side_effect = (given_data_holder.data_type_internal,)
 
     # When validating the data

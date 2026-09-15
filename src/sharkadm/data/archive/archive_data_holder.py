@@ -22,7 +22,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
     def __init__(
         self, archive_root_directory: str | pathlib.Path | None = None, **kwargs
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self._archive_root_directory = pathlib.Path(archive_root_directory)
 
         self._data: pl.DataFrame = pl.DataFrame()
@@ -68,7 +68,9 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
             return
 
         d_source = CsvRowFormatPolarsDataFile(
-            path=data_file_path, data_type=self.delivery_note.data_type
+            nodc_conf=self.config,
+            path=data_file_path,
+            data_type=self.delivery_note.data_type,
         )
         d_source.map_header(self.import_matrix_mapper)
 
@@ -227,7 +229,7 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_txt_file(
-            self.delivery_note_path, mapper=self._import_matrix_mapper
+            self.config, self.delivery_note_path, mapper=self._import_matrix_mapper
         )
 
     def _load_sampling_info(self) -> None:

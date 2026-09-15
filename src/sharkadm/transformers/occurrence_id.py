@@ -2,7 +2,6 @@ import pathlib
 import shutil
 
 from sharkadm import event, utils
-from sharkadm.config import sharkadm_config
 from sharkadm.sharkadm_logger import adm_logger
 
 from ..data import PolarsDataHolder
@@ -14,7 +13,6 @@ try:
     import nodc_occurrence_id
     from nodc_occurrence_id import event as occurrence_event
     from nodc_occurrence_id.occurrence import OccurrencesDatabase
-    from nodc_occurrence_id.utils import CONFIG_SUBDIRECTORY
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -88,8 +86,8 @@ class AddOccurrenceId(PolarsTransformer):
         # 3: Om när match. Logga _temp_occurence_id som man sedan kan sätta nya ????
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
+            data_holder.config,
             data_holder.data_type_internal,
-            root_directory=sharkadm_config.root_dir / CONFIG_SUBDIRECTORY,
         )
         self.col_to_set = self.database.id_column
         self.valid_matches = []
