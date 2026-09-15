@@ -20,7 +20,7 @@ class PolarsAddSharkId(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(
-            data_type=data_holder.data_type_internal
+            nodc_conf=data_holder.config, data_type=data_holder.data_type_internal
         )
         for level, cols in import_matrix.get_columns_by_level().items():
             if level == "variable":

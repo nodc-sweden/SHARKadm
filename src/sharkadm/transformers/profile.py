@@ -121,7 +121,9 @@ class AddMetadataToStandardFormat(PolarsTransformer):
 
         df = pl.DataFrame(rows)
 
-        import_matrix = config.get_import_matrix_config(data_type="profile")
+        import_matrix = config.get_import_matrix_config(
+            data_type="profile", nodc_conf=data_holder.config
+        )
         mapper = import_matrix.get_mapper("PROFILE")
         df = df.rename(
             {col: mapper.get_internal_name(col) for col in df.columns if col != "source"}

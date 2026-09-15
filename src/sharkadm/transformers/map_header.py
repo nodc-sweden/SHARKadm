@@ -17,11 +17,12 @@ class ArchiveMapper(PolarsTransformer):
 
     def _transform(self, data_holder: archive.PolarsArchiveDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(
-            data_type=data_holder.delivery_note.data_type
+            nodc_conf=data_holder.config, data_type=data_holder.delivery_note.data_type
         )
         if not import_matrix:
             import_matrix = config.get_import_matrix_config(
-                data_type=data_holder.delivery_note.data_format
+                nodc_conf=data_holder.config,
+                data_type=data_holder.delivery_note.data_format,
             )
         mapper = import_matrix.get_mapper(data_holder.delivery_note.import_matrix_key)
 
@@ -42,7 +43,7 @@ class ExternalMapper(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(
-            data_type=data_holder.data_type_internal
+            nodc_conf=data_holder.config, data_type=data_holder.data_type_internal
         )
         mapper = import_matrix.get_mapper(self._export_column)
         mapped_header = []

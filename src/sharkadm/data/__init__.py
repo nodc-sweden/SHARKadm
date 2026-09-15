@@ -109,7 +109,7 @@ def get_polars_data_holder(
     **kwargs,
 ) -> PolarsDataHolder:
     if isinstance(path, pl.DataFrame):
-        return get_data_frame_data_holder(path)
+        return get_data_frame_data_holder(nodc_conf, path)
     if path:
         path = pathlib.Path(path)
         if not path.exists() and path.suffix:

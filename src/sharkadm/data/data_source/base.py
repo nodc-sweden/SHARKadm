@@ -149,9 +149,9 @@ class PolarsDataFile(PolarsDataSource, ABC):
 
 class PolarsDataDataFrame(PolarsDataSource, ABC):
     def __init__(
-        self, df: pl.DataFrame, data_type: str | None = None, source: str = ""
+        self, df: pl.DataFrame, data_type: str | None = None, source: str = "", **kwargs
     ) -> None:
-        super().__init__(data_type=data_type)
+        super().__init__(data_type=data_type, **kwargs)
         self._source: str = source or "Given polars dataframe"
         self._data: pd.DataFrame = df
         self._original_header: list = []

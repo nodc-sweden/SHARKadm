@@ -1,11 +1,13 @@
 import pandas as pd
 import polars as pl
+from nodc_config import Config
 
 from sharkadm.data.df.df_data_holder import PolarsDataFrameDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 
 
 def get_data_frame_data_holder(
+    nodc_conf: Config,
     df: pl.DataFrame | pd.DataFrame,
     data_type: str | None = None,
     import_matrix_key: str = "",
@@ -27,5 +29,5 @@ def get_data_frame_data_holder(
         else:
             data_type = "unknown"
     return PolarsDataFrameDataHolder(
-        df, data_type=data_type, import_matrix_key=import_matrix_key
+        nodc_conf, df, data_type=data_type, import_matrix_key=import_matrix_key
     )

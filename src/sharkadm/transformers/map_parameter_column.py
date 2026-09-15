@@ -19,11 +19,12 @@ class PolarsMapperParameterColumn(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         import_matrix = config.get_import_matrix_config(
-            data_type=data_holder.data_type_internal
+            nodc_conf=data_holder.config, data_type=data_holder.data_type_internal
         )
         if not import_matrix:
             import_matrix = config.get_import_matrix_config(
-                data_type=data_holder.delivery_note.data_format
+                nodc_conf=data_holder.config,
+                data_type=data_holder.delivery_note.data_format,
             )
         mapper = import_matrix.get_mapper(self._import_column)
         data_holder.data = data_holder.data.with_columns(

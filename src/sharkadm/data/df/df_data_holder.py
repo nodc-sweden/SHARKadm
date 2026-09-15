@@ -1,4 +1,5 @@
 import polars as pl
+from nodc_config import Config
 
 from sharkadm.config import ImportMatrixMapper
 from sharkadm.data.data_holder import PolarsDataHolder
@@ -8,6 +9,7 @@ from sharkadm.data.data_source.base import PolarsDataDataFrame
 class PolarsDataFrameDataHolder(PolarsDataHolder):
     def __init__(
         self,
+        nodc_conf: Config,
         df: pl.DataFrame,
         import_matrix_key: str = "",
         header_mapper: ImportMatrixMapper = None,
@@ -17,7 +19,9 @@ class PolarsDataFrameDataHolder(PolarsDataHolder):
         assert isinstance(df, pl.DataFrame), (
             f"Invalid input datatype {type(df)}, must be polars.DataFrame"
         )
-        super().__init__(data_type=data_type, data_structure=data_structure)
+        super().__init__(
+            nodc_conf=nodc_conf, data_type=data_type, data_structure=data_structure
+        )
 
         self._import_matrix_key = import_matrix_key
         self._header_mapper = header_mapper
@@ -26,7 +30,7 @@ class PolarsDataFrameDataHolder(PolarsDataHolder):
 
         self._dataset_name = "From polars dataframe"
         d_source = PolarsDataDataFrame(
-            df, data_type=self.data_type, source=self._dataset_name
+            df, data_type=self.data_type, source=self._dataset_name, nodc_conf=self.config
         )
         if self._header_mapper:
             d_source.map_header(self._header_mapper)

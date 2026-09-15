@@ -42,7 +42,10 @@ class PolarsHarbourSealArchiveDataHolder(PolarsArchiveDataHolder):
         df = ddf.join(ldf, left_on="STATN", right_on="Lokal", how="inner")
 
         d_source = PolarsDataDataFrame(
-            df, data_type=self.data_type, source=self.archive_root_directory
+            df,
+            data_type=self.data_type,
+            source=self.archive_root_directory,
+            nodc_conf=self.config,
         )
 
         return d_source
