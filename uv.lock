@@ -2283,7 +2283,7 @@ requires-dist = [
     { name = "nodc-config", git = "https://github.com/nodc-sweden/nodc-config.git?rev=v0.1.0" },
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = ">=2.2.1" },
-    { name = "polars", specifier = "==1.31.0" },
+    { name = "polars", specifier = ">=1.31.0" },
     { name = "pyarrow", specifier = ">=25.0.1" },
     { name = "pyproj", specifier = ">=3.6.1" },
     { name = "pyyaml", specifier = ">=6.0.1" },
