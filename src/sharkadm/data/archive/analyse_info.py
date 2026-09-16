@@ -8,6 +8,7 @@ from typing import Protocol
 
 import openpyxl
 import pandas as pd
+from nodc_config import Config
 
 from sharkadm.sharkadm_logger import adm_logger
 
@@ -235,7 +236,8 @@ class AnalyseInfo:
 
     @classmethod
     def from_dv_template(
-        cls, path: str | pathlib.Path, mapper: Mapper = None
+        cls,
+            path: str | pathlib.Path, mapper: Mapper = None
     ) -> "AnalyseInfo":
         wb = openpyxl.load_workbook(path)
         sheet_name = None

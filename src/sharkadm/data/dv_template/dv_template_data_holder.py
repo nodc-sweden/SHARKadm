@@ -132,7 +132,9 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_dv_template(
-            self._template_path, mapper=self._import_matrix_mapper
+            self.config,
+            self._template_path,
+            mapper=self._import_matrix_mapper
         )
 
     def _load_analyse_info(self) -> None:
@@ -271,6 +273,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
                 self._number_metadata_rows = r - 1
                 break
         d_source = XlsxFormatPolarsDataFile(
+            nodc_conf=self.config,
             path=self._template_path,
             data_type=self.delivery_note.data_type,
             sheet_name=sheet_name,

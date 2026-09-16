@@ -12,8 +12,8 @@ from sharkadm import (
     utils,
     validators,
 )
-from sharkadm.config import sharkadm_config
-from sharkadm.config.data_type import DataType, data_type_handler
+from nodc_config import get_nodc_config, Config
+from sharkadm.config.data_type import DataType, get_data_type_handler
 from sharkadm.controller import SHARKadmPolarsController, get_polars_controller_with_data
 from sharkadm.exporters import PolarsExporter
 from sharkadm.exporters.base import PolarsFileExporter
@@ -53,6 +53,8 @@ class SHARKadmWorkflow:
     ) -> None:
 
         data_sources = data_sources or []
+
+        self._nodc_config: Config = get_nodc_config()
 
         self._data_sources: list[str] = []
         self._controller = SHARKadmPolarsController()
@@ -97,7 +99,7 @@ class SHARKadmWorkflow:
 
     @property
     def data_type(self) -> DataType:
-        return data_type_handler.get_data_type_obj(
+        return get_data_type_handler(self._nodc_config).get_data_type_obj(
             self._workflow_config.get(
                 "name", self._workflow_config.get("data_type", "unknown")
             )
@@ -350,7 +352,7 @@ class SHARKadmWorkflow:
 
 
 def get_workflows() -> dict[str, pathlib.Path]:
-    return {path.stem: path for path in sharkadm_config["workflow"].iterdir()}
+    return {path.stem: path for path in get_nodc_config()["workflow"].iterdir()}
 
 
 def get_workflow(workflow_name: str) -> SHARKadmWorkflow:

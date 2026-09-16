@@ -100,14 +100,17 @@ class DeliveryNote:
         return DeliveryNote(nodc_conf, data, mapper=mapper)
 
     @classmethod
-    def from_dv_template(cls, path: str | pathlib.Path, mapper: Mapper = None):
+    def from_dv_template(cls,
+                         nodc_conf: Config,
+                         path: str | pathlib.Path,
+                         mapper: Mapper = None):
         path = pathlib.Path(path)
         if path.suffix != ".xlsx":
             msg = f"File is not a valid xlsx dv template: {path}"
             adm_logger.log_workflow(msg, level=adm_logger.ERROR)
             raise FileNotFoundError(msg)
 
-        dn_mapper = config.get_delivery_note_mapper()
+        dn_mapper = config.get_delivery_note_mapper(nodc_conf)
 
         dn = pd.read_excel(path, sheet_name="Förklaring")
         dn["key_row"] = dn[dn.columns[0]].apply(
@@ -132,7 +135,7 @@ class DeliveryNote:
             data["data_format"] = "Phytoplankton"
             data["DTYPE"] = "Phytoplankton"
             data["import_matrix_key"] = "PP_REG"
-        return DeliveryNote(data, mapper=mapper)
+        return DeliveryNote(nodc_conf, data, mapper=mapper)
 
     @property
     def data(self) -> dict[str, str]:
