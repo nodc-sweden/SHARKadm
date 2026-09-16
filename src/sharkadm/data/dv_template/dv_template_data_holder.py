@@ -132,9 +132,7 @@ class PolarsDvTemplateDataHolder(PolarsDataHolder):
 
     def _load_delivery_note(self) -> None:
         self._delivery_note = delivery_note.DeliveryNote.from_dv_template(
-            self.config,
-            self._template_path,
-            mapper=self._import_matrix_mapper
+            self.config, self._template_path, mapper=self._import_matrix_mapper
         )
 
     def _load_analyse_info(self) -> None:

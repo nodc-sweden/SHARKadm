@@ -100,10 +100,9 @@ class DeliveryNote:
         return DeliveryNote(nodc_conf, data, mapper=mapper)
 
     @classmethod
-    def from_dv_template(cls,
-                         nodc_conf: Config,
-                         path: str | pathlib.Path,
-                         mapper: Mapper = None):
+    def from_dv_template(
+        cls, nodc_conf: Config, path: str | pathlib.Path, mapper: Mapper = None
+    ):
         path = pathlib.Path(path)
         if path.suffix != ".xlsx":
             msg = f"File is not a valid xlsx dv template: {path}"
