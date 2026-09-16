@@ -30,6 +30,7 @@ class PolarsSharkDataHolder(PolarsDataHolder):
 
         self._initiate()
         self._load_data()
+        self._fix()
 
     def _load_import_matrix(self) -> None:
         """Loads the import matrix for the given data type and provider found in
@@ -65,6 +66,14 @@ class PolarsSharkDataHolder(PolarsDataHolder):
             d_source.map_header(self.import_matrix_mapper)
 
         self._set_data_source(d_source)
+
+    def _fix(self):
+        if "parameter" in self._data.columns:
+            self._data_structure = "row"
+        elif "PARAM" in self._data.columns:
+            self._data = self.data.with_columns(pl.col("PARAM").alias("parameter"))
+            self._data = self.data.with_columns(pl.col("VALUE").alias("value"))
+            self._data_structure = "row"
 
     @staticmethod
     def get_data_holder_description() -> str:
