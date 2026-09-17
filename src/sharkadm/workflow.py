@@ -2,7 +2,7 @@ import pathlib
 from typing import Any
 
 import yaml
-from nodc_config import Config, get_nodc_config
+from nodc_config import Config
 
 from sharkadm import (
     data_filter,
@@ -41,6 +41,7 @@ class _Operators(list):
 class SHARKadmWorkflow:
     def __init__(
         self,
+        nodc_config: Config,
         data_sources: list[str | pathlib.Path] | None = None,
         operators: list[dict[str, str | dict[str, str]]] | None = None,
         # validators_before: list[dict[str, str | dict[str, str]]] | None = None,
@@ -54,7 +55,7 @@ class SHARKadmWorkflow:
 
         data_sources = data_sources or []
 
-        self._nodc_config: Config = get_nodc_config()
+        self._nodc_config: Config = nodc_config
 
         self._data_sources: list[str] = []
         self._controller = SHARKadmPolarsController()
@@ -351,34 +352,34 @@ class SHARKadmWorkflow:
         return workflow
 
 
-def get_workflows() -> dict[str, pathlib.Path]:
-    return {path.stem: path for path in get_nodc_config()["workflow"].iterdir()}
+def get_workflows(nodc_conf: Config) -> dict[str, pathlib.Path]:
+    return {path.stem: path for path in nodc_conf["workflow"].iterdir()}
 
 
-def get_workflow(workflow_name: str) -> SHARKadmWorkflow:
-    workflows = get_workflows()
+def get_workflow(nodc_conf: Config, workflow_name: str) -> SHARKadmWorkflow:
+    workflows = get_workflows(nodc_conf=nodc_conf)
     if not workflows.get(workflow_name):
         raise sharkadm_exceptions.InvalidWorkflow
     return SHARKadmWorkflow.from_yaml_config(workflows.get(workflow_name))
 
 
 def get_dv_workflow_for_data_type(
-    data_type: str, default_if_missing: bool = True
+    nodc_conf: Config, data_type: str, default_if_missing: bool = True
 ) -> SHARKadmWorkflow:
     name = f"workflow_dv_{data_type.lower()}"
-    workflows = get_workflows()
+    workflows = get_workflows(nodc_conf)
     if workflows.get(name):
-        return get_workflow(name)
+        return get_workflow(nodc_conf, name)
     if default_if_missing:
         return get_workflow("workflow_dv")
 
 
 def get_dv_validation_workflow_for_data_type(
-    data_type: str, default_if_missing: bool = True
+    nodc_conf: Config, data_type: str, default_if_missing: bool = True
 ) -> SHARKadmWorkflow | None:
     name = f"workflow_dv_validation_{data_type.lower()}"
-    workflows = get_workflows()
+    workflows = get_workflows(nodc_conf)
     if workflows.get(name):
-        return get_workflow(name)
+        return get_workflow(nodc_conf, name)
     if default_if_missing:
         return get_workflow("workflow_dv_validation")
