@@ -123,7 +123,6 @@ class PolarsExporter(ABC, Operator):
         if data is None:
             data = data_holder.data
         header_as: str = self._kwargs.get("header_as", "")
-        print(f"{header_as=}")
         if not header_as:
             return data
         mapper = dict()

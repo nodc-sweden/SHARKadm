@@ -55,7 +55,7 @@ class PolarsDataFrame(PolarsExporter):
         df = self._get_mapped_header_dataframe(data_holder, data=df)
         return df
 
-    def _get_float_columns(self, df: pd.DataFrame):
+    def _get_float_columns(self, df: pd.DataFrame) -> list[str]:
         float_columns = ["value"]
         for col in df.columns:
             if "latitude" in col:

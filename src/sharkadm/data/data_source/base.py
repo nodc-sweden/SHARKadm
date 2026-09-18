@@ -86,10 +86,13 @@ class PolarsDataSource:
     def unit_mapper(self) -> dict[str, str]:
         return self._unit_mapper
 
-    def map_header(self, mapper: ImportMapper) -> None:
+    def map_header(self, mapper: ImportMapper | dict) -> None:
         mapped_header = []
         for item in self._original_header:
-            internal_name = mapper.get_internal_name(item)
+            if isinstance(mapper, dict):
+                internal_name = mapper.get(item, item)
+            else:
+                internal_name = mapper.get_internal_name(item)
             if item == internal_name:
                 self._not_mapped_columns.append(item)
             else:
