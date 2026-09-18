@@ -68,13 +68,11 @@ def get_import_matrix_mapper(
     return config.get_mapper(import_column)
 
 
-def get_header_mapper_from_data_holder(
-    data_holder: DataHolderProtocol, import_column: str
+def get_import_matrix_header_mapper_from_data_holder(
+    data_holder: DataHolderProtocol, to_column: str
 ) -> ImportMatrixMapper | None:
-    if import_column == "original":
-        return data_holder.header_mapper
     return get_import_matrix_mapper(
-        data_holder.config, data_holder.data_type_internal, import_column
+        data_holder.config, data_holder.data_type_internal, to_column
     )
 
 

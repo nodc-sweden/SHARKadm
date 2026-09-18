@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
-from sharkadm.config import get_header_mapper_from_data_holder
 from sharkadm.data import PolarsDataHolder
 from sharkadm.exporters.base import PolarsExporter
 from sharkadm.sharkadm_logger import adm_logger
@@ -11,11 +10,10 @@ from sharkadm.sharkadm_logger import adm_logger
 class PolarsDataFrame(PolarsExporter):
     def __init__(
         self,
-        header_as: str | None = None,
         float_columns: bool | list[str] = False,
+        **kwargs,
     ):
-        super().__init__()
-        self._header_as = header_as
+        super().__init__(**kwargs)
         self._float_columns = float_columns
 
     @staticmethod
@@ -54,18 +52,7 @@ class PolarsDataFrame(PolarsExporter):
                             .otherwise(pl.col(col))
                             .alias(col)
                         )
-        if self._header_as:
-            mapper = get_header_mapper_from_data_holder(
-                data_holder, import_column=self._header_as
-            )
-            if not mapper:
-                self._log(
-                    f"Could not find mapper using header_as = {self._header_as}",
-                    level=adm_logger.WARNING,
-                )
-                return
-            new_column_names = [mapper.get_external_name(col) for col in df.columns]
-            df.columns = new_column_names
+        df = self._get_mapped_header_dataframe(data_holder, data=df)
         return df
 
     def _get_float_columns(self, df: pd.DataFrame):
