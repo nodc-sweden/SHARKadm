@@ -23,5 +23,23 @@ class TranslateHeaders:
             missing_utf8_is_empty_string=True,
         )
 
+    @property
+    def columns(self) -> list[str]:
+        return self._config.columns
+
     def get_mapper(self, to: str, map_from: str = "internal_key") -> dict[str, str]:
-        pass
+        mapper = dict(zip(self._config[map_from], self._config[to]))
+        mapper.update(self._get_no_unit_mapper(mapper))
+        return mapper
+
+    def get_to_internal_mapper(self):
+        mapper = dict()
+        for col in [c for c in self._config.columns if c != "internal_key"]:
+            col_mapper = dict(zip(self._config[col], self._config["internal_key"]))
+            mapper.update(col_mapper)
+        mapper.update(self._get_no_unit_mapper(mapper))
+        return mapper
+
+    @staticmethod
+    def _get_no_unit_mapper(mapper: dict[str, str]) -> dict[str, str]:
+        return dict((key.split("(")[0].strip(), value) for key, value in mapper.items())

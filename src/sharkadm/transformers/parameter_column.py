@@ -1,13 +1,13 @@
 import polars as pl
 
-from sharkadm.config import get_header_mapper_from_data_holder
+from sharkadm.config import get_translate_headers_config
 from sharkadm.data import PolarsDataHolder
 from sharkadm.transformers import PolarsTransformer
 
 
 class PolarsAddParameterShortColumn(PolarsTransformer):
     valid_data_structures = ("row",)
-    valid_data_types = ("physicalchemical",)
+    # valid_data_types = ("physicalchemical",)
 
     col_to_set = "parameter_short"
     source_col = "parameter"
@@ -24,12 +24,11 @@ class PolarsAddParameterShortColumn(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(
             pl.col(self.source_col).alias(self.col_to_set)
         )
-        mapper = get_header_mapper_from_data_holder(
-            data_holder, import_column="PhysicalChemical"
-        )
+        trans = get_translate_headers_config(data_holder.config)
+        mapper = trans.get_mapper("short")
         for par in set(data_holder.data[self.source_col]):
-            mapped_par = mapper.get_external_name(par)
-            if mapped_par == par:
+            mapped_par = mapper.get(par)
+            if mapped_par is None:
                 continue
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.source_col) == par)

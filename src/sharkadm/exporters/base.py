@@ -3,7 +3,13 @@ import time
 from abc import ABC, abstractmethod
 from typing import Any
 
+import polars as pl
+
 from sharkadm import utils
+from sharkadm.config import (
+    get_import_matrix_header_mapper_from_data_holder,
+    get_translate_headers_config,
+)
 from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.sharkadm_operator import (
@@ -109,6 +115,30 @@ class PolarsExporter(ABC, Operator):
 
     def _log_workflow(self, msg: str, **kwargs):
         adm_logger.log_workflow(msg, cls=self.__class__.__name__, **kwargs)
+
+    def _get_mapped_header_dataframe(
+        self, data_holder: PolarsDataHolder, data: pl.DataFrame | None = None
+    ) -> (pl.DataFrame) | None:
+
+        if data is None:
+            data = data_holder.data
+        header_as: str = self._kwargs.get("header_as", "")
+        if not header_as:
+            return data
+        mapper = dict()
+        trans = get_translate_headers_config(data_holder.config)
+        if header_as in trans.columns:
+            mapper = trans.get_mapper(header_as)
+        if not mapper:
+            mapper = get_import_matrix_header_mapper_from_data_holder(
+                data_holder, to_column=header_as
+            )
+            if mapper:
+                mapper = mapper.reverse_mapper
+        if not mapper:
+            self._log(f"Could not find mapper using header_as = {header_as}")
+            return None
+        return data.rename(mapper, strict=False)
 
 
 class PolarsFileExporter(PolarsExporter, ABC):

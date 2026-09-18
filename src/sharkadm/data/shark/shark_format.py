@@ -2,7 +2,7 @@ import pathlib
 
 import polars as pl
 
-from ...config import ImportMatrixConfig, ImportMatrixMapper
+from ...config import ImportMatrixConfig, ImportMatrixMapper, get_translate_headers_config
 from ...config.data_type import get_data_type_handler
 from .. import PolarsDataHolder
 from ..data_source.base import PolarsDataFile
@@ -22,9 +22,8 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._data: pl.DataFrame = pl.DataFrame()
         self._dataset_name: str | None = None
 
-        self._import_matrix: ImportMatrixConfig | None = None
-        self._import_matrix_mapper: ImportMatrixMapper | None = None
-        # self._data_type_mapper = get_data_type_mapper()
+        # self._import_matrix: ImportMatrixConfig | None = None
+        # self._import_matrix_mapper: ImportMatrixMapper | None = None
 
         self._data_sources: dict[str, PolarsDataFile] = {}
 
@@ -32,11 +31,11 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         self._load_data()
         self._fix()
 
-    def _load_import_matrix(self) -> None:
-        """Loads the import matrix for the given data type and provider found in
-        delivery note"""
-        self._import_matrix = self.data_type_obj.import_matrix
-        self._import_matrix_mapper = self.data_type_obj.get_mapper(self.data_format)
+    # def _load_import_matrix(self) -> None:
+    # """Loads the import matrix for the given data type and provider found in
+    # delivery note"""
+    # self._import_matrix = self.data_type_obj.import_matrix
+    # self._import_matrix_mapper = self.data_type_obj.get_mapper(self.data_format)
 
     def _load_data(self) -> None:
         d_source = CsvRowFormatPolarsDataFile(
@@ -45,9 +44,6 @@ class PolarsSharkDataHolder(PolarsDataHolder):
         for col in ["Datatyp", "Data type", "DTYPE", "delivery_datatype", "data_type"]:
             if col in d_source.data:
                 all_data_types = set(d_source.data[col])
-                # Not sure if we want to raise exception if multiple datatypes are found
-                # if len(all_data_types) > 1:
-                #     raise sharkadm_exceptions.ToManyDatatypesError(str(all_data_types))
                 data_type = all_data_types.pop()
                 self._data_type_obj = get_data_type_handler(
                     self.config
@@ -55,24 +51,14 @@ class PolarsSharkDataHolder(PolarsDataHolder):
                 d_source.data_type_obj = self._data_type_obj
                 break
 
-        # if d_source._data_type:
-        #     self._data_type_obj = data_type_handler.get_data_type_obj(
-        #         d_source._data_type.lower().replace(" ", "")
-        #     )
-        # print(f"{self._data_type_obj=}")
-
-        self._load_import_matrix()
-        if self.import_matrix_mapper:
-            d_source.map_header(self.import_matrix_mapper)
+        trans = get_translate_headers_config(self._nodc_config)
+        mapper = trans.get_to_internal_mapper()
+        d_source.map_header(mapper)
 
         self._set_data_source(d_source)
 
     def _fix(self):
         if "parameter" in self._data.columns:
-            self._data_structure = "row"
-        elif "PARAM" in self._data.columns:
-            self._data = self.data.with_columns(pl.col("PARAM").alias("parameter"))
-            self._data = self.data.with_columns(pl.col("VALUE").alias("value"))
             self._data_structure = "row"
 
     @staticmethod
