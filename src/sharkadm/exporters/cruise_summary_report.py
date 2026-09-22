@@ -13,7 +13,6 @@ class CruiseSummaryReport(PolarsFileExporter):
         self,
         identifier: str,
         projects: list[str],
-        general_ocean_areas: list[str],
         specific_ocean_areas: list[str],
         objective_of_cruise: str,
         export_directory: str | pathlib.Path | None = None,
@@ -27,7 +26,6 @@ class CruiseSummaryReport(PolarsFileExporter):
 
         self.identifier = identifier
         self.projects = projects
-        self.general_ocean_areas = general_ocean_areas
         self.specific_ocean_areas = specific_ocean_areas
         self.objective_of_cruise = objective_of_cruise
 
@@ -52,7 +50,6 @@ class CruiseSummaryReport(PolarsFileExporter):
         metadata = CsrMetadata(
             identifier=self.identifier,
             projects=self.projects,
-            general_ocean_areas=self.general_ocean_areas,
             specific_ocean_areas=self.specific_ocean_areas,
             objective_of_cruise=self.objective_of_cruise,
             cruise_expedition_leader=self.cruise_expedition_leader,
