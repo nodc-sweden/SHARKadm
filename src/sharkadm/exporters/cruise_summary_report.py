@@ -1,6 +1,6 @@
 import pathlib
 
-from nodc_csr import CsrMetadata, generate_csr
+from nodc_csr import CsrUserInputs, generate_csr
 
 from sharkadm.data import PolarsDataHolder
 from sharkadm.exporters.base import PolarsFileExporter
@@ -47,7 +47,7 @@ class CruiseSummaryReport(PolarsFileExporter):
         data_holder: PolarsDataHolder,
     ) -> None:
         df = data_holder.data
-        metadata = CsrMetadata(
+        metadata = CsrUserInputs(
             identifier=self.identifier,
             projects=self.projects,
             specific_ocean_areas=self.specific_ocean_areas,
