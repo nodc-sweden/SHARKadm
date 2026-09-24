@@ -107,7 +107,9 @@ class PolarsAddStationInfo(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return
-        self._stations = nodc_station.get_station_object(data_holder.config)
+        self._stations = nodc_station.get_station_object(
+            data_holder.config, case_sensitive=self._kwargs.get("case_sensitive", False)
+        )
         self._create_columns_if_missing(data_holder)
 
         for (lat_str, lon_str, reported_station), df in data_holder.data.group_by(
