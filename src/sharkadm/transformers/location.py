@@ -61,7 +61,7 @@ class _PolarsAddLocationBase(PolarsTransformer):
                 self._log(f"Empty x, y position ('{x}', '{y}')", level=adm_logger.WARNING)
                 continue
             info = nodc_geography.get_shape_file_info_at_position(
-                x_pos=x, y_pos=y, variable=self.col_to_set
+                nodc_conf=data_holder.config, x_pos=x, y_pos=y, variable=self.col_to_set
             )
             code = info.get(self.col_to_set, "")
 
@@ -128,7 +128,7 @@ class PolarsAddLocations(PolarsTransformer):
             for loc in self._locations:
                 if info.get(loc) is None:
                     info = nodc_geography.get_shape_file_info_at_position(
-                        x_pos=x, y_pos=y, variable=loc
+                        nodc_conf=data_holder.config, x_pos=x, y_pos=y, variable=loc
                     )
                 code = info.get(loc, "") or ""
 
