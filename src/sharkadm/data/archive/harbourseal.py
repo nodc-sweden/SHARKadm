@@ -27,10 +27,14 @@ class PolarsHarbourSealArchiveDataHolder(PolarsArchiveDataHolder):
             return False
 
         d_source = data_source.SkvDataFile(
-            path=data_file_path, data_type=self.delivery_note.data_type
+            path=data_file_path,
+            data_type=self.delivery_note.data_type,
+            nodc_conf=self.config,
         )
         l_source = data_source.SkvDataFile(
-            path=lokaler_file_path, data_type=self.delivery_note.data_type
+            path=lokaler_file_path,
+            data_type=self.delivery_note.data_type,
+            nodc_conf=self.config,
         )
         ddf = d_source.data.filter(pl.col("STATN") != "")
         ldf = l_source.data.filter(pl.col("Lokal") != "")

@@ -41,7 +41,7 @@ class _Operators(list):
 class SHARKadmWorkflow:
     def __init__(
         self,
-        nodc_config: Config,
+        nodc_conf: Config,
         data_sources: list[str | pathlib.Path] | None = None,
         operators: list[dict[str, str | dict[str, str]]] | None = None,
         # validators_before: list[dict[str, str | dict[str, str]]] | None = None,
@@ -55,7 +55,7 @@ class SHARKadmWorkflow:
 
         data_sources = data_sources or []
 
-        self._nodc_config: Config = nodc_config
+        self._nodc_conf: Config = nodc_conf
 
         self._data_sources: list[str] = []
         self._controller = SHARKadmPolarsController()
@@ -100,7 +100,7 @@ class SHARKadmWorkflow:
 
     @property
     def data_type(self) -> DataType:
-        return get_data_type_handler(self._nodc_config).get_data_type_obj(
+        return get_data_type_handler(self._nodc_conf).get_data_type_obj(
             self._workflow_config.get(
                 "name", self._workflow_config.get("data_type", "unknown")
             )
@@ -222,7 +222,9 @@ class SHARKadmWorkflow:
         for data_source in self._data_sources:
             if self._adm_logger_config.get("reset_between_data_sources"):
                 adm_logger.reset_log()
-            self._controller = get_polars_controller_with_data(data_source)
+            self._controller = get_polars_controller_with_data(
+                self._nodc_conf, data_source
+            )
             info = self._controller.run_operators(*self._operator_objects)
             print(f"{info=}")
             if info.terminated:
@@ -345,10 +347,14 @@ class SHARKadmWorkflow:
         return self._export_paths
 
     @classmethod
-    def from_yaml_config(cls, path: str | pathlib.Path) -> "SHARKadmWorkflow":
+    def from_yaml_config(
+        cls, nodc_conf: Config, path: str | pathlib.Path
+    ) -> "SHARKadmWorkflow":
         with open(path) as fid:
             config = yaml.safe_load(fid)
-        workflow = SHARKadmWorkflow(file_path=pathlib.Path(path), **config)
+        workflow = SHARKadmWorkflow(
+            nodc_conf=nodc_conf, file_path=pathlib.Path(path), **config
+        )
         return workflow
 
 
@@ -360,7 +366,7 @@ def get_workflow(nodc_conf: Config, workflow_name: str) -> SHARKadmWorkflow:
     workflows = get_workflows(nodc_conf=nodc_conf)
     if not workflows.get(workflow_name):
         raise sharkadm_exceptions.InvalidWorkflow
-    return SHARKadmWorkflow.from_yaml_config(workflows.get(workflow_name))
+    return SHARKadmWorkflow.from_yaml_config(nodc_conf, workflows.get(workflow_name))
 
 
 def get_dv_workflow_for_data_type(

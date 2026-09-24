@@ -22,7 +22,6 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
             export_file_name = "shark_data.txt"
         super().__init__(export_directory, export_file_name, **kwargs)
         self._exclude_missing_columns = exclude_missing_columns
-        self._column_views = get_column_views_config()
         self._separator = kwargs.get("separator", "\t")
 
     @staticmethod
@@ -33,6 +32,7 @@ class PolarsSHARKdataTxt(PolarsFileExporter):
         )
 
     def _export(self, data_holder: PolarsDataHolder) -> None:
+        self._column_views = get_column_views_config(data_holder.config)
         column_list = self._column_views.get_columns_for_view(
             view=data_holder.data_type_internal
         )
