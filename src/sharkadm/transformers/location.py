@@ -320,3 +320,14 @@ class PolarsAddLocationOnLand(_PolarsAddLocationBase):
         data_holder.data = data_holder.data.with_columns(
             pl.lit(boolean).alias(self.col_to_set)
         )
+
+
+class PolarsAddLocationSeaVoxRegion(_PolarsAddLocationBase):
+    x_pos_col = "sample_longitude_dd"
+    y_pos_col = "sample_latitude_dd"
+
+    col_to_set = "seavox_subregion"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds seavox_subregion from shape files."
