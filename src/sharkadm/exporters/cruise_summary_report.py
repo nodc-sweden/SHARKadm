@@ -47,6 +47,7 @@ class CruiseSummaryReport(PolarsFileExporter):
         data_holder: PolarsDataHolder,
     ) -> None:
         df = data_holder.data
+        config = data_holder.config
         metadata = CsrUserInputs(
             identifier=self.identifier,
             projects=self.projects,
@@ -57,7 +58,7 @@ class CruiseSummaryReport(PolarsFileExporter):
             port_of_return=self.port_of_return,
         )
 
-        xml = generate_csr(df, metadata)
+        xml = generate_csr(df, metadata, config)
 
         xml.write(
             self.export_file_path,
