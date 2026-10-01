@@ -75,22 +75,34 @@ class OdvExporter(PolarsFileExporter):
 
         expressions = []
         metadata_output_names = []
+
         for col in metadata_cols:
             output_name = self.EXPORT_COLUMN_NAMES.get(col, col)
             expressions.append(pl.col(col).alias(output_name))
             metadata_output_names.append(output_name)
 
-        expressions.append(pl.col(index_col).alias(self.export_index_name))
+        expressions.append(
+            pl.col(index_col)
+            .str.to_datetime(strict=True)
+            .dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
+            .alias(self.export_index_name)
+        )
 
-        for col in measurement_cols:
+        # Use a unique internal name — ODV header will be fixed later.
+        expressions.append(pl.col(f"qc_sdn_{index_col}").alias("__qc_index"))
+
+        for i, col in enumerate(measurement_cols):
             output_name = self.LOCAL_CODE_MAPPING.get(col, col)
             expressions.append(pl.col(col).alias(output_name))
+
             qc_col = f"qc_sdn_{col}"
             if qc_col not in data.columns:
                 raise ValueError(
                     f"QC column '{qc_col}' not found for measurement '{col}'"
                 )
-            expressions.append(pl.col(qc_col).alias("QV:SEADATANET"))
+
+            # Unique name inside Polars
+            expressions.append(pl.col(qc_col).alias(f"__qc_{i}"))
 
         output = data.select(expressions)
         output = output.with_columns(
@@ -105,22 +117,38 @@ class OdvExporter(PolarsFileExporter):
 
         header_lines = self._create_header(measurement_cols)
         csv_buffer = io.StringIO()
-        output.write_csv(csv_buffer, separator="\t", null_value="")
+        output.write_csv(csv_buffer, separator="\t", null_value="", include_header=False)
 
-        with open(self.export_file_path, "w", encoding="utf-8", newline="") as f:
+        output_column_names = [
+            *metadata_output_names,
+            self.export_index_name,
+            "QV:SEADATANET",  # QC for indexing column
+        ]
+
+        for col in measurement_cols:
+            output_column_names.append(self.LOCAL_CODE_MAPPING.get(col, col))
+            output_column_names.append("QV:SEADATANET")
+
+        with open(
+            self.export_file_path,
+            "w",
+            encoding="utf-8",
+            newline="",
+        ) as f:
             for line in header_lines:
                 f.write(line + "\n")
-            f.write(csv_buffer.getvalue())
 
-        # output.write_csv(
-        #     self.export_file_path,
-        #     separator="\t",
-        #     null_value="",
-        # )
+            # ODV allows duplicate column names.
+            f.write("\t".join(output_column_names) + "\n")
+            f.write(csv_buffer.getvalue())
 
     def _create_header(self, parameters: list[str]):
         header_lines = []
         header_lines.append("//")
+        header_lines.append("//SDN_parameter_mapping")
+        header_lines.append(
+            "//<subject>SDN:LOCAL:time_ISO8601</subject><object>SDN:P01::DTUT8601</object><units>SDN:P06::TISO</units>"
+        )
         for param in parameters:
             header_lines.append(self._create_param_header(param))
         header_lines.append("//")
@@ -140,3 +168,7 @@ class OdvExporter(PolarsFileExporter):
         header_line = f"//{subject}{object_part}{units_part}"
 
         return header_line
+
+    @staticmethod
+    def _format_odv_datetime(column: str) -> pl.Expr:
+        return pl.col(column).dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
