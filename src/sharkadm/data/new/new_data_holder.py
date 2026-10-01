@@ -1,4 +1,5 @@
 import pathlib
+from typing import ClassVar
 
 import polars as pl
 from openpyxl import load_workbook
@@ -48,6 +49,9 @@ class NewDataHolder(PolarsDataHolder):
     _data_set_name = ""
 
     _indexing_column = "sample_iso_datetime"
+
+    # TODO verify this mapping
+    _sdn_qc_mapping: ClassVar[dict[str, str]] = {"0": "1", "1": "2"}
 
     def __init__(
         self,
@@ -115,6 +119,7 @@ class NewDataHolder(PolarsDataHolder):
         data_source.map_header(INTERNAL_COLUMN_NAMES)
         self._set_data_source(data_source)
         self._update_data_columns()
+        self._add_sdn_qc_flags()
         self._load_metadata()
 
     def _load_metadata(self) -> None:
@@ -157,3 +162,28 @@ class NewDataHolder(PolarsDataHolder):
             for col_name, value in metadata_dict.items():
                 if col_name not in self._data.columns:
                     self._data = self._data.with_columns(pl.lit(value).alias(col_name))
+
+    def _add_sdn_qc_flags(self) -> None:
+        """Add SeaDataNet qualifier columns for each measurement column."""
+        expressions = []
+
+        for parameter in self._data_columns:
+            qc_column = f"qc_{parameter}"
+            sdn_qc_column = f"qc_sdn_{parameter}"
+
+            if qc_column not in self._data.columns:
+                continue
+
+            expressions.append(
+                pl.col(qc_column)
+                .cast(pl.String)
+                .fill_null("")
+                .replace_strict(
+                    self._sdn_qc_mapping,
+                    default="9",
+                )
+                .alias(sdn_qc_column)
+            )
+
+        if expressions:
+            self._data = self._data.with_columns(expressions)
