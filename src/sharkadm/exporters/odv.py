@@ -1,3 +1,4 @@
+import io
 import pathlib
 from typing import ClassVar
 
@@ -8,13 +9,13 @@ from sharkadm.exporters.base import PolarsFileExporter
 
 
 class OdvExporter(PolarsFileExporter):
-    """Exporter for Ocean Data Viewer (ODV) format"""
+    """
+    Exporter for Ocean Data Viewer (ODV) format.
+    """
 
     # TODO get full mapping
     LOCAL_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "DMS"}
-
     P01_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "FLUXDMS1"}
-
     P06_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "UUUD"}
 
     # Metadata fields in ODV
@@ -102,27 +103,38 @@ class OdvExporter(PolarsFileExporter):
             ]
         )
 
-        output.write_csv(
-            self.export_file_path,
-            separator="\t",
-            null_value="",
-        )
+        header_lines = self._create_header(measurement_cols)
+        csv_buffer = io.StringIO()
+        output.write_csv(csv_buffer, separator="\t", null_value="")
 
-    def _create_header():
-        # TODO
-        pass
+        with open(self.export_file_path, "w", encoding="utf-8", newline="") as f:
+            for line in header_lines:
+                f.write(line + "\n")
+            f.write(csv_buffer.getvalue())
 
-    def _create_param_header(
-        self, local_code: str, p01_code: str | None, p06_code: str | None
-    ) -> str:
+        # output.write_csv(
+        #     self.export_file_path,
+        #     separator="\t",
+        #     null_value="",
+        # )
+
+    def _create_header(self, parameters: list[str]):
+        header_lines = []
+        header_lines.append("//")
+        for param in parameters:
+            header_lines.append(self._create_param_header(param))
+        header_lines.append("//")
+        return header_lines
+
+    def _create_param_header(self, parameter) -> str:
         """
         Format a single line in the ODV header.
         """
-        local_code = ""
+        local_code = self.LOCAL_CODE_MAPPING[parameter]
         subject = f"<subject>SDN:LOCAL:{local_code}</subject>"
-        p01_code = ""
+        p01_code = self.P01_CODE_MAPPING[parameter]
         object_part = f"<object>SDN:P01::{p01_code}</object>"
-        p06_code = ""
+        p06_code = self.P06_CODE_MAPPING[parameter]
         units_part = f"<units>SDN:P06::{p06_code}</units>"
 
         header_line = f"//{subject}{object_part}{units_part}"
