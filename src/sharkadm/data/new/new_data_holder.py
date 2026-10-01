@@ -11,36 +11,13 @@ from sharkadm.sharkadm_logger import adm_logger
 
 INTERNAL_COLUMN_NAMES = {
     "datetime": "sample_iso_datetime",
-    # "LOCAL_CDI_ID": "",
-    # "Cruise": "",
-    # "Type": "",
-    # "dataset_ID": "",
-    # "Abstract": "",
-    # "documentation_URL":"",
     "start_date": "visit_date",
     "start_time": "sample_time",
     "end_date": "sample_enddate",
     "end_time": "sample_endtime",
-    # "Sea_area_code"	: "",
     "longitude": "visit_reported_longitude",
     "latitude": "visit_reported_latitude",
-    # "Horizontal_datum"	: "",
-    # "Horizontal_datum_code"	: "",
-    # "P02 codes"	: "",
-    # "platform_type"	: "",
     "station_name": "reported_station_name",
-    # "station_short_name"	: "",
-    # "station_start_date"	: "",
-    # "Measuring_area_type"	: "",
-    # "Time_resolution"	: "",
-    # "Time_resolution_unit"	: "",
-    # "Instrument"	: "",
-    # "originator"	: "",
-    # "custodian"	: "",
-    # "distributor"	: "",
-    # "CDI_partner"	: "",
-    # "EDMERP"	: "",
-    # "revision_date": ""
 }
 
 
@@ -121,6 +98,7 @@ class NewDataHolder(PolarsDataHolder):
         self._update_data_columns()
         self._add_sdn_qc_flags()
         self._load_metadata()
+        self._add_missing_values()
 
     def _load_metadata(self) -> None:
         """Load metadata from either CSV or XLSX file."""
@@ -167,6 +145,10 @@ class NewDataHolder(PolarsDataHolder):
         """Add SeaDataNet qualifier columns for each measurement column."""
         expressions = []
 
+        indexing_sdn_qc_column = f"qc_sdn_{self.indexing_column}"
+        if indexing_sdn_qc_column not in self._data.columns:
+            expressions.append(pl.lit("1").alias(indexing_sdn_qc_column))
+
         for parameter in self._data_columns:
             qc_column = f"qc_{parameter}"
             sdn_qc_column = f"qc_sdn_{parameter}"
@@ -184,6 +166,27 @@ class NewDataHolder(PolarsDataHolder):
                 )
                 .alias(sdn_qc_column)
             )
+
+        if expressions:
+            self._data = self._data.with_columns(expressions)
+
+    def _add_missing_values(self) -> None:
+        default_values: dict[str, object] = {
+            "LOCAL_CDI_ID": "MISSING",
+            "Bot. Depth [m]": "9999.9",
+            "visit_reported_longitude": "0",
+            "visit_reported_latitude": "0",
+        }
+
+        expressions = []
+        for col_name, default_value in default_values.items():
+            adm_logger.log_workflow(
+                f"Column '{col_name}' missing. Adding default value "
+                f"'{default_value}' as a temporary workaround.",
+                level=adm_logger.WARNING,
+            )
+            expressions.append(pl.lit(default_value).alias(col_name))
+            continue
 
         if expressions:
             self._data = self._data.with_columns(expressions)
