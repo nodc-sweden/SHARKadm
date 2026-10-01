@@ -10,6 +10,7 @@ from sharkadm.exporters.base import PolarsFileExporter
 class OdvExporter(PolarsFileExporter):
     """Exporter for Ocean Data Viewer (ODV) format"""
 
+    # TODO get full mapping
     LOCAL_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "DMS"}
 
     P01_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "FLUXDMS1"}
@@ -83,7 +84,7 @@ class OdvExporter(PolarsFileExporter):
         for col in measurement_cols:
             output_name = self.LOCAL_CODE_MAPPING.get(col, col)
             expressions.append(pl.col(col).alias(output_name))
-            qc_col = f"qc_{col}"
+            qc_col = f"qc_sdn_{col}"
             if qc_col not in data.columns:
                 raise ValueError(
                     f"QC column '{qc_col}' not found for measurement '{col}'"
