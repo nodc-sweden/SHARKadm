@@ -42,44 +42,12 @@ INTERNAL_COLUMN_NAMES = {
     # "revision_date": ""
 }
 
-EXPORT_COLUMN_NAMES = {
-    "datetime": "yyyy-mm-ddThh:mm:ss.sss",
-    # "LOCAL_CDI_ID": "",
-    # "Cruise": "",
-    # "Type": "",
-    # "dataset_ID": "",
-    # "Abstract": "",
-    # "documentation_URL":"",
-    "start_date": "",
-    "start_time": "",
-    "end_date": "",
-    "end_time": "",
-    # "Sea_area_code"	: "",
-    "longitude": "Longitude [degrees_east]",
-    "latitude": "Latitude [degrees_north]",
-    # "Horizontal_datum"	: "",
-    # "Horizontal_datum_code"	: "",
-    # "P02 codes"	: "",
-    # "platform_type"	: "",
-    "station_name": "Station",
-    # "station_short_name"	: "",
-    # "station_start_date"	: "",
-    # "Measuring_area_type"	: "",
-    # "Time_resolution"	: "",
-    # "Time_resolution_unit"	: "",
-    # "Instrument"	: "",
-    # "originator"	: "",
-    # "custodian"	: "",
-    "distributor": "EDMO_code",
-    "CDI_partner": "EDMO_code",
-    # "EDMERP"	: "",
-    # "revision_date": ""
-}
-
 
 class NewDataHolder(PolarsDataHolder):
     _data_structure = "column"
     _data_set_name = ""
+
+    _indexing_column = "sample_iso_datetime"
 
     def __init__(
         self,
@@ -97,6 +65,7 @@ class NewDataHolder(PolarsDataHolder):
         self._metadata_file_name = metadata_file_name
 
         self._data: pl.DataFrame = pl.DataFrame()
+        self._data_columns: list[str] = []
         self._dataset_name = self._data_root_directory.name
         self._load_data()
 
@@ -116,6 +85,26 @@ class NewDataHolder(PolarsDataHolder):
     def metadata_file_path(self) -> pathlib.Path:
         return self._data_root_directory / self._metadata_file_name
 
+    @property
+    def indexing_column(self) -> str:
+        """The column that indexes the series."""
+        return self._indexing_column
+
+    @property
+    def data_columns(self) -> tuple[str, ...]:
+        """Columns with data."""
+        return tuple(self._data_columns)
+
+    def _update_data_columns(self) -> None:
+        excluded_prefixes = ("qc_", "re_")
+        self._data_columns = [
+            c
+            for c in self._data.columns
+            if c != self.indexing_column
+            and not c.startswith(excluded_prefixes)
+            and c != "source"
+        ]
+
     def _load_data(self) -> None:
         data_source = CsvRowFormatPolarsDataFile(
             path=self.data_file_path,
@@ -125,7 +114,7 @@ class NewDataHolder(PolarsDataHolder):
         )
         data_source.map_header(INTERNAL_COLUMN_NAMES)
         self._set_data_source(data_source)
-
+        self._update_data_columns()
         self._load_metadata()
 
     def _load_metadata(self) -> None:
@@ -166,5 +155,5 @@ class NewDataHolder(PolarsDataHolder):
             metadata_dict = metadata_df[0, :].to_dicts()[0]
 
             for col_name, value in metadata_dict.items():
-                if col_name not in self._data.columns and value:
+                if col_name not in self._data.columns:
                     self._data = self._data.with_columns(pl.lit(value).alias(col_name))
