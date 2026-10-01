@@ -44,6 +44,8 @@ from sharkadm.exporters.dv_template_qc_result import (
 )
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
+from sharkadm.exporters.odv import OdvExporter
+
 
 @functools.cache
 def get_exporter_list() -> list[str]:
