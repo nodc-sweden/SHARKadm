@@ -31,7 +31,11 @@ from sharkadm.validators.columns import (
     ValidateUnmappedColumnsHasData,
 )
 from sharkadm.validators.common_values import ValidateCommonValuesByVisit
-from sharkadm.validators.date_and_time import MissingTime, ValidateDateAndTime
+from sharkadm.validators.date_and_time import (
+    MissingTime,
+    ValidateDateAndTime,
+    ValidateMissingDatetime,
+)
 from sharkadm.validators.depth import (
     ValidateSampleDepth,
     ValidateSecchiDepth,

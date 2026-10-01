@@ -175,3 +175,10 @@ class ImportMatrixConfig:
         """Returns a dict with levels as key and a list och corresponding variables as
         value"""
         return self._columns_by_level
+
+    def get_copy_variables(self) -> list[str]:
+        return [
+            item
+            for item in set(self._data["all"].values())
+            if item.startswith("COPY_VARIABLE")
+        ]

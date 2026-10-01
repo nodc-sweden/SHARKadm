@@ -2,6 +2,7 @@ import re
 
 import polars as pl
 
+from sharkadm import config
 from sharkadm.config import get_column_views_config
 from sharkadm.sharkadm_logger import adm_logger
 from sharkadm.utils import add_column, matching_strings
@@ -339,3 +340,21 @@ class AddColumnsWithPrefix(PolarsTransformer):
         return matching_strings.get_matching_strings(
             strings=data_holder.data.columns, match_strings=self.apply_on_columns
         )
+
+
+class PolarsRenameAddCopyVariablePrefix(PolarsTransformer):
+    valid_data_holders = ("PolarsSharkDataHolder",)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Rename variables in import matrix so that they get prefix COPY_VARIABLE"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        config_mapper = config.get_copy_variable_parameter_mapper(data_holder.config)
+        mapper = {}
+        for col in data_holder.data.columns:
+            map_to = config_mapper.get(col.split("(")[0].strip())
+            if not map_to:
+                continue
+            mapper[col] = map_to
+        data_holder.data = data_holder.data.rename(mapper, strict=False)

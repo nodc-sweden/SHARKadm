@@ -52,7 +52,7 @@ try:
     import folium
     import geopandas as gpd
     import shapely
-except ModuleNotFoundError as e:
+except (ModuleNotFoundError, ImportError) as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
         f'Could not import package "{module_name}" in module {__name__}. You need to '

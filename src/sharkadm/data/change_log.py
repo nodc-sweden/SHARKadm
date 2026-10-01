@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 
 from sharkadm.sharkadm_logger import adm_logger
@@ -55,6 +56,11 @@ class ChangeLog:
         self._sharkadm_logger_info = []
         adm_logger.reset_filter()
         adm_logger.filter(levels="info", log_type="transformation")
+        self._sharkadm_logger_info.append(
+            f"### Automatic changes in dataset "
+            f"{datetime.datetime.today().strftime('%Y-%m-%d')} ###"
+        )
+
         for data in adm_logger.data:
             self._sharkadm_logger_info.append(data.get("msg", ""))
         adm_logger.reset_filter()

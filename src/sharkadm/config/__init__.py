@@ -68,6 +68,25 @@ def get_import_matrix_mapper(
     return config.get_mapper(import_column)
 
 
+def get_copy_variable_parameter_mapper(nodc_conf: Config) -> dict[str, str]:
+    data_types = get_all_data_types(nodc_conf)
+    mapper = {}
+    for dtype in data_types:
+        config = get_import_matrix_config(nodc_conf, dtype)
+        for item in config.get_copy_variables():
+            key = item.split(".", 1)[1]
+            if item.startswith("COPY_VARIABLE_MULTIPLY"):
+                key = key.rsplit(".", 2)[0]
+            else:
+                key = key.rsplit(".", 1)[0]
+            mapper[key] = item
+
+        # mapper.update(
+        #     dict((item.split(".", 1)[1].rsplit(".", 1)[0], item) for item in
+        #          config.get_copy_variables()))
+    return mapper
+
+
 def get_import_matrix_header_mapper_from_data_holder(
     data_holder: DataHolderProtocol, to_column: str
 ) -> ImportMatrixMapper | None:

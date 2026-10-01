@@ -188,20 +188,24 @@ class PolarsArchiveDataHolder(PolarsDataHolder, ABC):
         return self._import_matrix_mapper
 
     @property
+    def datetime_without_none(self) -> pl.Series:
+        return self.data.select(pl.col("datetime").drop_nulls())["datetime"]
+
+    @property
     def min_year(self) -> str:
-        return str(min(self.data["datetime"]).year)
+        return str(min(self.datetime_without_none).year)
 
     @property
     def max_year(self) -> str:
-        return str(max(self.data["datetime"]).year)
+        return str(max(self.datetime_without_none).year)
 
     @property
     def min_date(self) -> str:
-        return min(self.data["datetime"]).strftime(self._date_str_format)
+        return min(self.datetime_without_none).strftime(self._date_str_format)
 
     @property
     def max_date(self) -> str:
-        return max(self.data["datetime"]).strftime(self._date_str_format)
+        return max(self.datetime_without_none).strftime(self._date_str_format)
 
     @property
     def min_longitude(self) -> str:

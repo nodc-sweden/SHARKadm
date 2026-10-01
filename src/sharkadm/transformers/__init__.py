@@ -65,6 +65,7 @@ from sharkadm.transformers.columns import (
     PolarsAddBooleanLargerThan,
     PolarsAddIntColumns,
     PolarsFixDuplicateColumns,
+    PolarsRenameAddCopyVariablePrefix,
 )
 from sharkadm.transformers.coordinates import PolarsSetBoundingBox
 from sharkadm.transformers.cruise import PolarsAddCruiseId
