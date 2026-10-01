@@ -121,3 +121,22 @@ class ValidateDateAndTime(Validator):
             except ValueError:
                 pass
         return None
+
+
+class ValidateMissingDatetime(Validator):
+    _display_name = "Missing datetime column"
+
+    @staticmethod
+    def get_validator_description() -> str:
+        return "Checks that datetime column has values."
+
+    def _validate(self, data_holder: DataHolderProtocol) -> None:
+        if "datetime" not in data_holder.data.columns:
+            self._log_fail("No datetime column in data", level=adm_logger.DEBUG)
+            return
+        nr = (
+            data_holder.data.height
+            - data_holder.data.select(pl.col("datetime").drop_nulls()).height
+        )
+        if nr:
+            self._log_fail(f"Missing datetime ({nr} places)", level=adm_logger.WARNING)

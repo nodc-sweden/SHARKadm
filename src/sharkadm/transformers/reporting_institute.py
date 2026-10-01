@@ -7,6 +7,7 @@ from .base import PolarsTransformer
 
 nodc_codes = None
 try:
+    import nodc_codes
     from nodc_codes import get_translate_codes_object
 except ModuleNotFoundError as e:
     module_name = str(e).split("'")[-2]

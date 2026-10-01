@@ -315,6 +315,17 @@ class PolarsFixDateFormat(PolarsTransformer):
             if col not in data_holder.data:
                 continue
 
+            data = data_holder.data.filter(pl.col(col) != pl.col(col).str.strip_chars())
+            if data.height:
+                for (val,), df in data.group_by(col):
+                    self._log(
+                        f"Stripping date value '{val}' ({df.height} places)",
+                        level=adm_logger.INFO,
+                    )
+                data_holder.data = data_holder.data.with_columns(
+                    pl.col(col).str.strip_chars()
+                )
+
             boolean = data_holder.data[col].str.find(pattern=r"^\d{8}$").is_not_null()
             if boolean.any():
                 data_holder.data = data_holder.data.with_columns(
@@ -341,7 +352,6 @@ class PolarsFixDateFormat(PolarsTransformer):
 
 
 class PolarsFixTimeFormat(PolarsTransformer):
-    invalid_data_types = ("harbourseal",)
     time_cols = ("sample_time", "visit_time", "sample_endtime")
 
     @staticmethod
@@ -351,8 +361,19 @@ class PolarsFixTimeFormat(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         for col in self.time_cols:
-            if col not in data_holder.data:
+            if col not in data_holder.data.columns:
                 continue
+
+            data = data_holder.data.filter(pl.col(col) != pl.col(col).str.strip_chars())
+            if data.height:
+                for (val,), df in data.group_by(col):
+                    self._log(
+                        f"Stripping time value '{val}' ({df.height} places)",
+                        level=adm_logger.INFO,
+                    )
+                data_holder.data = data_holder.data.with_columns(
+                    pl.col(col).str.strip_chars()
+                )
 
             t_boolean = (
                 data_holder.data[col].str.find(pattern=r"^\d{2}:\d{2}:\d{2}$").is_null()
@@ -394,8 +415,6 @@ class PolarsFixTimeFormat(PolarsTransformer):
                             level=adm_logger.ERROR,
                         )
                 elif ":" in value:
-                    print(f"{col=}")
-                    print(f"{value=}")
                     h, m = value.split(":")
                     new_value = f"{h.zfill(2)}:{m.zfill(2)}"
                     if self._is_valid_value(new_value):

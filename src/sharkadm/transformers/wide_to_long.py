@@ -2,6 +2,7 @@ import polars as pl
 
 from sharkadm import event
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import get_single_operators_info
 from sharkadm.utils import matching_strings
 
 from ..data.data_holder import PolarsDataHolder
@@ -57,6 +58,13 @@ class PolarsWideToLong(PolarsTransformer):
             return
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
+        if not self._data_columns:
+            self._log(
+                "Could not transform to row format. "
+                "No data columns with prefix COPY_VARIABLE found.",
+                level=adm_logger.WARNING,
+            )
+            return get_single_operators_info(operator=self, success=False)
         data_holder.data = self._get_transposed_data(data_holder.data)
         self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
