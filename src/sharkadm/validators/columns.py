@@ -1,13 +1,9 @@
-import logging
-
 import polars as pl
 
-from sharkadm import config
+from sharkadm import adm_logger, config
 
 from ..data import PolarsDataHolder
 from .base import DataHolderProtocol, Validator
-
-logger = logging.getLogger(__name__)
 
 
 class ValidateColumnViewColumnsNotInDataset(Validator):
@@ -32,17 +28,23 @@ class ValidateColumnViewColumnsNotInDataset(Validator):
 class ValidateUnmappedColumnsHasData(Validator):
     @staticmethod
     def get_validator_description() -> str:
-        return (
-            "Checks which columns in column views that are not present in dataset. "
-            "Use this as an early validation"
-        )
+        return "Checks which unmapped columns has data. Use this as an early validation"
 
     def _validate(self, data_holder: PolarsDataHolder) -> None:
-        for fr, to in data_holder.mapped_columns.items():
-            if fr in ["source"]:
+        for col in data_holder.unmapped_columns:
+            if col not in data_holder.data.columns:
                 continue
-            if fr != to:
+            if not len(data_holder.data.filter(pl.col(col) != "")):
                 continue
-            if not len(data_holder.data.filter(pl.col(fr) != "")):
-                continue
-            self._log_fail(f"Unmapped column {fr} has values")
+            self._log_fail(f"Unmapped column {col} has values")
+
+
+class ValidateListUnmappedColumns(Validator):
+    @staticmethod
+    def get_validator_description() -> str:
+        return "Logs columns that has not been mapped."
+
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
+        self._log_fail(
+            f"Unmapped columns: {data_holder.unmapped_columns}", level=adm_logger.WARNING
+        )

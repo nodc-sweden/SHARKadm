@@ -55,6 +55,7 @@ from sharkadm.transformers.calculate import (
 from sharkadm.transformers.columns import (
     PolarsAddColumnViewsColumns,
     PolarsOnlyKeepColumnViewsColumns,
+    PolarsRemoveUnmappedColumns,
     PolarsRemoveColumns,
     PolarsClearColumns,
     PolarsSortColumns,

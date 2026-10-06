@@ -49,6 +49,7 @@ class SHARKadmWorkflow:
         # validators_after: list[dict[str, str | dict[str, str]]] | None = None,
         exporters: list[dict[str, str | dict[str, str]]] | None = None,
         workflow_config: dict[str, str] | None = None,
+        controller_config: dict[str, str] | None = None,
         adm_logger_config: dict[str, str | list] | None = None,
         **kwargs,
     ) -> None:
@@ -61,6 +62,7 @@ class SHARKadmWorkflow:
         self._controller = SHARKadmPolarsController()
         self._operators_info = operators or []
         self._exporters_info = exporters or []
+        self._controller_config = controller_config or {}
 
         self._all_validator_objects: _Operators[Validator] = _Operators()
         self._all_transformer_objects: _Operators[PolarsTransformer] = _Operators()
@@ -223,7 +225,7 @@ class SHARKadmWorkflow:
             if self._adm_logger_config.get("reset_between_data_sources"):
                 adm_logger.reset_log()
             self._controller = get_polars_controller_with_data(
-                self._nodc_conf, data_source
+                self._nodc_conf, data_source, **self._controller_config
             )
             info = self._controller.run_operators(*self._operator_objects)
             print(f"{info=}")

@@ -63,10 +63,7 @@ class PolarsClearColumns(PolarsTransformer):
 class PolarsAddColumnViewsColumns(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:
-        return (
-            "Adds empty columns from column_views not already present in dataframe. "
-            "NN data dded!"
-        )
+        return "Adds empty columns from column_views not already present in dataframe."
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         self._column_views = get_column_views_config(data_holder.config)
@@ -79,6 +76,24 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
                 continue
             empty_cols_to_add.append(pl.lit("").alias(col))
         data_holder.data = data_holder.data.with_columns(empty_cols_to_add)
+
+
+class PolarsRemoveUnmappedColumns(PolarsTransformer):
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes columns that has not been mapped. "
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        self._log(
+            f"Removing unmapped columns: {data_holder.unmapped_columns}",
+            level=adm_logger.DEBUG,
+        )
+        columns_to_keep = [
+            col
+            for col in data_holder.data.columns
+            if col not in data_holder.unmapped_columns
+        ]
+        data_holder.data = data_holder.data[columns_to_keep]
 
 
 class PolarsOnlyKeepColumnViewsColumns(PolarsTransformer):

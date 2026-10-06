@@ -28,6 +28,7 @@ from sharkadm.validators.column_combination import (
 )
 from sharkadm.validators.columns import (
     ValidateColumnViewColumnsNotInDataset,
+    ValidateListUnmappedColumns,
     ValidateUnmappedColumnsHasData,
 )
 from sharkadm.validators.common_values import ValidateCommonValuesByVisit

@@ -31,7 +31,7 @@ class PolarsDataSource:
         self._original_header: list = []
         self._header_mapper: ImportMapper | None = None
         self._mapped_columns: dict = dict()
-        self._not_mapped_columns: list = []
+        self._unmapped_columns: list = []
         self._unit_mapper: dict[str, str] = dict()
 
     def __repr__(self) -> str:
@@ -94,7 +94,8 @@ class PolarsDataSource:
             else:
                 internal_name = mapper.get_internal_name(item)
             if item == internal_name:
-                self._not_mapped_columns.append(item)
+                if item != "source":
+                    self._unmapped_columns.append(item)
             else:
                 self._mapped_columns[item] = internal_name
             while internal_name in mapped_header:
@@ -122,8 +123,8 @@ class PolarsDataSource:
         return self._mapped_columns
 
     @property
-    def not_mapped_columns(self) -> list[str]:
-        return self._not_mapped_columns
+    def unmapped_columns(self) -> list[str]:
+        return self._unmapped_columns
 
 
 class PolarsDataFile(PolarsDataSource, ABC):
@@ -160,6 +161,6 @@ class PolarsDataDataFrame(PolarsDataSource, ABC):
         self._original_header: list = []
         self._header_mapper: ImportMapper | None = None
         self._mapped_columns: dict = dict()
-        self._not_mapped_columns: list = []
+        self._unmapped_columns: list = []
 
         self._do_post_init_stuf()

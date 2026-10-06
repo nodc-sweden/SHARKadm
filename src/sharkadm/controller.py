@@ -70,9 +70,8 @@ from sharkadm.validators import Validator
 
 
 class SHARKadmPolarsController:
-    # def __init__(self, nodc_conf: Config) -> None:
-    def __init__(self) -> None:
-        # self._config: Config = nodc_conf
+    def __init__(self, keep_unmapped_columns: bool = False, **kwargs) -> None:
+        self._keep_unmapped_columns = keep_unmapped_columns
         self._data_holder: PolarsDataHolder | None = None
         self._transformers: list[PolarsTransformer | PolarsMultiTransformer] = []
         self._validators_before: list[Validator] = []
@@ -178,7 +177,9 @@ class SHARKadmPolarsController:
     def set_data_holder(self, data_holder: PolarsDataHolder) -> Self:
         self._data_holder = data_holder
         adm_logger.dataset_name = data_holder.dataset_name
-        self.transform(transformers.PolarsAddRowNumber())
+        if not self._keep_unmapped_columns:
+            self.run_operator(transformers.PolarsRemoveUnmappedColumns())
+        self.run_operator(transformers.PolarsAddRowNumber())
         return self
 
     def transform(
@@ -294,7 +295,7 @@ def _get_fixed_list(
 def get_polars_controller_with_data(
     nodc_conf: Config, path: pathlib.Path | str | pl.DataFrame, **kwargs
 ) -> SHARKadmPolarsController:
-    c = SHARKadmPolarsController()
+    c = SHARKadmPolarsController(**kwargs)
     holder = get_polars_data_holder(nodc_conf, path, **kwargs)
     c.set_data_holder(holder)
     return c
