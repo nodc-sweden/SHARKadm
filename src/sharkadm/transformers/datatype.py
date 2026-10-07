@@ -17,6 +17,19 @@ class PolarsAddDatatype(PolarsTransformer):
         )
 
 
+class PolarsAddDatatypeInternal(PolarsTransformer):
+    col_to_set = "data_type_internal"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return f"Adds {PolarsAddDatatypeInternal.col_to_set} column"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit(data_holder.data_type_internal).alias(self.col_to_set)
+        )
+
+
 class PolarsAddDatatypePlanktonBarcoding(PolarsTransformer):
     valid_data_types = ("plankton_barcoding",)
 

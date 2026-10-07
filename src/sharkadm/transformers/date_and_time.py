@@ -107,16 +107,16 @@ class PolarsAddDatetime(PolarsTransformer):
             data_holder.data = data_holder.data.with_columns(
                 pl.concat_str(
                     [
-                        pl.col("datetime_str").str.slice(0, 10),
-                        pl.col(self.time_source_column),
+                        pl.col("datetime_str").str.slice(0, 10).str.strip_chars(),
+                        pl.col(self.time_source_column).str.strip_chars(),
                     ],
                     separator=" ",
-                ).alias("datetime_str")
+                )
+                .str.strip_chars()
+                .alias("datetime_str")
             )
         data_holder.data = data_holder.data.with_columns(
-            datetime=pl.col("datetime_str")
-            .str.strip_chars()
-            .str.to_datetime(strict=self.strict)
+            datetime=pl.col("datetime_str").str.to_datetime(strict=self.strict)
         )
 
 

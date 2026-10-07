@@ -1,16 +1,12 @@
 import polars as pl
 
-from sharkadm import adm_logger, config
+from sharkadm import config
+from sharkadm.sharkadm_logger import adm_logger
 
-from ..data import PolarsDataHolder
-from .base import DataHolderProtocol, Validator
+from .base import PolarsDataHolder, Validator
 
 
 class ValidateColumnViewColumnsNotInDataset(Validator):
-    def __init__(self):
-        super().__init__()
-        self._column_views = config.get_column_views_config()
-
     @staticmethod
     def get_validator_description() -> str:
         return (
@@ -18,7 +14,8 @@ class ValidateColumnViewColumnsNotInDataset(Validator):
             "Use this as an early validation"
         )
 
-    def _validate(self, data_holder: DataHolderProtocol) -> None:
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
+        self._column_views = config.get_column_views_config(data_holder.config)
         for col in self._column_views.get_columns_for_view(data_holder.data_type):
             if col in data_holder.data.columns:
                 continue
