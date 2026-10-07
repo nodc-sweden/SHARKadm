@@ -35,12 +35,14 @@ class AddOccurrenceId(PolarsTransformer):
         add_if_valid: bool = False,
         create_backup_db: bool = False,
         inspect_diff_in_winmerge: bool = False,
+        sort_db: bool = True,
         **kwargs,
     ):
         super().__init__(*args, *kwargs)
         self._add_if_valid = add_if_valid
         self._create_backup_db = create_backup_db
         self._inspect_diff_in_winmerge = inspect_diff_in_winmerge
+        self._sort_db = sort_db
         self.col_to_set = ""  # Is set in self._transform
         self.database: OccurrencesDatabase | None = None
         self.valid_matches = []
@@ -86,8 +88,7 @@ class AddOccurrenceId(PolarsTransformer):
         # 3: Om när match. Logga _temp_occurence_id som man sedan kan sätta nya ????
 
         self.database = nodc_occurrence_id.get_occurrence_database_for_data_type(
-            data_holder.config,
-            data_holder.data_type_internal,
+            data_holder.config, data_holder.data_type_internal, sort_db=self._sort_db
         )
         self.col_to_set = self.database.id_column
         self.valid_matches = []

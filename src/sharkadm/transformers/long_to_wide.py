@@ -50,7 +50,7 @@ class LongToWide(PolarsTransformer):
         par_columns = []
         for par in unique_pars:
             unit = unit_mapping[par]
-            if par in data_holder.not_mapped_columns:
+            if par in data_holder.unmapped_columns:
                 qpar = f"{data_holder.original_qf_column_prefix}{par}"
             else:
                 qpar = f"QFLAG.{par}"

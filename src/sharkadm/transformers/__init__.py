@@ -55,6 +55,7 @@ from sharkadm.transformers.calculate import (
 from sharkadm.transformers.columns import (
     PolarsAddColumnViewsColumns,
     PolarsOnlyKeepColumnViewsColumns,
+    PolarsRemoveUnmappedColumns,
     PolarsRemoveColumns,
     PolarsClearColumns,
     PolarsSortColumns,
@@ -80,6 +81,7 @@ from sharkadm.transformers.dataset_name import (
 )
 from sharkadm.transformers.datatype import (
     PolarsAddDatatype,
+    PolarsAddDatatypeInternal,
     PolarsAddDatatypePlanktonBarcoding,
 )
 from sharkadm.transformers.date_and_time import (

@@ -148,17 +148,17 @@ class PolarsDataHolder(ABC):
         return mapped
 
     @property
-    def not_mapped_columns(self) -> list[str]:
+    def unmapped_columns(self) -> list[str]:
         not_mapped = []
         for name, source in self._data_sources.items():
-            to_add = [col for col in source.not_mapped_columns if col not in not_mapped]
+            to_add = [col for col in source.unmapped_columns if col not in not_mapped]
             not_mapped.extend(to_add)
         return not_mapped
 
     @property
     def imported_columns(self) -> list[str]:
         columns = list(self.mapped_columns.values())
-        columns.extend(self.not_mapped_columns)
+        columns.extend(self.unmapped_columns)
         if "source" in columns:
             columns.pop(columns.index("source"))
         return columns
