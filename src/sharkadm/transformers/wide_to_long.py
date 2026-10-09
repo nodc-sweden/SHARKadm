@@ -2,7 +2,9 @@ import polars as pl
 
 from sharkadm import event
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.sharkadm_operator import get_single_operators_info
+from sharkadm.sharkadm_operator import (
+    OperatorInfo,
+)
 from sharkadm.utils import matching_strings
 
 from ..data.data_holder import PolarsDataHolder
@@ -44,30 +46,46 @@ class PolarsWideToLong(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Transposes data from column data to row data"
 
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> OperatorInfo:
         self._qf_prefix = data_holder.qf_column_prefixes
         self._metadata_columns = []
         self._data_columns = []
         self._qf_col_mapping = {}
         if self._column_name_parameter in data_holder.columns:
-            self._log(
+            msg = (
                 "Could not transform to row format. "
-                f"Column {self._column_name_parameter} already in data",
+                "Column {self._column_name_parameter} already in data"
+            )
+            self._log(
+                msg,
                 level=adm_logger.WARNING,
             )
-            return
+            return OperatorInfo(operator=self, success=False, msg=msg)
+        info = self._check_possibility_to_perform_wide_to_long(data_holder)
+        if not info.success:
+            return info
+        only_one = self._add_single_parameter(data_holder)
+        if only_one:
+            self._add_reported_columns(data_holder)
+            data_holder.data_structure = "row"
+            return OperatorInfo(operator=self)
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
+        print(f"{self._data_columns=}")
         if not self._data_columns:
-            self._log(
+            msg = (
                 "Could not transform to row format. "
-                "No data columns with prefix COPY_VARIABLE found.",
+                "No data columns with prefix COPY_VARIABLE found."
+            )
+            self._log(
+                msg,
                 level=adm_logger.WARNING,
             )
-            return get_single_operators_info(operator=self, success=False)
+            return OperatorInfo(operator=self, success=False, msg=msg)
         data_holder.data = self._get_transposed_data(data_holder.data)
         self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
+        return OperatorInfo(operator=self)
 
     def _save_metadata_columns(self, df: pl.DataFrame) -> None:
         for col in df.columns:
@@ -95,6 +113,8 @@ class PolarsWideToLong(PolarsTransformer):
                 continue
             if self._ignore(col):
                 continue
+            print(f"{col=}")
+            print(f"{qcol=}")
             self._data_columns.append(original_col)
             self._qf_col_mapping[original_col] = qcol
             self._qf_col_mapping[col] = qcol
@@ -116,6 +136,50 @@ class PolarsWideToLong(PolarsTransformer):
             if qcol in df.columns:
                 return qcol
         return ""
+
+    def _check_possibility_to_perform_wide_to_long(
+        self, data_holder: PolarsDataHolder
+    ) -> OperatorInfo:
+        parameters = [col for col in data_holder.data.columns if "COPY_VARIABLE" in col]
+        if len(parameters) > 1:
+            if "quality_flag" in data_holder.data.columns:
+                msg = (
+                    "There are several parameter columns in data and already a "
+                    "quality_flag column. No solution found for this..."
+                    "WideToLong not performed"
+                )
+                self._log(
+                    msg,
+                    level=adm_logger.WARNING,
+                )
+                return OperatorInfo(operator=self, success=False, msg=msg)
+            return OperatorInfo(operator=self)
+        return OperatorInfo(operator=self)
+
+    def _add_single_parameter(self, data_holder: PolarsDataHolder) -> bool:
+        parameters = [col for col in data_holder.data.columns if "COPY_VARIABLE" in col]
+        if len(parameters) != 1:
+            return False
+        if "quality_flag" not in data_holder.data.columns:
+            msg = (
+                f"No quality_flag column found in data when transposing "
+                f"{parameters[0]} to the parameter column"
+            )
+            self._log(
+                msg,
+                level=adm_logger.WARNING,
+            )
+        # variable.COPY_VARIABLE.# counted.ind
+        parameter = parameters[0]
+        par_parts = parameter.split(".")
+        par = par_parts[-2]
+        unit = par_parts[-1]
+        data_holder.data = data_holder.data.rename({parameter: "value"})
+        data_holder.data = data_holder.data.with_columns(
+            pl.lit(par).alias("parameter"),
+            pl.lit(unit).alias("unit"),
+        )
+        return True
 
     def _get_transposed_data(self, df: pl.DataFrame) -> pl.DataFrame:
         data = []
