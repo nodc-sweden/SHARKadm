@@ -71,7 +71,6 @@ class PolarsWideToLong(PolarsTransformer):
             return OperatorInfo(operator=self)
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
-        print(f"{self._data_columns=}")
         if not self._data_columns:
             msg = (
                 "Could not transform to row format. "
@@ -113,8 +112,6 @@ class PolarsWideToLong(PolarsTransformer):
                 continue
             if self._ignore(col):
                 continue
-            print(f"{col=}")
-            print(f"{qcol=}")
             self._data_columns.append(original_col)
             self._qf_col_mapping[original_col] = qcol
             self._qf_col_mapping[col] = qcol
