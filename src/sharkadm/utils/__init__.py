@@ -11,6 +11,8 @@ import zipfile
 
 from sharkadm.utils.svn import get_modified_svn_files, get_svn_info
 
+from .suggest import suggest_commands
+
 SHARKADM_DIRECTORY = pathlib.Path.home() / "sharkadm"
 
 

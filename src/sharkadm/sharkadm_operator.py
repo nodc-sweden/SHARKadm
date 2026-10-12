@@ -221,7 +221,7 @@ def get_single_operators_info(
     msg: str = "",
     cause_for_termination: bool = False,
     **kwargs,
-):
+) -> OperatorsInfo:
     """Returns a OperatorsInfo object containing one OperatorInfo object"""
     all_info = OperatorsInfo()
     if not operator_info:
