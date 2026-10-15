@@ -59,6 +59,7 @@ from sharkadm.validators.scientific_name import (
     ValidateScientificNameIsPresent,
     ValidateScientificNameIsTranslated,
 )
+from sharkadm.validators.seals import ValidateSealsHaveCountSum, ValidateSumSeals
 from sharkadm.validators.serial_number import ValidateSerialNumber
 from sharkadm.validators.size_class import (
     ValidateSizeClassIsPresent,

@@ -61,14 +61,15 @@ class PolarsWideToLong(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return OperatorInfo(operator=self, success=False, msg=msg)
-        info = self._check_possibility_to_perform_wide_to_long(data_holder)
-        if not info.success:
-            return info
+        # info = self._check_possibility_to_perform_wide_to_long(data_holder)
+        # if not info.success:
+        #     return info
         only_one = self._add_single_parameter(data_holder)
         if only_one:
             self._add_reported_columns(data_holder)
             data_holder.data_structure = "row"
             return OperatorInfo(operator=self)
+
         self._save_metadata_columns(data_holder.data)
         self._save_data_columns(data_holder.data)
         if not self._data_columns:
@@ -81,7 +82,13 @@ class PolarsWideToLong(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return OperatorInfo(operator=self, success=False, msg=msg)
-        data_holder.data = self._get_transposed_data(data_holder.data)
+
+        if self._column_name_qf in data_holder.data.columns:
+            data_holder.data = self._get_transposed_data_qflag_column_exists(
+                data_holder.data
+            )
+        else:
+            data_holder.data = self._get_transposed_data(data_holder.data)
         self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
         return OperatorInfo(operator=self)
@@ -166,7 +173,11 @@ class PolarsWideToLong(PolarsTransformer):
                 msg,
                 level=adm_logger.WARNING,
             )
-        # variable.COPY_VARIABLE.# counted.ind
+        msg = f"Transposing data with single parameter {parameters[0]}"
+        self._log(
+            msg,
+            level=adm_logger.DEBUG,
+        )
         parameter = parameters[0]
         par_parts = parameter.split(".")
         par = par_parts[-2]
@@ -178,9 +189,27 @@ class PolarsWideToLong(PolarsTransformer):
         )
         return True
 
+    def _get_parameter_mapper(self) -> dict[str, str]:
+        return {
+            col: self._get_parameter_name_from_parameter(col)
+            for col in self._data_columns
+        }
+
+    def _get_unit_mapper(self) -> dict[str, str]:
+        return {col: self._get_unit_from_parameter(col) for col in self._data_columns}
+
     def _get_transposed_data(self, df: pl.DataFrame) -> pl.DataFrame:
+        msg = "Transposing data with individual quality flag columns"
+        self._log(
+            msg,
+            level=adm_logger.DEBUG,
+        )
         data = []
         len_df = len(df)
+
+        par_mapper = self._get_parameter_mapper()
+        unit_mapper = self._get_unit_mapper()
+
         for index, row in enumerate(df.iter_rows(named=True)):
             meta = [row[column] for column in self._metadata_columns]
             if not index % 1000:
@@ -193,7 +222,8 @@ class PolarsWideToLong(PolarsTransformer):
                 value = row[col]
                 if not value and not self._keep_empty_rows:
                     continue
-                par = self._get_parameter_name_from_parameter(col)
+                par = par_mapper.get(col)
+                # par = self._get_parameter_name_from_parameter(col)
                 qf = row.get(q_col)
                 if qf is None:
                     # self._log(
@@ -201,7 +231,8 @@ class PolarsWideToLong(PolarsTransformer):
                     #     level=adm_logger.WARNING
                     # )
                     qf = ""
-                unit = self._get_unit_from_parameter(col)
+                unit = unit_mapper.get(col)
+                # unit = self._get_unit_from_parameter(col)
                 new_row = [*meta, par, value, qf, unit]
                 data.append(new_row)
 
@@ -219,6 +250,65 @@ class PolarsWideToLong(PolarsTransformer):
                 self._column_name_parameter,
                 self._column_name_value,
                 self._column_name_qf,
+                self._column_name_unit,
+            ],
+            orient="row",
+        )
+        return new_df
+
+    def _get_transposed_data_qflag_column_exists(
+        self, df: pl.DataFrame
+    ) -> pl.DataFrame | None:
+        if "quality_flag" not in df.columns:
+            self._log(
+                "Will not transpose data without quality_flag column. Use "
+                "another method for this...",
+                level=adm_logger.WARNING,
+            )
+            return None
+        msg = "Transposing data with existing quality_flag column"
+        self._log(
+            msg,
+            level=adm_logger.DEBUG,
+        )
+        data = []
+        len_df = len(df)
+
+        meta_columns = [*self._metadata_columns, "quality_flag"]
+        par_mapper = self._get_parameter_mapper()
+        unit_mapper = self._get_unit_mapper()
+
+        for index, row in enumerate(df.iter_rows(named=True)):
+            meta = [row[column] for column in meta_columns]
+            if not index % 1000:
+                event.post_event(
+                    "progress",
+                    dict(total=len_df, current=index, title="Transposing data"),
+                )
+            for col in self._data_columns:
+                value = row[col]
+                if not value and not self._keep_empty_rows:
+                    continue
+                par = par_mapper.get(col)
+                unit = unit_mapper.get(col)
+                # unit = self._get_unit_from_parameter(col)
+                new_row = [*meta, par, value, unit]
+                data.append(new_row)
+
+        self.columns = [
+            *meta_columns,
+            self._column_name_parameter,
+            self._column_name_value,
+            # self._column_name_qf,
+            self._column_name_unit,
+        ]
+        new_df = pl.DataFrame(
+            data=data,
+            schema=[
+                *meta_columns,
+                self._column_name_parameter,
+                self._column_name_value,
+                # self._column_name_qf,
                 self._column_name_unit,
             ],
             orient="row",

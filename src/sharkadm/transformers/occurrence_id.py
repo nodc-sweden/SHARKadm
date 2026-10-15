@@ -27,6 +27,7 @@ class AddOccurrenceId(PolarsTransformer):
         "zoobenthos",
         "plankton_imaging",
         "harbourseal",
+        "greyseal",
     )
 
     def __init__(

@@ -154,8 +154,8 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
     lat_col_to_set = "sample_latitude_dd"
     lon_col_to_set = "sample_longitude_dd"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, sweref_if_more_than_nr_digits: int | None = None, **kwargs):
+        super().__init__(**kwargs)
 
         self.lat_source_col = "reported_latitude"
         self.lon_source_col = "reported_longitude"
@@ -198,6 +198,10 @@ class PolarsAddSamplePositionDD(PolarsTransformer):
         if self._is_sweref99tm(
             value=lat, nr_digits=self.lat_nr_sweref_digits
         ) and self._is_sweref99tm(value=lon, nr_digits=self.lon_nr_sweref_digits):
+            return geography.sweref99tm_to_decdeg(lon, lat)
+        elif self._is_sweref99tm(value=lat, nr_digits=7) and self._is_sweref99tm(
+            value=lon, nr_digits=7
+        ):
             return geography.sweref99tm_to_decdeg(lon, lat)
         elif self._is_dd(lat) and self._is_dd(lon):
             return lat, lon

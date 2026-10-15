@@ -344,9 +344,13 @@ class PolarsFixDateFormat(PolarsTransformer):
                 continue
 
             unique_values = set(data_holder.data.filter(boolean)[col])
+            try:
+                unique_values = sorted(unique_values)
+            except TypeError:
+                pass
             self._log(
                 f"Could not convert the following dates in column {col}: "
-                f"{', '.join(sorted(unique_values))}",
+                f"{', '.join(unique_values)}",
                 level=adm_logger.ERROR,
             )
 
@@ -395,6 +399,8 @@ class PolarsFixTimeFormat(PolarsTransformer):
 
             boolean = t_boolean & m_boolean
 
+            self._left_pad_zeros(data_holder, col)
+
             unique_values = set(data_holder.data.filter(boolean)[col])
             for value in unique_values:
                 if re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", value):
@@ -434,6 +440,22 @@ class PolarsFixTimeFormat(PolarsTransformer):
                             f"Cant handle time format {value} in column {col}",
                             level=adm_logger.ERROR,
                         )
+
+    def _left_pad_zeros(self, data_holder: PolarsDataHolder, col: str) -> None:
+        # Leftpad values with zeros if only numbers
+        nr_filter = pl.col(col).str.find(pattern=r"^\d{2,3}$").is_not_null()
+        df = data_holder.data.filter(nr_filter)
+        if df.height:
+            self._log(
+                f"Padding zeros to {col} ({df.height} places)",
+                level=adm_logger.INFO,
+            )
+        data_holder.data = data_holder.data.with_columns(
+            pl.when(nr_filter)
+            .then(pl.col(col).str.pad_start(4, "0"))
+            .otherwise(pl.col(col))
+            .alias(col)
+        )
 
     def _set_new_value(
         self,

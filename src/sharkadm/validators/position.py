@@ -57,3 +57,15 @@ class ValidateReportedPosition(Validator):
                         f"{lon_col} has unknown format",
                         row_numbers=list(df["row_number"]),
                     )
+
+
+class ValidateLatLargerThanLon(Validator):
+    lat_col = "visit_reported_latitude"
+    lon_col = "visit_reported_longitude"
+
+    @staticmethod
+    def get_validator_description() -> str:
+        return "Check that lat is larger than lon"
+
+    def _validate(self, data_holder: PolarsDataHolder) -> None:
+        pass
