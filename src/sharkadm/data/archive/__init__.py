@@ -11,6 +11,7 @@ from sharkadm.data.archive.chlorophyll import PolarsChlorophyllArchiveDataHolder
 from sharkadm.data.archive.delivery_note import DeliveryNote
 from sharkadm.data.archive.epibenthos import PolarsEpibenthosArchiveDataHolder
 from sharkadm.data.archive.greyseal import PolarsGreySealArchiveDataHolder
+from sharkadm.data.archive.harbourporpoise import PolarsHarbourPorpoiseArchiveDataHolder
 from sharkadm.data.archive.harbourseal import PolarsHarbourSealArchiveDataHolder
 from sharkadm.data.archive.jellyfish import PolarsJellyfishArchiveDataHolder
 from sharkadm.data.archive.marine_biotoxins import PolarsMarineBiotoxinsArchiveDataHolder
@@ -21,6 +22,7 @@ from sharkadm.data.archive.primaryproduction import (
     PolarsPrimaryProductionArchiveDataHolder,
 )
 from sharkadm.data.archive.profile import PolarsProfileArchiveDataHolder
+from sharkadm.data.archive.ringedseal import PolarsRingedSealArchiveDataHolder
 from sharkadm.data.archive.zoobenthos import PolarsZoobenthosArchiveDataHolder
 from sharkadm.data.archive.zooplankton import PolarsZooplanktonArchiveDataHolder
 
@@ -45,6 +47,7 @@ def get_polars_archive_data_holder(
     )
     d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
+        print(path)
         raise sharkadm_exceptions.ArchiveDataHolderError(d_note.data_format)
     return d_holder(path, nodc_conf=nodc_conf)
 

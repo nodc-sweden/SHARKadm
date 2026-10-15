@@ -89,7 +89,8 @@ class DeliveryNote:
                     data["data_format"] = parts[0]
                     if len(parts) == 1:
                         msg = (
-                            f"Can not find any import_matrix_key (data_format) "
+                            f"Can not find any import_matrix_key (data_format line is "
+                            f"{value}) "
                             f"in delivery_note: {path}"
                         )
                         raise sharkadm_exceptions.NoDataFormatFoundError(msg)

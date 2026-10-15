@@ -86,7 +86,7 @@ class SHARKadmPolarsController:
 
     def __add__(self, other):
         cdh = self.data_holder + other.data_holder
-        new_controller = SHARKadmPolarsController(self._config)
+        new_controller = SHARKadmPolarsController()
         new_controller.set_data_holder(cdh)
         return new_controller
 

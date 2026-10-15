@@ -52,9 +52,16 @@ class PolarsDataHolder(ABC):
                 f"{self.dataset_name}"
             )
             raise TypeError
-        concat_data = pl.concat([self.data, other.data])
-        cdh = PolarsConcatDataHolder()
-        cdh.data = concat_data
+        if self.data_structure != other.data_structure:
+            adm_logger.log_workflow(
+                f"Not allowed to merge to instances with different data structures: "
+                f"{self.data_structure} and {other.data_structure}"
+            )
+            raise TypeError
+        concat_data = pl.concat([self.data, other.data], how="diagonal")
+        cdh = PolarsConcatDataHolder(self.config)
+        cdh.data_structure = self.data_structure
+        cdh.data = concat_data.fill_null("")
         cdh.set_data_type_obj(self.data_type_obj)
         return cdh
 
@@ -304,9 +311,6 @@ class PolarsDataHolder(ABC):
 
 
 class PolarsConcatDataHolder(PolarsDataHolder):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     @staticmethod
     def get_data_holder_description() -> str:
         return "This is a concatenated data holder"
