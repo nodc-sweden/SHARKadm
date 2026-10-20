@@ -131,6 +131,7 @@ from sharkadm.transformers.location import (
     PolarsAddLocationMunicipality,
     PolarsAddLocationNation,
     PolarsAddLocationSeaBasin,
+    PolarsAddLocationSeaVoxRegion,
     PolarsAddLocationTypeArea,
     PolarsAddLocationSeaAreaCode,
     PolarsAddLocationSeaAreaName,
