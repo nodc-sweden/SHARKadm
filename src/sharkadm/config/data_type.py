@@ -129,6 +129,20 @@ class DataTypeMarineBiotoxins(DataType):
         return "Marine Biotoxins"
 
 
+class DataTypeChlorophyll(DataType):
+    @property
+    def data_type(self) -> str:
+        return "Chlorophyll"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return "Chlorophyll"
+
+
 class DataTypeHandler:
     def __init__(self, nodc_conf: Config):
         self._nodc_conf: Config = nodc_conf
