@@ -52,6 +52,7 @@ try:
     import folium
     import geopandas as gpd
     import shapely
+    from xyzservices import providers
 except (ModuleNotFoundError, ImportError) as e:
     module_name = str(e).split("'")[-2]
     adm_logger.log_workflow(
@@ -351,6 +352,7 @@ class PolarsHtmlMap(PolarsFileExporter):
             zoom_start=6,
             tiles="Cartodb Positron",
         )
+        folium.TileLayer(providers.Esri.WorldStreetMap).add_to(m)
         m.fit_bounds(
             (
                 (
