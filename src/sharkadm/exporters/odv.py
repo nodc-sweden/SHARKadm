@@ -173,11 +173,11 @@ class OdvExporter(PolarsFileExporter):
         """
         Format a single line in the ODV header.
         """
-        local_code = self.LOCAL_CODE_MAPPING[parameter]
+        local_code = self.LOCAL_CODE_MAPPING.get(parameter)
         subject = f"<subject>SDN:LOCAL:{local_code}</subject>"
-        p01_code = self.P01_CODE_MAPPING[parameter]
+        p01_code = self.P01_CODE_MAPPING.get(parameter)
         object_part = f"<object>SDN:P01::{p01_code}</object>"
-        p06_code = self.P06_CODE_MAPPING[parameter]
+        p06_code = self.P06_CODE_MAPPING.get(parameter)
         units_part = f"<units>SDN:P06::{p06_code}</units>"
 
         header_line = f"//{subject}{object_part}{units_part}"

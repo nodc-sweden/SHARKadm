@@ -52,7 +52,7 @@ class NewDataHolder(PolarsDataHolder):
 
     @staticmethod
     def get_data_holder_description() -> str:
-        return """Holds data from [your description here]"""
+        return """Holds data from a time series."""
 
     @property
     def dataset_name(self) -> str:
@@ -76,16 +76,6 @@ class NewDataHolder(PolarsDataHolder):
         """Columns with data."""
         return tuple(self._data_columns)
 
-    def _update_data_columns(self) -> None:
-        excluded_prefixes = ("qc_", "re_")
-        self._data_columns = [
-            c
-            for c in self._data.columns
-            if c != self.indexing_column
-            and not c.startswith(excluded_prefixes)
-            and c != "source"
-        ]
-
     def _load_data(self) -> None:
         data_source = CsvRowFormatPolarsDataFile(
             path=self.data_file_path,
@@ -99,6 +89,46 @@ class NewDataHolder(PolarsDataHolder):
         self._add_sdn_qc_flags()
         self._load_metadata()
         self._add_missing_values()
+
+    def _update_data_columns(self) -> None:
+        """Store the names of the data columns."""
+        excluded_prefixes = ("qc_", "re_")
+        self._data_columns = [
+            c
+            for c in self._data.columns
+            if c != self.indexing_column
+            and not c.startswith(excluded_prefixes)
+            and c != "source"
+        ]
+
+    def _add_sdn_qc_flags(self) -> None:
+        """Add SeaDataNet qualifier columns for each measurement column."""
+        expressions = []
+
+        indexing_sdn_qc_column = f"qc_sdn_{self.indexing_column}"
+        if indexing_sdn_qc_column not in self._data.columns:
+            expressions.append(pl.lit("1").alias(indexing_sdn_qc_column))
+
+        for parameter in self._data_columns:
+            qc_column = f"qc_{parameter}"
+            sdn_qc_column = f"qc_sdn_{parameter}"
+
+            if qc_column not in self._data.columns:
+                continue
+
+            expressions.append(
+                pl.col(qc_column)
+                .cast(pl.String)
+                .fill_null("")
+                .replace_strict(
+                    self._sdn_qc_mapping,
+                    default="9",
+                )
+                .alias(sdn_qc_column)
+            )
+
+        if expressions:
+            self._data = self._data.with_columns(expressions)
 
     def _load_metadata(self) -> None:
         """Load metadata from either CSV or XLSX file."""
@@ -141,36 +171,8 @@ class NewDataHolder(PolarsDataHolder):
                 if col_name not in self._data.columns:
                     self._data = self._data.with_columns(pl.lit(value).alias(col_name))
 
-    def _add_sdn_qc_flags(self) -> None:
-        """Add SeaDataNet qualifier columns for each measurement column."""
-        expressions = []
-
-        indexing_sdn_qc_column = f"qc_sdn_{self.indexing_column}"
-        if indexing_sdn_qc_column not in self._data.columns:
-            expressions.append(pl.lit("1").alias(indexing_sdn_qc_column))
-
-        for parameter in self._data_columns:
-            qc_column = f"qc_{parameter}"
-            sdn_qc_column = f"qc_sdn_{parameter}"
-
-            if qc_column not in self._data.columns:
-                continue
-
-            expressions.append(
-                pl.col(qc_column)
-                .cast(pl.String)
-                .fill_null("")
-                .replace_strict(
-                    self._sdn_qc_mapping,
-                    default="9",
-                )
-                .alias(sdn_qc_column)
-            )
-
-        if expressions:
-            self._data = self._data.with_columns(expressions)
-
     def _add_missing_values(self) -> None:
+        """Add defaults to a set of columns."""
         default_values: dict[str, object] = {
             "LOCAL_CDI_ID": "MISSING",
             "Bot. Depth [m]": "9999.9",
