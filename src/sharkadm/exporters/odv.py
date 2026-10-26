@@ -17,6 +17,7 @@ class OdvExporter(PolarsFileExporter):
     LOCAL_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "DMS"}
     P01_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "FLUXDMS1"}
     P06_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "UUUD"}
+    P06_VALUE_MAPPING: ClassVar[dict[str, str]] = {"UUUD": "[umol/m^2/d]"}
 
     # Metadata fields in ODV
     EXPORT_COLUMN_NAMES: ClassVar[dict[str, str]] = {
@@ -126,7 +127,12 @@ class OdvExporter(PolarsFileExporter):
         ]
 
         for col in measurement_cols:
-            output_column_names.append(self.LOCAL_CODE_MAPPING.get(col, col))
+            local_name = self.LOCAL_CODE_MAPPING.get(col, col)
+            unit_code = self.P06_CODE_MAPPING.get(col)
+            unit = self.P06_VALUE_MAPPING.get(unit_code) if unit_code else None
+            column_name = f"{local_name} {unit}" if unit else local_name
+
+            output_column_names.append(column_name)
             output_column_names.append("QV:SEADATANET")
 
         with open(
