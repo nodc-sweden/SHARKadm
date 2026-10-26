@@ -19,7 +19,7 @@ class OdvExporter(PolarsFileExporter):
     P06_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "UUUD"}
     P06_VALUE_MAPPING: ClassVar[dict[str, str]] = {"UUUD": "[umol/m^2/d]"}
 
-    # Metadata fields in ODV
+    # Map data fields to metadata fields in ODV
     EXPORT_COLUMN_NAMES: ClassVar[dict[str, str]] = {
         "Cruise": "Cruise",
         "reported_station_name": "Station",
@@ -79,7 +79,16 @@ class OdvExporter(PolarsFileExporter):
 
         for col in metadata_cols:
             output_name = self.EXPORT_COLUMN_NAMES.get(col, col)
-            expressions.append(pl.col(col).alias(output_name))
+            if col == "sample_iso_datetime":
+                expressions.append(
+                    pl.col(col)
+                    .cast(pl.String)
+                    .str.to_datetime(strict=True)
+                    .dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
+                    .alias(output_name)
+                )
+            else:
+                expressions.append(pl.col(col).alias(output_name))
             metadata_output_names.append(output_name)
 
         expressions.append(
