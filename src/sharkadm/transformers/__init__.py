@@ -52,10 +52,15 @@ from sharkadm.transformers.calculate import (
     PolarsFixCalcByDc,
     PolarsOnlyKeepReportedIfCalcByDc,
 )
+from sharkadm.transformers.calculate_seals import (
+    PolarsCalculateSealsNrCounted,
+    PolarsFixCalcByDcSeals,
+)
 from sharkadm.transformers.columns import (
     PolarsAddColumnViewsColumns,
     PolarsOnlyKeepColumnViewsColumns,
     PolarsRemoveUnmappedColumns,
+    PolarsAddEmptyColumns,
     PolarsRemoveColumns,
     PolarsClearColumns,
     PolarsSortColumns,
@@ -96,6 +101,10 @@ from sharkadm.transformers.date_and_time import (
     PolarsFixDateFormat,
     PolarsFixTimeFormat,
     PolarsAddCurrentDate,
+)
+from sharkadm.transformers.decimals import (
+    PolarsStripAndSetNrDecimals,
+    PolarsRoundAndSetNrDecimals,
 )
 from sharkadm.transformers.delivery_note_info import (
     PolarsAddDeliveryNoteInfo,
@@ -171,6 +180,9 @@ from sharkadm.transformers.position import (
     PolarsAddReportedPositionString,
     PolarsAddPositionDirection,
     PolarsAddPositionDDId,
+    PolarsAddVisitTransectStartPositionDD,
+    PolarsAddVisitTransectEndPositionDD,
+    PolarsAddSpaceInPositionDM,
 )
 from sharkadm.transformers.profile import (
     PolarsAddMetadataToProfileData,
@@ -226,7 +238,9 @@ from sharkadm.transformers.station import (
     PolarsSetStationNameFromReportedStationNameIfMissing,
 )
 from sharkadm.transformers.status import SetStatusDataHost, SetStatusDeliverer
-from sharkadm.transformers.string import PolarsCodesToUppercase
+from sharkadm.transformers.string import (
+    PolarsCodesToUppercase,
+)
 from sharkadm.transformers.strip import PolarsStripAllValues
 from sharkadm.transformers.trophic_type import PolarsSetTrophicTypeSMHI
 from sharkadm.transformers.visit import (

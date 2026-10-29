@@ -27,7 +27,11 @@ from sharkadm.exporters.shark_metadata_auto import PolarsSHARKMetadataAuto
 from sharkadm.exporters.species_translation import SpeciesTranslationTxt
 
 # from sharkadm.exporters.standard_format import PolarsStandardFormat
-from sharkadm.exporters.statistics import PolarsPrintStatistics, PolarsStatisticsToTxt
+from sharkadm.exporters.statistics import (
+    PolarsPrintStatistics,
+    PolarsStatisticsToTxt,
+    PolarsPrintNrPositionsPerReportedStationName,
+)
 from sharkadm.exporters.system import (
     ExportersSummaryFile,
     TransformersSummaryFile,

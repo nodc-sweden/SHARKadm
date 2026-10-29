@@ -5,14 +5,14 @@ from sharkadm.utils import sweref99tm_db
 
 
 def decdeg_to_decmin(
-    pos: float | str, nr_decimals: int | None = 2, with_space: bool = False
+    pos: float | str, nr_decimals: int | None = None, with_space: bool = False
 ):
     pos = float(pos)
     deg = np.floor(pos)
     minute = 0
     if deg:
         minute = pos % deg * 60.0
-    if nr_decimals:
+    if nr_decimals is not None:
         output = "%%2.%sf" % nr_decimals % (deg * 100.0 + minute)
     else:
         output = str(deg * 100.0 + minute)
@@ -22,14 +22,14 @@ def decdeg_to_decmin(
     return output
 
 
-def decmin_to_decdeg(pos: str, nr_decimals: int | None = 2):
+def decmin_to_decdeg(pos: str, nr_decimals: int | None = None):
     pos = float(pos.replace(" ", ""))
     if pos >= 0:
         output = np.floor(pos / 100.0) + (pos % 100) / 60.0
     else:
         output = np.ceil(pos / 100.0) - (-pos % 100) / 60.0
 
-    if nr_decimals:
+    if nr_decimals is not None:
         output = np.round(output, nr_decimals)
 
     return str(output)

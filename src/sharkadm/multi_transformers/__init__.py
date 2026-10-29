@@ -5,7 +5,7 @@ from typing import Type
 from sharkadm import utils
 from sharkadm.multi_transformers.base import PolarsMultiTransformer
 from sharkadm.multi_transformers.bvol import BvolPolars
-from sharkadm.multi_transformers.calculate import CalculatePolars
+from sharkadm.multi_transformers.calculate import CalculatePhytoplanktonPolars
 from sharkadm.multi_transformers.date_time import DateTimePolars
 from sharkadm.multi_transformers.dyntaxa import DyntaxaPolars
 from sharkadm.multi_transformers.general_dv import GeneralDVPolars

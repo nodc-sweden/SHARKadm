@@ -159,6 +159,10 @@ class SHARKadmPolarsController:
         return self._data_holder
 
     @property
+    def dh(self) -> PolarsDataHolder:
+        return self.data_holder
+
+    @property
     def is_filtered(self) -> bool:
         return self._data_holder.is_filtered
 

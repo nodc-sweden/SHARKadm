@@ -55,3 +55,32 @@ class PolarsStatisticsToTxt(PolarsFileExporter):
             with open(self.export_file_path, "w", encoding=self._encoding) as fid:
                 for key, value in stats.items():
                     fid.write(f"{key.ljust(40)}\t{value}\n")
+
+
+class PolarsPrintNrPositionsPerReportedStationName(PolarsFileExporter):
+    def __init__(
+        self, min_nr: int | None = None, mapped_station: bool | None = None, **kwargs
+    ):
+        self._min_nr = min_nr
+        self._mapped_station = mapped_station
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_exporter_description() -> str:
+        return "Prints nr positions per reported station name"
+
+    def _export(self, data_holder: PolarsDataHolder) -> None:
+        title = "Number of unique positions per reported station name"
+        if self._min_nr is not None:
+            title = title + f" (Showing >={self._min_nr})"
+        mark_len = 100
+        print("=" * mark_len)
+        print(title)
+        print("-" * mark_len)
+        print(
+            statistics.get_nr_positions_per_reported_station_name(
+                data_holder.data,
+                min_nr=self._min_nr,
+                mapped_station=self._mapped_station,
+            )
+        )
