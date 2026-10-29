@@ -10,6 +10,7 @@ DTYPE_MAPPER = {
     "physicalandchemical": "physicalchemical",
     "PHYCHE".lower(): "physicalchemical",
     "marinebiotoxins": "marine_biotoxins",
+    "Harbour seal": "harbourseal",
 }
 
 
@@ -101,6 +102,20 @@ class DataTypeGraySeal(DataType):
         return "Gray seal"
 
 
+class DataTypeRingedSeal(DataType):
+    @property
+    def data_type(self) -> str:
+        return "RingedSeal"
+
+    @property
+    def data_type_internal(self) -> str:
+        return self._data_type_internal
+
+    @property
+    def data_type_in_data(self) -> str:
+        return "Ringed seal"
+
+
 class DataTypeHarbourSeal(DataType):
     @property
     def data_type(self) -> str:
@@ -150,6 +165,7 @@ CLASS_MAPPER = {
     "marine_biotoxins": DataTypeMarineBiotoxins,
     "harbourseal": DataTypeHarbourSeal,
     "grayseal": DataTypeGraySeal,
+    "ringedseal": DataTypeRingedSeal,
 }
 
 

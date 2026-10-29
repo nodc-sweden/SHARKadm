@@ -306,8 +306,15 @@ class PolarsDataHolder(ABC):
         if "parameter" not in self._data.columns:
             self._data_structure = "column"
 
-    def get_columns_containing_string(self, string: str) -> list[str]:
+    def search_columns(self, string: str) -> list[str]:
         return [col for col in self.data.columns if string in col]
+
+    # def set_ref_data_holder(self, ref_data_holder: PolarsDataHolder) -> None:
+    #     if ref_data_holder.data_type_internal != self.data_type_internal:
+    #         raise
+    #
+    #     self._ref_data_holder = ref_data_holder
+    #     return self
 
 
 class PolarsConcatDataHolder(PolarsDataHolder):

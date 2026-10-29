@@ -66,6 +66,7 @@ class PolarsWideToLong(PolarsTransformer):
         #     return info
         only_one = self._add_single_parameter(data_holder)
         if only_one:
+            print(f"{only_one=}")
             self._add_reported_columns(data_holder)
             data_holder.data_structure = "row"
             return OperatorInfo(operator=self)
@@ -82,13 +83,15 @@ class PolarsWideToLong(PolarsTransformer):
                 level=adm_logger.WARNING,
             )
             return OperatorInfo(operator=self, success=False, msg=msg)
-
+        print(f"{self._data_columns=}")
         if self._column_name_qf in data_holder.data.columns:
             data_holder.data = self._get_transposed_data_qflag_column_exists(
                 data_holder.data
             )
+            print("if")
         else:
             data_holder.data = self._get_transposed_data(data_holder.data)
+            print("else")
         self._add_reported_columns(data_holder)
         data_holder.data_structure = "row"
         return OperatorInfo(operator=self)
@@ -187,6 +190,8 @@ class PolarsWideToLong(PolarsTransformer):
             pl.lit(par).alias("parameter"),
             pl.lit(unit).alias("unit"),
         )
+        if not self._keep_empty_rows:
+            data_holder.data = data_holder.data.filter(pl.col("value") != "")
         return True
 
     def _get_parameter_mapper(self) -> dict[str, str]:

@@ -78,6 +78,25 @@ class PolarsAddColumnViewsColumns(PolarsTransformer):
         data_holder.data = data_holder.data.with_columns(empty_cols_to_add)
 
 
+class PolarsAddEmptyColumns(PolarsTransformer):
+    def __init__(self, *columns, **kwargs):
+        self._columns = columns
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds empty columns if non existing."
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.with_columns(
+            [
+                pl.lit("").alias(col)
+                for col in self._columns
+                if col not in data_holder.data.columns
+            ]
+        )
+
+
 class PolarsRemoveUnmappedColumns(PolarsTransformer):
     @staticmethod
     def get_transformer_description() -> str:

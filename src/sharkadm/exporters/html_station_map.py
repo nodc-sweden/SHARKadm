@@ -6,6 +6,7 @@ import numpy as np
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import OperatorInfo
 
 from ..data import PolarsDataHolder
 from .base import PolarsFileExporter
@@ -125,13 +126,14 @@ class PolarsHtmlScatterMap(PolarsFileExporter):
     def get_exporter_description() -> str:
         return "Creates a html scatter map."
 
-    def _export(self, data_holder: PolarsDataHolder) -> None:
+    def _export(self, data_holder: PolarsDataHolder) -> OperatorInfo:
         if not folium:
+            msg = f"Could not export {self.__class__.__name__}. folium package not found!"
             self._log(
-                f"Could not export {self.__class__.__name__}. folium package not found!",
+                msg,
                 level=adm_logger.WARNING,
             )
-            return
+            return OperatorInfo(success=False, msg=msg)
 
         # lat_mid, lon_mid = self._get_mid_position_for_data(data_holder.data)
         self.m = folium.Map(
@@ -161,6 +163,7 @@ class PolarsHtmlScatterMap(PolarsFileExporter):
         folium.LayerControl().add_to(self.m)
         export_path = self._get_path(data_holder)
         self.m.save(export_path)
+        return OperatorInfo()
 
     def _plot_by_percentage(self, data_holder: PolarsDataHolder) -> None:
         if not self._by_percentage:
@@ -350,7 +353,8 @@ class PolarsHtmlMap(PolarsFileExporter):
         m = folium.Map(
             # location=(lat_mid, lon_mid),
             zoom_start=6,
-            tiles="Cartodb Positron",
+            # tiles=None,
+            # tiles="Cartodb Positron",
         )
         folium.TileLayer(providers.Esri.WorldStreetMap).add_to(m)
         m.fit_bounds(
