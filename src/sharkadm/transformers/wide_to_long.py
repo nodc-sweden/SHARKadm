@@ -64,9 +64,8 @@ class PolarsWideToLong(PolarsTransformer):
         # info = self._check_possibility_to_perform_wide_to_long(data_holder)
         # if not info.success:
         #     return info
-        only_one = self._add_single_parameter(data_holder)
-        if only_one:
-            print(f"{only_one=}")
+
+        if self._add_single_parameter(data_holder):
             self._add_reported_columns(data_holder)
             data_holder.data_structure = "row"
             return OperatorInfo(operator=self)
@@ -164,9 +163,32 @@ class PolarsWideToLong(PolarsTransformer):
         return OperatorInfo(operator=self)
 
     def _add_single_parameter(self, data_holder: PolarsDataHolder) -> bool:
+        """Handle single parameters without matching quality flags.
+
+        This is a special-case path for datasets that contain exactly one
+        data parameter (COPY_VARIABLE) field, but do not follow the usual
+        wide-format pattern where each parameter has a matching quality-flag column.
+        In that case, the column is reshaped directly into long format by renaming
+        the value column to "value" and adding "parameter" and "unit"
+        columns.
+
+        Returns:
+            bool: True if the special single-parameter shortcut was applied.
+            False if the data should continue through the normal wide-to-long
+            logic instead.
+        """
         parameters = [col for col in data_holder.data.columns if "COPY_VARIABLE" in col]
         if len(parameters) != 1:
             return False
+
+        parameter = parameters[0]
+        param_name = self._get_parameter_name_from_parameter(parameter)
+
+        # If the normal wide layout exists for this single parameter, do not use
+        # the shortcut path.
+        if self._associated_qf_col(param_name, data_holder.data):
+            return False
+
         if "quality_flag" not in data_holder.data.columns:
             msg = (
                 f"No quality_flag column found in data when transposing "
@@ -181,7 +203,6 @@ class PolarsWideToLong(PolarsTransformer):
             msg,
             level=adm_logger.DEBUG,
         )
-        parameter = parameters[0]
         par_parts = parameter.split(".")
         par = par_parts[-2]
         unit = par_parts[-1]
