@@ -102,20 +102,6 @@ class PolarsAddReportedPosition(PolarsTransformer):
             cols_to_add.append(pl.lit("").alias(col))
         data_holder.data = data_holder.data.with_columns(cols_to_add)
 
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col("sample_reported_latitude") != "")
-        #     .then(pl.col("sample_reported_latitude"))
-        #     .otherwise(pl.col("visit_reported_latitude"))
-        #     .alias("reported_latitude")
-        # )
-        #
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col("sample_reported_longitude") != "")
-        #     .then(pl.col("sample_reported_longitude"))
-        #     .otherwise(pl.col("visit_reported_longitude"))
-        #     .alias("reported_longitude")
-        # )
-
     def _set_reported_from_deg_and_min(self, data_holder: PolarsDataHolder):
         self._save_reported_deg_and_min_columns(data_holder)
         data_holder.data = data_holder.data.with_columns(
@@ -150,17 +136,19 @@ class PolarsAddReportedPosition(PolarsTransformer):
             )
 
 
-class _PolarsPositionDD(PolarsTransformer):
-    lat_col_to_set = "sample_latitude_dd"
-    lon_col_to_set = "sample_longitude_dd"
-    lat_source_col = "reported_latitude"
-    lon_source_col = "reported_longitude"
-    lat_nr_sweref_digits = 7
-    lon_nr_sweref_digits = 6
+class _PolarsPosition(PolarsTransformer):
+    lat_col_to_set: str | None = None
+    lon_col_to_set: str | None = None
+
+    lat_source_col: str = "reported_latitude"
+    lon_source_col: str = "reported_longitude"
+
+    lat_nr_sweref_digits: int = 7
+    lon_nr_sweref_digits: int = 6
 
     @staticmethod
     def get_transformer_description() -> str:
-        return "Adds sample position based on reported position"
+        return "Base class for transformers that add position columns."
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         if self.lat_col_to_set in data_holder.data:
@@ -170,7 +158,7 @@ class _PolarsPositionDD(PolarsTransformer):
         for (lat, lon), df in data_holder.data.group_by(
             [self.lat_source_col, self.lon_source_col]
         ):
-            new_lat, new_lon = self._get(str(lat), str(lon))
+            new_lat, new_lon = self._convert(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
                 .then(pl.lit(new_lat))
@@ -184,36 +172,33 @@ class _PolarsPositionDD(PolarsTransformer):
                 .alias(self.lon_col_to_set)
             )
 
-    def _get(self, lat: str, lon: str) -> (str, str):
-        lat = lat.replace(" ", "")  # .replace(',', '.')
-        lon = lon.replace(" ", "")  # .replace(',', '.')
-
-        if not all([lat, lon]):
-            return "", ""
-
+    def _get_coordinate_format(self, lat: str, lon: str) -> str | None:
         if self._is_sweref99tm(
             value=lat, nr_digits=self.lat_nr_sweref_digits
         ) and self._is_sweref99tm(value=lon, nr_digits=self.lon_nr_sweref_digits):
-            return geography.sweref99tm_to_decdeg(lon, lat)
+            return "sweref99tm"
         elif self._is_sweref99tm(value=lat, nr_digits=7) and self._is_sweref99tm(
             value=lon, nr_digits=7
         ):
-            return geography.sweref99tm_to_decdeg(lon, lat)
+            return "sweref99tm"
         elif self._is_dd(lat) and self._is_dd(lon):
-            return lat, lon
+            return "DD"
         elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
-            return (geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon))
+            return "DM"
         elif self._is_rt90(value=lat) and self._is_rt90(value=lon):
-            return mellifica.rt90_to_wgs84(float(lon), float(lat))
+            return "rt90"
         else:
             self._log(
                 f"Unknown format of reported_latitude and/or "
-                f"reported_longitude when tying to to set "
+                f"reported_longitude when tying to identify the coordinate format of "
                 f"{self.lat_source_col} and "
                 f"{self.lon_source_col}",
                 level=adm_logger.ERROR,
             )
-            return "", ""
+            return None
+
+    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
+        return lat, lon
 
     def _is_sweref99tm(self, value: str, nr_digits: int) -> bool:
         if len(value.split(".")[0]) == nr_digits:
@@ -242,6 +227,49 @@ class _PolarsPositionDD(PolarsTransformer):
         if len(parts[0].zfill(2)) == 2:
             return True
         return False
+
+
+class _PolarsPositionDD(_PolarsPosition):
+    lat_col_to_set = "sample_latitude_dd"
+    lon_col_to_set = "sample_longitude_dd"
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Adds sample position based on reported position"
+
+    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
+        lat = lat.replace(" ", "")
+        lon = lon.replace(" ", "")
+
+        if not all([lat, lon]):
+            self._log(
+                f"Missing position when trying to set {self.lat_col_to_set} "
+                f"and {self.lon_col_to_set}",
+                level=adm_logger.WARNING,
+            )
+            return "", ""
+
+        reported_format = self._get_coordinate_format(lat, lon)
+
+        if reported_format is None:
+            return "", ""
+        if reported_format == "DD":
+            return lat, lon
+        elif reported_format == "DM":
+            return (geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon))
+        elif reported_format == "sweref99tm":
+            return geography.sweref99tm_to_decdeg(lon, lat)
+        elif reported_format == "rt90":
+            return mellifica.rt90_to_wgs84(float(lon), float(lat))
+        else:
+            self._log(
+                f"Unknown format of reported_latitude and/or "
+                f"reported_longitude when tying to to set "
+                f"{self.lat_source_col} and "
+                f"{self.lon_source_col}",
+                level=adm_logger.ERROR,
+            )
+            return "", ""
 
 
 class PolarsAddSamplePositionDD(_PolarsPositionDD):
@@ -273,9 +301,7 @@ class PolarsAddVisitTransectStartPositionDD(_PolarsPositionDD):
     lon_nr_sweref_digits = 6
 
 
-class PolarsAddSamplePositionDM(PolarsTransformer):
-    lat_source_col = "sample_latitude_dd"
-    lon_source_col = "sample_longitude_dd"
+class PolarsAddSamplePositionDM(_PolarsPosition):
     lat_col_to_set = "sample_latitude_dm"
     lon_col_to_set = "sample_longitude_dm"
 
@@ -283,44 +309,45 @@ class PolarsAddSamplePositionDM(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Adds sample position in decimal minute"
 
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
-        data_holder.data = data_holder.data.with_columns(
-            pl.lit("").alias(self.lat_col_to_set)
-        )
-        data_holder.data = data_holder.data.with_columns(
-            pl.lit("").alias(self.lon_col_to_set)
-        )
-        lat_handled = dict()
-        lon_handled = dict()
-        for (lat, lon), df in data_holder.data.group_by(
-            [self.lat_source_col, self.lon_source_col]
-        ):
-            if not all([lat, lon]):
-                self._log(
-                    f"Missing position when trying to set {self.lat_col_to_set} "
-                    f"and {self.lon_col_to_set}",
-                    level=adm_logger.WARNING,
-                )
-                continue
-            if not lat_handled.get(lat):
-                new_lat = geography.decdeg_to_decmin(lat)
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(pl.col(self.lat_source_col) == lat)
-                    .then(pl.lit(new_lat))
-                    .otherwise(pl.col(self.lat_col_to_set))
-                    .alias(self.lat_col_to_set)
-                )
-                lat_handled[lat] = True
+    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
+        lat = lat.replace(" ", "")
+        lon = lon.replace(" ", "")
 
-            if not lon_handled.get(lat):
-                new_lon = geography.decdeg_to_decmin(lon)
-                data_holder.data = data_holder.data.with_columns(
-                    pl.when(pl.col(self.lon_source_col) == lon)
-                    .then(pl.lit(new_lon))
-                    .otherwise(pl.col(self.lon_col_to_set))
-                    .alias(self.lon_col_to_set)
-                )
-                lon_handled[lon] = True
+        if not all([lat, lon]):
+            self._log(
+                f"Missing position when trying to set {self.lat_col_to_set} "
+                f"and {self.lon_col_to_set}",
+                level=adm_logger.WARNING,
+            )
+            return "", ""
+
+        reported_format = self._get_coordinate_format(lat, lon)
+
+        if reported_format == "DM":
+            return lat, lon
+        elif reported_format == "DD":
+            return (geography.decdeg_to_decmin(lat), geography.decdeg_to_decmin(lon))
+        elif reported_format == "sweref99tm":
+            lat_dd, lon_dd = geography.sweref99tm_to_decdeg(lon, lat)
+            return (
+                geography.decdeg_to_decmin(lat_dd),
+                geography.decdeg_to_decmin(lon_dd),
+            )
+        elif reported_format == "rt90":
+            lat_dd, lon_dd = mellifica.rt90_to_wgs84(float(lon), float(lat))
+            return (
+                geography.decdeg_to_decmin(lat_dd),
+                geography.decdeg_to_decmin(lon_dd),
+            )
+        else:
+            self._log(
+                f"Unknown format of reported_latitude and/or "
+                f"reported_longitude when tying to to set "
+                f"{self.lat_source_col} and "
+                f"{self.lon_source_col}",
+                level=adm_logger.ERROR,
+            )
+            return "", ""
 
 
 class PolarsAddSamplePositionDDAsFloat(PolarsTransformer):
@@ -375,68 +402,6 @@ class PolarsSetPositionDDNumberOfDecimal(PolarsTransformer):
                 nr_decimals=self._nr_decimals,
                 pad_end=self._pad_end,
             )
-            # Add trailing . if missing
-            # data_holder.data = data_holder.data.with_columns(
-            #     pl.when(
-            #         (pl.col(col) != "") &
-            #         ~(pl.col(col).str.contains("."))
-            #     )
-            #     .then(pl.concat_str([pl.col(col), pl.lit(".")], separator=""))
-            #     .otherwise(pl.col(col))
-            #     .alias(col)
-            # )
-            # # Round value
-            # data_holder.data = data_holder.data.with_columns(
-            #     pl.when(pl.col(col) != "")
-            #     .then(pl.col(col).cast(float).round(self._nr_decimals).cast(str))
-            #     .otherwise(pl.col(col))
-            #     .alias(col)
-            # )
-            # # Add trailing padding
-            # if self._pad_end:
-            #     data_holder.data = data_holder.data.with_columns(
-            #         pl.when(pl.col(col) != "")
-            #         .then(
-            #             pl.concat_str(
-            #                 [
-            #                     pl.col(col).str.split(".").list[0],
-            #                     pl.col(col).str.split(".").list[1].str.pad_end(
-            #                         self._nr_decimals, fill_char="0")
-            #                  ],
-            #                 separator="."
-            #             )
-            #         )
-            #         .otherwise(pl.col(col))
-            #         .alias(col)
-            #     )
-
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col(self.lat_col) != "")
-        #     .then(
-        #         pl.col(self.lat_col).str.replace(
-        #             rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$", r"$1"
-        #         )
-        #     )
-        #     .otherwise(pl.col(self.lat_col))
-        #     .alias(self.lat_col)
-        # )
-        #
-        # data_holder.data = data_holder.data.with_columns(
-        #     pl.when(pl.col(self.lon_col) != "")
-        #     .then(
-        #         pl.col(self.lon_col).str.replace(
-        #             rf"^([^.]+\.\d{{{self._nr_decimals}}})\d*$", r"$1"
-        #         )
-        #     )
-        #     .otherwise(pl.col(self.lon_col))
-        #     .alias(self.lon_col)
-        # )
-        #
-        # if self._pad_end:
-        #     data_holder.data = data_holder.data.with_columns(
-        #         pl.col(self.lat_col).str.pad_end(3 + self._nr_decimals, fill_char="0"),
-        #         pl.col(self.lon_col).str.pad_end(3 + self._nr_decimals, fill_char="0"),
-        #     )
 
 
 class PolarsAddReportedPositionString(PolarsTransformer):
