@@ -49,7 +49,7 @@ def decmin_to_decdeg(pos: str, nr_decimals: int | None = None):
 #     return x, y
 
 
-def decdeg_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> (float, float):
+def decdeg_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> tuple[float, float]:
     if not use_db:
         return _convert_decdeg_to_sweref99tm(lat, lon)
     info = sweref99tm_db.get(lat, lon)
@@ -79,7 +79,7 @@ def get_decdeg_to_sweref99tm_mapper(
     return mapper
 
 
-def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> (str, str):
+def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> tuple[str, str]:
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
     sweref99tm = pyproj.CRS("EPSG:3006")  # SWEREF 99TM
     transformer = pyproj.Transformer.from_crs(wgs84, sweref99tm, always_xy=True)
@@ -87,7 +87,7 @@ def _convert_decdeg_to_sweref99tm(lat: str, lon: str) -> (str, str):
     return x, y
 
 
-def sweref99tm_to_decdeg(x: float | str, y: float | str) -> (float, float):
+def sweref99tm_to_decdeg(x: float | str, y: float | str) -> tuple[float, float]:
     x = float(x)
     y = float(y)
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
@@ -98,7 +98,7 @@ def sweref99tm_to_decdeg(x: float | str, y: float | str) -> (float, float):
     return lat, lon
 
 
-def rt90_to_decdeg(x: float | str, y: float | str) -> (float, float):
+def rt90_to_decdeg(x: float | str, y: float | str) -> tuple[float, float]:
     x = float(x)
     y = float(y)
     wgs84 = pyproj.CRS("EPSG:4326")  # WGS84 i decimalgrader
