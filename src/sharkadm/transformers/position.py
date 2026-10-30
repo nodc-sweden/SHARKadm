@@ -158,7 +158,18 @@ class _PolarsPosition(PolarsTransformer):
         for (lat, lon), df in data_holder.data.group_by(
             [self.lat_source_col, self.lon_source_col]
         ):
-            new_lat, new_lon = self._convert(str(lat), str(lon))
+            lat = lat.replace(" ", "")
+            lon = lon.replace(" ", "")
+
+            if not all([lat, lon]):
+                self._log(
+                    f"Missing position when trying to set {self.lat_col_to_set} "
+                    f"and {self.lon_col_to_set}",
+                    level=adm_logger.WARNING,
+                )
+                continue
+
+            new_lat, new_lon = self._convert_to_target_format(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
                 pl.when(pl.col(self.lat_source_col) == lat)
                 .then(pl.lit(new_lat))
@@ -197,8 +208,10 @@ class _PolarsPosition(PolarsTransformer):
             )
             return None
 
-    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
-        return lat, lon
+    def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
+        raise NotImplementedError(
+            f"{self.__class__.__name__} must implement _convert_to_target_format()"
+        )
 
     def _is_sweref99tm(self, value: str, nr_digits: int) -> bool:
         if len(value.split(".")[0]) == nr_digits:
@@ -237,18 +250,7 @@ class _PolarsPositionDD(_PolarsPosition):
     def get_transformer_description() -> str:
         return "Adds sample position based on reported position"
 
-    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
-        lat = lat.replace(" ", "")
-        lon = lon.replace(" ", "")
-
-        if not all([lat, lon]):
-            self._log(
-                f"Missing position when trying to set {self.lat_col_to_set} "
-                f"and {self.lon_col_to_set}",
-                level=adm_logger.WARNING,
-            )
-            return "", ""
-
+    def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
         reported_format = self._get_coordinate_format(lat, lon)
 
         if reported_format is None:
@@ -309,18 +311,7 @@ class PolarsAddSamplePositionDM(_PolarsPosition):
     def get_transformer_description() -> str:
         return "Adds sample position in decimal minute"
 
-    def _convert(self, lat: str, lon: str) -> tuple[str, str]:
-        lat = lat.replace(" ", "")
-        lon = lon.replace(" ", "")
-
-        if not all([lat, lon]):
-            self._log(
-                f"Missing position when trying to set {self.lat_col_to_set} "
-                f"and {self.lon_col_to_set}",
-                level=adm_logger.WARNING,
-            )
-            return "", ""
-
+    def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
         reported_format = self._get_coordinate_format(lat, lon)
 
         if reported_format == "DM":
