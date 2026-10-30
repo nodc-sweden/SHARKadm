@@ -64,9 +64,8 @@ class PolarsWideToLong(PolarsTransformer):
         # info = self._check_possibility_to_perform_wide_to_long(data_holder)
         # if not info.success:
         #     return info
-        only_one = self._add_single_parameter(data_holder)
-        if only_one:
-            print(f"{only_one=}")
+
+        if self._add_single_parameter(data_holder):
             self._add_reported_columns(data_holder)
             data_holder.data_structure = "row"
             return OperatorInfo(operator=self)
@@ -164,12 +163,13 @@ class PolarsWideToLong(PolarsTransformer):
         return OperatorInfo(operator=self)
 
     def _add_single_parameter(self, data_holder: PolarsDataHolder) -> bool:
-        """Handle the non-standard single-parameter case.
+        """Handle single parameters without matching quality flags.
 
-        Some import matrices contain only one data parameter (COPY_VARIABLE), but the
-        import matrix does not define the usual per-parameter QFLAG as is the wide-format
-        convention. In that situation, the data can be reshaped directly into row format
-        by renaming the value column to "value" and adding "parameter" and "unit"
+        This is a special-case path for datasets that contain exactly one
+        data parameter (COPY_VARIABLE) field, but do not follow the usual
+        wide-format pattern where each parameter has a matching quality-flag column.
+        In that case, the column is reshaped directly into long format by renaming
+        the value column to "value" and adding "parameter" and "unit"
         columns.
 
         Returns:
