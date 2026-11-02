@@ -183,6 +183,7 @@ class SHARKadmPolarsController:
         adm_logger.dataset_name = data_holder.dataset_name
         if not self._keep_unmapped_columns:
             self.run_operator(transformers.PolarsRemoveUnmappedColumns())
+        self.run_operator(transformers.PolarsStripAllValues())
         self.run_operator(transformers.PolarsAddRowNumber())
         return self
 
