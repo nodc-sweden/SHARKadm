@@ -49,3 +49,17 @@ class AddNrCountedSealsIfMissing(PolarsTransformer):
         )
         data_holder.data = pl.concat([data_holder.data, pl.DataFrame(rows_to_add)])
         return OperatorInfo(msg=f"{len(rows_to_add)} missing '# counted' found and fixed")
+
+
+class RemoveZeroNrCountedRows(PolarsTransformer):
+    valid_data_types = ("harbourseal",)
+    valid_data_structures = ("row",)
+
+    @staticmethod
+    def get_transformer_description() -> str:
+        return "Removes rows where # counted is '0'"
+
+    def _transform(self, data_holder: PolarsDataHolder) -> None:
+        data_holder.data = data_holder.data.filter(
+            pl.col("parameter") == "# counted", pl.col("value") != "0"
+        )

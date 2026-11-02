@@ -216,7 +216,10 @@ from sharkadm.transformers.scientific_name import (
     PolarsSetScientificNameFromDyntaxaScientificName,
     PolarsSetScientificNameFromReportedScientificName,
 )
-from sharkadm.transformers.seals import AddNrCountedSealsIfMissing
+from sharkadm.transformers.seals import (
+    AddNrCountedSealsIfMissing,
+    RemoveZeroNrCountedRows,
+)
 from sharkadm.transformers.serial_number import FormatSerialNumber
 from sharkadm.transformers.shark_metadata import PolarsAddSharkMetadataInfo
 
