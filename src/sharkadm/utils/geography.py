@@ -1,38 +1,104 @@
-import numpy as np
 import pyproj
 
 from sharkadm.utils import sweref99tm_db
 
 
 def decdeg_to_decmin(
-    pos: float | str, nr_decimals: int | None = None, with_space: bool = False
-):
+    pos: float | str,
+    nr_decimals: int | None = None,
+    with_space: bool = False,
+) -> str:
+    """Convert decimal degrees (DD) to degrees and decimal minutes (DDM)."""
+
     pos = float(pos)
-    deg = np.floor(pos)
-    minute = 0
-    if deg:
-        minute = pos % deg * 60.0
+
+    sign = "-" if pos < 0 else ""
+    abs_pos = abs(pos)
+
+    if abs_pos == 0:
+        return "00.0" if not with_space else "0 0.0"
+
+    degrees = int(abs_pos)
+    minutes = (abs_pos - degrees) * 60.0
+
     if nr_decimals is not None:
-        output = "%%2.%sf" % nr_decimals % (deg * 100.0 + minute)
+        minutes = round(minutes, nr_decimals)
+
+        if minutes >= 60:
+            degrees += 1
+            minutes = 0.0
+
+        minute_str = f"{minutes:.{nr_decimals}f}"
     else:
-        output = str(deg * 100.0 + minute)
+        minute_str = str(minutes)
+
+    # Ensure at least two digits before decimal point
+    integer_part, *decimal_part = minute_str.split(".")
+    minute_str = integer_part.zfill(2)
+
+    if decimal_part:
+        minute_str += "." + decimal_part[0]
+
     if with_space:
-        a, b = output.split(".")
-        output = f"{a[:-2]} {a[-2:]}.{b}"
-    return output
+        return f"{sign}{degrees} {minute_str}"
+
+    return f"{sign}{degrees}{minute_str}"
 
 
-def decmin_to_decdeg(pos: str, nr_decimals: int | None = None):
-    pos = float(pos.replace(" ", ""))
-    if pos >= 0:
-        output = np.floor(pos / 100.0) + (pos % 100) / 60.0
-    else:
-        output = np.ceil(pos / 100.0) - (-pos % 100) / 60.0
+def decmin_to_decdeg(
+    pos: str | float,
+    nr_decimals: int | None = None,
+) -> str:
+    """Convert degrees and decimal minutes (DDM) to decimal degrees (DD)."""
+
+    pos = float(str(pos).replace(" ", ""))
+
+    sign = -1 if pos < 0 else 1
+    abs_pos = abs(pos)
+
+    degrees = int(abs_pos // 100)
+    minutes = abs_pos - degrees * 100
+
+    if minutes >= 60:
+        raise ValueError("Minutes must be less than 60")
+
+    output = sign * (degrees + minutes / 60.0)
 
     if nr_decimals is not None:
-        output = np.round(output, nr_decimals)
+        output = round(output, nr_decimals)
 
     return str(output)
+
+
+# def decdeg_to_decmin(
+#     pos: float | str, nr_decimals: int | None = None, with_space: bool = False
+# ):
+#     pos = float(pos)
+#     deg = np.floor(pos)
+#     minute = 0
+#     if deg:
+#         minute = pos % deg * 60.0
+#     if nr_decimals is not None:
+#         output = "%%2.%sf" % nr_decimals % (deg * 100.0 + minute)
+#     else:
+#         output = str(deg * 100.0 + minute)
+#     if with_space:
+#         a, b = output.split(".")
+#         output = f"{a[:-2]} {a[-2:]}.{b}"
+#     return output
+#
+#
+# def decmin_to_decdeg(pos: str, nr_decimals: int | None = None):
+#     pos = float(pos.replace(" ", ""))
+#     if pos >= 0:
+#         output = np.floor(pos / 100.0) + (pos % 100) / 60.0
+#     else:
+#         output = np.ceil(pos / 100.0) - (-pos % 100) / 60.0
+#
+#     if nr_decimals is not None:
+#         output = np.round(output, nr_decimals)
+#
+#     return str(output)
 
 
 def wgs84_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> tuple[float, float]:
