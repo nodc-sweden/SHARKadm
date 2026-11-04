@@ -301,6 +301,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         show_stations: list[str] | None = None,
         show_custom_positions: dict[str, list[dict]] | Sequence[dict] | None = None,
         show_lines_between_stations: bool = False,
+        show_position_popup: bool = False,
         **kwargs,
     ):
         self._shape_layers = self.shape_layers or shape_layers or []
@@ -319,6 +320,7 @@ class PolarsHtmlMap(PolarsFileExporter):
         self._show_stations = show_stations
         self._show_custom_positions = show_custom_positions
         self._show_lines_between_stations = show_lines_between_stations
+        self._show_position_popup = show_position_popup
         super().__init__(export_directory, export_file_name, **kwargs)
 
         self._master = None
@@ -372,6 +374,7 @@ class PolarsHtmlMap(PolarsFileExporter):
 
         # folium.TileLayer("OpenStreetMap").add_to(m)
         # folium.TileLayer(show=False).add_to(m)
+        self._add_lat_lon_popup(m)
         self._add_shape_layers(m)
         self._add_shape_files(m)
         self._save_station_info(data_holder)
@@ -408,6 +411,11 @@ class PolarsHtmlMap(PolarsFileExporter):
             ]
         )
         return lat_mid, lon_mid
+
+    def _add_lat_lon_popup(self, m: "folium.Map"):
+        if not self._show_position_popup:
+            return
+        m.add_child(folium.LatLngPopup())
 
     def _add_shape_layers(self, m: "folium.Map") -> None:
         if not self._shape_layers:

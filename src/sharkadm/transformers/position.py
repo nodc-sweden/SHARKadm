@@ -1,10 +1,19 @@
+from enum import StrEnum, auto
+
 import polars as pl
 
 from sharkadm.sharkadm_logger import adm_logger
-from sharkadm.utils import decimals, geography, mellifica
+from sharkadm.utils import decimals, geography
 
 from ..data import PolarsDataHolder
 from .base import PolarsTransformer
+
+
+class Projections(StrEnum):
+    DD = auto()
+    DM = auto()
+    SWEREF99 = auto()
+    RT90 = auto()
 
 
 class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
@@ -28,7 +37,8 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
             pl.lit("").alias(self.x_column_to_set),
             pl.lit("").alias(self.y_column_to_set),
         )
-        mapper = geography.get_decdeg_to_sweref99tm_mapper(
+        mapper = geography.get_wgs84_to_sweref99tm_mapper(
+            data_holder.config,
             data_holder.data["sample_latitude_dd"],
             data_holder.data["sample_longitude_dd"],
             use_db=self._use_db,
@@ -137,14 +147,11 @@ class PolarsAddReportedPosition(PolarsTransformer):
 
 
 class _PolarsPosition(PolarsTransformer):
-    lat_col_to_set: str | None = None
-    lon_col_to_set: str | None = None
+    lat_col_to_set: str = ""
+    lon_col_to_set: str = ""
 
     lat_source_col: str = "reported_latitude"
     lon_source_col: str = "reported_longitude"
-
-    lat_nr_sweref_digits: int = 7
-    lon_nr_sweref_digits: int = 6
 
     @staticmethod
     def get_transformer_description() -> str:
@@ -183,61 +190,47 @@ class _PolarsPosition(PolarsTransformer):
                 .alias(self.lon_col_to_set)
             )
 
-    def _get_coordinate_format(self, lat: str, lon: str) -> str | None:
-        if self._is_sweref99tm(
-            value=lat, nr_digits=self.lat_nr_sweref_digits
-        ) and self._is_sweref99tm(value=lon, nr_digits=self.lon_nr_sweref_digits):
-            return "sweref99tm"
-        elif self._is_sweref99tm(value=lat, nr_digits=7) and self._is_sweref99tm(
-            value=lon, nr_digits=7
-        ):
-            return "sweref99tm"
-        elif self._is_dd(lat) and self._is_dd(lon):
-            return "DD"
-        elif self._is_dm_lat(lat) and self._is_dm_lon(lon):
-            return "DM"
-        elif self._is_rt90(value=lat) and self._is_rt90(value=lon):
-            return "rt90"
-        else:
-            self._log(
-                f"Unknown format of reported_latitude and/or "
-                f"reported_longitude when tying to identify the coordinate format of "
-                f"{self.lat_source_col} and "
-                f"{self.lon_source_col}",
-                level=adm_logger.ERROR,
-            )
-            return None
+    def _get_coordinate_format(self, lat: str, lon: str) -> Projections | None:
+        if self._is_dm(lat, lon):
+            return Projections.DM
+        if self._is_dd(lat, lon):
+            return Projections.DD
+        if self._is_sweref99tm(lat, lon):
+            return Projections.SWEREF99
+        if self._is_rt90(lat, lon):
+            return Projections.RT90
+
+        self._log(
+            f"Unknown format of reported_latitude and/or "
+            f"reported_longitude when tying to identify the coordinate format of "
+            f"{self.lat_source_col} and "
+            f"{self.lon_source_col}",
+            level=adm_logger.ERROR,
+        )
+        return None
 
     def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
         raise NotImplementedError(
             f"{self.__class__.__name__} must implement _convert_to_target_format()"
         )
 
-    def _is_sweref99tm(self, value: str, nr_digits: int) -> bool:
-        if len(value.split(".")[0]) == nr_digits:
+    def _is_sweref99tm(self, lat: str, lon: str) -> bool:
+        if len(lat.split(".")[0]) == 7 and len(lon.split(".")[0]) == 6:
             return True
         return False
 
-    def _is_rt90(self, value: str) -> bool:
-        if len(value) == 7:
+    def _is_rt90(self, lat: str, lon: str) -> bool:
+        if len(lat.split(".")[0]) == 7 and len(lon.split(".")[0]) == 7:
             return True
         return False
 
-    def _is_dm_lat(self, value: str) -> bool:
-        parts = value.split(".")
-        if len(parts[0].zfill(4)) == 4:
+    def _is_dm(self, lat: str, lon: str) -> bool:
+        if len(lat.split(".")[0].zfill(4)) == 4 and len(lon.split(".")[0].zfill(5)) == 5:
             return True
         return False
 
-    def _is_dm_lon(self, value: str) -> bool:
-        parts = value.split(".")
-        if len(parts[0].zfill(5)) == 5:
-            return True
-        return False
-
-    def _is_dd(self, value: str) -> bool:
-        parts = value.split(".")
-        if len(parts[0].zfill(2)) == 2:
+    def _is_dd(self, lat: str, lon: str) -> bool:
+        if len(lat.split(".")[0].zfill(2)) == 2 and len(lon.split(".")[0].zfill(2)) == 2:
             return True
         return False
 
@@ -252,17 +245,18 @@ class _PolarsPositionDD(_PolarsPosition):
 
     def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
         reported_format = self._get_coordinate_format(lat, lon)
-
         if reported_format is None:
             return "", ""
-        if reported_format == "DD":
+        if reported_format == Projections.DD:
             return lat, lon
-        elif reported_format == "DM":
-            return (geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon))
-        elif reported_format == "sweref99tm":
-            return geography.sweref99tm_to_decdeg(lon, lat)
-        elif reported_format == "rt90":
-            return mellifica.rt90_to_wgs84(float(lon), float(lat))
+        elif reported_format == Projections.DM:
+            return geography.decmin_to_decdeg(lat), geography.decmin_to_decdeg(lon)
+        elif reported_format == Projections.SWEREF99:
+            lat, lon = geography.sweref99tm_to_wgs84(lat, lon)
+            return str(lat), str(lon)
+        elif reported_format == Projections.RT90:
+            lat, lon = geography.rt90_to_wgs84(lat, lon)
+            return str(lat), str(lon)
         else:
             self._log(
                 f"Unknown format of reported_latitude and/or "
@@ -279,8 +273,6 @@ class PolarsAddSamplePositionDD(_PolarsPositionDD):
     lon_col_to_set = "sample_longitude_dd"
     lat_source_col = "reported_latitude"
     lon_source_col = "reported_longitude"
-    lat_nr_sweref_digits = 7
-    lon_nr_sweref_digits = 6
 
 
 class PolarsAddVisitTransectEndPositionDD(_PolarsPositionDD):
@@ -289,8 +281,6 @@ class PolarsAddVisitTransectEndPositionDD(_PolarsPositionDD):
     lon_col_to_set = "visit_transect_end_longitude_dd"
     lat_source_col = "visit_transect_end_latitude"
     lon_source_col = "visit_transect_end_longitude"
-    lat_nr_sweref_digits = 7
-    lon_nr_sweref_digits = 6
 
 
 class PolarsAddVisitTransectStartPositionDD(_PolarsPositionDD):
@@ -299,8 +289,6 @@ class PolarsAddVisitTransectStartPositionDD(_PolarsPositionDD):
     lon_col_to_set = "visit_transect_start_longitude_dd"
     lat_source_col = "visit_transect_start_latitude"
     lon_source_col = "visit_transect_start_longitude"
-    lat_nr_sweref_digits = 7
-    lon_nr_sweref_digits = 6
 
 
 class PolarsAddSamplePositionDM(_PolarsPosition):
@@ -314,18 +302,18 @@ class PolarsAddSamplePositionDM(_PolarsPosition):
     def _convert_to_target_format(self, lat: str, lon: str) -> tuple[str, str]:
         reported_format = self._get_coordinate_format(lat, lon)
 
-        if reported_format == "DM":
+        if reported_format == Projections.DM:
             return lat, lon
-        elif reported_format == "DD":
+        elif reported_format == Projections.DD:
             return (geography.decdeg_to_decmin(lat), geography.decdeg_to_decmin(lon))
-        elif reported_format == "sweref99tm":
-            lat_dd, lon_dd = geography.sweref99tm_to_decdeg(lon, lat)
+        elif reported_format == Projections.SWEREF99:
+            lat_dd, lon_dd = geography.sweref99tm_to_wgs84(lat, lon)
             return (
                 geography.decdeg_to_decmin(lat_dd),
                 geography.decdeg_to_decmin(lon_dd),
             )
-        elif reported_format == "rt90":
-            lat_dd, lon_dd = mellifica.rt90_to_wgs84(float(lon), float(lat))
+        elif reported_format == Projections.RT90:
+            lat_dd, lon_dd = geography.rt90_to_wgs84(lat, lon)
             return (
                 geography.decdeg_to_decmin(lat_dd),
                 geography.decdeg_to_decmin(lon_dd),
