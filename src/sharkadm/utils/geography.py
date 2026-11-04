@@ -1,4 +1,5 @@
 import pyproj
+from nodc_config import Config
 
 from sharkadm.utils import sweref99tm_db
 
@@ -113,12 +114,13 @@ def wgs84_to_sweref99tm(lat: str, lon: str, use_db: bool = False) -> tuple[float
 
 
 def get_wgs84_to_sweref99tm_mapper(
-    lat: list[str], lon: list[str], use_db: bool = False
+    nodc_config: Config, lat: list[str], lon: list[str], use_db: bool = False
 ) -> (dict)[(str, str), (str, str)]:
+    db = sweref99tm_db.Sweref99tmDatabase(nodc_config)
     mapper = {}
     if use_db:
-        mapper = sweref99tm_db.get_mapper()
-        print(f"Getting mapper: {sweref99tm_db.DB_PATH}")
+        mapper = db.get_mapper()
+        print(f"Getting mapper: {db.get_db_path()}")
     for pos in zip(lat, lon):
         if not mapper.get(pos):
             if not pos[0] and not pos[1]:
@@ -126,7 +128,7 @@ def get_wgs84_to_sweref99tm_mapper(
                 continue
             x, y = _convert_wgs84_to_sweref99tm(pos[0], pos[1])
             if use_db:
-                sweref99tm_db.add(pos[0], pos[1], x, y)
+                db.add(pos[0], pos[1], x, y)
             mapper[(pos[0], pos[1])] = (x, y)
     return mapper
 

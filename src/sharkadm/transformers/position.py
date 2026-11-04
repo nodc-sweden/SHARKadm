@@ -38,6 +38,7 @@ class PolarsAddSamplePositionSweref99tm(PolarsTransformer):
             pl.lit("").alias(self.y_column_to_set),
         )
         mapper = geography.get_wgs84_to_sweref99tm_mapper(
+            data_holder.config,
             data_holder.data["sample_latitude_dd"],
             data_holder.data["sample_longitude_dd"],
             use_db=self._use_db,
