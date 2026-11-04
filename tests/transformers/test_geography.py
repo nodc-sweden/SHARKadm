@@ -1,14 +1,10 @@
-from datetime import datetime
-from unittest.mock import Mock, patch
-
-import polars as pl
 import pytest
-from nodc_config import Config
 
 from sharkadm.utils import geography
 
-
 """ TEST RT90 """
+
+
 def test_rt90_to_wgs84_with_float():
     """Testa konvertering med numeriska koordinater."""
     northing = 6358256
@@ -31,6 +27,7 @@ def test_rt90_to_wgs84_with_string():
 
     assert lat_str == pytest.approx(lat_float)
     assert lon_str == pytest.approx(lon_float)
+
 
 def test_rt90_to_wgs84_mallifica():
     """Testa konvertering samma som malifica."""
@@ -60,8 +57,9 @@ def test_rt90_to_wgs84_invalid_input(northing, easting):
         geography.rt90_to_wgs84(northing, easting)
 
 
-
 """ TEST swerf99tm """
+
+
 def test_sweref99tm_to_wgs84_with_float():
     """Testa konvertering med numeriska koordinater."""
     northing = 6357045
@@ -84,6 +82,7 @@ def test_sweref99tm_to_wgs84_with_string():
 
     assert lat_str == pytest.approx(lat_float)
     assert lon_str == pytest.approx(lon_float)
+
 
 def test_sweref99tm_to_wgs84_mallifica():
     """Testa konvertering samma som malifica."""
@@ -113,10 +112,10 @@ def test_sweref99tm_to_wgs84_invalid_input(northing, easting):
         geography.sweref99tm_to_wgs84(northing, easting)
 
 
-
 """ decdeg <--> decmin"""
-class TestDecdegToDecmin:
 
+
+class TestDecdegToDecmin:
     @pytest.mark.parametrize(
         "pos, expected",
         [
@@ -150,7 +149,6 @@ class TestDecdegToDecmin:
 
 
 class TestDecminToDecdeg:
-
     @pytest.mark.parametrize(
         "pos, expected",
         [
@@ -193,7 +191,6 @@ class TestDecminToDecdeg:
 
 
 class TestCoordinateRoundtrip:
-
     @pytest.mark.parametrize(
         "coordinate",
         [
@@ -211,4 +208,3 @@ class TestCoordinateRoundtrip:
         result = float(geography.decmin_to_decdeg(decmin))
 
         assert result == pytest.approx(coordinate, abs=1e-8)
-
