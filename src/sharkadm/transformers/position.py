@@ -190,7 +190,7 @@ class _PolarsPosition(PolarsTransformer):
                 .alias(self.lon_col_to_set)
             )
 
-    def _get_coordinate_format(self, lat: str, lon: str) -> str | None:
+    def _get_coordinate_format(self, lat: str, lon: str) -> Projections | None:
         if self._is_dm(lat, lon):
             return Projections.DM
         if self._is_dd(lat, lon):
