@@ -16,7 +16,10 @@ from sharkadm.data.df import (
     PolarsDataFrameDataHolder,
     get_data_frame_data_holder,
 )
-from sharkadm.data.dv_template import get_polars_dv_template_data_holder
+from sharkadm.data.dv_template import (
+    PolarsDvNewDPSTemplateDataHolder,
+    get_polars_dv_template_data_holder,
+)
 from sharkadm.data.lims import (
     PolarsLimsDataHolder,
     get_polars_lims_data_holder,
