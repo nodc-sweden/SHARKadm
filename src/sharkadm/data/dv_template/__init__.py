@@ -2,6 +2,7 @@ import pathlib
 
 from nodc_config import Config
 
+from .dv_new_dps_template_data_holder import PolarsDvNewDPSTemplateDataHolder
 from .dv_template_data_holder import PolarsDvTemplateDataHolder
 
 
