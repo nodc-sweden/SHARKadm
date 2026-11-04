@@ -191,10 +191,10 @@ class _PolarsPosition(PolarsTransformer):
             )
 
     def _get_coordinate_format(self, lat: str, lon: str) -> Projections | None:
-        if self._is_dm(lat, lon):
-            return Projections.DM
         if self._is_dd(lat, lon):
             return Projections.DD
+        if self._is_dm(lat, lon):
+            return Projections.DM
         if self._is_sweref99tm(lat, lon):
             return Projections.SWEREF99
         if self._is_rt90(lat, lon):
