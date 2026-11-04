@@ -8,7 +8,6 @@ class PositionPolars(PolarsMultiTransformer):
         transformers.PolarsAddSamplePositionDD,
         transformers.PolarsAddSamplePositionDM,
         transformers.PolarsAddSamplePositionSweref99tm,
-        transformers.PolarsSetPositionDDNumberOfDecimal,
     )
 
     @staticmethod
