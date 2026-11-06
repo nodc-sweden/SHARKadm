@@ -88,7 +88,7 @@ class Validator(ABC, Operator):
         return get_single_operators_info(operator=self)
 
     @abstractmethod
-    def _validate(self, data_holder: PolarsDataHolder) -> None: ...
+    def _validate(self, data_holder: PolarsDataHolder) -> OperatorInfo | None: ...
 
     def _log_success(self, msg: str, level: str = adm_logger.INFO, **kwargs):
         adm_logger.log_validation(
