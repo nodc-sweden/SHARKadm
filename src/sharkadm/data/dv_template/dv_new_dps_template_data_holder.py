@@ -4,21 +4,21 @@ import openpyxl
 import polars as pl
 
 from sharkadm.config import get_all_data_types
+from sharkadm.config.data_type import DataType, get_data_type_handler
 from sharkadm.config.import_matrix import ImportMatrixConfig, ImportMatrixMapper
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.data_source.base import PolarsDataFile
 from sharkadm.data.data_source.xlsx_file import XlsxFormatPolarsDataFile
 
+# TODO not raise errors, log instead
+from sharkadm.sharkadm_logger import adm_logger
+
 
 class PolarsDvNewDPSTemplateDataHolder(PolarsDataHolder):
     _data_structure = "column"
-    # _date_str_format = "%Y-%m-%d"
 
     def __init__(self, template_path: str | pathlib.Path | None = None, **kwargs):
         super().__init__(**kwargs)
-        # OM man hamnar här så VET man att det är det nya formatet
-
-        # TODO make root path?
         self._template_path = pathlib.Path(template_path)
 
         self._data: pl.DataFrame = pl.DataFrame()
@@ -32,11 +32,20 @@ class PolarsDvNewDPSTemplateDataHolder(PolarsDataHolder):
         self._data_type_synonym: str | None = None
         self._data_format: str | None = None
 
+        self._validation_list_columns: list = []
+        self._checked_validation_list_columns: list = []
+
         self._initiate()
         self._set_data_type()
+
+        self._data_type_obj: DataType = get_data_type_handler(
+            self._nodc_config
+        ).get_data_type_obj(kwargs.get("data_type", self._data_type_synonym))
+
         self._set_data_format()
         self._load_import_matrix()
         self._load_data()
+        self._load_validation_columns()
 
     @staticmethod
     def get_data_holder_description() -> str:
@@ -110,9 +119,6 @@ class PolarsDvNewDPSTemplateDataHolder(PolarsDataHolder):
         return str(max(self.data["visit_reported_latitude"].cast(float)))
 
     def _load_import_matrix(self) -> None:
-        """Loads the import matrix for the given data type and provider found in
-        delivery note"""
-
         self._import_matrix = self.data_type_obj.import_matrix
         self._import_matrix_mapper = self.data_type_obj.get_mapper(self._data_format)
 
@@ -145,7 +151,7 @@ class PolarsDvNewDPSTemplateDataHolder(PolarsDataHolder):
     def _set_data_format(self) -> None:
         overview_data = self._get_overview_data()
         version = overview_data.get("Version")
-        self._data_format = f"DPS{version}"
+        self._data_format = f"DPS_{version}"
 
     def _load_data(self) -> None:
         wb = openpyxl.load_workbook(self._template_path, read_only=True)
@@ -168,3 +174,61 @@ class PolarsDvNewDPSTemplateDataHolder(PolarsDataHolder):
             d_source.map_header(self._import_matrix_mapper)
 
         self._set_data_source(d_source)
+
+    @property
+    def validation_list_columns(self) -> list[str]:
+        return self._validation_list_columns
+
+    def _load_validation_columns(self) -> None:
+        """
+        Store the names of all columnds with validation lists.
+
+        Some columns may only have values from a specific validation list, and the
+        (internal) names of these columns are stored in self._validation_list_columns.
+        By storing which these columns are, a validation can later be run that checks that
+        all columns with validation lists have been validated against their respective
+        list.
+        """
+        self._validation_list_columns = []
+        wb = openpyxl.load_workbook(self._template_path, read_only=True, data_only=True)
+
+        sheet_name = "Förklaring"
+        try:
+            if sheet_name not in wb.sheetnames:
+                adm_logger.log_workflow(
+                    f"Could not find sheet '{sheet_name}'. Unable to identify columns "
+                    "with validation lists."
+                )
+                return
+
+            ws = wb[sheet_name]
+
+            headers = next(ws.iter_rows(min_row=1, max_row=1, values_only=True))
+            try:
+                attribute_col = headers.index("Attribut")
+                value_type_col = headers.index("Värdetyp")
+            except ValueError:
+                msg = (
+                    f"Could not find required headers 'Attribut' and 'Värdetyp' "
+                    f"in sheet '{sheet_name}'. Unable to identify columns with "
+                    "validation lists."
+                )
+                adm_logger.log_workflow(msg, level=adm_logger.ERROR)
+                return
+
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                attribute = row[attribute_col]
+                value_type = row[value_type_col]
+
+                if attribute is not None and value_type == "värdelista":
+                    self._validation_list_columns.append(attribute)
+
+        finally:
+            wb.close()
+
+    @property
+    def checked_validation_list_columns(self) -> list[str]:
+        return self._checked_validation_list_columns
+
+    def update_checked_validation_lists(self, col: str) -> None:
+        self._checked_validation_list_columns.append(col)

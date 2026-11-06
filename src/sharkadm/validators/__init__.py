@@ -74,6 +74,10 @@ from sharkadm.validators.station import (
     ValidateStationIdentity,
     ValidateSynonymsInMaster,
 )
+from sharkadm.validators.template_validation_lists import (
+    ValidateMonitoringProgramCode,
+    ValidateThatAllValidationListsHaveBeenChecked,
+)
 from sharkadm.validators.waves import ValidateWaves
 from sharkadm.validators.weather import ValidateWeath, ValidateWeatherConsistency
 from sharkadm.validators.wind import ValidateWindir, ValidateWinsp
