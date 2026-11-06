@@ -57,6 +57,9 @@ class ValidateMonitoringProgramCode(ValidateListValues):
     validation_list = "unknown"  # TODO
 
     def _get_valid_values(self):
+        # Dummy values
+        # Oklart om denna måste implementeras per column,
+        # eller om en generell lösning kan göras i ValidateListValues
         return ["OVRIGT"]
 
 
