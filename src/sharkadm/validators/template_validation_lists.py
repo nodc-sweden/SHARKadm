@@ -60,15 +60,14 @@ class ValidateMonitoringProgramCode(ValidateListValues):
         return ["OVRIGT"]
 
 
-# TODO namn..................................................
-class ValidateThatAllValidationListsHaveBeenChecked(Validator):
+class ValidateAllValidationListColumns(Validator):
     valid_data_holders = ("PolarsDvNewDPSTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
         return (
             "Check that all columns listed as 'Värdelistor' (validation lists) have "
-            "been validated."
+            "been validated against the corresponding validation list."
         )
 
     def _validate(self, data_holder: PolarsDataHolder) -> OperatorInfo:
