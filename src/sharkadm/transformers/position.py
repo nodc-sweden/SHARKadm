@@ -162,11 +162,11 @@ class _PolarsPosition(PolarsTransformer):
             return
         self._add_empty_col(data_holder, self.lat_col_to_set)
         self._add_empty_col(data_holder, self.lon_col_to_set)
-        for (lat, lon), df in data_holder.data.group_by(
+        for (source_lat, source_lon), df in data_holder.data.group_by(
             [self.lat_source_col, self.lon_source_col]
         ):
-            lat = lat.replace(" ", "")
-            lon = lon.replace(" ", "")
+            lat = source_lat.replace(" ", "")
+            lon = source_lon.replace(" ", "")
 
             if not all([lat, lon]):
                 self._log(
@@ -178,13 +178,13 @@ class _PolarsPosition(PolarsTransformer):
 
             new_lat, new_lon = self._convert_to_target_format(str(lat), str(lon))
             data_holder.data = data_holder.data.with_columns(
-                pl.when(pl.col(self.lat_source_col) == lat)
+                pl.when(pl.col(self.lat_source_col) == source_lat)
                 .then(pl.lit(new_lat))
                 .otherwise(pl.col(self.lat_col_to_set))
                 .alias(self.lat_col_to_set)
             )
             data_holder.data = data_holder.data.with_columns(
-                pl.when(pl.col(self.lon_source_col) == lon)
+                pl.when(pl.col(self.lon_source_col) == source_lon)
                 .then(pl.lit(new_lon))
                 .otherwise(pl.col(self.lon_col_to_set))
                 .alias(self.lon_col_to_set)
