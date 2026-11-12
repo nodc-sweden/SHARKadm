@@ -8,8 +8,10 @@ class DPSArchiveDataHolder(DPSTemplateDataHolder, PolarsArchiveDataHolder):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._init_dps_template_state()
+        self._data_format = self.delivery_note.import_matrix_key
+        self._dps_version = self._data_format.split("_")[1]
+
         self._set_template_path_from_metadata(
-            self.delivery_note.data_type, self.delivery_note.data_format
+            self.delivery_note.data_type.lower(), self._dps_version
         )
         self._load_validation_columns()

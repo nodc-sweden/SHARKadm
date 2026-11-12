@@ -22,11 +22,11 @@ class DPSTemplateDataHolder(PolarsDataHolder):
     A subclass that inherits this data holder must set the template_path.
     """
 
-    def _init_dps_template_state(self) -> None:
-        """Initialize the attributes specific to the template."""
+    def __init__(self, *args, **kwargs):
         self._template_path: pathlib.Path | None = None
         self._validation_list_columns: list[str] = []
         self._checked_validation_list_columns: list[str] = []
+        super().__init__(*args, **kwargs)
 
     @property
     def validation_list_columns(self) -> list[str]:
@@ -102,24 +102,26 @@ class DPSTemplateDataHolder(PolarsDataHolder):
         try:
             return mapping[name]
         except KeyError:
+            msg = f"'{name}' in template does not map to a known datatype."
             adm_logger.log_workflow(
-                f"'{name}' in template does not map to a known datatype.",
+                msg,
                 level=adm_logger.ERROR,
             )
+            raise KeyError(msg)
 
     def _set_template_path_from_metadata(self, name: str, version: str) -> None:
         """Set template_path to the template stored in config."""
-        dtype = self._map_dps_dtype(name)  # TODO not a complete
+        dtype = name
         template_name = f"{dtype}_v{version}.xlsx"
         self._template_path = pathlib.Path(self.config.get_path(template_name))
 
 
-class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder, PolarsDataHolder):
+class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
     _data_structure = "column"
+    _date_str_format = "%Y-%m-%d"
 
-    def __init__(self, file_path: str | pathlib.Path | None = None, **kwargs):
+    def __init__(self, file_path: str | pathlib.Path, **kwargs):
         super().__init__(**kwargs)
-        self._init_dps_template_state()
 
         self._file_path = pathlib.Path(file_path)
 
@@ -201,7 +203,7 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder, PolarsDataHolder):
     @property
     def max_longitude(self) -> str:
         if "sample_longitude_dd" in self._data.columns:
-            return str(min(self.data["sample_longitude_dd"].cast(float)))
+            return str(max(self.data["sample_longitude_dd"].cast(float)))
         return str(max(self.data["visit_reported_longitude"].cast(float)))
 
     @property
@@ -213,7 +215,7 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder, PolarsDataHolder):
     @property
     def max_latitude(self) -> str:
         if "sample_latitude_dd" in self._data.columns:
-            return str(min(self.data["sample_latitude_dd"].cast(float)))
+            return str(max(self.data["sample_latitude_dd"].cast(float)))
         return str(max(self.data["visit_reported_latitude"].cast(float)))
 
     def _load_import_matrix(self) -> None:
