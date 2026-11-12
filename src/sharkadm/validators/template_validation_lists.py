@@ -2,12 +2,12 @@ import polars as pl
 
 from sharkadm.sharkadm_operator import OperatorInfo
 
-from ..data import PolarsDataHolder, PolarsDvNewDPSTemplateDataHolder
+from ..data import DPSTemplateDataHolder
 from .base import Validator
 
 
 class ValidateListValues(Validator):
-    valid_data_holders = ("PolarsDvNewDPSTemplateDataHolder",)
+    valid_data_holders = ("DPSTemplateDataHolder",)
     col_to_check = ""
     validation_list = ""
 
@@ -21,7 +21,7 @@ class ValidateListValues(Validator):
     def _get_valid_values(self) -> list[str]:
         pass
 
-    def _validate(self, data_holder: PolarsDvNewDPSTemplateDataHolder) -> OperatorInfo:
+    def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
         valid_values = self._get_valid_values()
 
         # TODO what to do if col to check does not exist?
@@ -64,7 +64,7 @@ class ValidateMonitoringProgramCode(ValidateListValues):
 
 
 class ValidateAllValidationListColumns(Validator):
-    valid_data_holders = ("PolarsDvNewDPSTemplateDataHolder",)
+    valid_data_holders = ("DPSTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -73,7 +73,7 @@ class ValidateAllValidationListColumns(Validator):
             "been validated against the corresponding validation list."
         )
 
-    def _validate(self, data_holder: PolarsDataHolder) -> OperatorInfo:
+    def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
         checked_cols = data_holder.checked_validation_list_columns
         cols = data_holder.validation_list_columns
 
