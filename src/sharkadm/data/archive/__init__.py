@@ -46,6 +46,12 @@ def get_polars_archive_data_holder(
     d_note = DeliveryNote.from_txt_file(
         nodc_conf, path / "processed_data/delivery_note.txt"
     )
+    if "DPS" in d_note.import_matrix_key:
+        dtype = d_note.data_type.lower()
+        return DPSArchiveDataHolder(
+            dtype=dtype, archive_root_directory=path, nodc_conf=nodc_conf
+        )
+
     d_holder = polars_object_mapping.get(d_note.data_format)
     if not d_holder:
         print(path)
