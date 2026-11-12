@@ -109,7 +109,7 @@ class DPSTemplateDataHolder(PolarsDataHolder):
             )
             raise KeyError(msg)
 
-    def _set_template_path_from_metadata(self, name: str, version: str) -> None:
+    def _set_template_path(self, name: str, version: str) -> None:
         """Set template_path to the template stored in config."""
         dtype = name
         template_name = f"{dtype}_v{version}.xlsx"
@@ -137,9 +137,7 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
         self._data_format: str | None = None
 
         self.overview = self._get_overview_data(self._file_path)
-        self._set_template_path_from_metadata(
-            self.overview["Namn"], self.overview["Version"]
-        )
+        self._set_template_path(self.overview["Namn"], self.overview["Version"])
 
         self._set_dataset_name()
         self._set_data_type()
