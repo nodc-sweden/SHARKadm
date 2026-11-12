@@ -3,11 +3,10 @@ from sharkadm.data.dv_template import DPSTemplateDataHolder
 
 
 class DPSArchiveDataHolder(DPSTemplateDataHolder, PolarsArchiveDataHolder):
-    # TODO make general by getting data_type from delivery_note
-    _data_type_synonym = "phytoplankton"
+    def __init__(self, archive_root_directory, *, dtype: str, **kwargs):
+        self._data_type_synonym = dtype
+        super().__init__(archive_root_directory=archive_root_directory, **kwargs)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
         self._data_format = self.delivery_note.import_matrix_key
         self._dps_version = self._data_format.split("_")[1]
 
