@@ -4,6 +4,7 @@ from typing import Type
 
 from sharkadm import utils
 from sharkadm.multi_validators.base import MultiValidator
+from sharkadm.multi_validators.dv_dps import DpsTemplateValidation
 from sharkadm.utils.inspect_kwargs import get_kwargs_for_class
 
 

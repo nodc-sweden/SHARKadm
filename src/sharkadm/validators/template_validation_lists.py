@@ -22,10 +22,10 @@ class ValidateListValues(Validator):
     valid_data_holders = ("DPSTemplateDataHolder",)
     col_to_check = ""
 
-    @staticmethod
-    def get_validator_description() -> str:
+    @classmethod
+    def get_validator_description(cls) -> str:
         return (
-            f"Validate that the values in {ValidateListValues.col_to_check} belong to "
+            f"Validate that the values in column '{cls.col_to_check}' belong to "
             "the list of valid values."
         )
 
@@ -38,10 +38,9 @@ class ValidateListValues(Validator):
             ),
             None,
         )
-        self._template_list = template_list
         df = pl.read_excel(data_holder._template_path, sheet_name="Värdelistor")
 
-        return df[template_list].drop_nulls().to_list()
+        return df[template_list].drop_nulls().cast(pl.String).to_list()
 
     def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
         valid_values = self._get_valid_values(data_holder)
@@ -61,7 +60,7 @@ class ValidateListValues(Validator):
             msg = (
                 f"Invalid values found in column '{self.col_to_check}'. "
                 f"The following values are not included in the corresponding "
-                f"validation list '{self._template_list}':\n"
+                f"validation list contains the following values:\n"
                 f"- {invalid_values_formatted}"
             )
             self._log_fail(msg)
@@ -83,12 +82,12 @@ class ValidateDataOrigin(ValidateListValues):
     col_to_check = "data_origin"
 
 
-class ValidatePositionSystemCode(ValidateListValues):
-    col_to_check = "position_system_code"
+class ValidatePositioningSystemCode(ValidateListValues):
+    col_to_check = "positioning_system_code"
 
 
-class ValidateSamplingLaboratoryAccredited(ValidateListValues):
-    col_to_check = "sampling_laboratory_accredited"
+class ValidateSamplingLaboratoryAccreditated(ValidateListValues):
+    col_to_check = "sampling_laboratory_accreditated"
 
 
 class ValidateIceObservationCode(ValidateListValues):
@@ -123,13 +122,9 @@ class ValidateCounterProgram(ValidateListValues):
     col_to_check = "counter_program"
 
 
-# class ValidateSizeClassRefListCode(ValidateListValues):
-#     # There is a validator already for this column, in size_class.py
-#     col_to_check = "size_class_ref_list_code"
-
-
 class ValidatePlatformCode(ValidateListValues):
     col_to_check = "platform_code"
+    # TODO implement _get_valid_values to get ICES values
 
 
 class ValidateSamplingLaboratoryCode(ValidateListValues):
