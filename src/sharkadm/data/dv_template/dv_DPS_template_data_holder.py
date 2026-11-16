@@ -1,4 +1,5 @@
 import pathlib
+from abc import abstractmethod
 
 import openpyxl
 import polars as pl
@@ -33,6 +34,18 @@ class DPSTemplateDataHolder(PolarsDataHolder):
         """All columns where values must come from a specific validation list."""
         return self._validation_list_columns
 
+    @property
+    @abstractmethod
+    def import_matrix_mapper(self) -> ImportMatrixMapper: ...
+
+    @property
+    def template_path(self) -> pathlib.Path:
+        if self._template_path is None:
+            raise RuntimeError(
+                f"{type(self).__name__} must call _set_template_path() during setup."
+            )
+        return self._template_path
+
     def _load_validation_columns(self) -> None:
         """
         Store the names of all columns with validation lists in attribute
@@ -46,7 +59,7 @@ class DPSTemplateDataHolder(PolarsDataHolder):
         """
         self._validation_list_columns = []
 
-        wb = openpyxl.load_workbook(self._template_path, read_only=True, data_only=True)
+        wb = openpyxl.load_workbook(self.template_path, read_only=True, data_only=True)
         sheet_name = "Förklaring"
         try:
             if sheet_name not in wb.sheetnames:
@@ -76,7 +89,8 @@ class DPSTemplateDataHolder(PolarsDataHolder):
                 value_type = row[value_type_col]
 
                 if attribute is not None and value_type == "värdelista":
-                    self._validation_list_columns.append(attribute)
+                    attribute_internal = self.import_matrix_mapper.mapper[attribute]
+                    self._validation_list_columns.append(attribute_internal)
         finally:
             wb.close()
 
@@ -137,10 +151,10 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
         self._data_format: str | None = None
 
         self.overview = self._get_overview_data(self._file_path)
-        self._set_template_path(self.overview["Namn"], self.overview["Version"])
+        self._set_data_type()
+        self._set_template_path(self._data_type_synonym, self.overview["Version"])
 
         self._set_dataset_name()
-        self._set_data_type()
         self._data_type_obj: DataType = get_data_type_handler(
             self._nodc_config
         ).get_data_type_obj(kwargs.get("data_type", self._data_type_synonym))
@@ -164,9 +178,9 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
     def header_mapper(self):
         return self._import_matrix_mapper
 
-    @property
-    def template_path(self) -> pathlib.Path:
-        return self._template_path
+    # @property
+    # def template_path(self) -> pathlib.Path:
+    #     return self._template_path
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:

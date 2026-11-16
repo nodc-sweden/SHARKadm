@@ -89,7 +89,6 @@ from sharkadm.validators.template_validation_lists import (
     ValidateQualityFlag,
     ValidateSampleOrdererCode,
     ValidateSamplerTypeCode,
-    ValidateSamplingLaboratoryAccreditated,
     ValidateSamplingLaboratoryCode,
     ValidateSpeciesFlagCode,
     ValidateTrophicTypeCode,

@@ -19,7 +19,6 @@ class DpsTemplateValidation(MultiValidator):
         validators.ValidateQualityFlag,
         validators.ValidateSampleOrdererCode,
         validators.ValidateSamplerTypeCode,
-        validators.ValidateSamplingLaboratoryAccreditated,
         validators.ValidateSamplingLaboratoryCode,
         validators.ValidateSpeciesFlagCode,
         validators.ValidateTrophicTypeCode,

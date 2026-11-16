@@ -1,3 +1,5 @@
+import csv
+
 import polars as pl
 
 from sharkadm.sharkadm_operator import OperatorInfo
@@ -46,12 +48,31 @@ class ValidateListValues(Validator):
         valid_values = self._get_valid_values(data_holder)
 
         invalid_values = (
-            data_holder.data.filter(~pl.col(self.col_to_check).is_in(valid_values))
+            data_holder.data.select(
+                pl.col(self.col_to_check)
+                .str.split(",")
+                .list.eval(pl.element().str.strip_chars())
+                .alias(self.col_to_check)
+            )
+            .explode(self.col_to_check)
+            .filter(
+                pl.col(self.col_to_check).is_not_null()
+                & (pl.col(self.col_to_check) != "")
+                & ~pl.col(self.col_to_check).is_in(valid_values)
+            )
             .select(self.col_to_check)
             .unique()
             .to_series()
             .to_list()
         )
+
+        has_null_values = data_holder.data.select(
+            pl.col(self.col_to_check).is_null().any()
+        ).item()
+
+        has_empty_values = data_holder.data.select(
+            (pl.col(self.col_to_check).str.strip_chars() == "").any()
+        ).item()
 
         data_holder.update_checked_validation_lists(self.col_to_check)
 
@@ -62,6 +83,12 @@ class ValidateListValues(Validator):
                 f"The following values are not included in the corresponding "
                 f"validation list contains the following values:\n"
                 f"- {invalid_values_formatted}"
+            )
+            self._log_fail(msg)
+        elif has_null_values or has_empty_values:
+            msg = (
+                f"Missing values in column '{self.col_to_check}'. "
+                "Values should come from a validation list"
             )
             self._log_fail(msg)
         else:
@@ -84,10 +111,6 @@ class ValidateDataOrigin(ValidateListValues):
 
 class ValidatePositioningSystemCode(ValidateListValues):
     col_to_check = "positioning_system_code"
-
-
-class ValidateSamplingLaboratoryAccreditated(ValidateListValues):
-    col_to_check = "sampling_laboratory_accreditated"
 
 
 class ValidateIceObservationCode(ValidateListValues):
@@ -124,28 +147,34 @@ class ValidateCounterProgram(ValidateListValues):
 
 class ValidatePlatformCode(ValidateListValues):
     col_to_check = "platform_code"
-    # TODO implement _get_valid_values to get ICES values
+
+    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+        path = data_holder.config.get_path("ices_shipc.csv")
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            ship_codes = [row["Code"] for row in reader]
+        return ship_codes
 
 
 class ValidateSamplingLaboratoryCode(ValidateListValues):
     col_to_check = "sampling_laboratory_code"
 
     def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
-        nodc_codes.get_labo_list(data_holder.config)
+        return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateSampleOrdererCode(ValidateListValues):
     col_to_check = "sample_orderer_code"
 
     def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
-        nodc_codes.get_labo_list(data_holder.config)
+        return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateAnalyticalLaboratoryCode(ValidateListValues):
     col_to_check = "analytical_laboratory_code"
 
     def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
-        nodc_codes.get_labo_list(data_holder.config)
+        return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateAllValidationListColumns(Validator):
@@ -162,8 +191,10 @@ class ValidateAllValidationListColumns(Validator):
         checked_cols = data_holder.checked_validation_list_columns
         cols = data_holder.validation_list_columns
 
+        # Columns listed as värdelista in template, but have not been marked as checked
         unchecked_cols = set(cols) - set(checked_cols)
 
+        # Column marked as checked, but not listed as värdelist by template
         missing_cols = set(checked_cols) - set(cols)
 
         if unchecked_cols:
