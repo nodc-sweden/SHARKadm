@@ -1,4 +1,5 @@
 import polars as pl
+from nodc_config import Config
 
 from ..data import PolarsDataHolder
 from ..sharkadm_logger import adm_logger
@@ -43,7 +44,7 @@ class PolarsAddBvolScientificNameOriginal(PolarsTransformer):
         # self._log_result(data_holder)
 
     def _add_column(self, data_holder: PolarsDataHolder):
-        translate_bvol_name = nodc_bvol.get_translate_bvol_name_object()
+        translate_bvol_name = nodc_bvol.get_translate_bvol_name_object(data_holder.config)
         _mapper = translate_bvol_name.get_scientific_name_from_to_mapper()
 
         data_holder.data = data_holder.data.with_columns(
@@ -106,7 +107,9 @@ class PolarsAddBvolScientificNameAndSizeClass(PolarsTransformer):
 
         self._remove_columns(data_holder, self.col_to_set_name, self.col_to_set_size)
 
-        translate_bvol_name_and_size = nodc_bvol.get_translate_bvol_name_size_object()
+        translate_bvol_name_and_size = nodc_bvol.get_translate_bvol_name_size_object(
+            data_holder.config
+        )
         _mapper = translate_bvol_name_and_size.get_scientific_name_from_to_mapper()
 
         data_holder.data = data_holder.data.with_columns(
@@ -192,7 +195,7 @@ class PolarsAddBvolAphiaId(PolarsTransformer):
     #     )
 
     def _add_column(self, data_holder: PolarsDataHolder):
-        bvol_nomp = nodc_bvol.get_bvol_nomp_object()
+        bvol_nomp = nodc_bvol.get_bvol_nomp_object(data_holder.config)
         _mapper = bvol_nomp.get_species_to_aphia_id_mapper()
         # One species might map to multiple aphia_ids. Check this! Should not happen
         # Diplopsalis och Diplopsalis CPX
@@ -276,7 +279,7 @@ class PolarsAddBvolRefList(PolarsTransformer):
         )
 
     def _add_column(self, data_holder: PolarsDataHolder):
-        bvol_nomp = nodc_bvol.get_bvol_nomp_object()
+        bvol_nomp = nodc_bvol.get_bvol_nomp_object(data_holder.config)
         _mapper = bvol_nomp.get_species_and_size_class_to_ref_list_mapper()
         # TODO: One species might map to multiple aphia_ids. Check this! Might be fixed...
         # Species = 1138
@@ -312,7 +315,7 @@ class _PolarsAddBvolMapper(PolarsTransformer):
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
         data_holder = self._add_help_columns(data_holder)
-        volume_mapper = self._get_mapper()
+        volume_mapper = self._get_mapper(data_holder.config)
 
         data_holder.data = data_holder.data.with_columns(
             pl.col(COL_JOINED_APHIA_ID_AND_SIZE_CLASS)
@@ -321,7 +324,7 @@ class _PolarsAddBvolMapper(PolarsTransformer):
             .alias(self.col_to_set)
         )
 
-    def _get_mapper(self) -> dict:
+    def _get_mapper(self, config: Config) -> dict:
         return {}
 
     def _add_help_columns(self, data_holder: PolarsDataHolder) -> PolarsDataHolder:
@@ -348,8 +351,8 @@ class PolarsAddBvolCellVolume(_PolarsAddBvolMapper):
     def get_transformer_description() -> str:
         return f"Adds {PolarsAddBvolCellVolume.col_to_set}"
 
-    def _get_mapper(self) -> dict:
-        _nomp = nodc_bvol.get_bvol_nomp_object()
+    def _get_mapper(self, config: Config) -> dict:
+        _nomp = nodc_bvol.get_bvol_nomp_object(config)
         return _nomp.get_calculated_volume_mapper()
 
 
@@ -361,6 +364,6 @@ class PolarsAddBvolCarbonVolume(_PolarsAddBvolMapper):
     def get_transformer_description() -> str:
         return f"Adds {PolarsAddBvolCarbonVolume.col_to_set}"
 
-    def _get_mapper(self) -> dict:
-        _nomp = nodc_bvol.get_bvol_nomp_object()
+    def _get_mapper(self, config: Config) -> dict:
+        _nomp = nodc_bvol.get_bvol_nomp_object(config)
         return _nomp.get_carbon_per_volume_mapper()
