@@ -26,7 +26,7 @@ class DPSTemplateDataHolder(PolarsDataHolder):
     def __init__(self, *args, **kwargs):
         self._template_path: pathlib.Path | None = None
         self._validation_list_columns: list[str] = []
-        self._checked_validation_list_columns: list[str] = []
+        self._checked_validation_list_columns: dict[str, bool] = {}
         super().__init__(*args, **kwargs)
 
     @property
@@ -95,18 +95,19 @@ class DPSTemplateDataHolder(PolarsDataHolder):
             wb.close()
 
     @property
-    def checked_validation_list_columns(self) -> list[str]:
+    def checked_validation_list_columns(self) -> dict[str, bool]:
+        """Return all checked validation-list column and whether it passed."""
         return self._checked_validation_list_columns
 
-    def update_checked_validation_lists(self, col: str) -> None:
-        """
-        Call this method during validation of columns with validation lists.
+    def update_checked_validation_lists(self, col: str, result: bool) -> None:
+        """Record the validation outcome for a validation-list column.
 
-        By storing which columns that have been validated against the respective
-        validation lists, a final validation can be made by ensuring that all columns
-        with validation lists have been validated.
+        Store ``True`` when validation passes and ``False`` when it fails.
+        Only columns which have been checked by a validator exist in the mapping.
+        For complete template validation, every column in
+        ``self.validation_list_columns`` should be checked.
         """
-        self._checked_validation_list_columns.append(col)
+        self._checked_validation_list_columns[col] = result
 
     @staticmethod
     def _map_dps_dtype(name: str) -> str:
@@ -177,10 +178,6 @@ class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
     @property
     def header_mapper(self):
         return self._import_matrix_mapper
-
-    # @property
-    # def template_path(self) -> pathlib.Path:
-    #     return self._template_path
 
     @property
     def import_matrix_mapper(self) -> ImportMatrixMapper:

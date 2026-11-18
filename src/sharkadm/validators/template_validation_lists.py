@@ -74,8 +74,6 @@ class ValidateListValues(Validator):
             (pl.col(self.col_to_check).str.strip_chars() == "").any()
         ).item()
 
-        data_holder.update_checked_validation_lists(self.col_to_check)
-
         if invalid_values:
             invalid_values_formatted = "\n- ".join(invalid_values)
             msg = (
@@ -85,15 +83,18 @@ class ValidateListValues(Validator):
                 f"- {invalid_values_formatted}"
             )
             self._log_fail(msg)
+            data_holder.update_checked_validation_lists(self.col_to_check, False)
         elif has_null_values or has_empty_values:
             msg = (
                 f"Missing values in column '{self.col_to_check}'. "
                 "Values should come from a validation list"
             )
             self._log_fail(msg)
+            data_holder.update_checked_validation_lists(self.col_to_check, False)
         else:
             msg = f"All values in column '{self.col_to_check}' are valid."
             self._log_success(msg)
+            data_holder.update_checked_validation_lists(self.col_to_check, True)
         return OperatorInfo(msg=msg)
 
 
@@ -184,40 +185,49 @@ class ValidateAllValidationListColumns(Validator):
     def get_validator_description() -> str:
         return (
             "Check that all columns listed as 'Värdelistor' (validation lists) have "
-            "been validated against the corresponding validation list."
+            "been validated against the corresponding validation list and that the "
+            "validations were successful."
         )
 
     def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
-        checked_cols = data_holder.checked_validation_list_columns
-        cols = data_holder.validation_list_columns
+        results = data_holder.checked_validation_list_columns
+        validation_cols = set(data_holder.validation_list_columns)
+        checked_cols = set(results)
 
-        # Columns listed as värdelista in template, but have not been marked as checked
-        unchecked_cols = set(cols) - set(checked_cols)
+        failed_cols = sorted(col for col, passed in results.items() if passed is False)
+        unchecked_cols = sorted(validation_cols - checked_cols)
+        unexpected_checked_cols = sorted(checked_cols - validation_cols)
 
-        # Column marked as checked, but not listed as värdelist by template
-        missing_cols = set(checked_cols) - set(cols)
+        errors = []
+
+        if failed_cols:
+            errors.append("Validation failed for columns:\n- " + "\n- ".join(failed_cols))
 
         if unchecked_cols:
-            unchecked_cols_formatted = "\n- ".join(unchecked_cols)
+            errors.append(
+                "Unvalidated columns with validation lists:\n- "
+                + "\n- ".join(unchecked_cols)
+            )
+
+        if unexpected_checked_cols:
+            errors.append(
+                "Validated columns not listed as validation-list columns by template:\n- "
+                + "\n- ".join(unexpected_checked_cols)
+                + "\nIs template outdated?"
+            )
+
+        if errors:
             msg = (
-                f"Unvalidated columns: The following columns contain values that have "
-                "not been validated against their corresponding validation lists:\n"
-                f"- {unchecked_cols_formatted}"
+                "Stopping workflow due to validation failures, no export will be made. "
+                + "\n".join(errors)
             )
             self._log_fail(msg)
-
-        elif missing_cols:
-            missing_cols_formatted = "\n- ".join(missing_cols)
-            msg = (
-                f"Missing validation columns. The following columns, required for "
-                f"validation against the corresponding value lists, were not found "
-                f"in the data. Could this be due to an outdated template?\n"
-                f"- {missing_cols_formatted}"
+            return OperatorInfo(
+                msg=msg,
+                success=False,
+                cause_for_termination=True,
             )
-            self._log_fail(msg)
 
-        else:
-            msg = "All columns with validation lists have been validated."
-            self._log_success(msg)
-
+        msg = "All columns with validation lists have been validated."
+        self._log_success(msg)
         return OperatorInfo(msg=msg)
