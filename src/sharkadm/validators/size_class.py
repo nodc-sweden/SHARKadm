@@ -47,3 +47,8 @@ class ValidateSizeClassRefListCode(Validator):
                 self._log_fail(f"Missing {self.col_to_check} ({len(d)} places)")
                 continue
             self._log_fail(f"Invalid {self.col_to_check}: {code} ({len(d)} places)")
+
+        if hasattr(data_holder, "update_checked_validation_lists"):
+            data_holder.update_checked_validation_lists(
+                self.col_to_check, code in valid_codes
+            )
