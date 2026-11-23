@@ -4,7 +4,7 @@ from typing import ClassVar
 
 import polars as pl
 
-from sharkadm.data import NewDataHolder
+from sharkadm.data import BasevocDataHolder
 from sharkadm.exporters.base import PolarsFileExporter
 
 
@@ -13,26 +13,18 @@ class OdvExporter(PolarsFileExporter):
     Exporter for Ocean Data Viewer (ODV) format.
     """
 
-    # TODO get full mapping
-    LOCAL_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "DMS"}
-    P01_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "FLUXDMS1"}
-    P06_CODE_MAPPING: ClassVar[dict[str, str]] = {"63.027": "UUUD"}
-    P06_VALUE_MAPPING: ClassVar[dict[str, str]] = {"UUUD": "[umol/m^2/d]"}
-
-    # Map data fields to metadata fields in ODV
     EXPORT_COLUMN_NAMES: ClassVar[dict[str, str]] = {
-        "Cruise": "Cruise",
+        "cruise": "Cruise",
         "reported_station_name": "Station",
-        "Type": "Type",
+        "type": "Type",
         "sample_iso_datetime": "yyyy-mm-ddThh:mm:ss.sss",
         "visit_reported_longitude": "Longitude [degrees_east]",
         "visit_reported_latitude": "Latitude [degrees_north]",
-        "LOCAL_CDI_ID": "LOCAL_CDI_ID",
+        "local_cdi_id": "LOCAL_CDI_ID",
         "distributor": "EDMO_code",
-        # "CDI_partner": "EDMO_code",
-        "Bot. Depth [m]": "Bot. Depth [m]",
     }
     export_index_name = "time_ISO8601 [yyyy-mm-ddThh:mm:ss.sss]"
+    valid_data_holders = ("BasevocDataHolder",)
 
     def __init__(
         self,
@@ -53,7 +45,7 @@ class OdvExporter(PolarsFileExporter):
         """Description of what this exporter does"""
         return "Exports data to Ocean Data Viewer (ODV) format"
 
-    def _export(self, data_holder: NewDataHolder) -> None:
+    def _export(self, data_holder: BasevocDataHolder) -> None:
         """
         Args:
             data_holder: The data holder containing the data to export
@@ -98,21 +90,18 @@ class OdvExporter(PolarsFileExporter):
             .alias(self.export_index_name)
         )
 
-        # Use a unique internal name — ODV header will be fixed later.
-        expressions.append(pl.col(f"qc_sdn_{index_col}").alias("__qc_index"))
+        expressions.append(pl.col(f"qc_sdn_{index_col}"))
 
         for i, col in enumerate(measurement_cols):
-            output_name = self.LOCAL_CODE_MAPPING.get(col, col)
-            expressions.append(pl.col(col).alias(output_name))
+            local_name = data_holder.selected_compound["Value column in data file"]
+            expressions.append(pl.col(col).alias(local_name))
 
-            qc_col = f"qc_sdn_{col}"
+            qc_col = f"{data_holder.selected_compound['Parameter'].lower()}_qflag_L20"
             if qc_col not in data.columns:
                 raise ValueError(
                     f"QC column '{qc_col}' not found for measurement '{col}'"
                 )
-
-            # Unique name inside Polars
-            expressions.append(pl.col(qc_col).alias(f"__qc_{i}"))
+            expressions.append(pl.col(qc_col))
 
         output = data.select(expressions)
         output = output.with_columns(
@@ -125,7 +114,7 @@ class OdvExporter(PolarsFileExporter):
             ]
         )
 
-        header_lines = self._create_header(measurement_cols)
+        header_lines = self._create_header(data_holder)
         csv_buffer = io.StringIO()
         output.write_csv(csv_buffer, separator="\t", null_value="", include_header=False)
 
@@ -136,9 +125,8 @@ class OdvExporter(PolarsFileExporter):
         ]
 
         for col in measurement_cols:
-            local_name = self.LOCAL_CODE_MAPPING.get(col, col)
-            unit_code = self.P06_CODE_MAPPING.get(col)
-            unit = self.P06_VALUE_MAPPING.get(unit_code) if unit_code else None
+            local_name = col
+            unit = data_holder.selected_compound["unit_ODV_label"]
             column_name = f"{local_name} {unit}" if unit else local_name
 
             output_column_names.append(column_name)
@@ -157,32 +145,26 @@ class OdvExporter(PolarsFileExporter):
             f.write("\t".join(output_column_names) + "\n")
             f.write(csv_buffer.getvalue())
 
-    def _create_header(self, parameters: list[str]):
+    def _create_header(self, data_holder: BasevocDataHolder):
         header_lines = []
         header_lines.append("//")
         header_lines.append("//SDN_parameter_mapping")
         header_lines.append(
             "//<subject>SDN:LOCAL:time_ISO8601</subject><object>SDN:P01::DTUT8601</object><units>SDN:P06::TISO</units>"
         )
+        parameters = data_holder.data_columns
         for param in parameters:
-            header_lines.append(self._create_param_header(param))
+            subject = f"<subject>SDN:LOCAL:{param}</subject>"
+            p01_code = data_holder.selected_compound["P01 vocab"]
+            object_part = f"<object>SDN:P01::{p01_code}</object>"
+            p06_code = data_holder.selected_compound["P06"]
+            units_part = f"<units>SDN:P06::{p06_code}</units>"
+
+            header_line = f"//{subject}{object_part}{units_part}"
+
+            header_lines.append(header_line)
         header_lines.append("//")
         return header_lines
-
-    def _create_param_header(self, parameter) -> str:
-        """
-        Format a single line in the ODV header.
-        """
-        local_code = self.LOCAL_CODE_MAPPING.get(parameter)
-        subject = f"<subject>SDN:LOCAL:{local_code}</subject>"
-        p01_code = self.P01_CODE_MAPPING.get(parameter)
-        object_part = f"<object>SDN:P01::{p01_code}</object>"
-        p06_code = self.P06_CODE_MAPPING.get(parameter)
-        units_part = f"<units>SDN:P06::{p06_code}</units>"
-
-        header_line = f"//{subject}{object_part}{units_part}"
-
-        return header_line
 
     @staticmethod
     def _format_odv_datetime(column: str) -> pl.Expr:
