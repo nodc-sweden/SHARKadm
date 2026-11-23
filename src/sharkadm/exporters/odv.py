@@ -48,60 +48,109 @@ class OdvExporter(PolarsFileExporter):
     def _export(self, data_holder: BasevocDataHolder) -> None:
         """
         Args:
-            data_holder: The data holder containing the data to export
+            data_holder: Data holder containing the data to export.
         """
         self._log(f"Exporting to ODV format: {self.export_file_path}")
 
         data = data_holder.data
+        existing_columns = set(data.columns)
 
-        metadata_cols = list(self.EXPORT_COLUMN_NAMES.keys())
         index_col = data_holder.indexing_column
-        measurement_cols = list(data_holder.data_columns)
+        measurement_cols = data_holder.data_columns
+        metadata_cols = list(self.EXPORT_COLUMN_NAMES)
 
-        required_cols = set([*metadata_cols, index_col, *measurement_cols])
+        # Validate that the required information exists in selected compounds
+        compound = data_holder.selected_compound
+        required_compound_fields = (
+            "Value column in data file",
+            "Parameter",
+            "P01 vocab",
+            "P06",
+            "unit_ODV_label",
+        )
+        missing_compound_fields = [
+            field for field in required_compound_fields if field not in compound
+        ]
+        if missing_compound_fields:
+            raise ValueError(
+                f"Missing selected-compound configuration for "
+                f"'{data_holder.dataset_name}': "
+                f"{', '.join(missing_compound_fields)}"
+            )
 
-        missing = required_cols - set(data.columns)
+        # Check that the expected columns exist in the data holder
+        required_columns = {
+            *metadata_cols,
+            index_col,
+            *measurement_cols,
+        }
+        missing_columns = sorted(required_columns - existing_columns)
+        if missing_columns:
+            raise ValueError(
+                f"Cannot export '{data_holder.dataset_name}': missing required "
+                f"columns: {', '.join(missing_columns)}"
+            )
 
-        if missing:
-            if missing:
-                data = data.with_columns([pl.lit(None).alias(col) for col in missing])
-
-        expressions = []
-        metadata_output_names = []
+        qc_columns = data_holder.qc_columns
+        expressions = []  # Used to filter the dataframe
+        output_column_names = []  # The headers used in the export
 
         for col in metadata_cols:
-            output_name = self.EXPORT_COLUMN_NAMES.get(col, col)
+            output_name = self.EXPORT_COLUMN_NAMES[col]
+
             if col == "sample_iso_datetime":
-                expressions.append(
+                expression = (
                     pl.col(col)
                     .cast(pl.String)
                     .str.to_datetime(strict=True)
                     .dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
-                    .alias(output_name)
                 )
             else:
-                expressions.append(pl.col(col).alias(output_name))
-            metadata_output_names.append(output_name)
+                expression = pl.col(col)
 
+            expressions.append(expression)
+            output_column_names.append(output_name)
+
+        # Indexing column + create indexing QC column
         expressions.append(
             pl.col(index_col)
+            .cast(pl.String)
             .str.to_datetime(strict=True)
             .dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
             .alias(self.export_index_name)
         )
+        output_column_names.append(self.export_index_name)
 
-        expressions.append(pl.col(f"qc_sdn_{index_col}"))
+        index_qc_col = f"qc_sdn_{index_col}"
+        expressions.append(pl.col(index_qc_col))
+        output_column_names.append("QV:SEADATANET")
 
-        for i, col in enumerate(measurement_cols):
-            local_name = data_holder.selected_compound["Value column in data file"]
-            expressions.append(pl.col(col).alias(local_name))
-
-            qc_col = f"{data_holder.selected_compound['Parameter'].lower()}_qflag_L20"
-            if qc_col not in data.columns:
+        for col in measurement_cols:
+            if col not in qc_columns:
                 raise ValueError(
-                    f"QC column '{qc_col}' not found for measurement '{col}'"
+                    f"Cannot export '{data_holder.dataset_name}': no QC-column "
+                    f"mapping is configured for measurement '{col}'"
                 )
+
+            qc_col = qc_columns[col]
+            if qc_col not in existing_columns:
+                raise ValueError(
+                    f"Cannot export '{data_holder.dataset_name}': missing QC "
+                    f"column '{qc_col}' for measurement '{col}'"
+                )
+
+            local_name = compound["Value column in data file"]
+            unit = compound.get("unit_ODV_label")
+            measurement_header = f"{local_name} [{unit}]" if unit else local_name
+
+            expressions.append(pl.col(col))
+            output_column_names.append(measurement_header)
+
+            # Keep original name of QC columns because dupliacted column names are
+            # not allowed in polars dataframe.
+            # Export name of column stored in output_column_names
             expressions.append(pl.col(qc_col))
+            output_column_names.append("QV:SEADATANET")
 
         output = data.select(expressions)
         output = output.with_columns(
@@ -110,62 +159,50 @@ class OdvExporter(PolarsFileExporter):
                 .then(pl.col(name))
                 .otherwise(pl.lit(None))
                 .alias(name)
-                for name in metadata_output_names
+                for name in list(self.EXPORT_COLUMN_NAMES)
             ]
         )
 
-        header_lines = self._create_header(data_holder)
         csv_buffer = io.StringIO()
-        output.write_csv(csv_buffer, separator="\t", null_value="", include_header=False)
+        output.write_csv(
+            csv_buffer,
+            separator="\t",
+            null_value="",
+            include_header=False,
+        )
 
-        output_column_names = [
-            *metadata_output_names,
-            self.export_index_name,
-            "QV:SEADATANET",  # QC for indexing column
-        ]
-
-        for col in measurement_cols:
-            local_name = col
-            unit = data_holder.selected_compound["unit_ODV_label"]
-            column_name = f"{local_name} {unit}" if unit else local_name
-
-            output_column_names.append(column_name)
-            output_column_names.append("QV:SEADATANET")
+        header_lines = self._create_header(data_holder)
 
         with open(
             self.export_file_path,
             "w",
             encoding="utf-8",
             newline="",
-        ) as f:
+        ) as fid:
             for line in header_lines:
-                f.write(line + "\n")
+                fid.write(line + "\n")
 
-            # ODV allows duplicate column names.
-            f.write("\t".join(output_column_names) + "\n")
-            f.write(csv_buffer.getvalue())
+            fid.write("\t".join(output_column_names) + "\n")
+            fid.write(csv_buffer.getvalue())
 
     def _create_header(self, data_holder: BasevocDataHolder):
-        header_lines = []
-        header_lines.append("//")
-        header_lines.append("//SDN_parameter_mapping")
+        header_lines = ["//", "//SDN_parameter_mapping"]
+
         header_lines.append(
-            "//<subject>SDN:LOCAL:time_ISO8601</subject><object>SDN:P01::DTUT8601</object><units>SDN:P06::TISO</units>"
+            "//<subject>SDN:LOCAL:time_ISO8601</subject>"
+            "<object>SDN:P01::DTUT8601</object>"
+            "<units>SDN:P06::TISO</units>"
         )
-        parameters = data_holder.data_columns
-        for param in parameters:
-            subject = f"<subject>SDN:LOCAL:{param}</subject>"
+
+        for parameter in data_holder.data_columns:
             p01_code = data_holder.selected_compound["P01 vocab"]
-            object_part = f"<object>SDN:P01::{p01_code}</object>"
             p06_code = data_holder.selected_compound["P06"]
-            units_part = f"<units>SDN:P06::{p06_code}</units>"
 
-            header_line = f"//{subject}{object_part}{units_part}"
+            header_lines.append(
+                f"//<subject>SDN:LOCAL:{parameter}</subject>"
+                f"<object>SDN:P01::{p01_code}</object>"
+                f"<units>SDN:P06::{p06_code}</units>"
+            )
 
-            header_lines.append(header_line)
         header_lines.append("//")
         return header_lines
-
-    @staticmethod
-    def _format_odv_datetime(column: str) -> pl.Expr:
-        return pl.col(column).dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")

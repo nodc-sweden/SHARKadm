@@ -27,9 +27,9 @@ class BasevocDataHolder(PolarsDataHolder):
 
     def __init__(
         self,
-        data_file: str | pathlib.Path | None = None,
-        metadata_file: str | pathlib.Path | None = None,
-        selected_compounds_file: str | pathlib.Path | None = None,
+        data_file: str | pathlib.Path,
+        metadata_file: str | pathlib.Path,
+        selected_compounds_file: str | pathlib.Path,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -39,7 +39,8 @@ class BasevocDataHolder(PolarsDataHolder):
 
         self._data: pl.DataFrame = pl.DataFrame()
         self._data_columns: list[str] = []
-        self._selected_compund = {}
+        self._qc_columns: dict[str, str]
+        self._selected_compound: dict[str, str] = {}
         self._dataset_name = self.data_file.stem
 
         self._load_selected_compounds()
@@ -82,6 +83,11 @@ class BasevocDataHolder(PolarsDataHolder):
         """Columns with data."""
         return self._data_columns
 
+    @property
+    def qc_columns(self) -> dict[str, str]:
+        """Columns with data."""
+        return self._qc_columns
+
     def _load_data(self) -> None:
         data_source = CsvRowFormatPolarsDataFile(
             path=self.data_file,
@@ -94,25 +100,54 @@ class BasevocDataHolder(PolarsDataHolder):
 
     def _update_data_columns(self) -> None:
         """Store the names of the data columns."""
-        # In the future there might be more than one data column per file
-        self._data_columns = [self._selected_compound["Value column in data file"]]
+        column_name = self.selected_compound.get("Value column in data file")
+
+        if not column_name:
+            raise ValueError(
+                f"No 'Value column in data file' is configured for "
+                f"'{self.data_file}' in selected compounds file."
+            )
+
+        column_name = column_name.strip()
+        if column_name not in self.data.columns:
+            raise ValueError(
+                f"Expected data column '{column_name}' is missing from {self.data_file}"
+            )
+
+        # Currently, one file contains one selected measurement.
+        self._data_columns = [column_name]
 
     def _update_qc_columns(self) -> None:
-        """Store a mapping to corresponding qc column for each data column."""
+        """Store a mapping to the QC column for each data column."""
 
-        # Mixing ratio i uncertain, because no mixing data available yet
-        parameter_to_qc_column = {
-            "Flux": "flux_qflag_L20",
-            "Mixing ratio": "mixing_ratio_qflag_L20",
+        PARAMETER_TO_QC_COLUMN = {
+            "flux": "flux_qflag_L20",
+            "mixing ratio": "mixing_ratio_qflag_L20",
         }
-        parameter = self.selected_compound["Parameter"]
-        qc_column = parameter_to_qc_column[parameter]
+        parameter = self.selected_compound.get("Parameter")
+
+        if not parameter:
+            raise ValueError(
+                f"No 'Parameter' is configured for '{self.data_file}' "
+                "in selected compounds file."
+            )
+
+        parameter = parameter.strip().lower()
+        qc_column = PARAMETER_TO_QC_COLUMN.get(parameter)
+
+        if qc_column is None:
+            raise ValueError(
+                f"Unsupported parameter '{parameter}' in the selected-compounds "
+                f"row for {self.data_file}"
+            )
 
         indexing_qc_column = f"qc_sdn_{self.indexing_column}"
         self.data = self.data.with_columns(pl.lit(1).alias(indexing_qc_column))
+
         self._qc_columns = {self.indexing_column: indexing_qc_column}
-        for col in self.data_columns:
-            self._qc_columns[col] = qc_column
+
+        for column_name in self.data_columns:
+            self._qc_columns[column_name] = qc_column
 
     def _load_metadata(self) -> None:
         """Load metadata from either CSV or XLSX file and add to the dataframe."""
@@ -149,23 +184,23 @@ class BasevocDataHolder(PolarsDataHolder):
         metadata_df = self._get_data_from_data_source(metadata_source)
 
         # The relevant metadata row is matched through the local_cdi_id
-        compound = self.selected_compound["Compound label in data file"]
-        measurement_type = self.selected_compound["Parameter"]
-        if measurement_type.lower() == "flux":
+        # Currently this is not listed in selected compounds, but can be inferred
+        # from the compound and measurement type
+        compound = (
+            str(self.selected_compound["Compound label in data file"]).strip().lower()
+        )
+
+        measurement_type = str(self.selected_compound["Parameter"]).strip().lower()
+
+        if measurement_type == "flux":
             metadata_filtered = metadata_df.filter(
-                pl.col("local_cdi_id")
-                .str.to_lowercase()
-                .str.contains(compound.lower().strip())
-                & pl.col("local_cdi_id")
-                .str.to_lowercase()
-                .str.contains(measurement_type.lower().strip())
+                pl.col("local_cdi_id").str.to_lowercase().str.contains(compound)
+                & pl.col("local_cdi_id").str.to_lowercase().str.contains(measurement_type)
             ).head(1)
-        elif measurement_type.lower == "mixing ratio":
+        elif measurement_type == "mixing ratio":
             type_match = "mix"
             metadata_filtered = metadata_df.filter(
-                pl.col("local_cdi_id")
-                .str.to_lowercase()
-                .str.contains(compound.lower().strip())
+                pl.col("local_cdi_id").str.to_lowercase().str.contains(compound)
                 & pl.col("local_cdi_id").str.to_lowercase().str.contains(type_match)
             ).head(1)
         else:
@@ -175,9 +210,7 @@ class BasevocDataHolder(PolarsDataHolder):
             f"Connected file '{self.data_file}' to local_cdi_id = "
             f"'{metadata_filtered['local_cdi_id'][0]}'"
         )
-        metadata_dict = metadata_filtered[0, :].to_dicts()[
-            0
-        ]  # Antar endast en rad här, flera av filerna ha flera rader
+        metadata_dict = metadata_filtered[0, :].to_dicts()[0]
 
         for col_name, value in metadata_dict.items():
             if col_name not in self._data.columns:
