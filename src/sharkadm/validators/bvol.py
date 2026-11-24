@@ -57,7 +57,7 @@ class ValidateBvolSizeClass(Validator):
         )
 
     def _map_and_validate(self, data_holder: PolarsDataHolder):
-        bvol_nomp = nodc_bvol.get_bvol_nomp_object()
+        bvol_nomp = nodc_bvol.get_bvol_nomp_object(data_holder.config)
         _mapper = bvol_nomp.get_species_and_size_class_to_aphia_id_mapper()
         # TODO: One species might map to multiple aphia_ids. Check this!
         # Species = 1138

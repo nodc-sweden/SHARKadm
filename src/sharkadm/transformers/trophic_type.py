@@ -20,7 +20,7 @@ class PolarsSetTrophicTypeSMHI(PolarsTransformer):
         )
 
     def _transform(self, data_holder: PolarsDataHolder) -> None:
-        tt_object = get_trophic_type_smhi_object()
+        tt_object = get_trophic_type_smhi_object(data_holder.config)
         mapper = tt_object.get_mapper()
         if self.col_to_set not in data_holder.data.columns:
             self._add_empty_col_to_set(data_holder)
