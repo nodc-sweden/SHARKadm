@@ -13,7 +13,7 @@ from sharkadm.data.data_source.xlsx_file import XlsxFormatPolarsDataFile
 from sharkadm.sharkadm_logger import adm_logger
 
 
-class DPSTemplateDataHolder(PolarsDataHolder):
+class _DPSTemplateDataHolder(PolarsDataHolder):
     """Shared behaviour for dataholders with data from the new DPS template.
 
     This includes management of columns with validation lists. Note that this data holder
@@ -131,7 +131,7 @@ class DPSTemplateDataHolder(PolarsDataHolder):
         self._template_path = pathlib.Path(self.config.get_path(template_name))
 
 
-class ExcelDPSTemplateDataHolder(DPSTemplateDataHolder):
+class ExcelDPSTemplateDataHolder(_DPSTemplateDataHolder):
     _data_structure = "column"
     _date_str_format = "%Y-%m-%d"
 

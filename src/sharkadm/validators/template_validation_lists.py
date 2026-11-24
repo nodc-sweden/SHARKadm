@@ -4,7 +4,7 @@ import polars as pl
 
 from sharkadm.sharkadm_operator import OperatorInfo
 
-from ..data import DPSTemplateDataHolder
+from ..data import _DPSTemplateDataHolder
 from ..sharkadm_logger import adm_logger
 from .base import Validator
 
@@ -21,7 +21,7 @@ except ModuleNotFoundError as e:
 
 
 class ValidateListValues(Validator):
-    valid_data_holders = ("DPSTemplateDataHolder",)
+    valid_data_holders = ("_DPSTemplateDataHolder",)
     col_to_check = ""
 
     @classmethod
@@ -31,7 +31,7 @@ class ValidateListValues(Validator):
             "the list of valid values."
         )
 
-    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+    def _get_valid_values(self, data_holder: _DPSTemplateDataHolder):
         template_list = next(
             (
                 temp_col
@@ -44,7 +44,7 @@ class ValidateListValues(Validator):
 
         return df[template_list].drop_nulls().cast(pl.String).to_list()
 
-    def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
+    def _validate(self, data_holder: _DPSTemplateDataHolder) -> OperatorInfo:
         valid_values = self._get_valid_values(data_holder)
 
         invalid_values = (
@@ -149,7 +149,7 @@ class ValidateCounterProgram(ValidateListValues):
 class ValidatePlatformCode(ValidateListValues):
     col_to_check = "platform_code"
 
-    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+    def _get_valid_values(self, data_holder: _DPSTemplateDataHolder):
         path = data_holder.config.get_path("ices_shipc.csv")
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -160,26 +160,26 @@ class ValidatePlatformCode(ValidateListValues):
 class ValidateSamplingLaboratoryCode(ValidateListValues):
     col_to_check = "sampling_laboratory_code"
 
-    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+    def _get_valid_values(self, data_holder: _DPSTemplateDataHolder):
         return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateSampleOrdererCode(ValidateListValues):
     col_to_check = "sample_orderer_code"
 
-    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+    def _get_valid_values(self, data_holder: _DPSTemplateDataHolder):
         return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateAnalyticalLaboratoryCode(ValidateListValues):
     col_to_check = "analytical_laboratory_code"
 
-    def _get_valid_values(self, data_holder: DPSTemplateDataHolder):
+    def _get_valid_values(self, data_holder: _DPSTemplateDataHolder):
         return nodc_codes.get_labo_list(data_holder.config)
 
 
 class ValidateAllValidationListColumns(Validator):
-    valid_data_holders = ("DPSTemplateDataHolder",)
+    valid_data_holders = ("_DPSTemplateDataHolder",)
 
     @staticmethod
     def get_validator_description() -> str:
@@ -189,7 +189,7 @@ class ValidateAllValidationListColumns(Validator):
             "validations were successful."
         )
 
-    def _validate(self, data_holder: DPSTemplateDataHolder) -> OperatorInfo:
+    def _validate(self, data_holder: _DPSTemplateDataHolder) -> OperatorInfo:
         results = data_holder.checked_validation_list_columns
         validation_cols = set(data_holder.validation_list_columns)
         checked_cols = set(results)
