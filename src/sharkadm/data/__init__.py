@@ -11,6 +11,7 @@ from sharkadm.data.archive import (
     directory_is_archive,
     get_polars_archive_data_holder,
 )
+from sharkadm.data.basevoc import BasevocDataHolder
 from sharkadm.data.data_holder import PolarsDataHolder
 from sharkadm.data.df import (
     PolarsDataFrameDataHolder,

@@ -1,0 +1,1 @@
+from .basevoc import BasevocDataHolder
