@@ -54,13 +54,13 @@ class OdvExporter(PolarsFileExporter):
 
         data = data_holder.data
         existing_columns = set(data.columns)
-
         index_col = data_holder.indexing_column
         measurement_cols = data_holder.data_columns
         metadata_cols = list(self.EXPORT_COLUMN_NAMES)
-
-        # Validate that the required information exists in selected compounds
+        qc_columns = data_holder.qc_columns
         compound = data_holder.selected_compound
+
+        # Validate that the required information exists in selected_compound
         required_compound_fields = (
             "Value column in data file",
             "Parameter",
@@ -78,7 +78,7 @@ class OdvExporter(PolarsFileExporter):
                 f"{', '.join(missing_compound_fields)}"
             )
 
-        # Check that the expected columns exist in the data holder
+        # Validate that the expected columns exist in the data holder
         required_columns = {
             *metadata_cols,
             index_col,
@@ -91,13 +91,15 @@ class OdvExporter(PolarsFileExporter):
                 f"columns: {', '.join(missing_columns)}"
             )
 
-        qc_columns = data_holder.qc_columns
-        expressions = []  # Used to filter the dataframe
+        # Prepare output on format
+        # [metadata_columns*,index_col, index_qc, measurement_col, measurement_qx,...]
+        # A separate list of the output column name is kept because the names of the QC
+        # columns are duplicates, and this is not allowed in polars dataframes
+        expressions = []
         output_column_names = []  # The headers used in the export
 
+        # Metadata
         for col in metadata_cols:
-            output_name = self.EXPORT_COLUMN_NAMES[col]
-
             if col == "sample_iso_datetime":
                 expression = (
                     pl.col(col)
@@ -109,9 +111,9 @@ class OdvExporter(PolarsFileExporter):
                 expression = pl.col(col)
 
             expressions.append(expression)
-            output_column_names.append(output_name)
+            output_column_names.append(self.EXPORT_COLUMN_NAMES[col])
 
-        # Indexing column + create indexing QC column
+        # Index and index QC
         expressions.append(
             pl.col(index_col)
             .cast(pl.String)
@@ -119,12 +121,10 @@ class OdvExporter(PolarsFileExporter):
             .dt.strftime("%Y-%m-%dT%H:%M:%S%.3f")
             .alias(self.export_index_name)
         )
-        output_column_names.append(self.export_index_name)
+        expression.append(pl.col(f"qc_sdn_{index_col}"))
+        output_column_names.extend([self.export_index_name, "QV:SEADATANET"])
 
-        index_qc_col = f"qc_sdn_{index_col}"
-        expressions.append(pl.col(index_qc_col))
-        output_column_names.append("QV:SEADATANET")
-
+        # Measurements
         for col in measurement_cols:
             if col not in qc_columns:
                 raise ValueError(
@@ -133,6 +133,7 @@ class OdvExporter(PolarsFileExporter):
                 )
 
             qc_col = qc_columns[col]
+
             if qc_col not in existing_columns:
                 raise ValueError(
                     f"Cannot export '{data_holder.dataset_name}': missing QC "
@@ -143,14 +144,8 @@ class OdvExporter(PolarsFileExporter):
             unit = compound.get("unit_ODV_label")
             measurement_header = f"{local_name} [{unit}]" if unit else local_name
 
-            expressions.append(pl.col(col))
-            output_column_names.append(measurement_header)
-
-            # Keep original name of QC columns because dupliacted column names are
-            # not allowed in polars dataframe.
-            # Export name of column stored in output_column_names
-            expressions.append(pl.col(qc_col))
-            output_column_names.append("QV:SEADATANET")
+            expressions.extend([pl.col(col), pl.col(qc_col)])
+        output_column_names.extend([measurement_header, "QV:SEADATANET"])
 
         output = data.select(expressions)
         output = output.with_columns(
