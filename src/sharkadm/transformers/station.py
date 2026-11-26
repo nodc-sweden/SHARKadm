@@ -2,6 +2,7 @@ import polars as pl
 
 from sharkadm.data import PolarsDataHolder
 from sharkadm.sharkadm_logger import adm_logger
+from sharkadm.sharkadm_operator import OperatorsInfo, get_single_operators_info
 from sharkadm.transformers.base import PolarsTransformer
 
 nodc_station = None
@@ -98,15 +99,16 @@ class PolarsAddStationInfo(PolarsTransformer):
     def get_transformer_description() -> str:
         return "Adds station information to all places"
 
-    def _transform(self, data_holder: PolarsDataHolder) -> None:
+    def _transform(self, data_holder: PolarsDataHolder) -> OperatorsInfo | None:
         if not nodc_station:
+            msg = 'Package "nodc_station" not found. '
+            "You need to install this dependency if you want to use this "
+            "transformer."
             self._log(
-                'Package "nodc_station" not found. '
-                "You need to install this dependency if you want to use this "
-                "transformer.",
+                msg,
                 level=adm_logger.WARNING,
             )
-            return
+            return get_single_operators_info(msg=msg, success=False)
         self._stations = nodc_station.get_station_object(
             data_holder.config, case_sensitive=self._kwargs.get("case_sensitive", False)
         )
