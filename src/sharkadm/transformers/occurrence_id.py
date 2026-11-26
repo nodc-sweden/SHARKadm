@@ -144,7 +144,7 @@ class AddOccurrenceId(PolarsTransformer):
         self._log(f"Occurrence_id NOT ADDED: {data.get('msg', '')}", level=level)
 
     def _on_other_result(self, data: dict) -> None:
-        level = adm_logger.DEBUG
+        level = adm_logger.WARNING
         self._log(data.get("msg", ""), level=level)
 
     def _on_db_updated(self, data: dict) -> None:
