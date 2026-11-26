@@ -34,6 +34,7 @@ class AddOccurrenceId(PolarsTransformer):
         self,
         *args,
         add_if_valid: bool = False,
+        force_new_occurrences: list[str] | None = None,
         create_backup_db: bool = False,
         inspect_diff_in_winmerge: bool = False,
         sort_db: bool = True,
@@ -41,6 +42,7 @@ class AddOccurrenceId(PolarsTransformer):
     ):
         super().__init__(*args, *kwargs)
         self._add_if_valid = add_if_valid
+        self._force_new_occurrences = force_new_occurrences
         self._create_backup_db = create_backup_db
         self._inspect_diff_in_winmerge = inspect_diff_in_winmerge
         self._sort_db = sort_db
@@ -57,10 +59,12 @@ class AddOccurrenceId(PolarsTransformer):
 
         occurrence_event.subscribe(occurrence_event.Events.PROGRESS, self._on_progress)
         occurrence_event.subscribe(
-            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid
+            occurrence_event.Events.NR_VALID_NOT_ADDED, self._on_valid_not_added
         )
         occurrence_event.subscribe(occurrence_event.Events.NR_NEW, self._on_other_result)
-        occurrence_event.subscribe(occurrence_event.Events.NR_VALID_ADDED, self._on_valid)
+        occurrence_event.subscribe(
+            occurrence_event.Events.NR_VALID_ADDED, self._on_valid_added
+        )
         occurrence_event.subscribe(
             occurrence_event.Events.NR_PERFECT_MATCH, self._on_other_result
         )
@@ -97,8 +101,10 @@ class AddOccurrenceId(PolarsTransformer):
         if self._create_backup_db:
             self._create_db_backup()
 
-        data_holder.data = self.database.add_uuid_to_data_and_database(
-            data_holder.data, add_if_valid=self._add_if_valid
+        data_holder.data = self.database.add_occurrence_id_to_data_and_database(
+            data_holder.data,
+            add_if_valid=self._add_if_valid,
+            force_new_occurrences=self._force_new_occurrences,
         )
 
         if self._svn_commit:
@@ -129,12 +135,16 @@ class AddOccurrenceId(PolarsTransformer):
     def _on_progress(self, data: dict) -> None:
         event.post_event("progress", data)
 
-    def _on_valid(self, data: dict) -> None:
+    def _on_valid_added(self, data: dict) -> None:
         level = adm_logger.WARNING
-        self._log(data.get("msg", ""), level=level)
+        self._log(f"Occurrence_id ADDED: {data.get('msg', '')}", level=level)
+
+    def _on_valid_not_added(self, data: dict) -> None:
+        level = adm_logger.WARNING
+        self._log(f"Occurrence_id NOT ADDED: {data.get('msg', '')}", level=level)
 
     def _on_other_result(self, data: dict) -> None:
-        level = adm_logger.INFO
+        level = adm_logger.DEBUG
         self._log(data.get("msg", ""), level=level)
 
     def _on_db_updated(self, data: dict) -> None:
